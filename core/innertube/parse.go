@@ -1,6 +1,7 @@
 package innertube
 
 import (
+	"slices"
 	"strconv"
 	"strings"
 
@@ -30,10 +31,11 @@ func parseSong(item listItem) (music.Track, bool) {
 
 	segments := splitSegments(item.column(1))
 	return music.Track{
-		VideoID:         videoID,
-		Title:           title,
-		Artists:         parseArtists(segments),
-		Album:           parseAlbum(segments),
+		VideoID: videoID,
+		Title:   title,
+		Artists: parseArtists(segments),
+		// Search puts the album in the subtitle column, the home feed in a column of its own.
+		Album:           parseAlbum(slices.Concat(item.column(1), item.column(2))),
 		DurationSeconds: parseDuration(segments),
 		Thumbnails:      parseThumbnails(item.thumbnails()),
 	}, true
@@ -69,12 +71,10 @@ func isArtistJoiner(text string) bool {
 	return trimmed == "" || trimmed == "," || trimmed == "&"
 }
 
-func parseAlbum(segments [][]run) *music.Album {
-	for _, segment := range segments {
-		for _, textRun := range segment {
-			if textRun.pageType() == pageTypeAlbum {
-				return &music.Album{ID: textRun.browseID(), Name: textRun.Text}
-			}
+func parseAlbum(runs []run) *music.Album {
+	for _, textRun := range runs {
+		if textRun.pageType() == pageTypeAlbum {
+			return &music.Album{ID: textRun.browseID(), Name: textRun.Text}
 		}
 	}
 	return nil
