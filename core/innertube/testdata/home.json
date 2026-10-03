@@ -1,0 +1,395 @@
+{
+	"contents": {
+		"singleColumnBrowseResultsRenderer": {
+			"tabs": [
+				{
+					"tabRenderer": {
+						"content": {
+							"sectionListRenderer": {
+								"contents": [
+									{
+										"musicCarouselShelfRenderer": {
+											"header": {
+												"musicCarouselShelfBasicHeaderRenderer": {
+													"title": {
+														"runs": [
+															{
+																"text": "Throwback"
+															}
+														]
+													}
+												}
+											},
+											"contents": [
+												{
+													"musicTwoRowItemRenderer": {
+														"title": {
+															"runs": [
+																{
+																	"text": "'80s Pop",
+																	"navigationEndpoint": {
+																		"browseEndpoint": {
+																			"browseId": "VLRDCLAK5uy_k1Wu8QbZASiGVqr1wmie9NIYo38aBqscQ",
+																			"browseEndpointContextSupportedConfigs": {
+																				"browseEndpointContextMusicConfig": {
+																					"pageType": "MUSIC_PAGE_TYPE_PLAYLIST"
+																				}
+																			}
+																		}
+																	}
+																}
+															]
+														},
+														"subtitle": {
+															"runs": [
+																{
+																	"text": "George Michael"
+																},
+																{
+																	"text": ", "
+																},
+																{
+																	"text": "Madonna"
+																},
+																{
+																	"text": ", "
+																},
+																{
+																	"text": "Michael Jackson"
+																},
+																{
+																	"text": ", "
+																},
+																{
+																	"text": "Erasure"
+																}
+															]
+														},
+														"navigationEndpoint": {
+															"browseEndpoint": {
+																"browseId": "VLRDCLAK5uy_k1Wu8QbZASiGVqr1wmie9NIYo38aBqscQ",
+																"browseEndpointContextSupportedConfigs": {
+																	"browseEndpointContextMusicConfig": {
+																		"pageType": "MUSIC_PAGE_TYPE_PLAYLIST"
+																	}
+																}
+															}
+														},
+														"thumbnailRenderer": {
+															"musicThumbnailRenderer": {
+																"thumbnail": {
+																	"thumbnails": [
+																		{
+																			"url": "https://yt3.googleusercontent.com/zcEHBRn_jSdT3KRb-i1ociI4xOAVqxZj_ct12X0oWneK-HUcY0WkJVyAJa0p9KNKmIUrKBjzPfTzrms=w226-h226-l90-rj",
+																			"width": 226,
+																			"height": 226
+																		},
+																		{
+																			"url": "https://yt3.googleusercontent.com/zcEHBRn_jSdT3KRb-i1ociI4xOAVqxZj_ct12X0oWneK-HUcY0WkJVyAJa0p9KNKmIUrKBjzPfTzrms=w544-h544-l90-rj",
+																			"width": 544,
+																			"height": 544
+																		}
+																	]
+																}
+															}
+														}
+													}
+												},
+												{
+													"musicTwoRowItemRenderer": {
+														"title": {
+															"runs": [
+																{
+																	"text": "80s Sing-Alongs",
+																	"navigationEndpoint": {
+																		"browseEndpoint": {
+																			"browseId": "VLRDCLAK5uy_kmPuJ7R7b9mIaF6otQaKbtFl2x94n9FDw",
+																			"browseEndpointContextSupportedConfigs": {
+																				"browseEndpointContextMusicConfig": {
+																					"pageType": "MUSIC_PAGE_TYPE_PLAYLIST"
+																				}
+																			}
+																		}
+																	}
+																}
+															]
+														},
+														"subtitle": {
+															"runs": [
+																{
+																	"text": "Kim Wilde"
+																},
+																{
+																	"text": ", "
+																},
+																{
+																	"text": "a-ha"
+																},
+																{
+																	"text": ", "
+																},
+																{
+																	"text": "Tiffany"
+																},
+																{
+																	"text": ", "
+																},
+																{
+																	"text": "The Communards"
+																}
+															]
+														},
+														"navigationEndpoint": {
+															"browseEndpoint": {
+																"browseId": "VLRDCLAK5uy_kmPuJ7R7b9mIaF6otQaKbtFl2x94n9FDw",
+																"browseEndpointContextSupportedConfigs": {
+																	"browseEndpointContextMusicConfig": {
+																		"pageType": "MUSIC_PAGE_TYPE_PLAYLIST"
+																	}
+																}
+															}
+														},
+														"thumbnailRenderer": {
+															"musicThumbnailRenderer": {
+																"thumbnail": {
+																	"thumbnails": [
+																		{
+																			"url": "https://yt3.googleusercontent.com/E2aCwodafktnEC0d2BBuiei659e_GY9jZbrXG8VVE_GrmSqkkXXlBJpmQ5mUCuhzpuhdiKRlxPu4Mclk=w226-h226-l90-rj",
+																			"width": 226,
+																			"height": 226
+																		},
+																		{
+																			"url": "https://yt3.googleusercontent.com/E2aCwodafktnEC0d2BBuiei659e_GY9jZbrXG8VVE_GrmSqkkXXlBJpmQ5mUCuhzpuhdiKRlxPu4Mclk=w544-h544-l90-rj",
+																			"width": 544,
+																			"height": 544
+																		}
+																	]
+																}
+															}
+														}
+													}
+												}
+											]
+										}
+									},
+									{
+										"musicCarouselShelfRenderer": {
+											"header": {
+												"musicCarouselShelfBasicHeaderRenderer": {
+													"title": {
+														"runs": [
+															{
+																"text": "Quick picks"
+															}
+														]
+													}
+												}
+											},
+											"contents": [
+												{
+													"musicResponsiveListItemRenderer": {
+														"playlistItemData": {
+															"videoId": "G-C9t4MLrbA"
+														},
+														"thumbnail": {
+															"musicThumbnailRenderer": {
+																"thumbnail": {
+																	"thumbnails": [
+																		{
+																			"url": "https://yt3.googleusercontent.com/DNFuGZeuZ7vGTxa49zFs3YNAwA-TOTVXYRFqPt3RQGmq0vK2zbLyTxJHxc88dShIoQrfQUiIugawXoK_=w60-h60-l90-rj",
+																			"width": 60,
+																			"height": 60
+																		},
+																		{
+																			"url": "https://yt3.googleusercontent.com/DNFuGZeuZ7vGTxa49zFs3YNAwA-TOTVXYRFqPt3RQGmq0vK2zbLyTxJHxc88dShIoQrfQUiIugawXoK_=w120-h120-l90-rj",
+																			"width": 120,
+																			"height": 120
+																		}
+																	]
+																}
+															}
+														},
+														"flexColumns": [
+															{
+																"musicResponsiveListItemFlexColumnRenderer": {
+																	"text": {
+																		"runs": [
+																			{
+																				"text": "Cleveland!"
+																			}
+																		]
+																	}
+																}
+															},
+															{
+																"musicResponsiveListItemFlexColumnRenderer": {
+																	"text": {
+																		"runs": [
+																			{
+																				"text": "Taylor Swift",
+																				"navigationEndpoint": {
+																					"browseEndpoint": {
+																						"browseId": "UCPC0L1d253x-KuMNwa05TpA",
+																						"browseEndpointContextSupportedConfigs": {
+																							"browseEndpointContextMusicConfig": {
+																								"pageType": "MUSIC_PAGE_TYPE_ARTIST"
+																							}
+																						}
+																					}
+																				}
+																			},
+																			{
+																				"text": " • "
+																			},
+																			{
+																				"text": "8.3M plays"
+																			}
+																		]
+																	}
+																}
+															},
+															{
+																"musicResponsiveListItemFlexColumnRenderer": {
+																	"text": {
+																		"runs": [
+																			{
+																				"text": "The Life of a Showgirl: The Encore",
+																				"navigationEndpoint": {
+																					"browseEndpoint": {
+																						"browseId": "MPREb_L64BnYDQpHZ",
+																						"browseEndpointContextSupportedConfigs": {
+																							"browseEndpointContextMusicConfig": {
+																								"pageType": "MUSIC_PAGE_TYPE_ALBUM"
+																							}
+																						}
+																					}
+																				}
+																			}
+																		]
+																	}
+																}
+															}
+														]
+													}
+												},
+												{
+													"musicResponsiveListItemRenderer": {
+														"playlistItemData": {
+															"videoId": "eJFi2TK5174"
+														},
+														"thumbnail": {
+															"musicThumbnailRenderer": {
+																"thumbnail": {
+																	"thumbnails": [
+																		{
+																			"url": "https://yt3.googleusercontent.com/3FPUVAjcpcScmksLnEZYdP9k1UB0PhwEJpGx-8CDeWhW6cR3Ib9lt5m25PAVpGrjdEK3Yjh_IYvOsTAN=w60-h60-l90-rj",
+																			"width": 60,
+																			"height": 60
+																		},
+																		{
+																			"url": "https://yt3.googleusercontent.com/3FPUVAjcpcScmksLnEZYdP9k1UB0PhwEJpGx-8CDeWhW6cR3Ib9lt5m25PAVpGrjdEK3Yjh_IYvOsTAN=w120-h120-l90-rj",
+																			"width": 120,
+																			"height": 120
+																		}
+																	]
+																}
+															}
+														},
+														"flexColumns": [
+															{
+																"musicResponsiveListItemFlexColumnRenderer": {
+																	"text": {
+																		"runs": [
+																			{
+																				"text": "Solar Eclipse"
+																			}
+																		]
+																	}
+																}
+															},
+															{
+																"musicResponsiveListItemFlexColumnRenderer": {
+																	"text": {
+																		"runs": [
+																			{
+																				"text": "Drake",
+																				"navigationEndpoint": {
+																					"browseEndpoint": {
+																						"browseId": "UCU6cE7pdJPc6DU2jSrKEsdQ",
+																						"browseEndpointContextSupportedConfigs": {
+																							"browseEndpointContextMusicConfig": {
+																								"pageType": "MUSIC_PAGE_TYPE_ARTIST"
+																							}
+																						}
+																					}
+																				}
+																			},
+																			{
+																				"text": " & "
+																			},
+																			{
+																				"text": "Don Toliver",
+																				"navigationEndpoint": {
+																					"browseEndpoint": {
+																						"browseId": "UCSzWQmDsKG37iKN2vw1G-2Q",
+																						"browseEndpointContextSupportedConfigs": {
+																							"browseEndpointContextMusicConfig": {
+																								"pageType": "MUSIC_PAGE_TYPE_ARTIST"
+																							}
+																						}
+																					}
+																				}
+																			},
+																			{
+																				"text": " • "
+																			},
+																			{
+																				"text": "6.2M plays"
+																			}
+																		]
+																	}
+																}
+															},
+															{
+																"musicResponsiveListItemFlexColumnRenderer": {
+																	"text": {
+																		"runs": [
+																			{
+																				"text": "HABIBTI (FOMO)",
+																				"navigationEndpoint": {
+																					"browseEndpoint": {
+																						"browseId": "MPREb_L2anhKI1Knd",
+																						"browseEndpointContextSupportedConfigs": {
+																							"browseEndpointContextMusicConfig": {
+																								"pageType": "MUSIC_PAGE_TYPE_ALBUM"
+																							}
+																						}
+																					}
+																				}
+																			}
+																		]
+																	}
+																}
+															}
+														]
+													}
+												}
+											]
+										}
+									}
+								],
+								"continuations": [
+									{
+										"nextContinuationData": {
+											"continuation": "fixture-continuation-token"
+										}
+									}
+								]
+							}
+						}
+					}
+				}
+			]
+		}
+	}
+}

@@ -1,0 +1,369 @@
+{
+	"contents": {
+		"singleColumnBrowseResultsRenderer": {
+			"tabs": [
+				{
+					"tabRenderer": {
+						"title": "Home"
+					}
+				}
+			]
+		}
+	},
+	"continuationContents": {
+		"sectionListContinuation": {
+			"contents": [
+				{
+					"musicCarouselShelfRenderer": {
+						"header": {
+							"musicCarouselShelfBasicHeaderRenderer": {
+								"title": {
+									"runs": [
+										{
+											"text": "New releases"
+										}
+									]
+								}
+							}
+						},
+						"contents": [
+							{
+								"musicTwoRowItemRenderer": {
+									"title": {
+										"runs": [
+											{
+												"text": "Dance With Me",
+												"navigationEndpoint": {
+													"browseEndpoint": {
+														"browseId": "MPREb_zJXCvnQsnxE",
+														"browseEndpointContextSupportedConfigs": {
+															"browseEndpointContextMusicConfig": {
+																"pageType": "MUSIC_PAGE_TYPE_ALBUM"
+															}
+														}
+													}
+												}
+											}
+										]
+									},
+									"subtitle": {
+										"runs": [
+											{
+												"text": "Single"
+											},
+											{
+												"text": " • "
+											},
+											{
+												"text": "Bruno Mars",
+												"navigationEndpoint": {
+													"browseEndpoint": {
+														"browseId": "UCZn4r7heNOPY-C43YIywnVA",
+														"browseEndpointContextSupportedConfigs": {
+															"browseEndpointContextMusicConfig": {
+																"pageType": "MUSIC_PAGE_TYPE_ARTIST"
+															}
+														}
+													}
+												}
+											}
+										]
+									},
+									"navigationEndpoint": {
+										"browseEndpoint": {
+											"browseId": "MPREb_zJXCvnQsnxE",
+											"browseEndpointContextSupportedConfigs": {
+												"browseEndpointContextMusicConfig": {
+													"pageType": "MUSIC_PAGE_TYPE_ALBUM"
+												}
+											}
+										}
+									},
+									"thumbnailRenderer": {
+										"musicThumbnailRenderer": {
+											"thumbnail": {
+												"thumbnails": [
+													{
+														"url": "https://yt3.googleusercontent.com/MnppmGGQeh_hMbVObvZTtoYEBIsk6ctVYq9SnV14reJIcrug7WWPouSLOacx5A6d5aDzh9vq4vC1BSw7=w226-h226-l90-rj",
+														"width": 226,
+														"height": 226
+													},
+													{
+														"url": "https://yt3.googleusercontent.com/MnppmGGQeh_hMbVObvZTtoYEBIsk6ctVYq9SnV14reJIcrug7WWPouSLOacx5A6d5aDzh9vq4vC1BSw7=w544-h544-l90-rj",
+														"width": 544,
+														"height": 544
+													}
+												]
+											}
+										}
+									}
+								}
+							},
+							{
+								"musicTwoRowItemRenderer": {
+									"title": {
+										"runs": [
+											{
+												"text": "Unshatter Film Soundtrack (Live in São Paulo)",
+												"navigationEndpoint": {
+													"browseEndpoint": {
+														"browseId": "MPREb_wEEmZQjogFh",
+														"browseEndpointContextSupportedConfigs": {
+															"browseEndpointContextMusicConfig": {
+																"pageType": "MUSIC_PAGE_TYPE_ALBUM"
+															}
+														}
+													}
+												}
+											}
+										]
+									},
+									"subtitle": {
+										"runs": [
+											{
+												"text": "Album"
+											},
+											{
+												"text": " • "
+											},
+											{
+												"text": "Linkin Park",
+												"navigationEndpoint": {
+													"browseEndpoint": {
+														"browseId": "UCxgN32UVVztKAQd2HkXzBtw",
+														"browseEndpointContextSupportedConfigs": {
+															"browseEndpointContextMusicConfig": {
+																"pageType": "MUSIC_PAGE_TYPE_ARTIST"
+															}
+														}
+													}
+												}
+											}
+										]
+									},
+									"navigationEndpoint": {
+										"browseEndpoint": {
+											"browseId": "MPREb_wEEmZQjogFh",
+											"browseEndpointContextSupportedConfigs": {
+												"browseEndpointContextMusicConfig": {
+													"pageType": "MUSIC_PAGE_TYPE_ALBUM"
+												}
+											}
+										}
+									},
+									"thumbnailRenderer": {
+										"musicThumbnailRenderer": {
+											"thumbnail": {
+												"thumbnails": [
+													{
+														"url": "https://yt3.googleusercontent.com/hBCJTsmq_mIgRkrR0qG2nUxOgBDAujZqDTHF2gVDNI6vN8AwRzbjPJolXZ_vrrmkaylHSiYfSElPqfso=w226-h226-l90-rj",
+														"width": 226,
+														"height": 226
+													},
+													{
+														"url": "https://yt3.googleusercontent.com/hBCJTsmq_mIgRkrR0qG2nUxOgBDAujZqDTHF2gVDNI6vN8AwRzbjPJolXZ_vrrmkaylHSiYfSElPqfso=w544-h544-l90-rj",
+														"width": 544,
+														"height": 544
+													}
+												]
+											}
+										}
+									}
+								}
+							}
+						]
+					}
+				},
+				{
+					"musicCarouselShelfRenderer": {
+						"header": {
+							"musicCarouselShelfBasicHeaderRenderer": {
+								"title": {
+									"runs": [
+										{
+											"text": "Trending songs for you"
+										}
+									]
+								}
+							}
+						},
+						"contents": [
+							{
+								"musicResponsiveListItemRenderer": {
+									"playlistItemData": {
+										"videoId": "cCvLt6gqAIA"
+									},
+									"thumbnail": {
+										"musicThumbnailRenderer": {
+											"thumbnail": {
+												"thumbnails": [
+													{
+														"url": "https://yt3.googleusercontent.com/DNFuGZeuZ7vGTxa49zFs3YNAwA-TOTVXYRFqPt3RQGmq0vK2zbLyTxJHxc88dShIoQrfQUiIugawXoK_=w60-h60-l90-rj",
+														"width": 60,
+														"height": 60
+													},
+													{
+														"url": "https://yt3.googleusercontent.com/DNFuGZeuZ7vGTxa49zFs3YNAwA-TOTVXYRFqPt3RQGmq0vK2zbLyTxJHxc88dShIoQrfQUiIugawXoK_=w120-h120-l90-rj",
+														"width": 120,
+														"height": 120
+													}
+												]
+											}
+										}
+									},
+									"flexColumns": [
+										{
+											"musicResponsiveListItemFlexColumnRenderer": {
+												"text": {
+													"runs": [
+														{
+															"text": "Babylon"
+														}
+													]
+												}
+											}
+										},
+										{
+											"musicResponsiveListItemFlexColumnRenderer": {
+												"text": {
+													"runs": [
+														{
+															"text": "Taylor Swift",
+															"navigationEndpoint": {
+																"browseEndpoint": {
+																	"browseId": "UCPC0L1d253x-KuMNwa05TpA",
+																	"browseEndpointContextSupportedConfigs": {
+																		"browseEndpointContextMusicConfig": {
+																			"pageType": "MUSIC_PAGE_TYPE_ARTIST"
+																		}
+																	}
+																}
+															}
+														},
+														{
+															"text": " • "
+														},
+														{
+															"text": "8.9M plays"
+														}
+													]
+												}
+											}
+										},
+										{
+											"musicResponsiveListItemFlexColumnRenderer": {
+												"text": {
+													"runs": [
+														{
+															"text": "The Life of a Showgirl: The Encore",
+															"navigationEndpoint": {
+																"browseEndpoint": {
+																	"browseId": "MPREb_L64BnYDQpHZ",
+																	"browseEndpointContextSupportedConfigs": {
+																		"browseEndpointContextMusicConfig": {
+																			"pageType": "MUSIC_PAGE_TYPE_ALBUM"
+																		}
+																	}
+																}
+															}
+														}
+													]
+												}
+											}
+										}
+									]
+								}
+							},
+							{
+								"musicResponsiveListItemRenderer": {
+									"playlistItemData": {
+										"videoId": "9FHuWije2VE"
+									},
+									"thumbnail": {
+										"musicThumbnailRenderer": {
+											"thumbnail": {
+												"thumbnails": [
+													{
+														"url": "https://yt3.googleusercontent.com/DNFuGZeuZ7vGTxa49zFs3YNAwA-TOTVXYRFqPt3RQGmq0vK2zbLyTxJHxc88dShIoQrfQUiIugawXoK_=w60-h60-l90-rj",
+														"width": 60,
+														"height": 60
+													},
+													{
+														"url": "https://yt3.googleusercontent.com/DNFuGZeuZ7vGTxa49zFs3YNAwA-TOTVXYRFqPt3RQGmq0vK2zbLyTxJHxc88dShIoQrfQUiIugawXoK_=w120-h120-l90-rj",
+														"width": 120,
+														"height": 120
+													}
+												]
+											}
+										}
+									},
+									"flexColumns": [
+										{
+											"musicResponsiveListItemFlexColumnRenderer": {
+												"text": {
+													"runs": [
+														{
+															"text": "Pink Clouding"
+														}
+													]
+												}
+											}
+										},
+										{
+											"musicResponsiveListItemFlexColumnRenderer": {
+												"text": {
+													"runs": [
+														{
+															"text": "Taylor Swift",
+															"navigationEndpoint": {
+																"browseEndpoint": {
+																	"browseId": "UCPC0L1d253x-KuMNwa05TpA",
+																	"browseEndpointContextSupportedConfigs": {
+																		"browseEndpointContextMusicConfig": {
+																			"pageType": "MUSIC_PAGE_TYPE_ARTIST"
+																		}
+																	}
+																}
+															}
+														},
+														{
+															"text": " • "
+														},
+														{
+															"text": "7.7M plays"
+														}
+													]
+												}
+											}
+										},
+										{
+											"musicResponsiveListItemFlexColumnRenderer": {
+												"text": {
+													"runs": [
+														{
+															"text": "The Life of a Showgirl: The Encore",
+															"navigationEndpoint": {
+																"browseEndpoint": {
+																	"browseId": "MPREb_L64BnYDQpHZ",
+																	"browseEndpointContextSupportedConfigs": {
+																		"browseEndpointContextMusicConfig": {
+																			"pageType": "MUSIC_PAGE_TYPE_ALBUM"
+																		}
+																	}
+																}
+															}
+														}
+													]
+												}
+											}
+										}
+									]
+								}
+							}
+						]
+					}
+				}
+			]
+		}
+	}
+}

@@ -88,6 +88,16 @@ func (app *App) SearchSongs(query string) ([]music.Track, error) {
 	return app.innertube.SearchSongs(app.ctx, query)
 }
 
+// Home returns the first page of the home feed.
+func (app *App) Home() (music.HomePage, error) {
+	return app.innertube.Home(app.ctx)
+}
+
+// HomeContinuation returns the home feed page that continuation points to.
+func (app *App) HomeContinuation(continuation string) (music.HomePage, error) {
+	return app.innertube.HomeContinuation(app.ctx, continuation)
+}
+
 // StreamURL returns the URL an <audio> element plays videoID from.
 func (app *App) StreamURL(videoID string) string {
 	return app.streamBaseURL + stream.Path(videoID)

@@ -11,7 +11,7 @@ You're allowed to use git. Every time you make a big change, commit the current 
 ```
 core/               Go module github.com/neoworks/otter-music/core: the shared, UI-free core
   music/            domain types (Track, Artist, Album, Thumbnail): the one data shape every app sees
-  innertube/        InnerTube client: client profiles, visitor ID, search, player; testdata/ holds trimmed real responses
+  innertube/        InnerTube client: client profiles, visitor ID, search, home feed, player; testdata/ holds trimmed real responses
   stream/           resolver (profile chain → best audio URL, cached until expiry) + local HTTP proxy
 apps/desktop/       Wails v2 app (Go module …/apps/desktop), binds core to the webview
   frontend/         SvelteKit 3 + Tailwind 4 UI (static SPA, embedded into the binary)
@@ -30,7 +30,7 @@ apps/ios/           planned: Swift + SwiftUI + AVPlayer, core via gomobile xcfra
 
 ### YouTube extraction (three layers)
 
-1. **Metadata**: InnerTube JSON (search, browse, next) via the `WEB_REMIX` profile. Response structs model only the fields the parsers read; encoding/json matches InnerTube's camelCase keys case-insensitively, so they need no tags.
+1. **Metadata**: InnerTube JSON (search, browse, next) via the `WEB_REMIX` profile. The home feed is `browse` `FEmusic_home` plus continuations; continuation responses also carry an empty tab skeleton, so parse `continuationContents` first. Response structs model only the fields the parsers read; encoding/json matches InnerTube's camelCase keys case-insensitively, so they need no tags.
 2. **Stream URLs**: `player` requests via the `VISIONOS` profile, which returns plain, unciphered URLs that download fully without a PoToken (yt-dlp's default client without a JS runtime). Every request needs a visitor ID (`visitor_id` endpoint, fetched once per client); without it YouTube answers "Sign in to confirm you're not a bot". Stream URLs are bound to the requesting IP and expire after ~6 h.
 3. **PoToken + cipher** (not built, not needed today): `WEB` is SABR-only, `tv` needs a TV session and `web_embedded` rejects music tracks, so there is no ciphered fallback client worth supporting right now. If `VISIONOS` dies, the fallback is yt-dlp's solver ([yt-dlp/ejs](https://github.com/yt-dlp/ejs), Unlicense) plus BotGuard, both run **in the platform webview** (Wails WebKit, Android WebView, WKWebView) behind an interface in core. Not goja: it could not finish solving one player.js (~3 MB) in 5 minutes.
 

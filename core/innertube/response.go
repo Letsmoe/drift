@@ -4,8 +4,9 @@ package innertube
 // field names case-insensitively, so InnerTube's camelCase keys need no tags.
 
 const (
-	pageTypeArtist = "MUSIC_PAGE_TYPE_ARTIST"
-	pageTypeAlbum  = "MUSIC_PAGE_TYPE_ALBUM"
+	pageTypeArtist   = "MUSIC_PAGE_TYPE_ARTIST"
+	pageTypeAlbum    = "MUSIC_PAGE_TYPE_ALBUM"
+	pageTypePlaylist = "MUSIC_PAGE_TYPE_PLAYLIST"
 )
 
 type searchResponse struct {
@@ -14,12 +15,19 @@ type searchResponse struct {
 			Tabs []struct {
 				TabRenderer struct {
 					Content struct {
-						SectionListRenderer struct {
-							Contents []section
-						}
+						SectionListRenderer sectionList
 					}
 				}
 			}
+		}
+	}
+}
+
+type sectionList struct {
+	Contents      []section
+	Continuations []struct {
+		NextContinuationData struct {
+			Continuation string
 		}
 	}
 }
@@ -30,6 +38,7 @@ type section struct {
 			MusicResponsiveListItemRenderer *listItem
 		}
 	}
+	MusicCarouselShelfRenderer *carouselShelf
 }
 
 type listItem struct {
@@ -65,6 +74,9 @@ type run struct {
 
 type navigationEndpoint struct {
 	BrowseEndpoint *browseEndpoint
+	WatchEndpoint  *struct {
+		VideoID string
+	}
 }
 
 type browseEndpoint struct {
@@ -131,7 +143,10 @@ func (textRun run) browseID() string {
 }
 
 func (textRun run) pageType() string {
-	endpoint := textRun.browseEndpoint()
+	return textRun.browseEndpoint().pageType()
+}
+
+func (endpoint *browseEndpoint) pageType() string {
 	if endpoint == nil {
 		return ""
 	}
