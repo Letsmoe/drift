@@ -4,7 +4,6 @@ import { describeError } from '#lib/format.ts';
 export type SearchStatus = 'idle' | 'loading' | 'done' | 'failed';
 
 export class SongSearch {
-	query = $state('');
 	tracks = $state<Track[]>([]);
 	status = $state<SearchStatus>('idle');
 	errorMessage = $state('');
@@ -12,9 +11,10 @@ export class SongSearch {
 	// Responses can arrive out of order; only the latest request may update state.
 	#latestRequestId = 0;
 
-	async submit(): Promise<void> {
-		const query = this.query.trim();
-		if (query === '') {
+	async run(query: string): Promise<void> {
+		const trimmedQuery = query.trim();
+		if (trimmedQuery === '') {
+			this.status = 'idle';
 			return;
 		}
 
@@ -23,7 +23,7 @@ export class SongSearch {
 		this.status = 'loading';
 
 		try {
-			const tracks = await searchSongs(query);
+			const tracks = await searchSongs(trimmedQuery);
 			if (requestId === this.#latestRequestId) {
 				this.#showResults(tracks);
 			}
