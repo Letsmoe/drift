@@ -1,0 +1,27 @@
+{
+	"name": "otter-music",
+	"private": true,
+	"type": "module",
+	"workspaces": [
+		"apps/desktop/frontend"
+	],
+	"scripts": {
+		"desktop:dev": "cd apps/desktop && wails dev -tags webkit2_41",
+		"desktop:build": "cd apps/desktop && wails build -tags webkit2_41",
+		"desktop:start": "./apps/desktop/build/bin/otter-music",
+		"desktop:install": "bun run desktop:build && bun scripts/install-desktop.ts",
+		"bindings": "cd apps/desktop && wails generate module -tags webkit2_41",
+		"test": "cd core && go test ./...",
+		"lint": "bun run lint:go && bun run lint:frontend",
+		"lint:go": "cd core && golangci-lint run && cd ../apps/desktop && golangci-lint run --build-tags webkit2_41",
+		"lint:frontend": "prettier --check . && cd apps/desktop/frontend && bun run lint && bun run check",
+		"format": "bun run format:go && prettier --write .",
+		"format:go": "cd core && golangci-lint fmt && cd ../apps/desktop && golangci-lint fmt",
+		"tools": "go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest"
+	},
+	"devDependencies": {
+		"prettier": "^3.9.9",
+		"prettier-plugin-svelte": "^4.1.1",
+		"prettier-plugin-tailwindcss": "^0.8.1"
+	}
+}
