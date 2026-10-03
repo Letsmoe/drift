@@ -36,7 +36,7 @@ apps/ios/           planned: Swift + SwiftUI + AVPlayer, core via gomobile xcfra
 
 Profile identities (versions, user agents) mirror yt-dlp's `INNERTUBE_CLIENTS` in `yt_dlp/extractor/youtube/_base.py`; when YouTube rejects a profile, check there first.
 
-**Playback path:** `<audio src>` → `StreamURL(videoId)` → loopback proxy `GET /stream/{videoId}` → resolver → CDN. The proxy forwards `Range` for seeking and re-resolves once when the CDN answers 403/410. Desktop serves it on `127.0.0.1:<random>` instead of the Wails asset server because WebKitGTK's media pipeline does not seek reliably over custom URI schemes. Mobile will reuse the same proxy.
+**Playback path:** `<audio src>` → `StreamURL(videoId)` → loopback proxy `GET /stream/{videoId}` → resolver → CDN. The proxy forwards `Range` for seeking and re-resolves once when the CDN answers 403/410. It always sends a `Range` upstream (`bytes=0-` when the player sends none, as GStreamer does on its first request): without one the CDN throttles to about playback speed and songs take seconds to start. Set `OTTER_MUSIC_LOG=debug` to log every stream request. Desktop serves it on `127.0.0.1:<random>` instead of the Wails asset server because WebKitGTK's media pipeline does not seek reliably over custom URI schemes. Mobile will reuse the same proxy.
 
 Don't copy code from zemer-cipher or InnerTubeX (GPL-3.0, would make this app GPL) or MetrolistGroup/faraday (no license). Read them for reference only.
 
