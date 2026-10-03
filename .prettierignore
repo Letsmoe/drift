@@ -1,0 +1,9 @@
+node_modules
+build
+dist
+.svelte-kit
+storybook-static
+bun.lock
+graft
+apps/desktop/frontend/src/lib/wailsjs
+.claude

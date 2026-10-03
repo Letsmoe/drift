@@ -1,0 +1,10 @@
+{
+	"extends": "$app/tsconfig",
+	"compilerOptions": {
+		// Only generated Wails bindings are JavaScript; their .d.ts files carry the types.
+		"allowJs": false,
+		"checkJs": false,
+		"strict": true
+	},
+	"include": ["src", "*"]
+}

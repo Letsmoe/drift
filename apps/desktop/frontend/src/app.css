@@ -1,0 +1,5 @@
+@import 'tailwindcss';
+@import '@neoworks-dev/ui/styles';
+
+/* Tailwind skips node_modules; scan the linked ui components for their classes. */
+@source '../node_modules/@neoworks-dev/ui/src';
