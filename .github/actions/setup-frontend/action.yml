@@ -1,0 +1,32 @@
+name: Set up frontend
+description: >
+  Check out neoworks.dev next to this repo, bun-link its ui and config packages
+  the way a local checkout does, and install the desktop frontend.
+inputs:
+  neoworks-dev-token:
+    description: Read token for the private neoworks-dev/neoworks.dev repository.
+    required: true
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@v7
+      with:
+        repository: neoworks-dev/neoworks.dev
+        token: ${{ inputs.neoworks-dev-token }}
+        path: neoworks.dev
+        sparse-checkout: packages
+    - uses: oven-sh/setup-bun@v2
+    - name: Link design system packages
+      shell: bash
+      run: |
+        (cd neoworks.dev/packages/ui && bun link)
+        (cd neoworks.dev/packages/config && bun link)
+    - name: Install dependencies
+      shell: bash
+      working-directory: otter-music
+      run: bun install --frozen-lockfile
+    - name: Resolve ui's dependencies from the frontend
+      shell: bash
+      # Locally neoworks.dev has its own node_modules; installing that whole
+      # monorepo in CI is not worth it, so ui borrows the frontend's svelte & co.
+      run: ln -s "$GITHUB_WORKSPACE/otter-music/apps/desktop/frontend/node_modules" neoworks.dev/packages/ui/node_modules

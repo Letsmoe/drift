@@ -11,7 +11,8 @@ You're allowed to use git. Every time you make a big change, commit the current 
 ```
 core/               Go module github.com/neoworks/otter-music/core: the shared, UI-free core
   music/            domain types (Track, Artist, Album, Thumbnail): the one data shape every app sees
-  innertube/        YouTube Music InnerTube client (WEB_REMIX); testdata/ holds trimmed real responses
+  innertube/        InnerTube client: client profiles, visitor ID, search, player; testdata/ holds trimmed real responses
+  stream/           resolver (profile chain → best audio URL, cached until expiry) + local HTTP proxy
 apps/desktop/       Wails v2 app (Go module …/apps/desktop), binds core to the webview
   frontend/         SvelteKit 3 + Tailwind 4 UI (static SPA, embedded into the binary)
 apps/android/       planned: Kotlin + Jetpack Compose + Media3, core via gomobile .aar
@@ -22,18 +23,22 @@ apps/ios/           planned: Swift + SwiftUI + AVPlayer, core via gomobile xcfra
 
 ## Architecture
 
-- **Core is a library, not a backend.** No HTTP server, no GraphQL. Desktop calls it through Wails bindings; mobile will call it through gomobile. Keep all logic (search, queue, stream resolving, caching, recommendations) in `core` so the three UIs only display data.
+- **Core is a library, not a backend.** No API server, no GraphQL; the only HTTP server is the loopback stream proxy. Desktop calls it through Wails bindings; mobile will call it through gomobile. Keep all logic (search, queue, stream resolving, caching, recommendations) in `core` so the three UIs only display data.
 - **Core API is idiomatic Go.** gomobile can't export slices or most structs; a thin adapter package (e.g. `core/mobile`) will wrap the API for mobile later. Don't bend `core` itself around gomobile.
 - **Separate UIs per platform.** Desktop is Svelte, Android is Compose, iOS is SwiftUI. Don't share UI code between them; share data shapes through `core/music`.
 - **Domain types carry camelCase JSON tags.** Wails generates the TypeScript models from them (`frontend/src/lib/wailsjs/go/models.ts`).
 
 ### YouTube extraction (three layers)
 
-1. **Metadata**: InnerTube JSON (search, browse, next). Implemented in `core/innertube`. Response structs model only the fields the parsers read; encoding/json matches InnerTube's camelCase keys case-insensitively, so they need no tags.
-2. **Stream URLs** (not built yet): player request + `sig`/`n` deciphering by running parts of YouTube's `player.js` in goja. Use the per-player cipher configs published by MetrolistGroup/faraday instead of maintaining our own.
-3. **PoToken** (not built yet): BotGuard needs a real browser environment. Core will define a token-provider interface that each platform implements with its webview (Wails webview, Android WebView, WKWebView).
+1. **Metadata**: InnerTube JSON (search, browse, next) via the `WEB_REMIX` profile. Response structs model only the fields the parsers read; encoding/json matches InnerTube's camelCase keys case-insensitively, so they need no tags.
+2. **Stream URLs**: `player` requests via the `VISIONOS` profile, which returns plain, unciphered URLs that download fully without a PoToken (yt-dlp's default client without a JS runtime). Every request needs a visitor ID (`visitor_id` endpoint, fetched once per client); without it YouTube answers "Sign in to confirm you're not a bot". Stream URLs are bound to the requesting IP and expire after ~6 h.
+3. **PoToken + cipher** (not built, not needed today): `WEB` is SABR-only, `tv` needs a TV session and `web_embedded` rejects music tracks, so there is no ciphered fallback client worth supporting right now. If `VISIONOS` dies, the fallback is yt-dlp's solver ([yt-dlp/ejs](https://github.com/yt-dlp/ejs), Unlicense) plus BotGuard, both run **in the platform webview** (Wails WebKit, Android WebView, WKWebView) behind an interface in core. Not goja: it could not finish solving one player.js (~3 MB) in 5 minutes.
 
-zemer-cipher and InnerTubeX are GPL-3.0. Read them for reference; copying their code makes this app GPL.
+Profile identities (versions, user agents) mirror yt-dlp's `INNERTUBE_CLIENTS` in `yt_dlp/extractor/youtube/_base.py`; when YouTube rejects a profile, check there first.
+
+**Playback path:** `<audio src>` → `StreamURL(videoId)` → loopback proxy `GET /stream/{videoId}` → resolver → CDN. The proxy forwards `Range` for seeking and re-resolves once when the CDN answers 403/410. Desktop serves it on `127.0.0.1:<random>` instead of the Wails asset server because WebKitGTK's media pipeline does not seek reliably over custom URI schemes. Mobile will reuse the same proxy.
+
+Don't copy code from zemer-cipher or InnerTubeX (GPL-3.0, would make this app GPL) or MetrolistGroup/faraday (no license). Read them for reference only.
 
 ## Commands
 
@@ -49,12 +54,18 @@ Run from the repo root:
 | `bun run desktop:install` | build, then install for the current user (`scripts/install-desktop.ts`: Linux → `~/.local/bin` + desktop entry, macOS → `/Applications`) |
 | `bun run bindings`        | regenerate `frontend/src/lib/wailsjs` after changing bound Go methods                                                                    |
 | `bun run test`            | Go tests for core                                                                                                                        |
+| `bun run test:live`       | live tests against real YouTube (`-tags live`), same as the daily canary                                                                 |
 | `bun run lint`            | golangci-lint (core + desktop), prettier, eslint, svelte-check                                                                           |
 | `bun run format`          | gofumpt + goimports via `golangci-lint fmt`, then prettier                                                                               |
 
 Linux uses WebKitGTK 4.1, so Wails commands pass `-tags webkit2_41`; macOS/Windows don't need it.
 
-After writing changes, run `bun run lint` and `bun run test` and fix everything they report.
+After writing changes, run `bun run lint` and `bun run test` and fix everything they report. Run `bun run test:live` after touching `innertube` or `stream`.
+
+## CI
+
+- `.github/workflows/ci.yml`: core (golangci-lint, `go test -race`) and desktop (frontend lint/check, golangci-lint, `wails build`) on push to main and PRs. The desktop job checks out the private `neoworks-dev/neoworks.dev` next to this repo to bun-link the ui package; it needs the `NEOWORKS_DEV_TOKEN` secret (read access to that repo's contents).
+- `.github/workflows/canary.yml`: daily live tests against YouTube; on failure it opens an issue labelled `canary`, or comments on the open one. GitHub runner IPs may get bot-checked by YouTube more often than home connections, so a canary failure that doesn't reproduce locally may just be the runner.
 
 ## Frontend (apps/desktop/frontend)
 

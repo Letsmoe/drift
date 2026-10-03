@@ -3,3 +3,5 @@
 import {music} from '../models';
 
 export function SearchSongs(arg1:string):Promise<Array<music.Track>>;
+
+export function StreamURL(arg1:string):Promise<string>;

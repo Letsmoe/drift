@@ -1,11 +1,9 @@
 package innertube
 
 import (
-	"encoding/json"
 	"errors"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"reflect"
 	"testing"
 
@@ -13,31 +11,20 @@ import (
 )
 
 func TestSearchSongs(t *testing.T) {
-	fixture, err := os.ReadFile("testdata/search_songs.json")
+	server := newFakeServer(t)
+	server.respondWithFixture(t, "search", "testdata/search_songs.json")
+
+	tracks, err := server.client().SearchSongs(t.Context(), "daft punk")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	var received searchRequest
-	server := httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
-		if err := json.NewDecoder(request.Body).Decode(&received); err != nil {
-			t.Errorf("decode request: %v", err)
-		}
-		_, _ = writer.Write(fixture)
-	}))
-	defer server.Close()
-
-	client := NewClient(WithBaseURL(server.URL))
-	tracks, err := client.SearchSongs(t.Context(), "daft punk")
-	if err != nil {
-		t.Fatal(err)
+	request := server.lastRequest(t, "search")
+	if request.body["query"] != "daft punk" || request.body["params"] != songsFilterParams {
+		t.Errorf("unexpected request body: %v", request.body)
 	}
-
-	if received.Query != "daft punk" || received.Params != songsFilterParams {
-		t.Errorf("unexpected request: %+v", received)
-	}
-	if received.Context.Client.ClientName != webRemixClientName {
-		t.Errorf("client name = %q, want %q", received.Context.Client.ClientName, webRemixClientName)
+	if request.contextClient()["clientName"] != WebRemix.Name {
+		t.Errorf("client = %v, want %s", request.contextClient()["clientName"], WebRemix.Name)
 	}
 	if len(tracks) != 3 {
 		t.Fatalf("got %d tracks, want 3", len(tracks))
@@ -58,16 +45,49 @@ func TestSearchSongs(t *testing.T) {
 }
 
 func TestSearchSongsStatusError(t *testing.T) {
+	server := newFakeServer(t)
+
+	_, err := server.client().SearchSongs(t.Context(), "anything")
+
+	var statusError *StatusError
+	if !errors.As(err, &statusError) || statusError.StatusCode != http.StatusNotFound {
+		t.Errorf("err = %v, want StatusError 404", err)
+	}
+}
+
+func TestVisitorDataIsRequestedOnceAndSent(t *testing.T) {
+	server := newFakeServer(t)
+	server.respondWithFixture(t, "search", "testdata/search_songs.json")
+	client := server.client()
+
+	for range 2 {
+		if _, err := client.SearchSongs(t.Context(), "daft punk"); err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	if count := server.requestCount("visitor_id"); count != 1 {
+		t.Errorf("visitor_id requested %d times, want 1", count)
+	}
+	request := server.lastRequest(t, "search")
+	if request.headers.Get("X-Goog-Visitor-Id") != fakeVisitorData {
+		t.Errorf("X-Goog-Visitor-Id = %q", request.headers.Get("X-Goog-Visitor-Id"))
+	}
+	if request.contextClient()["visitorData"] != fakeVisitorData {
+		t.Errorf("context visitorData = %v", request.contextClient()["visitorData"])
+	}
+}
+
+func TestVisitorDataFailureStopsRequest(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, _ *http.Request) {
-		writer.WriteHeader(http.StatusForbidden)
+		_, _ = writer.Write([]byte(`{"responseContext":{}}`))
 	}))
 	defer server.Close()
 
 	_, err := NewClient(WithBaseURL(server.URL)).SearchSongs(t.Context(), "anything")
 
-	var statusError *StatusError
-	if !errors.As(err, &statusError) || statusError.StatusCode != http.StatusForbidden {
-		t.Errorf("err = %v, want StatusError 403", err)
+	if !errors.Is(err, errNoVisitorData) {
+		t.Errorf("err = %v, want errNoVisitorData", err)
 	}
 }
 
