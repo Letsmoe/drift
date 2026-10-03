@@ -1,7 +1,8 @@
 import type { Artist, Thumbnail } from '#lib/api/music.ts';
 
 export function formatDuration(totalSeconds: number): string {
-	if (totalSeconds <= 0) {
+	// <audio> reports NaN until a source is loaded.
+	if (!Number.isFinite(totalSeconds) || totalSeconds <= 0) {
 		return '';
 	}
 	const hours = Math.floor(totalSeconds / 3600);

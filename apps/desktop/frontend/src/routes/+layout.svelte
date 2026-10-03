@@ -2,8 +2,12 @@
 	import '@fontsource/geist-sans/400.css';
 	import '@fontsource/geist-sans/500.css';
 	import '@fontsource/geist-sans/600.css';
+	import '@fontsource/geist-sans/700.css';
 	import '../app.css';
+	import { FloatingScrollbar } from '@neoworks-dev/ui';
+	import LibrarySidebar from '#lib/components/LibrarySidebar.svelte';
 	import PlayerBar from '#lib/components/PlayerBar.svelte';
+	import TopBar from '#lib/components/TopBar.svelte';
 
 	let { children } = $props();
 </script>
@@ -12,9 +16,15 @@
 	<title>Otter Music</title>
 </svelte:head>
 
-<div class="flex h-screen flex-col overflow-hidden bg-canvas text-default">
-	<div class="flex min-h-0 flex-1 flex-col">
-		{@render children()}
+<div class="flex h-screen flex-col gap-2 overflow-hidden bg-canvas p-2 text-default">
+	<TopBar />
+	<div class="flex min-h-0 flex-1 gap-2">
+		<LibrarySidebar />
+		<FloatingScrollbar class="min-w-0 flex-1 rounded-lg bg-surface">
+			<main class="px-3 py-4">
+				{@render children()}
+			</main>
+		</FloatingScrollbar>
 	</div>
 	<PlayerBar />
 </div>
