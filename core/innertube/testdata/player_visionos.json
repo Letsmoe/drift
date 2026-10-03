@@ -1,0 +1,38 @@
+{
+	"playabilityStatus": {
+		"status": "OK"
+	},
+	"streamingData": {
+		"expiresInSeconds": "21540",
+		"adaptiveFormats": [
+			{
+				"itag": 137,
+				"mimeType": "video/mp4; codecs=\"avc1.640020\"",
+				"bitrate": 160594,
+				"contentLength": "896218",
+				"url": "https://rr1---sn-test.googlevideo.com/videoplayback?itag=137&expire=1791086400&c=VISIONOS"
+			},
+			{
+				"itag": 140,
+				"mimeType": "audio/mp4; codecs=\"mp4a.40.2\"",
+				"bitrate": 130993,
+				"contentLength": "2631817",
+				"url": "https://rr1---sn-test.googlevideo.com/videoplayback?itag=140&expire=1791086400&c=VISIONOS"
+			},
+			{
+				"itag": 251,
+				"mimeType": "audio/webm; codecs=\"opus\"",
+				"bitrate": 141465,
+				"contentLength": "2558160",
+				"url": "https://rr1---sn-test.googlevideo.com/videoplayback?itag=251&expire=1791086400&c=VISIONOS"
+			},
+			{
+				"itag": 250,
+				"mimeType": "audio/webm; codecs=\"opus\"",
+				"bitrate": 71940,
+				"contentLength": "1285394",
+				"signatureCipher": "s=ciphered&sp=sig&url=https%3A%2F%2Frr1---sn-test.googlevideo.com%2Fvideoplayback"
+			}
+		]
+	}
+}

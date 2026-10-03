@@ -1,0 +1,42 @@
+# Daily check against real YouTube: search, resolve a stream and download past the
+# CDN's 1 MiB window. Opens (or comments on) an issue when YouTube broke something.
+name: Canary
+
+on:
+  schedule:
+    - cron: '17 6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  youtube:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: go.work
+          cache-dependency-path: '**/go.sum'
+      - name: Live tests
+        id: live
+        working-directory: core
+        # Explicit bash enables pipefail, so tee does not hide a failing test.
+        shell: bash
+        run: go test -tags live -run Live -v ./... 2>&1 | tee "$RUNNER_TEMP/live.log"; exit "${PIPESTATUS[0]}"
+      - name: Report failure
+        if: failure() && steps.live.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          body="$(printf 'Canary failed: %s\n\n```\n%s\n```\n' "$RUN_URL" "$(tail -n 40 "$RUNNER_TEMP/live.log")")"
+          existing="$(gh issue list --repo "$GITHUB_REPOSITORY" --label canary --state open --json number --jq '.[0].number')"
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --repo "$GITHUB_REPOSITORY" --body "$body"
+          else
+            gh label create canary --repo "$GITHUB_REPOSITORY" --color d73a4a --description "YouTube canary failure" 2>/dev/null || true
+            gh issue create --repo "$GITHUB_REPOSITORY" --label canary --title "Canary: YouTube extraction is broken" --body "$body"
+          fi

@@ -3,6 +3,7 @@
 	import '@fontsource/geist-sans/500.css';
 	import '@fontsource/geist-sans/600.css';
 	import '../app.css';
+	import PlayerBar from '#lib/components/PlayerBar.svelte';
 
 	let { children } = $props();
 </script>
@@ -12,5 +13,8 @@
 </svelte:head>
 
 <div class="flex h-screen flex-col overflow-hidden bg-canvas text-default">
-	{@render children()}
+	<div class="flex min-h-0 flex-1 flex-col">
+		{@render children()}
+	</div>
+	<PlayerBar />
 </div>

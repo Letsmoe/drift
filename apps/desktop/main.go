@@ -5,6 +5,8 @@ package main
 import (
 	"embed"
 	"log"
+	"log/slog"
+	"os"
 
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
@@ -17,7 +19,8 @@ import (
 var assets embed.FS
 
 func main() {
-	app := NewApp()
+	logger := slog.New(slog.NewTextHandler(os.Stderr, nil))
+	app := NewApp(logger)
 
 	err := wails.Run(&options.App{
 		Title:            "Otter Music",
@@ -28,6 +31,7 @@ func main() {
 		AssetServer:      &assetserver.Options{Assets: assets},
 		BackgroundColour: &options.RGBA{R: 20, G: 20, B: 22, A: 255},
 		OnStartup:        app.startup,
+		OnShutdown:       app.shutdown,
 		Bind:             []any{app},
 	})
 	if err != nil {

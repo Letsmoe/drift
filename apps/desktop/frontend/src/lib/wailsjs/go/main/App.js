@@ -5,3 +5,7 @@
 export function SearchSongs(arg1) {
   return window['go']['main']['App']['SearchSongs'](arg1);
 }
+
+export function StreamURL(arg1) {
+  return window['go']['main']['App']['StreamURL'](arg1);
+}

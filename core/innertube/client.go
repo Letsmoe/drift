@@ -1,4 +1,4 @@
-// Package innertube is a client for YouTube Music's internal InnerTube API.
+// Package innertube is a client for YouTube's internal InnerTube API.
 package innertube
 
 import (
@@ -7,27 +7,23 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
+	"sync"
 	"time"
 )
 
-const (
-	defaultBaseURL = "https://music.youtube.com/youtubei/v1"
-	musicOrigin    = "https://music.youtube.com"
+const defaultTimeout = 15 * time.Second
 
-	webRemixClientName = "WEB_REMIX"
-	// InnerTube accepts any recent version; bump it when YouTube starts rejecting requests.
-	webRemixClientVersion = "1.20260930.01.00"
-	webRemixUserAgent     = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
-
-	defaultTimeout = 15 * time.Second
-)
-
-// Client sends requests to InnerTube as the YouTube Music web client.
+// Client sends InnerTube requests. It is safe for concurrent use.
 type Client struct {
 	httpClient *http.Client
-	baseURL    string
-	language   string
-	region     string
+	// baseURL replaces every profile's host when set, e.g. with a test server.
+	baseURL  string
+	language string
+	region   string
+
+	visitorMutex sync.Mutex
+	visitorData  string
 }
 
 // Option configures a Client.
@@ -40,14 +36,14 @@ func WithHTTPClient(httpClient *http.Client) Option {
 	}
 }
 
-// WithBaseURL points the client at another InnerTube host, e.g. a test server.
+// WithBaseURL sends all requests to baseURL instead of the profiles' hosts.
 func WithBaseURL(baseURL string) Option {
 	return func(client *Client) {
 		client.baseURL = baseURL
 	}
 }
 
-// WithLocale sets the language (hl) and region (gl) YouTube Music localizes results for.
+// WithLocale sets the language (hl) and region (gl) YouTube localizes results for.
 func WithLocale(language, region string) Option {
 	return func(client *Client) {
 		client.language = language
@@ -55,11 +51,17 @@ func WithLocale(language, region string) Option {
 	}
 }
 
+// WithVisitorData reuses a visitor ID from an earlier session instead of requesting one.
+func WithVisitorData(visitorData string) Option {
+	return func(client *Client) {
+		client.visitorData = visitorData
+	}
+}
+
 // NewClient creates a client with English/US defaults.
 func NewClient(options ...Option) *Client {
 	client := &Client{
 		httpClient: &http.Client{Timeout: defaultTimeout},
-		baseURL:    defaultBaseURL,
 		language:   "en",
 		region:     "US",
 	}
@@ -79,64 +81,79 @@ func (statusError *StatusError) Error() string {
 	return fmt.Sprintf("innertube %s: unexpected status %d", statusError.Endpoint, statusError.StatusCode)
 }
 
-type requestContext struct {
-	Client clientInfo `json:"client"`
-}
-
-type clientInfo struct {
-	ClientName    string `json:"clientName"`
-	ClientVersion string `json:"clientVersion"`
-	Language      string `json:"hl"`
-	Region        string `json:"gl"`
-}
-
-func (client *Client) requestContext() requestContext {
+func (client *Client) requestContext(profile Profile, visitorData string) requestContext {
 	return requestContext{
 		Client: clientInfo{
-			ClientName:    webRemixClientName,
-			ClientVersion: webRemixClientVersion,
+			ClientName:    profile.Name,
+			ClientVersion: profile.Version,
+			UserAgent:     profile.UserAgent,
+			DeviceMake:    profile.DeviceMake,
+			DeviceModel:   profile.DeviceModel,
+			OSName:        profile.OSName,
+			OSVersion:     profile.OSVersion,
 			Language:      client.language,
 			Region:        client.region,
+			VisitorData:   visitorData,
 		},
 	}
 }
 
-func (client *Client) post(ctx context.Context, endpoint string, payload, response any) error {
-	request, err := client.newRequest(ctx, endpoint, payload)
+type apiCall struct {
+	profile     Profile
+	endpoint    string
+	visitorData string
+	payload     any
+}
+
+func (client *Client) post(ctx context.Context, call apiCall, response any) error {
+	request, err := client.newRequest(ctx, call)
 	if err != nil {
 		return err
 	}
 
 	httpResponse, err := client.httpClient.Do(request)
 	if err != nil {
-		return fmt.Errorf("innertube %s: %w", endpoint, err)
+		return fmt.Errorf("innertube %s: %w", call.endpoint, err)
 	}
 	// The body is fully read or abandoned on error; a failed close changes nothing.
 	defer func() { _ = httpResponse.Body.Close() }()
 
 	if httpResponse.StatusCode != http.StatusOK {
-		return &StatusError{Endpoint: endpoint, StatusCode: httpResponse.StatusCode}
+		return &StatusError{Endpoint: call.endpoint, StatusCode: httpResponse.StatusCode}
 	}
 	if err := json.NewDecoder(httpResponse.Body).Decode(response); err != nil {
-		return fmt.Errorf("innertube %s: decode response: %w", endpoint, err)
+		return fmt.Errorf("innertube %s: decode response: %w", call.endpoint, err)
 	}
 	return nil
 }
 
-func (client *Client) newRequest(ctx context.Context, endpoint string, payload any) (*http.Request, error) {
-	body, err := json.Marshal(payload)
+func (client *Client) newRequest(ctx context.Context, call apiCall) (*http.Request, error) {
+	body, err := json.Marshal(call.payload)
 	if err != nil {
-		return nil, fmt.Errorf("innertube %s: encode request: %w", endpoint, err)
+		return nil, fmt.Errorf("innertube %s: encode request: %w", call.endpoint, err)
 	}
 
-	url := client.baseURL + "/" + endpoint + "?prettyPrint=false"
+	url := client.endpointURL(call.profile, call.endpoint)
 	request, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewReader(body))
 	if err != nil {
-		return nil, fmt.Errorf("innertube %s: build request: %w", endpoint, err)
+		return nil, fmt.Errorf("innertube %s: build request: %w", call.endpoint, err)
 	}
 
 	request.Header.Set("Content-Type", "application/json")
-	request.Header.Set("Origin", musicOrigin)
-	request.Header.Set("User-Agent", webRemixUserAgent)
+	request.Header.Set("Origin", call.profile.origin())
+	request.Header.Set("User-Agent", call.profile.UserAgent)
+	request.Header.Set("X-YouTube-Client-Name", strconv.Itoa(call.profile.ID))
+	request.Header.Set("X-YouTube-Client-Version", call.profile.Version)
+	if call.visitorData != "" {
+		request.Header.Set("X-Goog-Visitor-Id", call.visitorData)
+	}
 	return request, nil
+}
+
+func (client *Client) endpointURL(profile Profile, endpoint string) string {
+	baseURL := profile.origin()
+	if client.baseURL != "" {
+		baseURL = client.baseURL
+	}
+	return baseURL + "/youtubei/v1/" + endpoint + "?prettyPrint=false"
 }
