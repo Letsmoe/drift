@@ -19,7 +19,7 @@ import (
 var assets embed.FS
 
 func main() {
-	logger := slog.New(slog.NewTextHandler(os.Stderr, nil))
+	logger := slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: logLevel()}))
 	app := NewApp(logger)
 
 	err := wails.Run(&options.App{
@@ -37,4 +37,12 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+// logLevel enables debug logs (e.g. every stream request) with OTTER_MUSIC_LOG=debug.
+func logLevel() slog.Level {
+	if os.Getenv("OTTER_MUSIC_LOG") == "debug" {
+		return slog.LevelDebug
+	}
+	return slog.LevelInfo
 }

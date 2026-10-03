@@ -13,6 +13,11 @@ import (
 // forwardedHeaders are copied from the CDN response so the player can seek.
 var forwardedHeaders = []string{"Content-Type", "Content-Length", "Content-Range", "Accept-Ranges"}
 
+// fullRange is sent upstream when the player asks for the whole file: without a
+// Range header the CDN throttles to roughly playback speed (~30 KiB/s instead of
+// several MiB/s), which leaves the player buffering for seconds before it starts.
+const fullRange = "bytes=0-"
+
 // Proxy serves GET /stream/{videoId} by forwarding range requests to the CDN.
 // Players get a stable URL; expiry and re-resolving stay inside the core.
 type Proxy struct {
@@ -45,8 +50,9 @@ func (proxy *Proxy) Handler() http.Handler {
 
 func (proxy *Proxy) serveStream(writer http.ResponseWriter, request *http.Request) {
 	videoID := request.PathValue("videoId")
+	clientRange := request.Header.Get("Range")
 
-	upstream, err := proxy.openUpstream(request.Context(), videoID, request.Header.Get("Range"))
+	upstream, err := proxy.openUpstream(request.Context(), videoID, upstreamRange(clientRange))
 	if err != nil {
 		proxy.logger.Error("stream failed", "videoId", videoID, "error", err)
 		http.Error(writer, "stream unavailable", http.StatusBadGateway)
@@ -56,7 +62,14 @@ func (proxy *Proxy) serveStream(writer http.ResponseWriter, request *http.Reques
 
 	copyHeaders(writer.Header(), upstream.Header)
 	writer.Header().Set("Cache-Control", "no-store")
-	writer.WriteHeader(upstream.StatusCode)
+	status := upstream.StatusCode
+	if clientRange == "" && status == http.StatusPartialContent {
+		// The player never asked for a range, so it expects a plain 200 for fullRange.
+		writer.Header().Del("Content-Range")
+		status = http.StatusOK
+	}
+	writer.WriteHeader(status)
+	proxy.logger.Debug("stream", "videoId", videoID, "range", clientRange, "status", status)
 
 	// Copy errors are the listener going away (skip, pause, quit); nothing to recover.
 	_, _ = io.Copy(writer, upstream.Body)
@@ -85,9 +98,7 @@ func (proxy *Proxy) fetch(ctx context.Context, videoID, rangeHeader string) (*ht
 	if err != nil {
 		return nil, fmt.Errorf("build CDN request: %w", err)
 	}
-	if rangeHeader != "" {
-		request.Header.Set("Range", rangeHeader)
-	}
+	request.Header.Set("Range", rangeHeader)
 
 	response, err := proxy.httpClient.Do(request)
 	if err != nil {
@@ -98,6 +109,13 @@ func (proxy *Proxy) fetch(ctx context.Context, videoID, rangeHeader string) (*ht
 		return nil, fmt.Errorf("%w: status %d", errURLRejected, response.StatusCode)
 	}
 	return response, nil
+}
+
+func upstreamRange(clientRange string) string {
+	if clientRange == "" {
+		return fullRange
+	}
+	return clientRange
 }
 
 func copyHeaders(destination, source http.Header) {
