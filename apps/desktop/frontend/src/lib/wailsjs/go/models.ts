@@ -1,3 +1,86 @@
+export namespace importer {
+	
+	export class Options {
+	    liked: boolean;
+	    playlists: string[];
+	    albums: boolean;
+	    artists: boolean;
+	    shows: boolean;
+	    retryUnmatched: boolean;
+	
+	    static createFrom(source: any = {}) {
+	        return new Options(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.liked = source["liked"];
+	        this.playlists = source["playlists"];
+	        this.albums = source["albums"];
+	        this.artists = source["artists"];
+	        this.shows = source["shows"];
+	        this.retryUnmatched = source["retryUnmatched"];
+	    }
+	}
+	export class PlaylistSummary {
+	    key: string;
+	    name: string;
+	    trackCount: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new PlaylistSummary(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.key = source["key"];
+	        this.name = source["name"];
+	        this.trackCount = source["trackCount"];
+	    }
+	}
+	export class Summary {
+	    liked: number;
+	    playlists: PlaylistSummary[];
+	    albums: number;
+	    artists: number;
+	    shows: number;
+	    trackLimit: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new Summary(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.liked = source["liked"];
+	        this.playlists = this.convertValues(source["playlists"], PlaylistSummary);
+	        this.albums = source["albums"];
+	        this.artists = source["artists"];
+	        this.shows = source["shows"];
+	        this.trackLimit = source["trackLimit"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+
+}
+
 export namespace library {
 	
 	export class Impression {

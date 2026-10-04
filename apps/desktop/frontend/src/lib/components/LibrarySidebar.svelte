@@ -4,12 +4,14 @@
 	import BooksIcon from 'phosphor-svelte/lib/BooksIcon';
 	import HeartIcon from 'phosphor-svelte/lib/HeartIcon';
 	import PlusIcon from 'phosphor-svelte/lib/PlusIcon';
+	import SpotifyImportDialog from '#lib/components/SpotifyImportDialog.svelte';
 	import Chip from '#lib/components/Chip.svelte';
 	import LibraryRow from '#lib/components/LibraryRow.svelte';
 	import { library } from '#lib/library/library.svelte.ts';
 	import { LibraryListing, libraryFilters } from '#lib/library/libraryListing.svelte.ts';
 
 	const listing = new LibraryListing();
+	let importDialogOpen = $state(false);
 	const showPlaylistPrompt = $derived(
 		library.playlists.length === 0 && (listing.filter === 'all' || listing.filter === 'playlist')
 	);
@@ -94,6 +96,19 @@
 					</div>
 				</div>
 			{/if}
+			<div class="flex flex-col gap-3 rounded-lg bg-raised p-4">
+				<div>
+					<p class="text-base font-semibold">Bring your music from Spotify</p>
+					<p class="text-sm text-muted">Liked songs, playlists, albums and more.</p>
+				</div>
+				<div class="self-start">
+					<Button size="sm" onclick={() => (importDialogOpen = true)}>Import from Spotify</Button>
+				</div>
+			</div>
 		</div>
 	</FloatingScrollbar>
 </aside>
+
+{#if importDialogOpen}
+	<SpotifyImportDialog onclose={() => (importDialogOpen = false)} />
+{/if}

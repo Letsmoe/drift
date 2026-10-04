@@ -1,0 +1,33 @@
+{
+	"tracks": [
+		{
+			"artist": "Daft Punk",
+			"album": "Random Access Memories",
+			"track": "Get Lucky (feat. Pharrell Williams & Nile Rodgers)",
+			"uri": "spotify:track:69kOkLUCkxIZYexIgSG8rq"
+		},
+		{
+			"artist": "Beyoncé",
+			"album": "Lemonade",
+			"track": "Hold Up",
+			"uri": "spotify:track:2UiapBMGQcdjrFAxN6J6iQ"
+		},
+		{ "artist": "Unknown", "album": "", "track": "", "uri": "" },
+		{ "artist": "Local Band", "album": "Demo", "track": "Garage Tape" }
+	],
+	"albums": [
+		{ "artist": "Radiohead", "album": "OK Computer", "uri": "spotify:album:6dVIqQ8qmQ5GBnJ9shOYGE" }
+	],
+	"shows": [
+		{
+			"name": "Darknet Diaries",
+			"publisher": "Jack Rhysider",
+			"uri": "spotify:show:4XPl3uEEL9hvqMkoZrzbx5"
+		}
+	],
+	"episodes": [{ "name": "Some episode", "show": "Darknet Diaries", "uri": "spotify:episode:abc" }],
+	"bannedTracks": [],
+	"artists": [{ "name": "Bonobo", "uri": "spotify:artist:0cmWgDlu9CwTgxPhf403hb" }],
+	"bannedArtists": [],
+	"other": []
+}
