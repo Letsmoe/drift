@@ -16,6 +16,7 @@ core/               Go module github.com/neoworks/otter-music/core: the shared, 
   library/          local SQLite store (ratings, playlists, saved items, play + search history, impressions, response cache), embedded migrations
   queue/            playback queue: shuffle, repeat, autoplay extension through an Extender; UI-free, apps only render its State
   recommend/        recommendation engine over the library + a Catalog (the innertube client): candidates → weighted ranking → diversity re-ranking; also the queue's autoplay Extender
+  mobile/           gomobile adapter: the whole core behind one `Core` object, complex values as JSON strings (Android AAR)
 apps/desktop/       Wails v2 app (Go module …/apps/desktop), binds core to the webview
   frontend/         SvelteKit 3 + Tailwind 4 UI (static SPA, embedded into the binary)
 apps/android/       planned: Kotlin + Jetpack Compose + Media3, core via gomobile .aar
@@ -66,6 +67,7 @@ Run from the repo root:
 | `bun run desktop:start`   | run the last production build                                                                                                            |
 | `bun run desktop:install` | build, then install for the current user (`scripts/install-desktop.ts`: Linux → `~/.local/bin` + desktop entry, macOS → `/Applications`) |
 | `bun run bindings`        | regenerate `frontend/src/lib/wailsjs` after changing bound Go methods                                                                    |
+| `bun run android:core`    | build `apps/android/app/libs/otter-core.aar` from `core/mobile` (needs gomobile + Android SDK/NDK; skips when up to date)                |
 | `bun run test`            | Go tests for core                                                                                                                        |
 | `bun run test:live`       | live tests against real YouTube (`-tags live`), same as the daily canary                                                                 |
 | `bun run lint`            | golangci-lint (core + desktop), prettier, eslint, svelte-check                                                                           |
