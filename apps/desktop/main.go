@@ -42,6 +42,9 @@ func main() {
 		Linux: &linux.Options{
 			Icon:        appIcon,
 			ProgramName: "otter-music",
+			// Wails' default without Linux options. The zero value (on demand) turns on
+			// GPU rendering, which dies with Wayland protocol error 71 on Hyprland.
+			WebviewGpuPolicy: linux.WebviewGpuPolicyNever,
 		},
 	})
 	if err != nil {
