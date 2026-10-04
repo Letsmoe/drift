@@ -167,12 +167,18 @@ class PlayerController(
     fun setAutoplay(enabled: Boolean) = runQueueCommand { core.queueSetAutoplay(enabled) }
 
     /** Plays the track when it is not current, otherwise pauses or resumes it. */
-    fun playOrToggle(track: Track, tracks: List<Track> = listOf(track), startIndex: Int = 0, context: String = "track") {
+    fun playOrToggle(
+        track: Track,
+        tracks: List<Track> = listOf(track),
+        startIndex: Int = 0,
+        context: String = "track",
+        kind: ItemKind = ItemKind.Song,
+    ) {
         if (isCurrent(track)) {
             toggle()
             return
         }
-        playTracks(tracks, ItemKind.Song, startIndex, context)
+        playTracks(tracks, kind, startIndex, context)
     }
 
     /** True when the queue was started from [context] (`album:<id>`, `liked`, ...) and has a current track. */
