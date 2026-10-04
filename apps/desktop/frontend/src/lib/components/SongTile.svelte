@@ -5,7 +5,12 @@
 	import { formatArtists } from '#lib/format.ts';
 	import { player } from '#lib/player/player.svelte.ts';
 
-	let { track }: { track: Track } = $props();
+	let {
+		track,
+		tracks = [track],
+		index = 0,
+		context = 'track'
+	}: { track: Track; tracks?: Track[]; index?: number; context?: string } = $props();
 
 	const current = $derived(player.isCurrent(track));
 	const playing = $derived(player.isPlaying(track));
@@ -23,7 +28,7 @@
 		{playing}
 		size="sm"
 		label="Play {track.title}"
-		onclick={() => player.playOrToggle(track)}
+		onclick={() => player.playOrToggle(track, tracks, index, context)}
 		class={['shrink-0', !playing && 'opacity-0 group-hover:opacity-100']}
 	/>
 </div>

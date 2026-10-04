@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Item } from '#lib/api/music.ts';
+	import type { Item, ItemKind } from '#lib/api/music.ts';
 	import Cover from '#lib/components/Cover.svelte';
 	import PlayOverlayButton from '#lib/components/PlayOverlayButton.svelte';
 	import { player } from '#lib/player/player.svelte.ts';
@@ -17,7 +17,7 @@
 
 	function playTrack() {
 		if (item.track) {
-			player.playOrToggle(item.track);
+			player.playOrToggle(item.track, [item.track], 0, 'home', item.kind as ItemKind);
 		}
 	}
 </script>

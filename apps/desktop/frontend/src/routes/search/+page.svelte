@@ -24,8 +24,8 @@
 	<p class="py-12 text-center text-sm text-dim">No songs found.</p>
 {:else if search.status === 'done'}
 	<ul class="flex flex-col gap-1">
-		{#each search.tracks as track (track.videoId)}
-			<li><TrackRow {track} /></li>
+		{#each search.tracks as track, index (track.videoId)}
+			<li><TrackRow {track} tracks={search.tracks} {index} context="search" /></li>
 		{/each}
 	</ul>
 {/if}

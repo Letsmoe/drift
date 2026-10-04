@@ -25,8 +25,8 @@
 	<h2 class="px-3 text-2xl font-bold">{shelf.title}</h2>
 	{#if tracks}
 		<div class="grid grid-cols-2 gap-2 px-3 xl:grid-cols-3 2xl:grid-cols-4">
-			{#each tracks as track (track.videoId)}
-				<SongTile {track} />
+			{#each tracks as track, index (track.videoId)}
+				<SongTile {track} {tracks} {index} context="home" />
 			{/each}
 		</div>
 	{:else}

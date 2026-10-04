@@ -1,4 +1,5 @@
-import { home, homeContinuation, type HomePage, type Shelf } from '#lib/api/music.ts';
+import { home, homeContinuation } from '#lib/api/catalog.ts';
+import type { HomePage, Shelf } from '#lib/api/music.ts';
 import { describeError } from '#lib/format.ts';
 
 export type FeedStatus = 'loading' | 'done' | 'failed';

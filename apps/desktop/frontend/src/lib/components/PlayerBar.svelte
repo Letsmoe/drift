@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { Button, LoadingSpinner } from '@neoworks-dev/ui';
 	import RepeatIcon from 'phosphor-svelte/lib/RepeatIcon';
+	import RepeatOnceIcon from 'phosphor-svelte/lib/RepeatOnceIcon';
 	import ShuffleIcon from 'phosphor-svelte/lib/ShuffleIcon';
 	import SkipBackIcon from 'phosphor-svelte/lib/SkipBackIcon';
 	import SkipForwardIcon from 'phosphor-svelte/lib/SkipForwardIcon';
@@ -14,6 +15,14 @@
 	import { player } from '#lib/player/player.svelte.ts';
 
 	const VolumeIcon = $derived(pickVolumeIcon());
+	const RepeatButtonIcon = $derived(pickRepeatIcon());
+
+	function pickRepeatIcon() {
+		if (player.queue.repeat === 'one') {
+			return RepeatOnceIcon;
+		}
+		return RepeatIcon;
+	}
 
 	function pickVolumeIcon() {
 		if (player.muted || player.volume === 0) {
@@ -50,6 +59,7 @@
 	bind:muted={player.muted}
 	onwaiting={() => (player.buffering = true)}
 	onplaying={() => (player.buffering = false)}
+	onended={() => player.trackEnded()}
 	onerror={() => player.fail('This song could not be played.')}
 ></audio>
 
@@ -66,8 +76,22 @@
 
 	<div class="flex flex-col items-center gap-1">
 		<div class="flex items-center gap-2">
-			<Button round size="sm" variant="ghost" icon={ShuffleIcon} disabled />
-			<Button round size="sm" variant="ghost" icon={SkipBackIcon} disabled />
+			<span class={[player.queue.shuffle && '[&>button]:text-green']}>
+				<Button
+					round
+					size="sm"
+					variant="ghost"
+					icon={ShuffleIcon}
+					onclick={() => player.toggleShuffle()}
+				/>
+			</span>
+			<Button
+				round
+				size="sm"
+				variant="ghost"
+				icon={SkipBackIcon}
+				onclick={() => player.previous()}
+			/>
 			{#if player.buffering && player.track && !player.errorMessage}
 				<div class="flex size-8 items-center justify-center"><LoadingSpinner size={18} /></div>
 			{:else}
@@ -78,8 +102,22 @@
 					onclick={() => player.toggle()}
 				/>
 			{/if}
-			<Button round size="sm" variant="ghost" icon={SkipForwardIcon} disabled />
-			<Button round size="sm" variant="ghost" icon={RepeatIcon} disabled />
+			<Button
+				round
+				size="sm"
+				variant="ghost"
+				icon={SkipForwardIcon}
+				onclick={() => player.next()}
+			/>
+			<span class={[player.queue.repeat !== 'off' && '[&>button]:text-green']}>
+				<Button
+					round
+					size="sm"
+					variant="ghost"
+					icon={RepeatButtonIcon}
+					onclick={() => player.cycleRepeat()}
+				/>
+			</span>
 		</div>
 
 		{#if player.errorMessage}
