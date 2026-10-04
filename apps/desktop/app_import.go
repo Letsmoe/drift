@@ -10,12 +10,12 @@ import (
 	"github.com/neoworks/otter-music/core/importer"
 )
 
-// Events the frontend listens to while a Spotify import runs.
+// Events the frontend listens to while an import (Spotify or YouTube Music) runs.
 const (
-	importProgressEvent = "spotify-import-progress"
-	importDoneEvent     = "spotify-import-done"
-	importErrorEvent    = "spotify-import-error"
-	// importCancelledMessage is the importErrorEvent payload after SpotifyCancelImport.
+	importProgressEvent = "import-progress"
+	importDoneEvent     = "import-done"
+	importErrorEvent    = "import-error"
+	// importCancelledMessage is the importErrorEvent payload after CancelImport.
 	importCancelledMessage = "cancelled"
 )
 
@@ -47,14 +47,17 @@ func (app *App) previewSpotify(source importer.Source) (importer.Summary, error)
 }
 
 // SpotifyImport starts an import in the background (sourceKind is "export" or
-// "url") and reports through the spotify-import-progress, spotify-import-done
-// and spotify-import-error events.
+// "url") and reports through the import-progress, import-done and
+// import-error events.
 func (app *App) SpotifyImport(sourceKind, pathOrURL string, options importer.Options) error {
+	return app.startImport(importer.Source{Kind: sourceKind, Location: pathOrURL}, options)
+}
+
+func (app *App) startImport(source importer.Source, options importer.Options) error {
 	runner, err := app.requireImporter()
 	if err != nil {
 		return err
 	}
-	source := importer.Source{Kind: sourceKind, Location: pathOrURL}
 	return runner.Start(app.ctx, source, options,
 		func(progress importer.Progress) { runtime.EventsEmit(app.ctx, importProgressEvent, progress) },
 		app.reportImportEnd)
@@ -72,8 +75,8 @@ func (app *App) reportImportEnd(result importer.Result, err error) {
 	runtime.EventsEmit(app.ctx, importDoneEvent, result)
 }
 
-// SpotifyCancelImport stops the running import.
-func (app *App) SpotifyCancelImport() {
+// CancelImport stops the running import, whatever its source.
+func (app *App) CancelImport() {
 	if app.importer != nil {
 		app.importer.Cancel()
 	}

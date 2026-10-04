@@ -1,0 +1,65 @@
+{
+	"_synthesized": "Synthesized by hand in the shape ytmusicapi's library parsers expect; not a real signed-in capture.",
+	"responseContext": {
+		"serviceTrackingParams": [
+			{
+				"service": "GFEEDBACK",
+				"params": [
+					{
+						"key": "logged_in",
+						"value": "1"
+					}
+				]
+			}
+		]
+	},
+	"actions": [
+		{
+			"openPopupAction": {
+				"popup": {
+					"multiPageMenuRenderer": {
+						"header": {
+							"activeAccountHeaderRenderer": {
+								"accountName": {
+									"runs": [
+										{
+											"text": "Ada Lovelace"
+										}
+									]
+								},
+								"channelHandle": {
+									"runs": [
+										{
+											"text": "@ada"
+										}
+									]
+								},
+								"email": {
+									"runs": [
+										{
+											"text": "ada@example.com"
+										}
+									]
+								},
+								"accountPhoto": {
+									"thumbnails": [
+										{
+											"url": "https://yt3.ggpht.com/ada=s48",
+											"width": 48,
+											"height": 48
+										},
+										{
+											"url": "https://yt3.ggpht.com/ada=s108",
+											"width": 108,
+											"height": 108
+										}
+									]
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	]
+}

@@ -14,6 +14,10 @@ export function Artist(arg1) {
   return window['go']['main']['App']['Artist'](arg1);
 }
 
+export function CancelImport() {
+  return window['go']['main']['App']['CancelImport']();
+}
+
 export function ClearSearches() {
   return window['go']['main']['App']['ClearSearches']();
 }
@@ -24,6 +28,10 @@ export function CreatePlaylist(arg1) {
 
 export function DeletePlaylist(arg1) {
   return window['go']['main']['App']['DeletePlaylist'](arg1);
+}
+
+export function DetectBrowserSessions() {
+  return window['go']['main']['App']['DetectBrowserSessions']();
 }
 
 export function Home() {
@@ -198,10 +206,6 @@ export function SetRating(arg1, arg2, arg3) {
   return window['go']['main']['App']['SetRating'](arg1, arg2, arg3);
 }
 
-export function SpotifyCancelImport() {
-  return window['go']['main']['App']['SpotifyCancelImport']();
-}
-
 export function SpotifyImport(arg1, arg2, arg3) {
   return window['go']['main']['App']['SpotifyImport'](arg1, arg2, arg3);
 }
@@ -228,4 +232,28 @@ export function Unsave(arg1, arg2) {
 
 export function UpdatePlay(arg1, arg2, arg3) {
   return window['go']['main']['App']['UpdatePlay'](arg1, arg2, arg3);
+}
+
+export function YouTubeAccountStatus() {
+  return window['go']['main']['App']['YouTubeAccountStatus']();
+}
+
+export function YouTubeImport(arg1) {
+  return window['go']['main']['App']['YouTubeImport'](arg1);
+}
+
+export function YouTubePreview() {
+  return window['go']['main']['App']['YouTubePreview']();
+}
+
+export function YouTubeSignInFromBrowser(arg1, arg2) {
+  return window['go']['main']['App']['YouTubeSignInFromBrowser'](arg1, arg2);
+}
+
+export function YouTubeSignInWithCookies(arg1) {
+  return window['go']['main']['App']['YouTubeSignInWithCookies'](arg1);
+}
+
+export function YouTubeSignOut() {
+  return window['go']['main']['App']['YouTubeSignOut']();
 }

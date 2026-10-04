@@ -15,6 +15,7 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/neoworks/otter-music/core/account"
 	"github.com/neoworks/otter-music/core/importer"
 	"github.com/neoworks/otter-music/core/innertube"
 	"github.com/neoworks/otter-music/core/library"
@@ -27,6 +28,7 @@ const shutdownTimeout = 2 * time.Second
 
 var (
 	errLibraryUnavailable   = errors.New("the local library could not be opened")
+	errAccountUnavailable   = errors.New("the YouTube Music account needs the local library, which could not be opened")
 	errRecommendUnavailable = errors.New("recommendations need the local library, which could not be opened")
 )
 
@@ -48,6 +50,7 @@ type Core struct {
 	library  *library.Library
 	engine   *recommend.Engine
 	importer *importer.Importer
+	account  *account.Service
 	queue    *queue.Queue
 
 	streamServer  *http.Server
@@ -102,7 +105,8 @@ func (core *Core) openLibrary(dataDir string) {
 	}
 	core.library = lib
 	core.engine = recommend.New(lib, core.innertube, recommend.WithLogger(core.logger))
-	core.importer = importer.New(lib, core.innertube, core.logger)
+	core.account = account.New(lib)
+	core.importer = importer.New(lib, core.innertube, core.logger, importer.WithAccount(core.account.Reader))
 }
 
 // startStreamServer serves the proxy on a random loopback port.

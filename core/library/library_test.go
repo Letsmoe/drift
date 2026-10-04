@@ -3,7 +3,9 @@ package library
 import (
 	"context"
 	"errors"
+	"fmt"
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
@@ -88,8 +90,8 @@ func TestOpenIsIdempotent(t *testing.T) {
 	if err = second.DB().QueryRowContext(ctx, `SELECT COUNT(*) FROM _migration`).Scan(&applied); err != nil {
 		t.Fatal(err)
 	}
-	if applied != 2 {
-		t.Fatalf("applied migrations = %d, want 2", applied)
+	if applied != 3 {
+		t.Fatalf("applied migrations = %d, want 3", applied)
 	}
 	tracks, err := second.Tracks(ctx, []string{"a"})
 	if err != nil || len(tracks) != 1 {
@@ -478,5 +480,61 @@ func TestTimeFormatSortsAndRoundTrips(t *testing.T) {
 	parsed, err := ParseTime(FormatTime(early))
 	if err != nil || !parsed.Equal(early) {
 		t.Fatalf("round trip = %v, %v", parsed, err)
+	}
+}
+
+func TestYouTubeSessionLifecycle(t *testing.T) {
+	ctx := context.Background()
+	lib, _ := openTestLibrary(t)
+
+	_, found, err := lib.YouTubeSession(ctx)
+	if err != nil || found {
+		t.Fatalf("empty library: found = %v, err = %v", found, err)
+	}
+
+	account := music.Account{Name: "Ada", Handle: "@ada", PhotoURL: "https://example.com/ada"}
+	err = lib.SaveYouTubeSession(ctx, "SAPISID=secret", account)
+	if err != nil {
+		t.Fatalf("save: %v", err)
+	}
+	err = lib.MarkYouTubeSynced(ctx)
+	if err != nil {
+		t.Fatalf("mark synced: %v", err)
+	}
+	session, found, err := lib.YouTubeSession(ctx)
+	if err != nil || !found {
+		t.Fatalf("load: found = %v, err = %v", found, err)
+	}
+	if session.CookieHeader != "SAPISID=secret" || session.Account != account || session.LastSyncedAt.IsZero() {
+		t.Errorf("session = %+v", session.Account)
+	}
+	if strings.Contains(fmt.Sprintf("%v %+v %#v", session, session, session), "secret") {
+		t.Error("formatting a session leaks the cookies")
+	}
+
+	err = lib.SaveYouTubeSession(ctx, "SAPISID=newer", account)
+	if err != nil {
+		t.Fatalf("save again: %v", err)
+	}
+	session, _, _ = lib.YouTubeSession(ctx)
+	if session.LastSyncedAt.IsZero() {
+		t.Error("signing in again as the same account must keep the last-synced time")
+	}
+	err = lib.SaveYouTubeSession(ctx, "SAPISID=other", music.Account{Name: "Grace", Handle: "@grace"})
+	if err != nil {
+		t.Fatalf("save other account: %v", err)
+	}
+	session, _, _ = lib.YouTubeSession(ctx)
+	if !session.LastSyncedAt.IsZero() {
+		t.Error("a different account must start without a last-synced time")
+	}
+
+	err = lib.ClearYouTubeSession(ctx)
+	if err != nil {
+		t.Fatalf("clear: %v", err)
+	}
+	_, found, _ = lib.YouTubeSession(ctx)
+	if found {
+		t.Error("session still stored after sign-out")
 	}
 }

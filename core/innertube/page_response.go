@@ -11,6 +11,12 @@ type pageResponse struct {
 						SectionListRenderer struct {
 							Contents []struct {
 								MusicResponsiveHeaderRenderer *pageHeader
+								// Playlists the user owns wrap the same header.
+								MusicEditablePlaylistDetailHeaderRenderer *struct {
+									Header struct {
+										MusicResponsiveHeaderRenderer *pageHeader
+									}
+								}
 							}
 						}
 					}
@@ -163,6 +169,9 @@ func (response pageResponse) header() *pageHeader {
 		for _, content := range tab.TabRenderer.Content.SectionListRenderer.Contents {
 			if content.MusicResponsiveHeaderRenderer != nil {
 				return content.MusicResponsiveHeaderRenderer
+			}
+			if content.MusicEditablePlaylistDetailHeaderRenderer != nil {
+				return content.MusicEditablePlaylistDetailHeaderRenderer.Header.MusicResponsiveHeaderRenderer
 			}
 		}
 	}

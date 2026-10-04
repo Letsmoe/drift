@@ -1,0 +1,147 @@
+{
+	"_synthesized": "Synthesized by hand in the shape ytmusicapi's library parsers expect; not a real signed-in capture.",
+	"responseContext": {
+		"serviceTrackingParams": [
+			{
+				"service": "GFEEDBACK",
+				"params": [
+					{
+						"key": "logged_in",
+						"value": "1"
+					}
+				]
+			}
+		]
+	},
+	"contents": {
+		"singleColumnBrowseResultsRenderer": {
+			"tabs": [
+				{
+					"tabRenderer": {
+						"content": {
+							"sectionListRenderer": {
+								"contents": [
+									{
+										"musicShelfRenderer": {
+											"contents": [
+												{
+													"musicResponsiveListItemRenderer": {
+														"thumbnail": {
+															"musicThumbnailRenderer": {
+																"thumbnail": {
+																	"thumbnails": [
+																		{
+																			"url": "https://lh3.googleusercontent.com/x=w226-h226",
+																			"width": 226,
+																			"height": 226
+																		}
+																	]
+																}
+															}
+														},
+														"navigationEndpoint": {
+															"browseEndpoint": {
+																"browseId": "UCdaft",
+																"browseEndpointContextSupportedConfigs": {
+																	"browseEndpointContextMusicConfig": {
+																		"pageType": "MUSIC_PAGE_TYPE_ARTIST"
+																	}
+																}
+															}
+														},
+														"flexColumns": [
+															{
+																"musicResponsiveListItemFlexColumnRenderer": {
+																	"text": {
+																		"runs": [
+																			{
+																				"text": "Daft Punk"
+																			}
+																		]
+																	}
+																}
+															},
+															{
+																"musicResponsiveListItemFlexColumnRenderer": {
+																	"text": {
+																		"runs": [
+																			{
+																				"text": "3.2M subscribers"
+																			}
+																		]
+																	}
+																}
+															}
+														]
+													}
+												},
+												{
+													"musicResponsiveListItemRenderer": {
+														"thumbnail": {
+															"musicThumbnailRenderer": {
+																"thumbnail": {
+																	"thumbnails": [
+																		{
+																			"url": "https://lh3.googleusercontent.com/x=w226-h226",
+																			"width": 226,
+																			"height": 226
+																		}
+																	]
+																}
+															}
+														},
+														"navigationEndpoint": {
+															"browseEndpoint": {
+																"browseId": "MPLAUCradio",
+																"browseEndpointContextSupportedConfigs": {
+																	"browseEndpointContextMusicConfig": {
+																		"pageType": "MUSIC_PAGE_TYPE_LIBRARY_ARTIST"
+																	}
+																}
+															}
+														},
+														"flexColumns": [
+															{
+																"musicResponsiveListItemFlexColumnRenderer": {
+																	"text": {
+																		"runs": [
+																			{
+																				"text": "Radiohead"
+																			}
+																		]
+																	}
+																}
+															},
+															{
+																"musicResponsiveListItemFlexColumnRenderer": {
+																	"text": {
+																		"runs": [
+																			{
+																				"text": "1.1M subscribers"
+																			}
+																		]
+																	}
+																}
+															}
+														]
+													}
+												}
+											],
+											"continuations": [
+												{
+													"nextContinuationData": {
+														"continuation": "artists-next"
+													}
+												}
+											]
+										}
+									}
+								]
+							}
+						}
+					}
+				}
+			]
+		}
+	}
+}

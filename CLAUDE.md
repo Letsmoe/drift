@@ -1,6 +1,6 @@
 # Otter Music
 
-A YouTube Music player. No server: every app talks to YouTube Music directly through a shared Go core.
+A YouTube Music player. No server: every app talks to YouTube Music directly through a shared Go core. Anonymous by default; an optional YouTube Music sign-in is used only to import the user's library.
 
 ## Git
 
@@ -11,12 +11,14 @@ You're allowed to use git. Every time you make a big change, commit the current 
 ```
 core/               Go module github.com/neoworks/otter-music/core: the shared, UI-free core
   music/            domain types (Track, Artist, Album, Thumbnail): the one data shape every app sees
-  innertube/        InnerTube client: client profiles, visitor ID, search, home feed, album/playlist/artist/podcast pages, radio, player; testdata/ holds trimmed real responses
+  innertube/        InnerTube client: client profiles, visitor ID, search, home feed, album/playlist/artist/podcast pages, radio, player; `AccountClient` (session-authenticated library reads, the only client that sends cookies); testdata/ holds trimmed real responses (the account/library fixtures are synthesized)
   stream/           resolver (profile chain → best audio URL, cached until expiry) + local HTTP proxy
   library/          local SQLite store (ratings, playlists, saved items, play + search history, impressions, response cache), embedded migrations
   queue/            playback queue: shuffle, repeat, autoplay extension through an Extender; UI-free, apps only render its State
   spotify/          Spotify sources without an account: data-export parser (zip/folder/JSON) + public playlist/album embed-page fetcher; parsing only, no matching
-  importer/         Spotify import: matches tracks/albums/artists/podcasts to YouTube Music, remembers matches, writes likes/playlists/saved items
+  importer/         library import: Spotify (matches tracks/albums/artists/podcasts to YouTube Music, remembers matches) or the YouTube Music account (exact IDs, no matching); writes likes/playlists/saved items
+  account/          optional YouTube Music sign-in: validates + stores the session in the library, hands the importer an authenticated reader
+  browsercookies/   desktop-only, UI-free: reads a signed-in browser session (Firefox family, Chromium family) or parses pasted cookies; runs only on the user's click
   recommend/        recommendation engine over the library + a Catalog (the innertube client): candidates → weighted ranking → diversity re-ranking; also the queue's autoplay Extender
   mobile/           gomobile adapter: the whole core behind one `Core` object, complex values as JSON strings (Android AAR)
 apps/desktop/       Wails v2 app (Go module …/apps/desktop), binds core to the webview
@@ -64,7 +66,18 @@ Don't copy code from zemer-cipher or InnerTubeX (GPL-3.0, would make this app GP
 - **Public link** (`open.spotify.com/{playlist,album}/<id>`, `spotify:` URIs): the embed page `/embed/<kind>/<id>` carries `<script id="__NEXT_DATA__">` with `props.pageProps.state.data.entity` (`name`, `subtitle`, `trackList` [{uri, title, subtitle "A, B", duration ms}]). It needs a browser User-Agent and is **capped at 100 tracks** per playlist (the UI says so). An album link imports as one saved album.
 - **Matching**: query `<title> <first artist>` (`SearchSongs`; albums/artists/podcasts via `Search` and the matching shelf kind). `scoreSong` (pure, in `score.go`) = 0.5 title similarity + 0.3 artist overlap (primary artist weighs 0.7) + 0.2 duration (full within 3 s, 0 beyond 15 s; left out when unknown); feat./remaster/edition noise is stripped; a live/remix/acoustic/... mismatch scales by 0.8, a duration >15 s off by 0.85. Thresholds: song 0.75, album 0.75, artist 0.88 (name only), podcast 0.8. Catalog calls run 4 at a time with a 150 ms pause; 8 failures in a row (or only failures) abort the import.
 - **Stored matches**: `import_match` (source, source_uri) -> target id, score and the matched track/item as JSON; "no match" is stored too, so a re-import never searches again (`Options.RetryUnmatched` overrides). `import_playlist` links a Spotify playlist key to its local playlist: a re-import replaces that playlist's entries instead of duplicating it. Likes use `SetRating` (no fake play rows; already-liked tracks are left alone), albums/artists/podcasts use `Save`.
-- **API**: `importer.New(lib, catalog, logger)`, `Preview(source)`, `Run(ctx, source, Options, onProgress)`, `Start`/`Cancel` for background runs (one import at a time). Desktop: `app_import.go` + `spotify-import-*` events; mobile: `core/mobile/importer.go` (path-based, JSON + `ImportListener`).
+- **API**: `importer.New(lib, catalog, logger)`, `Preview(source)`, `Run(ctx, source, Options, onProgress)`, `Start`/`Cancel` for background runs (one import at a time). Desktop: `app_import.go` + `import-progress`/`import-done`/`import-error` events (shared with the YouTube account import); mobile: `core/mobile/importer.go` (path-based, JSON + `ImportListener`).
+
+## YouTube Music account
+
+Optional sign-in whose only job is reading the user's own library for import and re-sync. Catalog browsing, search, recommendations and playback stay anonymous: only `innertube.AccountClient` attaches the session, never the anonymous `Client` (so the account never touches stream fetching).
+
+- **Cookies**: the `Cookie` header of music.youtube.com (needs `SAPISID` or `__Secure-3PAPISID`). Sources: desktop reads a signed-in browser (`core/browsercookies`) or the user pastes a header, request headers or a "Copy as cURL" command (`ParseCookieHeader`); Android will pass its WebView `CookieManager` cookies to `Core.YouTubeSignIn`. Sign-in validates with `account/account_menu` and stores the session only when that works.
+- **Browser support** (implemented): Firefox, LibreWolf, Zen, Floorp, Waterfox on Linux/macOS/Windows (`cookies.sqlite` is copied with its `-wal` to a temp dir, read, deleted; only cookies a browser sends to music.youtube.com, unexpired, container tabs left out). Chrome, Chromium, Brave, Edge, Vivaldi on Linux (v10 "peanuts" key; v11 key from the Secret Service over D-Bus, KWallet through `kwallet-query` as fallback) and macOS (Keychain via `security`, best effort, untested). Chromium browsers on Windows are skipped (app-bound encryption); a profile that cannot be read is listed with a reason instead of failing the rest. Detection only runs from a UI click.
+- **Auth**: `Authorization: SAPISIDHASH <ts>_<sha1("<ts> <SAPISID> https://music.youtube.com")>` plus `SAPISID1PHASH`/`SAPISID3PHASH` (built from `__Secure-1PAPISID`/`__Secure-3PAPISID`) space-separated, `Cookie`, `Origin`/`X-Origin: https://music.youtube.com`, `X-Goog-AuthUser: 0`, visitor ID. Signed-out answers (401/403, `logged_in` = 0 in `serviceTrackingParams`, no account header) become `innertube.ErrSessionExpired`.
+- **Endpoints** (ytmusicapi `mixins/library.py`; parsers reuse `parseCard`/`parseSongs`, fixtures in `testdata/` are hand-synthesized in ytmusicapi's shapes, no real signed-in capture exists, so verify with `OTTER_MUSIC_TEST_COOKIES=<cookie header> bun run test:live` after touching them): liked songs = browse `VLLM` (playlist continuations), `FEmusic_liked_playlists` (grid; `LM`/`SE` auto playlists skipped), `FEmusic_liked_albums` (grid), `FEmusic_library_corpus_artists` (subscriptions, list rows), `FEmusic_library_non_music_audio_list` (podcasts, grid), `account/account_menu` (name, handle, email, photo). Grids and lists follow `nextContinuationData`, `continuationItemRenderer` and `appendContinuationItemsAction` continuations.
+- **Import**: source kind `youtube-account`, exact IDs, no `import_match`. Liked songs are liked oldest first (the newest YouTube like stays the newest local like; already-liked tracks are left alone), playlists mirror into local playlists via `ImportPlaylist` (source `youtube`, key = playlist ID without `VL`), albums/artists/podcasts use `Save`. Re-sync is running it again; `library.MarkYouTubeSynced` records the time.
+- **Storage**: migration `003_youtube_session.sql`, one row (`youtube_session`: cookie header, account name/handle/email/photo, created/validated/last-synced). The cookie header is a credential: `Session` and `library.YouTubeSession` redact themselves in logs and formatting, errors never carry it. Sign-out deletes the row.
 
 ## Commands
 

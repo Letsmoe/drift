@@ -3,26 +3,35 @@ import {
 	cancelImport,
 	importCancelledMessage,
 	listenToImport,
-	pickExportFile,
-	pickExportFolder,
-	previewExport,
-	previewLink,
-	startImport,
 	type ImportOptions,
 	type ImportProgress,
 	type ImportResult,
 	type ImportSourceKind,
 	type ImportSummary
+} from '#lib/api/musicImport.ts';
+import {
+	pickExportFile,
+	pickExportFolder,
+	previewExport,
+	previewLink,
+	startSpotifyImport
 } from '#lib/api/spotifyImport.ts';
+import {
+	previewAccount,
+	startAccountImport,
+	type BrowserSession
+} from '#lib/api/youtubeAccount.ts';
+import { YouTubeAccountState } from '#lib/import/youtubeAccount.svelte.ts';
 import { describeError } from '#lib/format.ts';
 import { library } from '#lib/library/library.svelte.ts';
 
-export type ImportStep = 'source' | 'loading' | 'preview' | 'running' | 'done';
+export type ImportStep = 'source' | 'signin' | 'loading' | 'preview' | 'running' | 'done';
 
-/** The Spotify import flow: choose a source, pick what to import, watch it run, read the summary. */
-export class SpotifyImportFlow {
+/** The import flow: choose a source, pick what to import, watch it run, read the summary. */
+export class MusicImportFlow {
 	step = $state<ImportStep>('source');
-	sourceKind = $state<ImportSourceKind>('export');
+	sourceKind = $state<ImportSourceKind>('youtube-account');
+	readonly youtube = new YouTubeAccountState();
 	linkText = $state('');
 	summary = $state<ImportSummary | null>(null);
 	includeLiked = $state(true);
@@ -37,6 +46,11 @@ export class SpotifyImportFlow {
 
 	#location = '';
 	#stopListening: (() => void) | null = null;
+
+	/** True when the items already are YouTube Music items, so nothing is matched. */
+	get isAccountSource(): boolean {
+		return this.sourceKind === 'youtube-account';
+	}
 
 	/** 0 to 1 share of the items matched so far. */
 	get progressFraction(): number {
@@ -63,6 +77,44 @@ export class SpotifyImportFlow {
 		count += this.#flagCount(this.includeArtists, this.summary.artists);
 		count += this.#flagCount(this.includeShows, this.summary.shows);
 		return count;
+	}
+
+	openSignIn(): void {
+		this.youtube.clearError();
+		this.step = 'signin';
+	}
+
+	closeSignIn(): void {
+		this.step = 'source';
+	}
+
+	async useBrowserSession(session: BrowserSession): Promise<void> {
+		const worked = await this.youtube.useBrowserSession(session);
+		if (worked) {
+			this.closeSignIn();
+		}
+	}
+
+	async usePastedCookies(): Promise<void> {
+		const worked = await this.youtube.usePastedCookies();
+		if (worked) {
+			this.closeSignIn();
+		}
+	}
+
+	/** Reads the account's library and lets the user pick what to import. */
+	async loadAccountPreview(): Promise<void> {
+		this.#location = '';
+		this.sourceKind = 'youtube-account';
+		await this.#loadPreview(previewAccount);
+	}
+
+	/** Re-syncs the whole account library without asking what to import. */
+	async syncNow(): Promise<void> {
+		await this.loadAccountPreview();
+		if (this.step === 'preview') {
+			await this.start();
+		}
 	}
 
 	async chooseExportFile(): Promise<void> {
@@ -117,7 +169,7 @@ export class SpotifyImportFlow {
 		});
 		this.step = 'running';
 		try {
-			await startImport(this.sourceKind, this.#location, this.#options());
+			await this.#startSource();
 		} catch (error) {
 			this.#fail(describeError(error));
 		}
@@ -131,6 +183,7 @@ export class SpotifyImportFlow {
 	restart(): void {
 		this.#stopImportListening();
 		this.step = 'source';
+		void this.youtube.refresh();
 		this.summary = null;
 		this.result = null;
 		this.progress = null;
@@ -179,6 +232,14 @@ export class SpotifyImportFlow {
 		}
 	}
 
+	async #startSource(): Promise<void> {
+		if (this.sourceKind === 'youtube-account') {
+			await startAccountImport(this.#options());
+			return;
+		}
+		await startSpotifyImport(this.sourceKind, this.#location, this.#options());
+	}
+
 	#options(): ImportOptions {
 		return {
 			liked: this.includeLiked,
@@ -201,7 +262,11 @@ export class SpotifyImportFlow {
 		this.#stopImportListening();
 		this.result = result;
 		this.step = 'done';
-		await Promise.all([library.refreshPlaylists(), library.refreshSavedItems()]);
+		await Promise.all([
+			library.refreshPlaylists(),
+			library.refreshSavedItems(),
+			this.youtube.refresh()
+		]);
 	}
 
 	#fail(message: string): void {

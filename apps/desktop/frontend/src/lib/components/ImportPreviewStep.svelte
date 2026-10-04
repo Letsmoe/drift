@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { Button, Checkbox } from '@neoworks-dev/ui';
-	import type { ImportSummary } from '#lib/api/spotifyImport.ts';
-	import type { SpotifyImportFlow } from '#lib/import/spotifyImport.svelte.ts';
+	import type { ImportSummary } from '#lib/api/musicImport.ts';
+	import type { MusicImportFlow } from '#lib/import/musicImport.svelte.ts';
 
-	let { flow, summary }: { flow: SpotifyImportFlow; summary: ImportSummary } = $props();
+	let { flow, summary }: { flow: MusicImportFlow; summary: ImportSummary } = $props();
 
 	const allPlaylistsSelected = $derived(
 		summary.playlists.length > 0 && flow.selectedPlaylistKeys.size === summary.playlists.length
@@ -20,7 +20,11 @@
 
 <div class="flex flex-col gap-3">
 	<p class="text-sm text-muted">
-		Choose what to bring over. Everything is matched to YouTube Music.
+		{#if flow.isAccountSource}
+			Choose what to bring over. Your YouTube Music library is imported as it is.
+		{:else}
+			Choose what to bring over. Everything is matched to YouTube Music.
+		{/if}
 	</p>
 
 	<div class="flex flex-col">
@@ -54,7 +58,9 @@
 							onchange={() => flow.togglePlaylist(playlist.key)}
 						/>
 						<span class="min-w-0 flex-1 truncate text-sm">{playlist.name}</span>
-						<span class="text-sm text-muted">{playlist.trackCount} tracks</span>
+						{#if playlist.trackCount > 0}
+							<span class="text-sm text-muted">{playlist.trackCount} tracks</span>
+						{/if}
 					</label>
 				{/each}
 			</div>

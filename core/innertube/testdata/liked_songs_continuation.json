@@ -1,0 +1,118 @@
+{
+	"_synthesized": "Synthesized by hand in the shape ytmusicapi's library parsers expect; not a real signed-in capture.",
+	"responseContext": {
+		"serviceTrackingParams": [
+			{
+				"service": "GFEEDBACK",
+				"params": [
+					{
+						"key": "logged_in",
+						"value": "1"
+					}
+				]
+			}
+		]
+	},
+	"onResponseReceivedActions": [
+		{
+			"appendContinuationItemsAction": {
+				"continuationItems": [
+					{
+						"musicResponsiveListItemRenderer": {
+							"thumbnail": {
+								"musicThumbnailRenderer": {
+									"thumbnail": {
+										"thumbnails": [
+											{
+												"url": "https://lh3.googleusercontent.com/x=w226-h226",
+												"width": 226,
+												"height": 226
+											}
+										]
+									}
+								}
+							},
+							"flexColumns": [
+								{
+									"musicResponsiveListItemFlexColumnRenderer": {
+										"text": {
+											"runs": [
+												{
+													"text": "Kiara",
+													"navigationEndpoint": {
+														"watchEndpoint": {
+															"videoId": "vid3"
+														}
+													}
+												}
+											]
+										}
+									}
+								},
+								{
+									"musicResponsiveListItemFlexColumnRenderer": {
+										"text": {
+											"runs": [
+												{
+													"text": "Bonobo",
+													"navigationEndpoint": {
+														"browseEndpoint": {
+															"browseId": "UCbonobo",
+															"browseEndpointContextSupportedConfigs": {
+																"browseEndpointContextMusicConfig": {
+																	"pageType": "MUSIC_PAGE_TYPE_ARTIST"
+																}
+															}
+														}
+													}
+												}
+											]
+										}
+									}
+								},
+								{
+									"musicResponsiveListItemFlexColumnRenderer": {
+										"text": {
+											"runs": [
+												{
+													"text": "Black Sands",
+													"navigationEndpoint": {
+														"browseEndpoint": {
+															"browseId": "MPREbblack",
+															"browseEndpointContextSupportedConfigs": {
+																"browseEndpointContextMusicConfig": {
+																	"pageType": "MUSIC_PAGE_TYPE_ALBUM"
+																}
+															}
+														}
+													}
+												}
+											]
+										}
+									}
+								}
+							],
+							"fixedColumns": [
+								{
+									"musicResponsiveListItemFixedColumnRenderer": {
+										"text": {
+											"runs": [
+												{
+													"text": "4:10"
+												}
+											]
+										}
+									}
+								}
+							],
+							"playlistItemData": {
+								"videoId": "vid3",
+								"playlistSetVideoId": "SETvid3"
+							}
+						}
+					}
+				]
+			}
+		}
+	]
+}
