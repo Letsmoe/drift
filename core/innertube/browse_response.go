@@ -2,6 +2,10 @@ package innertube
 
 // browseResponse is a browse page (contents) or its continuation (continuationContents).
 type browseResponse struct {
+	Header struct {
+		MusicImmersiveHeaderRenderer *artistHeader
+		MusicVisualHeaderRenderer    *artistHeader
+	}
 	Contents struct {
 		SingleColumnBrowseResultsRenderer struct {
 			Tabs []struct {
@@ -67,10 +71,7 @@ func (response browseResponse) sectionList() sectionList {
 }
 
 func (list sectionList) continuation() string {
-	if len(list.Continuations) == 0 {
-		return ""
-	}
-	return list.Continuations[0].NextContinuationData.Continuation
+	return list.Continuations.token()
 }
 
 func (item twoRowItem) thumbnails() []thumbnail {

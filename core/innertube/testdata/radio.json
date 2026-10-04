@@ -1,0 +1,507 @@
+{
+	"contents": {
+		"singleColumnMusicWatchNextResultsRenderer": {
+			"tabbedRenderer": {
+				"watchNextTabbedResultsRenderer": {
+					"tabs": [
+						{
+							"tabRenderer": {
+								"title": "Up next",
+								"content": {
+									"musicQueueRenderer": {
+										"content": {
+											"playlistPanelRenderer": {
+												"contents": [
+													{
+														"playlistPanelVideoRenderer": {
+															"title": {
+																"runs": [{ "text": "Outlands (From \"TRON: Legacy\"/Score)" }]
+															},
+															"longBylineText": {
+																"runs": [
+																	{
+																		"text": "Daft Punk",
+																		"navigationEndpoint": {
+																			"browseEndpoint": {
+																				"browseId": "UCRr1xG_2WIDs18a6cIiCxeA",
+																				"browseEndpointContextSupportedConfigs": {
+																					"browseEndpointContextMusicConfig": {
+																						"pageType": "MUSIC_PAGE_TYPE_ARTIST"
+																					}
+																				}
+																			}
+																		}
+																	},
+																	{ "text": " \u2022 " },
+																	{
+																		"text": "TRON: Legacy",
+																		"navigationEndpoint": {
+																			"browseEndpoint": {
+																				"browseId": "MPREb_BQHrCwSBM37",
+																				"browseEndpointContextSupportedConfigs": {
+																					"browseEndpointContextMusicConfig": {
+																						"pageType": "MUSIC_PAGE_TYPE_ALBUM"
+																					}
+																				}
+																			}
+																		}
+																	},
+																	{ "text": " \u2022 " },
+																	{ "text": "2010" }
+																]
+															},
+															"thumbnail": {
+																"thumbnails": [
+																	{
+																		"url": "https://yt3.googleusercontent.com/wY7kATQ2X8UkxWku6-JuLMCfjoIP4V5Mc9B24wV_bNcombU5iOTEPIgRax9iuIpgGcBbsTuF2lhsSyPO=w60-h60-l90-rj",
+																		"width": 60,
+																		"height": 60
+																	},
+																	{
+																		"url": "https://yt3.googleusercontent.com/wY7kATQ2X8UkxWku6-JuLMCfjoIP4V5Mc9B24wV_bNcombU5iOTEPIgRax9iuIpgGcBbsTuF2lhsSyPO=w120-h120-l90-rj",
+																		"width": 120,
+																		"height": 120
+																	}
+																]
+															},
+															"lengthText": { "runs": [{ "text": "2:43" }] },
+															"navigationEndpoint": {
+																"watchEndpoint": {
+																	"videoId": "UM6Cts99XdA",
+																	"playlistId": "RDAMVMUM6Cts99XdA",
+																	"watchEndpointMusicSupportedConfigs": {
+																		"watchEndpointMusicConfig": {
+																			"hasPersistentPlaylistPanel": true,
+																			"musicVideoType": "MUSIC_VIDEO_TYPE_ATV"
+																		}
+																	}
+																}
+															},
+															"videoId": "UM6Cts99XdA"
+														}
+													},
+													{
+														"playlistPanelVideoRenderer": {
+															"title": {
+																"runs": [{ "text": "Recognizer (From \"TRON: Legacy\"/Score)" }]
+															},
+															"longBylineText": {
+																"runs": [
+																	{
+																		"text": "Daft Punk",
+																		"navigationEndpoint": {
+																			"browseEndpoint": {
+																				"browseId": "UCRr1xG_2WIDs18a6cIiCxeA",
+																				"browseEndpointContextSupportedConfigs": {
+																					"browseEndpointContextMusicConfig": {
+																						"pageType": "MUSIC_PAGE_TYPE_ARTIST"
+																					}
+																				}
+																			}
+																		}
+																	},
+																	{ "text": " \u2022 " },
+																	{
+																		"text": "TRON: Legacy",
+																		"navigationEndpoint": {
+																			"browseEndpoint": {
+																				"browseId": "MPREb_BQHrCwSBM37",
+																				"browseEndpointContextSupportedConfigs": {
+																					"browseEndpointContextMusicConfig": {
+																						"pageType": "MUSIC_PAGE_TYPE_ALBUM"
+																					}
+																				}
+																			}
+																		}
+																	},
+																	{ "text": " \u2022 " },
+																	{ "text": "2010" }
+																]
+															},
+															"thumbnail": {
+																"thumbnails": [
+																	{
+																		"url": "https://yt3.googleusercontent.com/wY7kATQ2X8UkxWku6-JuLMCfjoIP4V5Mc9B24wV_bNcombU5iOTEPIgRax9iuIpgGcBbsTuF2lhsSyPO=w60-h60-l90-rj",
+																		"width": 60,
+																		"height": 60
+																	},
+																	{
+																		"url": "https://yt3.googleusercontent.com/wY7kATQ2X8UkxWku6-JuLMCfjoIP4V5Mc9B24wV_bNcombU5iOTEPIgRax9iuIpgGcBbsTuF2lhsSyPO=w120-h120-l90-rj",
+																		"width": 120,
+																		"height": 120
+																	}
+																]
+															},
+															"lengthText": { "runs": [{ "text": "2:38" }] },
+															"navigationEndpoint": {
+																"watchEndpoint": {
+																	"videoId": "vsD70GAtVac",
+																	"playlistId": "RDAMVMUM6Cts99XdA",
+																	"watchEndpointMusicSupportedConfigs": {
+																		"watchEndpointMusicConfig": {
+																			"hasPersistentPlaylistPanel": true,
+																			"musicVideoType": "MUSIC_VIDEO_TYPE_ATV"
+																		}
+																	}
+																}
+															},
+															"videoId": "vsD70GAtVac"
+														}
+													},
+													{
+														"playlistPanelVideoRenderer": {
+															"title": { "runs": [{ "text": "No Time for Caution" }] },
+															"longBylineText": {
+																"runs": [
+																	{
+																		"text": "Hans Zimmer",
+																		"navigationEndpoint": {
+																			"browseEndpoint": {
+																				"browseId": "UCfCNL5oajlQBAlyjWv1ChVw",
+																				"browseEndpointContextSupportedConfigs": {
+																					"browseEndpointContextMusicConfig": {
+																						"pageType": "MUSIC_PAGE_TYPE_ARTIST"
+																					}
+																				}
+																			}
+																		}
+																	},
+																	{ "text": " \u2022 " },
+																	{
+																		"text": "Interstellar (Original Motion Picture Soundtrack) [Expanded Edition]",
+																		"navigationEndpoint": {
+																			"browseEndpoint": {
+																				"browseId": "MPREb_ubWVztfWvdp",
+																				"browseEndpointContextSupportedConfigs": {
+																					"browseEndpointContextMusicConfig": {
+																						"pageType": "MUSIC_PAGE_TYPE_ALBUM"
+																					}
+																				}
+																			}
+																		}
+																	},
+																	{ "text": " \u2022 " },
+																	{ "text": "2014" }
+																]
+															},
+															"thumbnail": {
+																"thumbnails": [
+																	{
+																		"url": "https://yt3.googleusercontent.com/vHg1BrOwidLFzCWeJ2mYDXtb3rUIvyhW4JPOrNai2K08-Va329yERoCTtt_SW0BT-9cY_roe-Mvd4vK1=w60-h60-l90-rj",
+																		"width": 60,
+																		"height": 60
+																	},
+																	{
+																		"url": "https://yt3.googleusercontent.com/vHg1BrOwidLFzCWeJ2mYDXtb3rUIvyhW4JPOrNai2K08-Va329yERoCTtt_SW0BT-9cY_roe-Mvd4vK1=w120-h120-l90-rj",
+																		"width": 120,
+																		"height": 120
+																	}
+																]
+															},
+															"lengthText": { "runs": [{ "text": "4:07" }] },
+															"navigationEndpoint": {
+																"watchEndpoint": {
+																	"videoId": "2o9KfyPqQzY",
+																	"playlistId": "RDAMVMUM6Cts99XdA",
+																	"watchEndpointMusicSupportedConfigs": {
+																		"watchEndpointMusicConfig": {
+																			"hasPersistentPlaylistPanel": true,
+																			"musicVideoType": "MUSIC_VIDEO_TYPE_ATV"
+																		}
+																	}
+																}
+															},
+															"videoId": "2o9KfyPqQzY"
+														}
+													}
+												],
+												"playlistId": "RDAMVMUM6Cts99XdA"
+											}
+										},
+										"hack": true,
+										"musicQueueConfig": {},
+										"header": {
+											"musicQueueHeaderRenderer": {
+												"title": { "runs": [{ "text": "Playing from" }] },
+												"subtitle": {
+													"runs": [{ "text": "Outlands (From \"TRON: Legacy\"/Score) Mix" }]
+												},
+												"buttons": [
+													{
+														"chipCloudChipRenderer": {
+															"text": { "runs": [{ "text": "Save" }] },
+															"navigationEndpoint": {
+																"modalEndpoint": {
+																	"modal": {
+																		"modalWithTitleAndButtonRenderer": {
+																			"title": { "runs": [{ "text": "Save this for later" }] },
+																			"content": {
+																				"runs": [
+																					{
+																						"text": "Make playlists and share them after signing in"
+																					}
+																				]
+																			},
+																			"button": {
+																				"buttonRenderer": {
+																					"isDisabled": false,
+																					"text": { "runs": [{ "text": "Sign in" }] },
+																					"navigationEndpoint": {
+																						"signInEndpoint": { "hack": true }
+																					}
+																				}
+																			}
+																		}
+																	}
+																},
+																"saveQueueToPlaylistCommand": {}
+															},
+															"accessibilityData": { "accessibilityData": { "label": "Save" } },
+															"isSelected": false,
+															"uniqueId": "Save"
+														}
+													}
+												]
+											}
+										},
+										"subHeaderChipCloud": {
+											"chipCloudRenderer": {
+												"chips": [
+													{
+														"chipCloudChipRenderer": {
+															"text": { "runs": [{ "text": "All" }] },
+															"navigationEndpoint": {
+																"queueUpdateCommand": {
+																	"queueUpdateSection": "QUEUE_UPDATE_SECTION_QUEUE",
+																	"fetchContentsCommand": {
+																		"watchEndpoint": { "playlistId": "RDAMVMUM6Cts99XdA" }
+																	},
+																	"dedupeAgainstLocalQueue": true,
+																	"syncMode": "QUEUE_UPDATE_SYNC_MODE_DEDUPE_AGAINST_LOCAL"
+																}
+															},
+															"accessibilityData": { "accessibilityData": { "label": "All" } },
+															"isSelected": true,
+															"uniqueId": "All"
+														}
+													},
+													{
+														"chipCloudChipRenderer": {
+															"text": { "runs": [{ "text": "Popular" }] },
+															"navigationEndpoint": {
+																"queueUpdateCommand": {
+																	"queueUpdateSection": "QUEUE_UPDATE_SECTION_QUEUE",
+																	"fetchContentsCommand": {
+																		"watchEndpoint": { "playlistId": "RDATpYvUM6Cts99XdA" }
+																	},
+																	"dedupeAgainstLocalQueue": true,
+																	"syncMode": "QUEUE_UPDATE_SYNC_MODE_DEDUPE_AGAINST_LOCAL"
+																}
+															},
+															"accessibilityData": { "accessibilityData": { "label": "Popular" } },
+															"isSelected": false,
+															"uniqueId": "Popular"
+														}
+													},
+													{
+														"chipCloudChipRenderer": {
+															"text": { "runs": [{ "text": "Discover" }] },
+															"navigationEndpoint": {
+																"queueUpdateCommand": {
+																	"queueUpdateSection": "QUEUE_UPDATE_SECTION_QUEUE",
+																	"fetchContentsCommand": {
+																		"watchEndpoint": { "playlistId": "RDATiXvUM6Cts99XdA" }
+																	},
+																	"dedupeAgainstLocalQueue": true,
+																	"syncMode": "QUEUE_UPDATE_SYNC_MODE_DEDUPE_AGAINST_LOCAL"
+																}
+															},
+															"accessibilityData": { "accessibilityData": { "label": "Discover" } },
+															"isSelected": false,
+															"uniqueId": "Discover"
+														}
+													},
+													{
+														"chipCloudChipRenderer": {
+															"text": { "runs": [{ "text": "Deep cuts" }] },
+															"navigationEndpoint": {
+																"queueUpdateCommand": {
+																	"queueUpdateSection": "QUEUE_UPDATE_SECTION_QUEUE",
+																	"fetchContentsCommand": {
+																		"watchEndpoint": { "playlistId": "RDATpXvUM6Cts99XdA" }
+																	},
+																	"dedupeAgainstLocalQueue": true,
+																	"syncMode": "QUEUE_UPDATE_SYNC_MODE_DEDUPE_AGAINST_LOCAL"
+																}
+															},
+															"accessibilityData": {
+																"accessibilityData": { "label": "Deep cuts" }
+															},
+															"isSelected": false,
+															"uniqueId": "Deep cuts"
+														}
+													},
+													{
+														"chipCloudChipRenderer": {
+															"text": { "runs": [{ "text": "2010s" }] },
+															"navigationEndpoint": {
+																"queueUpdateCommand": {
+																	"queueUpdateSection": "QUEUE_UPDATE_SECTION_QUEUE",
+																	"fetchContentsCommand": {
+																		"watchEndpoint": { "playlistId": "RDATd0XvUM6Cts99XdA" }
+																	},
+																	"dedupeAgainstLocalQueue": true,
+																	"syncMode": "QUEUE_UPDATE_SYNC_MODE_DEDUPE_AGAINST_LOCAL"
+																}
+															},
+															"accessibilityData": { "accessibilityData": { "label": "2010s" } },
+															"isSelected": false,
+															"uniqueId": "2010s"
+														}
+													},
+													{
+														"chipCloudChipRenderer": {
+															"text": { "runs": [{ "text": "2020s" }] },
+															"navigationEndpoint": {
+																"queueUpdateCommand": {
+																	"queueUpdateSection": "QUEUE_UPDATE_SECTION_QUEUE",
+																	"fetchContentsCommand": {
+																		"watchEndpoint": { "playlistId": "RDATd1XvUM6Cts99XdA" }
+																	},
+																	"dedupeAgainstLocalQueue": true,
+																	"syncMode": "QUEUE_UPDATE_SYNC_MODE_DEDUPE_AGAINST_LOCAL"
+																}
+															},
+															"accessibilityData": { "accessibilityData": { "label": "2020s" } },
+															"isSelected": false,
+															"uniqueId": "2020s"
+														}
+													},
+													{
+														"chipCloudChipRenderer": {
+															"text": { "runs": [{ "text": "2000s" }] },
+															"navigationEndpoint": {
+																"queueUpdateCommand": {
+																	"queueUpdateSection": "QUEUE_UPDATE_SECTION_QUEUE",
+																	"fetchContentsCommand": {
+																		"watchEndpoint": { "playlistId": "RDATd-vUM6Cts99XdA" }
+																	},
+																	"dedupeAgainstLocalQueue": true,
+																	"syncMode": "QUEUE_UPDATE_SYNC_MODE_DEDUPE_AGAINST_LOCAL"
+																}
+															},
+															"accessibilityData": { "accessibilityData": { "label": "2000s" } },
+															"isSelected": false,
+															"uniqueId": "2000s"
+														}
+													},
+													{
+														"chipCloudChipRenderer": {
+															"text": { "runs": [{ "text": "Electronic" }] },
+															"navigationEndpoint": {
+																"queueUpdateCommand": {
+																	"queueUpdateSection": "QUEUE_UPDATE_SECTION_QUEUE",
+																	"fetchContentsCommand": {
+																		"watchEndpoint": { "playlistId": "RDATgivUM6Cts99XdA" }
+																	},
+																	"dedupeAgainstLocalQueue": true,
+																	"syncMode": "QUEUE_UPDATE_SYNC_MODE_DEDUPE_AGAINST_LOCAL"
+																}
+															},
+															"accessibilityData": {
+																"accessibilityData": { "label": "Electronic" }
+															},
+															"isSelected": false,
+															"uniqueId": "Electronic"
+														}
+													},
+													{
+														"chipCloudChipRenderer": {
+															"text": { "runs": [{ "text": "Focus" }] },
+															"navigationEndpoint": {
+																"queueUpdateCommand": {
+																	"queueUpdateSection": "QUEUE_UPDATE_SECTION_QUEUE",
+																	"fetchContentsCommand": {
+																		"watchEndpoint": { "playlistId": "RDATmavUM6Cts99XdA" }
+																	},
+																	"dedupeAgainstLocalQueue": true,
+																	"syncMode": "QUEUE_UPDATE_SYNC_MODE_DEDUPE_AGAINST_LOCAL"
+																}
+															},
+															"accessibilityData": { "accessibilityData": { "label": "Focus" } },
+															"isSelected": false,
+															"uniqueId": "Focus"
+														}
+													},
+													{
+														"chipCloudChipRenderer": {
+															"text": { "runs": [{ "text": "Instrumental" }] },
+															"navigationEndpoint": {
+																"queueUpdateCommand": {
+																	"queueUpdateSection": "QUEUE_UPDATE_SECTION_QUEUE",
+																	"fetchContentsCommand": {
+																		"watchEndpoint": { "playlistId": "RDATnXvUM6Cts99XdA" }
+																	},
+																	"dedupeAgainstLocalQueue": true,
+																	"syncMode": "QUEUE_UPDATE_SYNC_MODE_DEDUPE_AGAINST_LOCAL"
+																}
+															},
+															"accessibilityData": {
+																"accessibilityData": { "label": "Instrumental" }
+															},
+															"isSelected": false,
+															"uniqueId": "Instrumental"
+														}
+													},
+													{
+														"chipCloudChipRenderer": {
+															"text": { "runs": [{ "text": "Sleep" }] },
+															"navigationEndpoint": {
+																"queueUpdateCommand": {
+																	"queueUpdateSection": "QUEUE_UPDATE_SECTION_QUEUE",
+																	"fetchContentsCommand": {
+																		"watchEndpoint": { "playlistId": "RDATmfvUM6Cts99XdA" }
+																	},
+																	"dedupeAgainstLocalQueue": true,
+																	"syncMode": "QUEUE_UPDATE_SYNC_MODE_DEDUPE_AGAINST_LOCAL"
+																}
+															},
+															"accessibilityData": { "accessibilityData": { "label": "Sleep" } },
+															"isSelected": false,
+															"uniqueId": "Sleep"
+														}
+													},
+													{
+														"chipCloudChipRenderer": {
+															"text": { "runs": [{ "text": "Soundtracks" }] },
+															"navigationEndpoint": {
+																"queueUpdateCommand": {
+																	"queueUpdateSection": "QUEUE_UPDATE_SECTION_QUEUE",
+																	"fetchContentsCommand": {
+																		"watchEndpoint": { "playlistId": "RDATgKXvUM6Cts99XdA" }
+																	},
+																	"dedupeAgainstLocalQueue": true,
+																	"syncMode": "QUEUE_UPDATE_SYNC_MODE_DEDUPE_AGAINST_LOCAL"
+																}
+															},
+															"accessibilityData": {
+																"accessibilityData": { "label": "Soundtracks" }
+															},
+															"isSelected": false,
+															"uniqueId": "Soundtracks"
+														}
+													}
+												],
+												"selectionBehavior": "CHIP_CLOUD_SELECTION_BEHAVIOR_SINGLE_SELECT_ALWAYS_SELECTED"
+											}
+										}
+									}
+								}
+							}
+						}
+					]
+				}
+			}
+		}
+	}
+}

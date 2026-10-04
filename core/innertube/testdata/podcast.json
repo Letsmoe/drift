@@ -1,0 +1,486 @@
+{
+	"contents": {
+		"twoColumnBrowseResultsRenderer": {
+			"secondaryContents": {
+				"sectionListRenderer": {
+					"contents": [
+						{
+							"musicShelfRenderer": {
+								"contents": [
+									{
+										"musicMultiRowListItemRenderer": {
+											"thumbnail": {
+												"musicThumbnailRenderer": {
+													"thumbnail": {
+														"thumbnails": [
+															{
+																"url": "https://i.ytimg.com/vi/M6NrZuph2fU/sddefault.jpg?sqp=-oaymwElCIAFEOgCIAQqCghQELAEGAAg4ANIWvKriqkDCZoCBggpECkYKQ&rs=AMzJL3kWrwMzWaAVqm0cx_wcpnvF8HZ2HA",
+																"width": 640,
+																"height": 360
+															},
+															{
+																"url": "https://i.ytimg.com/vi/M6NrZuph2fU/hq720.jpg?sqp=-oaymwEmCIAKENAFIAQqCwiYAhDoBxgAINAFSFryq4qpAwmaAgYIKRApGCk&rs=AMzJL3kH87frRkNe_VQEFGlPGu8IqSZBLQ",
+																"width": 1280,
+																"height": 720
+															}
+														]
+													}
+												}
+											},
+											"onTap": {
+												"watchEndpoint": {
+													"videoId": "M6NrZuph2fU",
+													"watchEndpointMusicSupportedConfigs": {
+														"watchEndpointMusicConfig": {
+															"musicVideoType": "MUSIC_VIDEO_TYPE_PODCAST_EPISODE"
+														}
+													}
+												}
+											},
+											"subtitle": {
+												"runs": [{ "text": "1 view" }, { "text": " \u2022 " }, { "text": "Aug 30" }]
+											},
+											"playbackProgress": {
+												"musicPlaybackProgressRenderer": {
+													"playbackProgressPercentage": 0,
+													"playbackProgressText": {
+														"runs": [{ "text": " \u2022 " }, { "text": "34 min" }]
+													},
+													"videoPlaybackPositionFeedbackToken": "AB9zfpKDsaGug9TnY4lSXev0jnrXWWp6UmDaer3OPO3e9hj4FdB7-TgYgB9NqK2E7MR4e_IqUNBwRl2UrawLG8jYFuMzMADQxg",
+													"durationText": {
+														"runs": [{ "text": " \u2022 " }, { "text": "34 min" }]
+													},
+													"playedText": {
+														"runs": [
+															{ "text": " \u2022 " },
+															{ "text": "Played", "textColor": 4294921797 }
+														]
+													}
+												}
+											},
+											"title": {
+												"runs": [
+													{
+														"text": "Revenge of Potter in the Box",
+														"navigationEndpoint": {
+															"browseEndpoint": {
+																"browseId": "MPEDM6NrZuph2fU",
+																"browseEndpointContextSupportedConfigs": {
+																	"browseEndpointContextMusicConfig": {
+																		"pageType": "MUSIC_PAGE_TYPE_NON_MUSIC_AUDIO_TRACK_PAGE"
+																	}
+																}
+															}
+														}
+													}
+												]
+											},
+											"description": {
+												"runs": [
+													{
+														"text": "In this week's long-delayed episode, Joel highlights Digimon Adventure 02: Revenge of Diaboromon, the Harry Potter/Star Trek: Voyager fan fiction crossover Agent Potter, Section 31 by uNople (https://"
+													}
+												]
+											}
+										}
+									},
+									{
+										"musicMultiRowListItemRenderer": {
+											"thumbnail": {
+												"musicThumbnailRenderer": {
+													"thumbnail": {
+														"thumbnails": [
+															{
+																"url": "https://i.ytimg.com/vi/00fcWUYjHrM/sddefault.jpg?sqp=-oaymwElCIAFEOgCIAQqCghQELAEGAAg4ANIWvKriqkDCZoCBggMEAgYMw&rs=AMzJL3mrtVESzC0QWBW3NxPCG7YwThWWcw",
+																"width": 640,
+																"height": 360
+															},
+															{
+																"url": "https://i.ytimg.com/vi/00fcWUYjHrM/hq720.jpg?sqp=-oaymwEmCIAKENAFIAQqCwiYAhDoBxgAINAFSFryq4qpAwmaAgYIDBAIGDM&rs=AMzJL3lRHATbpf2Ep4YbjCFxjfJDhgFdjg",
+																"width": 1280,
+																"height": 720
+															}
+														]
+													}
+												}
+											},
+											"onTap": {
+												"watchEndpoint": {
+													"videoId": "00fcWUYjHrM",
+													"watchEndpointMusicSupportedConfigs": {
+														"watchEndpointMusicConfig": {
+															"musicVideoType": "MUSIC_VIDEO_TYPE_PODCAST_EPISODE"
+														}
+													}
+												}
+											},
+											"subtitle": { "runs": [{ "text": "Aug 30" }] },
+											"playbackProgress": {
+												"musicPlaybackProgressRenderer": {
+													"playbackProgressPercentage": 0,
+													"playbackProgressText": {
+														"runs": [{ "text": " \u2022 " }, { "text": "48 min" }]
+													},
+													"videoPlaybackPositionFeedbackToken": "AB9zfpLwTE9JvPw7G6hUPMMOrqPN4DERulLmVnaUSPy5mQT4zY9WhpSb6z_jHnREu49t_eup8rgN2LlRnanBXLZZgmlHZpTapA",
+													"durationText": {
+														"runs": [{ "text": " \u2022 " }, { "text": "48 min" }]
+													},
+													"playedText": {
+														"runs": [
+															{ "text": " \u2022 " },
+															{ "text": "Played", "textColor": 4294921797 }
+														]
+													}
+												}
+											},
+											"title": {
+												"runs": [
+													{
+														"text": "The Digital Grid [Season 7 Premiere]",
+														"navigationEndpoint": {
+															"browseEndpoint": {
+																"browseId": "MPED00fcWUYjHrM",
+																"browseEndpointContextSupportedConfigs": {
+																	"browseEndpointContextMusicConfig": {
+																		"pageType": "MUSIC_PAGE_TYPE_NON_MUSIC_AUDIO_TRACK_PAGE"
+																	}
+																}
+															}
+														}
+													}
+												]
+											},
+											"description": {
+												"runs": [
+													{
+														"text": "On the Season Premiere of The Pop Culture Shuffle, Joel highlights Disney's TRON trilogy which includes the original film, TRON Legacy, and TRON Ares.\n\n\nHe also takes a look at The DigiFiles: Egos and"
+													}
+												]
+											}
+										}
+									},
+									{
+										"musicMultiRowListItemRenderer": {
+											"thumbnail": {
+												"musicThumbnailRenderer": {
+													"thumbnail": {
+														"thumbnails": [
+															{
+																"url": "https://i.ytimg.com/vi/PGJRTCY-2r4/sddefault.jpg?sqp=-oaymwElCIAFEOgCIAQqCghQELAEGAAg4ANIWvKriqkDCZoCBggpECkYKQ&rs=AMzJL3m-4rb84ZbNNTuZ06P1SrogoBZJxQ",
+																"width": 640,
+																"height": 360
+															},
+															{
+																"url": "https://i.ytimg.com/vi/PGJRTCY-2r4/hq720.jpg?sqp=-oaymwEmCIAKENAFIAQqCwiYAhDoBxgAINAFSFryq4qpAwmaAgYIKRApGCk&rs=AMzJL3lXmcUswqeReF0JLBaXFtd4blpmQw",
+																"width": 1280,
+																"height": 720
+															}
+														]
+													}
+												}
+											},
+											"onTap": {
+												"watchEndpoint": {
+													"videoId": "PGJRTCY-2r4",
+													"watchEndpointMusicSupportedConfigs": {
+														"watchEndpointMusicConfig": {
+															"musicVideoType": "MUSIC_VIDEO_TYPE_PODCAST_EPISODE"
+														}
+													}
+												}
+											},
+											"subtitle": { "runs": [{ "text": "Aug 30" }] },
+											"playbackProgress": {
+												"musicPlaybackProgressRenderer": {
+													"playbackProgressPercentage": 0,
+													"playbackProgressText": {
+														"runs": [{ "text": " \u2022 " }, { "text": "48 min" }]
+													},
+													"videoPlaybackPositionFeedbackToken": "AB9zfpJ87b0a_H_eitjqAzn6vsrC2mz1Dkfuo2iCtMhUIpSegurNwfZBzvbcp06HSDwiBfJFU3dIlJje-4Q1CshkDAcANqDWBw",
+													"durationText": {
+														"runs": [{ "text": " \u2022 " }, { "text": "48 min" }]
+													},
+													"playedText": {
+														"runs": [
+															{ "text": " \u2022 " },
+															{ "text": "Played", "textColor": 4294921797 }
+														]
+													}
+												}
+											},
+											"title": {
+												"runs": [
+													{
+														"text": "Freakier Digital Dinosaurs Tri",
+														"navigationEndpoint": {
+															"browseEndpoint": {
+																"browseId": "MPEDPGJRTCY-2r4",
+																"browseEndpointContextSupportedConfigs": {
+																	"browseEndpointContextMusicConfig": {
+																		"pageType": "MUSIC_PAGE_TYPE_NON_MUSIC_AUDIO_TRACK_PAGE"
+																	}
+																}
+															}
+														}
+													}
+												]
+											},
+											"description": {
+												"runs": [
+													{
+														"text": "On this episode, Joel discusses Disney's Freaky Friday franchise, the Digimon Adventure Tri anime film series, his personal thoughts on dinosaurs and why he might never discuss Jurassic Park or World,"
+													}
+												]
+											}
+										}
+									}
+								],
+								"continuations": [
+									{
+										"nextContinuationData": {
+											"continuation": "4qmFsgJREhFNUFNQUExPck5VNmFRY19aNBo8ZWg1UVZEcERRbEZwUlVSTk1rOVVRVFJTVlUwd1QwVlpOVTFFYUVSTlZGR1NBUU1JMlFqYUNBUUlBaEFC"
+										}
+									}
+								]
+							}
+						}
+					],
+					"header": {
+						"chipCloudRenderer": {
+							"chips": [
+								{
+									"chipCloudChipRenderer": {
+										"text": { "runs": [{ "text": "Latest" }] },
+										"navigationEndpoint": {
+											"openPopupAction": {
+												"popup": {
+													"menuPopupRenderer": {
+														"items": [
+															{
+																"menuNavigationItemRenderer": {
+																	"text": { "simpleText": "Latest" },
+																	"navigationEndpoint": {
+																		"browseSectionListReloadEndpoint": {
+																			"continuation": {
+																				"reloadContinuationData": {
+																					"continuation": "4qmFsgIxEhFNUFNQUExPck5VNmFRY19aNBoca2dFRENOa0lvQVlCMmdnRUNBSVFBUSUzRCUzRA%3D%3D",
+																					"showSpinnerOverlay": true
+																				}
+																			}
+																		}
+																	}
+																}
+															},
+															{
+																"menuNavigationItemRenderer": {
+																	"text": { "simpleText": "Oldest" },
+																	"navigationEndpoint": {
+																		"browseSectionListReloadEndpoint": {
+																			"continuation": {
+																				"reloadContinuationData": {
+																					"continuation": "4qmFsgIxEhFNUFNQUExPck5VNmFRY19aNBoca2dFRENOa0lvQVlCMmdnRUNBRVFBUSUzRCUzRA%3D%3D",
+																					"showSpinnerOverlay": true
+																				}
+																			}
+																		}
+																	}
+																}
+															},
+															{
+																"menuNavigationItemRenderer": {
+																	"text": { "simpleText": "Popular" },
+																	"navigationEndpoint": {
+																		"browseSectionListReloadEndpoint": {
+																			"continuation": {
+																				"reloadContinuationData": {
+																					"continuation": "4qmFsgIxEhFNUFNQUExPck5VNmFRY19aNBoca2dFRENOa0lvQVlCMmdnRUNBSVFBZyUzRCUzRA%3D%3D",
+																					"showSpinnerOverlay": true
+																				}
+																			}
+																		}
+																	}
+																}
+															},
+															{
+																"menuNavigationItemRenderer": {
+																	"text": { "simpleText": "Creator provided" },
+																	"navigationEndpoint": {
+																		"browseSectionListReloadEndpoint": {
+																			"continuation": {
+																				"reloadContinuationData": {
+																					"continuation": "4qmFsgIhEhFNUFNQUExPck5VNmFRY19aNBoMa2dFRENOa0lvQVlC",
+																					"showSpinnerOverlay": true
+																				}
+																			}
+																		}
+																	}
+																}
+															}
+														]
+													}
+												},
+												"popupType": "DIALOG",
+												"reusePopup": true
+											}
+										},
+										"accessibilityData": { "accessibilityData": { "label": "Sort track list by" } },
+										"uniqueId": "YTM SDP Sort Chip",
+										"notSelectable": true
+									}
+								},
+								{
+									"chipCloudChipRenderer": {
+										"text": { "simpleText": "In progress" },
+										"navigationEndpoint": {
+											"browseSectionListReloadEndpoint": {
+												"continuation": {
+													"reloadContinuationData": {
+														"continuation": "4qmFsgI1EhFNUFNQUExPck5VNmFRY19aNBoga2dFRENOa0lvQVlCMmdnRUNBSVFBWWdKQXclM0QlM0Q%3D",
+														"showSpinnerOverlay": true
+													}
+												}
+											}
+										},
+										"isSelected": false,
+										"onDeselectedCommand": {
+											"browseSectionListReloadEndpoint": {
+												"continuation": {
+													"reloadContinuationData": {
+														"continuation": "4qmFsgIxEhFNUFNQUExPck5VNmFRY19aNBoca2dFRENOa0lvQVlCMmdnRUNBSVFBUSUzRCUzRA%3D%3D",
+														"showSpinnerOverlay": true
+													}
+												}
+											}
+										},
+										"uniqueId": "YTM SDP In progress Chip"
+									}
+								},
+								{
+									"chipCloudChipRenderer": {
+										"text": { "simpleText": "Unplayed" },
+										"navigationEndpoint": {
+											"browseSectionListReloadEndpoint": {
+												"continuation": {
+													"reloadContinuationData": {
+														"continuation": "4qmFsgI1EhFNUFNQUExPck5VNmFRY19aNBoga2dFRENOa0lvQVlCMmdnRUNBSVFBWWdKQVElM0QlM0Q%3D",
+														"showSpinnerOverlay": true
+													}
+												}
+											}
+										},
+										"isSelected": false,
+										"onDeselectedCommand": {
+											"browseSectionListReloadEndpoint": {
+												"continuation": {
+													"reloadContinuationData": {
+														"continuation": "4qmFsgIxEhFNUFNQUExPck5VNmFRY19aNBoca2dFRENOa0lvQVlCMmdnRUNBSVFBUSUzRCUzRA%3D%3D",
+														"showSpinnerOverlay": true
+													}
+												}
+											}
+										},
+										"uniqueId": "YTM SDP Unplayed Chip"
+									}
+								},
+								{
+									"chipCloudChipRenderer": {
+										"text": { "simpleText": "Played" },
+										"navigationEndpoint": {
+											"browseSectionListReloadEndpoint": {
+												"continuation": {
+													"reloadContinuationData": {
+														"continuation": "4qmFsgI1EhFNUFNQUExPck5VNmFRY19aNBoga2dFRENOa0lvQVlCMmdnRUNBSVFBWWdKQWclM0QlM0Q%3D",
+														"showSpinnerOverlay": true
+													}
+												}
+											}
+										},
+										"isSelected": false,
+										"onDeselectedCommand": {
+											"browseSectionListReloadEndpoint": {
+												"continuation": {
+													"reloadContinuationData": {
+														"continuation": "4qmFsgIxEhFNUFNQUExPck5VNmFRY19aNBoca2dFRENOa0lvQVlCMmdnRUNBSVFBUSUzRCUzRA%3D%3D",
+														"showSpinnerOverlay": true
+													}
+												}
+											}
+										},
+										"uniqueId": "YTM SDP Played Chip"
+									}
+								}
+							],
+							"horizontalScrollable": true,
+							"selectionBehavior": "CHIP_CLOUD_SELECTION_BEHAVIOR_SINGLE_SELECT"
+						}
+					}
+				}
+			},
+			"tabs": [
+				{
+					"tabRenderer": {
+						"content": {
+							"sectionListRenderer": {
+								"contents": [
+									{
+										"musicResponsiveHeaderRenderer": {
+											"thumbnail": {
+												"musicThumbnailRenderer": {
+													"thumbnail": {
+														"thumbnails": [
+															{
+																"url": "https://i.ytimg.com/podcasts_artwork/PLOrNU6aQc_Z4/rss_feed_ingested.jpg?sqp=CMiuiNYG-oaymwEICDwQPCAASFo&rs=AMzJL3mrIryOOQZPRpgCmk9m3XREBh_PGw",
+																"width": 60,
+																"height": 60
+															},
+															{
+																"url": "https://i.ytimg.com/podcasts_artwork/PLOrNU6aQc_Z4/rss_feed_ingested.jpg?sqp=CMiuiNYG-oaymwEICHgQeCAASFo&rs=AMzJL3netYXVT8HySuWwC-ar5djkYgvNBA",
+																"width": 120,
+																"height": 120
+															}
+														]
+													}
+												}
+											},
+											"title": { "runs": [{ "text": "The Pop Culture Shuffle" }] },
+											"subtitle": {},
+											"straplineTextOne": {
+												"runs": [
+													{
+														"text": "Joel Garcia",
+														"navigationEndpoint": {
+															"browseEndpoint": {
+																"browseId": "UCkQeESHaeH4g-gzFK-_G5Mg",
+																"browseEndpointContextSupportedConfigs": {
+																	"browseEndpointContextMusicConfig": {
+																		"pageType": "MUSIC_PAGE_TYPE_USER_CHANNEL"
+																	}
+																}
+															}
+														}
+													}
+												]
+											},
+											"description": {
+												"musicDescriptionShelfRenderer": {
+													"header": { "runs": [{ "text": "The Pop Culture Shuffle" }] },
+													"description": {
+														"runs": [
+															{
+																"text": "The Pop Culture Shuffle features host Joel Garcia talking about the latest in pop culture, such as Film and TV, as well the occasional sports talk. It is a podcast spin-off of The Shuffle Radio Show, which previously aired on both KCR College Radio at San Diego State University and KSDS-HD2/SDS Radio at San Diego City College."
+															}
+														]
+													}
+												}
+											}
+										}
+									}
+								]
+							}
+						}
+					}
+				}
+			]
+		}
+	}
+}

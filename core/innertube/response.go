@@ -4,9 +4,12 @@ package innertube
 // field names case-insensitively, so InnerTube's camelCase keys need no tags.
 
 const (
-	pageTypeArtist   = "MUSIC_PAGE_TYPE_ARTIST"
-	pageTypeAlbum    = "MUSIC_PAGE_TYPE_ALBUM"
-	pageTypePlaylist = "MUSIC_PAGE_TYPE_PLAYLIST"
+	pageTypeArtist        = "MUSIC_PAGE_TYPE_ARTIST"
+	pageTypeAlbum         = "MUSIC_PAGE_TYPE_ALBUM"
+	pageTypePlaylist      = "MUSIC_PAGE_TYPE_PLAYLIST"
+	pageTypePodcast       = "MUSIC_PAGE_TYPE_PODCAST_SHOW_DETAIL_PAGE"
+	pageTypeEpisode       = "MUSIC_PAGE_TYPE_NON_MUSIC_AUDIO_TRACK_PAGE"
+	musicVideoTypeEpisode = "MUSIC_VIDEO_TYPE_PODCAST_EPISODE"
 )
 
 type searchResponse struct {
@@ -25,35 +28,84 @@ type searchResponse struct {
 
 type sectionList struct {
 	Contents      []section
-	Continuations []struct {
-		NextContinuationData struct {
-			Continuation string
-		}
+	Continuations continuationList
+}
+
+// continuationList is the older continuation form: a token next to the list.
+type continuationList []struct {
+	NextContinuationData struct {
+		Continuation string
 	}
 }
 
 type section struct {
-	MusicShelfRenderer *struct {
-		Contents []struct {
-			MusicResponsiveListItemRenderer *listItem
+	MusicShelfRenderer         *listShelf
+	MusicPlaylistShelfRenderer *listShelf
+	MusicCarouselShelfRenderer *carouselShelf
+	MusicCardShelfRenderer     *cardShelf
+	ItemSectionRenderer        *struct {
+		Contents []shelfItem
+	}
+}
+
+// listShelf is a vertical list of rows: search results, album tracks, podcast episodes.
+type listShelf struct {
+	Title struct {
+		Runs []run
+	}
+	Contents      []shelfItem
+	Continuations continuationList
+}
+
+// shelfItem is one entry of a listShelf. The last entry of a playlist page is a
+// continuationItemRenderer holding the token for the next page.
+type shelfItem struct {
+	MusicResponsiveListItemRenderer *listItem
+	MusicMultiRowListItemRenderer   *episodeRow
+	ContinuationItemRenderer        *struct {
+		ContinuationEndpoint struct {
+			ContinuationCommand struct {
+				Token string
+			}
 		}
 	}
-	MusicCarouselShelfRenderer *carouselShelf
+}
+
+// cardShelf is the search "top result" card with its listed songs.
+type cardShelf struct {
+	Title struct {
+		Runs []run
+	}
+	Subtitle struct {
+		Runs []run
+	}
+	Thumbnail thumbnailContainer
+	Contents  []shelfItem
+}
+
+type thumbnailContainer struct {
+	MusicThumbnailRenderer struct {
+		Thumbnail struct {
+			Thumbnails []thumbnail
+		}
+	}
 }
 
 type listItem struct {
 	PlaylistItemData struct {
 		VideoID string
 	}
-	Thumbnail struct {
-		MusicThumbnailRenderer struct {
-			Thumbnail struct {
-				Thumbnails []thumbnail
+	NavigationEndpoint navigationEndpoint
+	Thumbnail          thumbnailContainer
+	FlexColumns        []struct {
+		MusicResponsiveListItemFlexColumnRenderer struct {
+			Text struct {
+				Runs []run
 			}
 		}
 	}
-	FlexColumns []struct {
-		MusicResponsiveListItemFlexColumnRenderer struct {
+	FixedColumns []struct {
+		MusicResponsiveListItemFixedColumnRenderer struct {
 			Text struct {
 				Runs []run
 			}
@@ -75,7 +127,12 @@ type run struct {
 type navigationEndpoint struct {
 	BrowseEndpoint *browseEndpoint
 	WatchEndpoint  *struct {
-		VideoID string
+		VideoID                            string
+		WatchEndpointMusicSupportedConfigs struct {
+			WatchEndpointMusicConfig struct {
+				MusicVideoType string
+			}
+		}
 	}
 }
 
@@ -88,32 +145,52 @@ type browseEndpoint struct {
 	}
 }
 
-// listItems flattens the shelves of the first (active) result tab.
-func (response searchResponse) listItems() []listItem {
+// sections returns the sections of the first (active) result tab.
+func (response searchResponse) sections() []section {
 	tabs := response.Contents.TabbedSearchResultsRenderer.Tabs
 	if len(tabs) == 0 {
 		return nil
 	}
+	return tabs[0].TabRenderer.Content.SectionListRenderer.Contents
+}
 
+// listItems flattens the shelves of the first (active) result tab.
+func (response searchResponse) listItems() []listItem {
 	var items []listItem
-	for _, section := range tabs[0].TabRenderer.Content.SectionListRenderer.Contents {
-		items = append(items, section.listItems()...)
+	for _, section := range response.sections() {
+		if section.MusicShelfRenderer != nil {
+			items = append(items, rowsOf(section.MusicShelfRenderer.Contents)...)
+		}
 	}
 	return items
 }
 
-func (section section) listItems() []listItem {
-	if section.MusicShelfRenderer == nil {
-		return nil
-	}
-
-	var items []listItem
-	for _, content := range section.MusicShelfRenderer.Contents {
-		if content.MusicResponsiveListItemRenderer != nil {
-			items = append(items, *content.MusicResponsiveListItemRenderer)
+// rowsOf picks the song rows out of shelf entries.
+func rowsOf(entries []shelfItem) []listItem {
+	var rows []listItem
+	for _, entry := range entries {
+		if entry.MusicResponsiveListItemRenderer != nil {
+			rows = append(rows, *entry.MusicResponsiveListItemRenderer)
 		}
 	}
-	return items
+	return rows
+}
+
+// continuationTokenOf returns the token of the continuationItemRenderer entry, if any.
+func continuationTokenOf(entries []shelfItem) string {
+	for _, entry := range entries {
+		if entry.ContinuationItemRenderer != nil {
+			return entry.ContinuationItemRenderer.ContinuationEndpoint.ContinuationCommand.Token
+		}
+	}
+	return ""
+}
+
+func (list continuationList) token() string {
+	if len(list) == 0 {
+		return ""
+	}
+	return list[0].NextContinuationData.Continuation
 }
 
 func (item listItem) column(index int) []run {
@@ -123,8 +200,43 @@ func (item listItem) column(index int) []run {
 	return item.FlexColumns[index].MusicResponsiveListItemFlexColumnRenderer.Text.Runs
 }
 
+func (item listItem) fixedColumn(index int) []run {
+	if index >= len(item.FixedColumns) {
+		return nil
+	}
+	return item.FixedColumns[index].MusicResponsiveListItemFixedColumnRenderer.Text.Runs
+}
+
 func (item listItem) thumbnails() []thumbnail {
 	return item.Thumbnail.MusicThumbnailRenderer.Thumbnail.Thumbnails
+}
+
+// browseEndpoint is the page the row opens: its own endpoint, else the title's.
+func (item listItem) browseEndpoint() *browseEndpoint {
+	if item.NavigationEndpoint.BrowseEndpoint != nil {
+		return item.NavigationEndpoint.BrowseEndpoint
+	}
+	title := item.column(0)
+	if len(title) == 0 {
+		return nil
+	}
+	return title[0].browseEndpoint()
+}
+
+// videoID is the video the row plays; episode and album rows without one open a page.
+func (item listItem) videoID() string {
+	return item.PlaylistItemData.VideoID
+}
+
+func (navigation navigationEndpoint) isEpisode() bool {
+	if navigation.BrowseEndpoint.pageType() == pageTypeEpisode {
+		return true
+	}
+	if navigation.WatchEndpoint == nil {
+		return false
+	}
+	config := navigation.WatchEndpoint.WatchEndpointMusicSupportedConfigs.WatchEndpointMusicConfig
+	return config.MusicVideoType == musicVideoTypeEpisode
 }
 
 func (textRun run) browseEndpoint() *browseEndpoint {
@@ -151,4 +263,8 @@ func (endpoint *browseEndpoint) pageType() string {
 		return ""
 	}
 	return endpoint.BrowseEndpointContextSupportedConfigs.BrowseEndpointContextMusicConfig.PageType
+}
+
+func (container thumbnailContainer) thumbnails() []thumbnail {
+	return container.MusicThumbnailRenderer.Thumbnail.Thumbnails
 }
