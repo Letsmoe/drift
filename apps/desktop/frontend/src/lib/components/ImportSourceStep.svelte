@@ -1,8 +1,9 @@
 <script lang="ts">
 	import { Button } from '@neoworks-dev/ui';
-	import type { SpotifyImportFlow } from '#lib/import/spotifyImport.svelte.ts';
+	import YouTubeAccountPanel from '#lib/components/YouTubeAccountPanel.svelte';
+	import type { MusicImportFlow } from '#lib/import/musicImport.svelte.ts';
 
-	let { flow }: { flow: SpotifyImportFlow } = $props();
+	let { flow }: { flow: MusicImportFlow } = $props();
 
 	function submitLink(event: SubmitEvent) {
 		event.preventDefault();
@@ -11,8 +12,10 @@
 </script>
 
 <div class="flex flex-col gap-5">
-	<section class="flex flex-col gap-2">
-		<h3 class="text-base font-semibold">Your Spotify data export</h3>
+	<YouTubeAccountPanel {flow} />
+
+	<section class="flex flex-col gap-2 border-t border-line pt-4">
+		<h3 class="text-base font-semibold">Spotify data export</h3>
 		<p class="text-sm text-muted">
 			On spotify.com open Account, then Privacy, and request "Account data". Spotify emails the
 			download in a few days. Choose the zip you get (<code>my_spotify_data.zip</code>), or its
@@ -44,7 +47,7 @@
 		</form>
 	</section>
 
-	{#if flow.errorMessage !== ''}
+	{#if flow.errorMessage !== '' && !flow.isAccountSource}
 		<p class="text-sm text-red">{flow.errorMessage}</p>
 	{/if}
 </div>

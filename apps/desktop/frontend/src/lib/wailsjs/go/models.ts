@@ -1,3 +1,67 @@
+export namespace account {
+	
+	export class Status {
+	    signedIn: boolean;
+	    account: music.Account;
+	    validatedAt: string;
+	    lastSyncedAt: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new Status(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.signedIn = source["signedIn"];
+	        this.account = this.convertValues(source["account"], music.Account);
+	        this.validatedAt = source["validatedAt"];
+	        this.lastSyncedAt = source["lastSyncedAt"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+
+}
+
+export namespace browsercookies {
+	
+	export class BrowserSession {
+	    browser: string;
+	    profile: string;
+	    hasYouTubeSession: boolean;
+	    reason: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new BrowserSession(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.browser = source["browser"];
+	        this.profile = source["profile"];
+	        this.hasYouTubeSession = source["hasYouTubeSession"];
+	        this.reason = source["reason"];
+	    }
+	}
+
+}
+
 export namespace importer {
 	
 	export class Options {
@@ -311,6 +375,24 @@ export namespace main {
 
 export namespace music {
 	
+	export class Account {
+	    name: string;
+	    handle: string;
+	    email: string;
+	    photoUrl: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new Account(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.name = source["name"];
+	        this.handle = source["handle"];
+	        this.email = source["email"];
+	        this.photoUrl = source["photoUrl"];
+	    }
+	}
 	export class Album {
 	    id: string;
 	    name: string;

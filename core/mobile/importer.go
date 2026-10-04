@@ -43,6 +43,10 @@ func (core *Core) previewSource(source importer.Source) (string, error) {
 // object. Progress and the end arrive on listener; it returns an error only
 // when the import could not start (e.g. another one is running).
 func (core *Core) SpotifyImport(sourceKind, pathOrURL, optionsJSON string, listener ImportListener) error {
+	return core.startImport(importer.Source{Kind: sourceKind, Location: pathOrURL}, optionsJSON, listener)
+}
+
+func (core *Core) startImport(source importer.Source, optionsJSON string, listener ImportListener) error {
 	runner, err := core.requireImporter()
 	if err != nil {
 		return err
@@ -52,7 +56,6 @@ func (core *Core) SpotifyImport(sourceKind, pathOrURL, optionsJSON string, liste
 	if err != nil {
 		return err
 	}
-	source := importer.Source{Kind: sourceKind, Location: pathOrURL}
 	return runner.Start(core.ctx, source, options,
 		func(progress importer.Progress) { listener.OnImportProgress(mustEncode(progress)) },
 		func(result importer.Result, runErr error) { reportImportDone(listener, result, runErr) })

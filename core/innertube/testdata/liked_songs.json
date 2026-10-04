@@ -1,0 +1,277 @@
+{
+	"_synthesized": "Synthesized by hand in the shape ytmusicapi's library parsers expect; not a real signed-in capture.",
+	"responseContext": {
+		"serviceTrackingParams": [
+			{
+				"service": "GFEEDBACK",
+				"params": [
+					{
+						"key": "logged_in",
+						"value": "1"
+					}
+				]
+			}
+		]
+	},
+	"contents": {
+		"twoColumnBrowseResultsRenderer": {
+			"tabs": [
+				{
+					"tabRenderer": {
+						"content": {
+							"sectionListRenderer": {
+								"contents": [
+									{
+										"musicEditablePlaylistDetailHeaderRenderer": {
+											"header": {
+												"musicResponsiveHeaderRenderer": {
+													"title": {
+														"runs": [
+															{
+																"text": "Liked Music"
+															}
+														]
+													},
+													"subtitle": {
+														"runs": [
+															{
+																"text": "Auto playlist"
+															}
+														]
+													},
+													"thumbnail": {
+														"musicThumbnailRenderer": {
+															"thumbnail": {
+																"thumbnails": [
+																	{
+																		"url": "https://lh3.googleusercontent.com/x=w226-h226",
+																		"width": 226,
+																		"height": 226
+																	}
+																]
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+								]
+							}
+						}
+					}
+				}
+			],
+			"secondaryContents": {
+				"sectionListRenderer": {
+					"contents": [
+						{
+							"musicPlaylistShelfRenderer": {
+								"playlistId": "LM",
+								"contents": [
+									{
+										"musicResponsiveListItemRenderer": {
+											"thumbnail": {
+												"musicThumbnailRenderer": {
+													"thumbnail": {
+														"thumbnails": [
+															{
+																"url": "https://lh3.googleusercontent.com/x=w226-h226",
+																"width": 226,
+																"height": 226
+															}
+														]
+													}
+												}
+											},
+											"flexColumns": [
+												{
+													"musicResponsiveListItemFlexColumnRenderer": {
+														"text": {
+															"runs": [
+																{
+																	"text": "One More Time",
+																	"navigationEndpoint": {
+																		"watchEndpoint": {
+																			"videoId": "vid1"
+																		}
+																	}
+																}
+															]
+														}
+													}
+												},
+												{
+													"musicResponsiveListItemFlexColumnRenderer": {
+														"text": {
+															"runs": [
+																{
+																	"text": "Daft Punk",
+																	"navigationEndpoint": {
+																		"browseEndpoint": {
+																			"browseId": "UCdaft",
+																			"browseEndpointContextSupportedConfigs": {
+																				"browseEndpointContextMusicConfig": {
+																					"pageType": "MUSIC_PAGE_TYPE_ARTIST"
+																				}
+																			}
+																		}
+																	}
+																}
+															]
+														}
+													}
+												},
+												{
+													"musicResponsiveListItemFlexColumnRenderer": {
+														"text": {
+															"runs": [
+																{
+																	"text": "Discovery",
+																	"navigationEndpoint": {
+																		"browseEndpoint": {
+																			"browseId": "MPREbdisc",
+																			"browseEndpointContextSupportedConfigs": {
+																				"browseEndpointContextMusicConfig": {
+																					"pageType": "MUSIC_PAGE_TYPE_ALBUM"
+																				}
+																			}
+																		}
+																	}
+																}
+															]
+														}
+													}
+												}
+											],
+											"fixedColumns": [
+												{
+													"musicResponsiveListItemFixedColumnRenderer": {
+														"text": {
+															"runs": [
+																{
+																	"text": "5:20"
+																}
+															]
+														}
+													}
+												}
+											],
+											"playlistItemData": {
+												"videoId": "vid1",
+												"playlistSetVideoId": "SETvid1"
+											}
+										}
+									},
+									{
+										"musicResponsiveListItemRenderer": {
+											"thumbnail": {
+												"musicThumbnailRenderer": {
+													"thumbnail": {
+														"thumbnails": [
+															{
+																"url": "https://lh3.googleusercontent.com/x=w226-h226",
+																"width": 226,
+																"height": 226
+															}
+														]
+													}
+												}
+											},
+											"flexColumns": [
+												{
+													"musicResponsiveListItemFlexColumnRenderer": {
+														"text": {
+															"runs": [
+																{
+																	"text": "Karma Police",
+																	"navigationEndpoint": {
+																		"watchEndpoint": {
+																			"videoId": "vid2"
+																		}
+																	}
+																}
+															]
+														}
+													}
+												},
+												{
+													"musicResponsiveListItemFlexColumnRenderer": {
+														"text": {
+															"runs": [
+																{
+																	"text": "Radiohead",
+																	"navigationEndpoint": {
+																		"browseEndpoint": {
+																			"browseId": "UCradio",
+																			"browseEndpointContextSupportedConfigs": {
+																				"browseEndpointContextMusicConfig": {
+																					"pageType": "MUSIC_PAGE_TYPE_ARTIST"
+																				}
+																			}
+																		}
+																	}
+																}
+															]
+														}
+													}
+												},
+												{
+													"musicResponsiveListItemFlexColumnRenderer": {
+														"text": {
+															"runs": [
+																{
+																	"text": "OK Computer",
+																	"navigationEndpoint": {
+																		"browseEndpoint": {
+																			"browseId": "MPREbokc",
+																			"browseEndpointContextSupportedConfigs": {
+																				"browseEndpointContextMusicConfig": {
+																					"pageType": "MUSIC_PAGE_TYPE_ALBUM"
+																				}
+																			}
+																		}
+																	}
+																}
+															]
+														}
+													}
+												}
+											],
+											"fixedColumns": [
+												{
+													"musicResponsiveListItemFixedColumnRenderer": {
+														"text": {
+															"runs": [
+																{
+																	"text": "4:21"
+																}
+															]
+														}
+													}
+												}
+											],
+											"playlistItemData": {
+												"videoId": "vid2",
+												"playlistSetVideoId": "SETvid2"
+											}
+										}
+									},
+									{
+										"continuationItemRenderer": {
+											"continuationEndpoint": {
+												"continuationCommand": {
+													"token": "liked-next"
+												}
+											}
+										}
+									}
+								]
+							}
+						}
+					]
+				}
+			}
+		}
+	}
+}

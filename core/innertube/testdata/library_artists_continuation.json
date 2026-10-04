@@ -1,0 +1,73 @@
+{
+	"_synthesized": "Synthesized by hand in the shape ytmusicapi's library parsers expect; not a real signed-in capture.",
+	"responseContext": {
+		"serviceTrackingParams": [
+			{
+				"service": "GFEEDBACK",
+				"params": [
+					{
+						"key": "logged_in",
+						"value": "1"
+					}
+				]
+			}
+		]
+	},
+	"continuationContents": {
+		"musicShelfContinuation": {
+			"contents": [
+				{
+					"musicResponsiveListItemRenderer": {
+						"thumbnail": {
+							"musicThumbnailRenderer": {
+								"thumbnail": {
+									"thumbnails": [
+										{
+											"url": "https://lh3.googleusercontent.com/x=w226-h226",
+											"width": 226,
+											"height": 226
+										}
+									]
+								}
+							}
+						},
+						"navigationEndpoint": {
+							"browseEndpoint": {
+								"browseId": "UCbonobo",
+								"browseEndpointContextSupportedConfigs": {
+									"browseEndpointContextMusicConfig": {
+										"pageType": "MUSIC_PAGE_TYPE_ARTIST"
+									}
+								}
+							}
+						},
+						"flexColumns": [
+							{
+								"musicResponsiveListItemFlexColumnRenderer": {
+									"text": {
+										"runs": [
+											{
+												"text": "Bonobo"
+											}
+										]
+									}
+								}
+							},
+							{
+								"musicResponsiveListItemFlexColumnRenderer": {
+									"text": {
+										"runs": [
+											{
+												"text": "800K subscribers"
+											}
+										]
+									}
+								}
+							}
+						]
+					}
+				}
+			]
+		}
+	}
+}

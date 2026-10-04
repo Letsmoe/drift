@@ -1,16 +1,24 @@
 <script lang="ts">
 	import { Button } from '@neoworks-dev/ui';
-	import type { SpotifyImportFlow } from '#lib/import/spotifyImport.svelte.ts';
+	import type { MusicImportFlow } from '#lib/import/musicImport.svelte.ts';
 
-	let { flow }: { flow: SpotifyImportFlow } = $props();
+	let { flow }: { flow: MusicImportFlow } = $props();
 
-	const phaseLabels: Record<string, string> = {
+	const matchingLabels: Record<string, string> = {
 		tracks: 'Matching songs',
 		albums: 'Matching albums',
 		artists: 'Matching artists',
 		shows: 'Matching podcasts',
 		saving: 'Saving to your library'
 	};
+	const readingLabels: Record<string, string> = {
+		tracks: 'Reading songs and playlists',
+		albums: 'Reading albums',
+		artists: 'Reading artists',
+		shows: 'Reading podcasts',
+		saving: 'Saving to your library'
+	};
+	const phaseLabels = $derived(flow.isAccountSource ? readingLabels : matchingLabels);
 
 	const phaseLabel = $derived.by(() => {
 		if (!flow.progress) {

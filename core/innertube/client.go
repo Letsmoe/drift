@@ -103,6 +103,8 @@ type apiCall struct {
 	endpoint    string
 	visitorData string
 	payload     any
+	// session is set for requests that act as the signed-in user; nil means anonymous.
+	session *Session
 }
 
 func (client *Client) post(ctx context.Context, call apiCall, response any) error {
@@ -118,6 +120,9 @@ func (client *Client) post(ctx context.Context, call apiCall, response any) erro
 	// The body is fully read or abandoned on error; a failed close changes nothing.
 	defer func() { _ = httpResponse.Body.Close() }()
 
+	if call.session != nil {
+		return decodeSessionResponse(call, httpResponse, response)
+	}
 	if httpResponse.StatusCode != http.StatusOK {
 		return &StatusError{Endpoint: call.endpoint, StatusCode: httpResponse.StatusCode}
 	}
@@ -146,6 +151,9 @@ func (client *Client) newRequest(ctx context.Context, call apiCall) (*http.Reque
 	request.Header.Set("X-YouTube-Client-Version", call.profile.Version)
 	if call.visitorData != "" {
 		request.Header.Set("X-Goog-Visitor-Id", call.visitorData)
+	}
+	if call.session != nil {
+		setSessionHeaders(request, *call.session)
 	}
 	return request, nil
 }

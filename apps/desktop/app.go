@@ -11,6 +11,7 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/neoworks/otter-music/core/account"
 	"github.com/neoworks/otter-music/core/importer"
 	"github.com/neoworks/otter-music/core/innertube"
 	"github.com/neoworks/otter-music/core/library"
@@ -32,6 +33,7 @@ type App struct {
 	library  *library.Library
 	engine   *recommend.Engine
 	importer *importer.Importer
+	account  *account.Service
 	queue    *queue.Queue
 
 	streamServer  *http.Server
@@ -75,7 +77,8 @@ func (app *App) openLibrary() {
 	}
 	app.library = lib
 	app.engine = recommend.New(lib, app.innertube, recommend.WithLogger(app.logger))
-	app.importer = importer.New(lib, app.innertube, app.logger)
+	app.account = account.New(lib)
+	app.importer = importer.New(lib, app.innertube, app.logger, importer.WithAccount(app.account.Reader))
 }
 
 func libraryPath() (string, error) {

@@ -12,6 +12,9 @@ const (
 	SourceExport = "export"
 	// SourceURL is the link of a public playlist or album.
 	SourceURL = "url"
+	// SourceYouTubeAccount is the signed-in YouTube Music account; its items
+	// already are YouTube Music items, so nothing is matched.
+	SourceYouTubeAccount = "youtube-account"
 )
 
 // matchSource is the import_match/import_playlist source name of Spotify data.
@@ -90,7 +93,7 @@ type PlaylistResult struct {
 
 // UnmatchedItem is an item YouTube Music had no match for.
 type UnmatchedItem struct {
-	// Kind is "track", "album", "artist" or "show".
+	// Kind is "track", "album", "artist", "show" or "playlist".
 	Kind    string   `json:"kind"`
 	Title   string   `json:"title"`
 	Artists []string `json:"artists"`

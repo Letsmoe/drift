@@ -4,7 +4,7 @@
 	import BooksIcon from 'phosphor-svelte/lib/BooksIcon';
 	import HeartIcon from 'phosphor-svelte/lib/HeartIcon';
 	import PlusIcon from 'phosphor-svelte/lib/PlusIcon';
-	import SpotifyImportDialog from '#lib/components/SpotifyImportDialog.svelte';
+	import MusicImportDialog from '#lib/components/MusicImportDialog.svelte';
 	import Chip from '#lib/components/Chip.svelte';
 	import LibraryRow from '#lib/components/LibraryRow.svelte';
 	import { library } from '#lib/library/library.svelte.ts';
@@ -98,11 +98,13 @@
 			{/if}
 			<div class="flex flex-col gap-3 rounded-lg bg-raised p-4">
 				<div>
-					<p class="text-base font-semibold">Bring your music from Spotify</p>
-					<p class="text-sm text-muted">Liked songs, playlists, albums and more.</p>
+					<p class="text-base font-semibold">Import your music</p>
+					<p class="text-sm text-muted">
+						From YouTube Music or Spotify: liked songs, playlists, albums and more.
+					</p>
 				</div>
 				<div class="self-start">
-					<Button size="sm" onclick={() => (importDialogOpen = true)}>Import from Spotify</Button>
+					<Button size="sm" onclick={() => (importDialogOpen = true)}>Import your music</Button>
 				</div>
 			</div>
 		</div>
@@ -110,5 +112,5 @@
 </aside>
 
 {#if importDialogOpen}
-	<SpotifyImportDialog onclose={() => (importDialogOpen = false)} />
+	<MusicImportDialog onclose={() => (importDialogOpen = false)} />
 {/if}

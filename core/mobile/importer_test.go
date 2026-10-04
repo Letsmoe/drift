@@ -41,3 +41,42 @@ func TestSpotifyImportReportsFailure(t *testing.T) {
 		t.Errorf("outcome = %q, want an error message and no result", outcome)
 	}
 }
+
+func TestYouTubeAccountStartsSignedOut(t *testing.T) {
+	core, _ := openTestCore(t)
+
+	encoded, err := core.YouTubeAccount()
+	if err != nil {
+		t.Fatalf("account: %v", err)
+	}
+	if status := decodeInto[map[string]any](t, encoded); status["signedIn"] != false {
+		t.Errorf("status = %v", status)
+	}
+	_, err = core.YouTubePreview()
+	if err == nil {
+		t.Error("previewing without a session must fail")
+	}
+	if core.YouTubeSignOut() != nil {
+		t.Error("signing out while signed out is not an error")
+	}
+}
+
+func TestYouTubeSignInRejectsCookiesWithoutSession(t *testing.T) {
+	core, _ := openTestCore(t)
+	_, err := core.YouTubeSignIn("YSC=nothing")
+	if err == nil {
+		t.Error("cookies without SAPISID must be rejected")
+	}
+}
+
+func TestYouTubeImportWithoutSessionReportsFailure(t *testing.T) {
+	core, _ := openTestCore(t)
+	listener := &recordingImportListener{done: make(chan string, 1)}
+	err := core.YouTubeImport(`{"liked":true}`, listener)
+	if err != nil {
+		t.Fatalf("start: %v", err)
+	}
+	if outcome := <-listener.done; outcome[0] != '|' {
+		t.Errorf("outcome = %q, want an error and no result", outcome)
+	}
+}

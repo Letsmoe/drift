@@ -27,6 +27,8 @@ type Importer struct {
 	logger       *slog.Logger
 	fetcher      *spotify.Fetcher
 	requestDelay time.Duration
+	// account supplies the signed-in YouTube Music reader for SourceYouTubeAccount.
+	account AccountProvider
 
 	running sync.Mutex
 	// cancelMutex guards cancelRunning, the cancel function of a Start-ed import.
@@ -69,6 +71,9 @@ func New(lib *library.Library, catalog Catalog, logger *slog.Logger, options ...
 // Preview counts what a source holds. It matches nothing; a public link is
 // fetched, a data export is only read.
 func (importer *Importer) Preview(ctx context.Context, source Source) (Summary, error) {
+	if source.Kind == SourceYouTubeAccount {
+		return importer.previewAccount(ctx)
+	}
 	content, err := importer.load(ctx, source)
 	if err != nil {
 		return Summary{}, err
@@ -142,6 +147,9 @@ func (importer *Importer) Cancel() {
 func (importer *Importer) run(ctx context.Context, source Source, options Options, onProgress func(Progress)) (Result, error) {
 	if onProgress == nil {
 		onProgress = func(Progress) {}
+	}
+	if source.Kind == SourceYouTubeAccount {
+		return importer.runAccount(ctx, options, onProgress)
 	}
 	content, err := importer.load(ctx, source)
 	if err != nil {
