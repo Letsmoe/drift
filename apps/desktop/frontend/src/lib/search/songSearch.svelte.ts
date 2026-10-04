@@ -1,4 +1,5 @@
-import { searchSongs, type Track } from '#lib/api/music.ts';
+import { searchSongs } from '#lib/api/catalog.ts';
+import type { Track } from '#lib/api/music.ts';
 import { describeError } from '#lib/format.ts';
 
 export type SearchStatus = 'idle' | 'loading' | 'done' | 'failed';

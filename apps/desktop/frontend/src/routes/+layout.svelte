@@ -8,8 +8,11 @@
 	import LibrarySidebar from '#lib/components/LibrarySidebar.svelte';
 	import PlayerBar from '#lib/components/PlayerBar.svelte';
 	import TopBar from '#lib/components/TopBar.svelte';
+	import { library } from '#lib/library/library.svelte.ts';
 
 	let { children } = $props();
+
+	library.load();
 </script>
 
 <svelte:head>

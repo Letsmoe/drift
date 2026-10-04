@@ -6,7 +6,12 @@
 	import { formatArtists, formatDuration, pickThumbnail } from '#lib/format.ts';
 	import { player } from '#lib/player/player.svelte.ts';
 
-	let { track }: { track: Track } = $props();
+	let {
+		track,
+		tracks = [track],
+		index = 0,
+		context = 'track'
+	}: { track: Track; tracks?: Track[]; index?: number; context?: string } = $props();
 
 	const coverUrl = $derived(pickThumbnail(track.thumbnails, 96));
 	const subtitle = $derived(buildSubtitle(track));
@@ -21,7 +26,11 @@
 	}
 </script>
 
-<ListRow title={track.title} {subtitle} onclick={() => player.play(track)}>
+<ListRow
+	title={track.title}
+	{subtitle}
+	onclick={() => player.playOrToggle(track, tracks, index, context)}
+>
 	{#snippet leading()}
 		{#if coverUrl}
 			<img src={coverUrl} alt="" class="size-10 rounded-sm object-cover" loading="lazy" />

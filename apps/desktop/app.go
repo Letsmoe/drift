@@ -7,10 +7,14 @@ import (
 	"log/slog"
 	"net"
 	"net/http"
+	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/neoworks/otter-music/core/innertube"
-	"github.com/neoworks/otter-music/core/music"
+	"github.com/neoworks/otter-music/core/library"
+	"github.com/neoworks/otter-music/core/queue"
+	"github.com/neoworks/otter-music/core/recommend"
 	"github.com/neoworks/otter-music/core/stream"
 )
 
@@ -23,6 +27,10 @@ type App struct {
 	logger    *slog.Logger
 	innertube *innertube.Client
 	proxy     *stream.Proxy
+	// library and engine stay nil when the library database could not be opened.
+	library *library.Library
+	engine  *recommend.Engine
+	queue   *queue.Queue
 
 	streamServer  *http.Server
 	streamBaseURL string
@@ -31,23 +39,57 @@ type App struct {
 // NewApp creates the bound application.
 func NewApp(logger *slog.Logger) *App {
 	innertubeClient := innertube.NewClient()
-	return &App{
+	app := &App{
 		logger:    logger,
 		innertube: innertubeClient,
 		proxy:     stream.NewProxy(stream.NewResolver(innertubeClient), logger),
 	}
+	app.queue = app.newQueue()
+	return app
 }
 
 // startup keeps the Wails context so bound calls are cancelled when the app quits,
 // and starts the stream proxy.
 func (app *App) startup(ctx context.Context) {
 	app.ctx = ctx
+	app.openLibrary()
 	if err := app.startStreamServer(); err != nil {
 		app.logger.Error("stream server failed to start", "error", err)
 	}
 }
 
+// openLibrary opens the local database and builds the recommendation engine on
+// it. Failure is logged loudly; library methods then return errors.
+func (app *App) openLibrary() {
+	path, err := libraryPath()
+	if err != nil {
+		app.logger.Error("library path", "error", err)
+		return
+	}
+	lib, err := library.Open(app.ctx, path)
+	if err != nil {
+		app.logger.Error("library failed to open", "path", path, "error", err)
+		return
+	}
+	app.library = lib
+	app.engine = recommend.New(lib, app.innertube, recommend.WithLogger(app.logger))
+}
+
+func libraryPath() (string, error) {
+	configDirectory, err := os.UserConfigDir()
+	if err != nil {
+		return "", fmt.Errorf("find config directory: %w", err)
+	}
+	directory := filepath.Join(configDirectory, "otter-music")
+	err = os.MkdirAll(directory, 0o700)
+	if err != nil {
+		return "", fmt.Errorf("create %s: %w", directory, err)
+	}
+	return filepath.Join(directory, "library.db"), nil
+}
+
 func (app *App) shutdown(_ context.Context) {
+	app.closeLibrary()
 	if app.streamServer == nil {
 		return
 	}
@@ -55,6 +97,16 @@ func (app *App) shutdown(_ context.Context) {
 	defer cancel()
 	if err := app.streamServer.Shutdown(ctx); err != nil {
 		app.logger.Warn("stream server shutdown", "error", err)
+	}
+}
+
+func (app *App) closeLibrary() {
+	if app.library == nil {
+		return
+	}
+	err := app.library.Close()
+	if err != nil {
+		app.logger.Warn("library close", "error", err)
 	}
 }
 
@@ -81,21 +133,6 @@ func (app *App) startStreamServer() error {
 		}
 	}()
 	return nil
-}
-
-// SearchSongs returns YouTube Music songs matching query.
-func (app *App) SearchSongs(query string) ([]music.Track, error) {
-	return app.innertube.SearchSongs(app.ctx, query)
-}
-
-// Home returns the first page of the home feed.
-func (app *App) Home() (music.HomePage, error) {
-	return app.innertube.Home(app.ctx)
-}
-
-// HomeContinuation returns the home feed page that continuation points to.
-func (app *App) HomeContinuation(continuation string) (music.HomePage, error) {
-	return app.innertube.HomeContinuation(app.ctx, continuation)
 }
 
 // StreamURL returns the URL an <audio> element plays videoID from.
