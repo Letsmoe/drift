@@ -17,7 +17,7 @@
 </script>
 
 <div
-	class="group duration-fast flex w-40 shrink-0 flex-col gap-2 rounded-lg p-3 transition-colors hover:bg-raised"
+	class="group/card duration-fast flex w-40 shrink-0 flex-col gap-2 rounded-lg p-3 transition-colors hover:bg-raised"
 	{@attach whenVisible(reportVisible)}
 >
 	<div class="relative">
@@ -29,7 +29,8 @@
 			onclick={onplay}
 			class={[
 				'absolute right-2 bottom-2',
-				!playing && 'translate-y-1 opacity-0 group-hover:translate-y-0 group-hover:opacity-100'
+				!playing &&
+					'translate-y-1 opacity-0 group-hover/card:translate-y-0 group-hover/card:opacity-100'
 			]}
 		/>
 	</div>

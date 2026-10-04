@@ -86,6 +86,12 @@
 		player.toggle();
 	}
 
+	// WebKit does not fire `playing` again after a seek, so the ready state decides, not the event.
+	function syncBuffering(event: Event): void {
+		const audio = event.currentTarget as HTMLAudioElement;
+		player.buffering = audio.readyState < HTMLMediaElement.HAVE_FUTURE_DATA;
+	}
+
 	function shownVolume(): number {
 		if (player.muted) {
 			return 0;
@@ -104,8 +110,11 @@
 	bind:duration={player.duration}
 	bind:volume={player.volume}
 	bind:muted={player.muted}
-	onwaiting={() => (player.buffering = true)}
-	onplaying={() => (player.buffering = false)}
+	onwaiting={syncBuffering}
+	onplaying={syncBuffering}
+	oncanplay={syncBuffering}
+	onseeked={syncBuffering}
+	ontimeupdate={syncBuffering}
 	onended={() => player.trackEnded()}
 	onerror={() => player.fail('This song could not be played.')}
 ></audio>

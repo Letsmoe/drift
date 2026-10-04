@@ -2,6 +2,7 @@
 	import HeartIcon from 'phosphor-svelte/lib/HeartIcon';
 	import type { Track } from '#lib/api/music.ts';
 	import { likedTracks } from '#lib/api/library.ts';
+	import { library } from '#lib/library/library.svelte.ts';
 	import MoreMenuButton from '#lib/components/MoreMenuButton.svelte';
 	import PageHeader from '#lib/components/PageHeader.svelte';
 	import PageShell from '#lib/components/PageShell.svelte';
@@ -15,13 +16,19 @@
 
 	const context = 'liked';
 	const resource = new RemoteResource(() => likedTracks());
-	const tracks = $derived(loadedTracks(resource.data));
+	const tracks = $derived(stillLikedTracks(resource.data));
 
-	function loadedTracks(data: Track[] | undefined): Track[] {
+	// A track whose rating changed away from like drops out without refetching.
+	function stillLikedTracks(data: Track[] | undefined): Track[] {
 		if (!data) {
 			return [];
 		}
-		return data;
+		return data.filter(isStillLiked);
+	}
+
+	function isStillLiked(track: Track): boolean {
+		const rating = library.ratings.get(track.videoId);
+		return rating === undefined || rating === 1;
 	}
 
 	$effect(() => {

@@ -35,7 +35,7 @@
 	{ondrop}
 	{ondragend}
 	class={[
-		'group duration-fast flex items-center gap-3 rounded-md p-1.5 transition-colors hover:bg-hover',
+		'group/queuerow duration-fast flex items-center gap-3 rounded-md p-1.5 transition-colors hover:bg-hover',
 		dropTarget && 'border-t-2 border-green'
 	]}
 >
@@ -45,7 +45,7 @@
 		<p class="truncate text-xs text-dim">{formatArtists(entry.track.artists)}</p>
 	</div>
 	{#if !current}
-		<div class="flex shrink-0 items-center opacity-0 group-hover:opacity-100">
+		<div class="flex shrink-0 items-center opacity-0 group-hover/queuerow:opacity-100">
 			<button
 				type="button"
 				aria-label="Play {entry.track.title}"

@@ -36,7 +36,7 @@
 </script>
 
 <div
-	class="group duration-fast flex h-16 items-center gap-3 overflow-hidden rounded-md bg-raised pr-3 transition-colors hover:bg-hover"
+	class="group/tile duration-fast flex h-16 items-center gap-3 overflow-hidden rounded-md bg-raised pr-3 transition-colors hover:bg-hover"
 	{@attach whenVisible(reportVisible)}
 >
 	<Cover thumbnails={track.thumbnails} size={64} class="h-full shrink-0" />
@@ -49,6 +49,6 @@
 		size="sm"
 		label="Play {track.title}"
 		onclick={play}
-		class={['shrink-0', !playing && 'opacity-0 group-hover:opacity-100']}
+		class={['shrink-0', !playing && 'opacity-0 group-hover/tile:opacity-100']}
 	/>
 </div>
