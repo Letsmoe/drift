@@ -7,3 +7,4 @@ bun.lock
 graft
 apps/desktop/frontend/src/lib/wailsjs
 .claude
+core/spotify/testdata/*.html

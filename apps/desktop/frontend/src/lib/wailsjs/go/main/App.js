@@ -50,6 +50,14 @@ export function MovePlaylistEntry(arg1, arg2, arg3) {
   return window['go']['main']['App']['MovePlaylistEntry'](arg1, arg2, arg3);
 }
 
+export function PickSpotifyExport() {
+  return window['go']['main']['App']['PickSpotifyExport']();
+}
+
+export function PickSpotifyExportFolder() {
+  return window['go']['main']['App']['PickSpotifyExportFolder']();
+}
+
 export function Playlist(arg1) {
   return window['go']['main']['App']['Playlist'](arg1);
 }
@@ -188,6 +196,22 @@ export function SearchSuggestions(arg1) {
 
 export function SetRating(arg1, arg2, arg3) {
   return window['go']['main']['App']['SetRating'](arg1, arg2, arg3);
+}
+
+export function SpotifyCancelImport() {
+  return window['go']['main']['App']['SpotifyCancelImport']();
+}
+
+export function SpotifyImport(arg1, arg2, arg3) {
+  return window['go']['main']['App']['SpotifyImport'](arg1, arg2, arg3);
+}
+
+export function SpotifyPreviewExport(arg1) {
+  return window['go']['main']['App']['SpotifyPreviewExport'](arg1);
+}
+
+export function SpotifyPreviewURL(arg1) {
+  return window['go']['main']['App']['SpotifyPreviewURL'](arg1);
 }
 
 export function StartPlay(arg1, arg2, arg3) {

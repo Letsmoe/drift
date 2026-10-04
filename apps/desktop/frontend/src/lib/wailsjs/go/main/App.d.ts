@@ -5,6 +5,7 @@ import {library} from '../models';
 import {queue} from '../models';
 import {main} from '../models';
 import {recommend} from '../models';
+import {importer} from '../models';
 
 export function AddToPlaylist(arg1:string,arg2:Array<music.Track>):Promise<void>;
 
@@ -29,6 +30,10 @@ export function LibraryPlaylist(arg1:string):Promise<library.Playlist>;
 export function LikedTracks():Promise<Array<music.Track>>;
 
 export function MovePlaylistEntry(arg1:string,arg2:number,arg3:number):Promise<void>;
+
+export function PickSpotifyExport():Promise<string>;
+
+export function PickSpotifyExportFolder():Promise<string>;
 
 export function Playlist(arg1:string):Promise<music.PlaylistPage>;
 
@@ -99,6 +104,14 @@ export function SearchSongs(arg1:string):Promise<Array<music.Track>>;
 export function SearchSuggestions(arg1:string):Promise<Array<string>>;
 
 export function SetRating(arg1:music.Track,arg2:string,arg3:number):Promise<void>;
+
+export function SpotifyCancelImport():Promise<void>;
+
+export function SpotifyImport(arg1:string,arg2:string,arg3:importer.Options):Promise<void>;
+
+export function SpotifyPreviewExport(arg1:string):Promise<importer.Summary>;
+
+export function SpotifyPreviewURL(arg1:string):Promise<importer.Summary>;
 
 export function StartPlay(arg1:music.Track,arg2:string,arg3:string):Promise<number>;
 

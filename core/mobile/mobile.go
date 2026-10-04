@@ -15,6 +15,7 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/neoworks/otter-music/core/importer"
 	"github.com/neoworks/otter-music/core/innertube"
 	"github.com/neoworks/otter-music/core/library"
 	"github.com/neoworks/otter-music/core/queue"
@@ -44,9 +45,10 @@ type Core struct {
 	innertube *innertube.Client
 	proxy     *stream.Proxy
 	// library and engine stay nil when the library database could not be opened.
-	library *library.Library
-	engine  *recommend.Engine
-	queue   *queue.Queue
+	library  *library.Library
+	engine   *recommend.Engine
+	importer *importer.Importer
+	queue    *queue.Queue
 
 	streamServer  *http.Server
 	streamBaseURL string
@@ -100,6 +102,7 @@ func (core *Core) openLibrary(dataDir string) {
 	}
 	core.library = lib
 	core.engine = recommend.New(lib, core.innertube, recommend.WithLogger(core.logger))
+	core.importer = importer.New(lib, core.innertube, core.logger)
 }
 
 // startStreamServer serves the proxy on a random loopback port.

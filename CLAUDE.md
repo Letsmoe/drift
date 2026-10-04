@@ -15,6 +15,8 @@ core/               Go module github.com/neoworks/otter-music/core: the shared, 
   stream/           resolver (profile chain → best audio URL, cached until expiry) + local HTTP proxy
   library/          local SQLite store (ratings, playlists, saved items, play + search history, impressions, response cache), embedded migrations
   queue/            playback queue: shuffle, repeat, autoplay extension through an Extender; UI-free, apps only render its State
+  spotify/          Spotify sources without an account: data-export parser (zip/folder/JSON) + public playlist/album embed-page fetcher; parsing only, no matching
+  importer/         Spotify import: matches tracks/albums/artists/podcasts to YouTube Music, remembers matches, writes likes/playlists/saved items
   recommend/        recommendation engine over the library + a Catalog (the innertube client): candidates → weighted ranking → diversity re-ranking; also the queue's autoplay Extender
   mobile/           gomobile adapter: the whole core behind one `Core` object, complex values as JSON strings (Android AAR)
 apps/desktop/       Wails v2 app (Go module …/apps/desktop), binds core to the webview
@@ -53,6 +55,16 @@ Don't copy code from zemer-cipher or InnerTubeX (GPL-3.0, would make this app GP
 - **Candidate sources** (each item tagged with one, prior in `weights.go`): `related:radio` (radio of each seed), `affinity:artist` (top songs of the top 5 artists), `explore:artist` (top songs of up to 4 related artists the profile doesn't know), `rediscover` (liked/completed tracks unplayed for 30 days), `search` (last 3 searches), `youtube` (home feed songs; the cold-start source). Catalog calls run 4 at a time with a timeout, responses are cached in the library (radio/artist/search 24 h, home 1 h), and a failing source is logged and skipped.
 - **Ranking**: `affinity + 0.6·prior − penalties` (played in the last day/week, fatigue from ignored impressions); disliked tracks are excluded. **Re-ranking** per 24-item page: ≤2 per artist, ≤3 per album, no source more than twice in a row, every 7th slot exploration; constraints drop weakest first.
 - `Feed` memoizes the ranking (first page 10 min, later pages 30 min, `refresh` forces a re-rank); `Rows` groups by reason ("Because you listened to X", "More from <artist>") and drops thin and youtube-only rows. `Extend` (queue autoplay) takes the radio of the last played track, drops disliked/queued/played tracks and ranks by taste.
+
+## Spotify import
+
+`core/spotify` reads, `core/importer` matches and writes; no Spotify account or API is used (new Spotify developer apps are allowlist-only). Two sources:
+
+- **Data export** (`my_spotify_data.zip`, an extracted folder or a single JSON): `YourLibrary.json` (liked `tracks`, `albums`, `artists`, `shows`) and `PlaylistN.json`. Parsed defensively (unknown/missing fields tolerated); the export has no durations and one artist string per track. Only `YourLibrary*`/`Playlist*` files are read.
+- **Public link** (`open.spotify.com/{playlist,album}/<id>`, `spotify:` URIs): the embed page `/embed/<kind>/<id>` carries `<script id="__NEXT_DATA__">` with `props.pageProps.state.data.entity` (`name`, `subtitle`, `trackList` [{uri, title, subtitle "A, B", duration ms}]). It needs a browser User-Agent and is **capped at 100 tracks** per playlist (the UI says so). An album link imports as one saved album.
+- **Matching**: query `<title> <first artist>` (`SearchSongs`; albums/artists/podcasts via `Search` and the matching shelf kind). `scoreSong` (pure, in `score.go`) = 0.5 title similarity + 0.3 artist overlap (primary artist weighs 0.7) + 0.2 duration (full within 3 s, 0 beyond 15 s; left out when unknown); feat./remaster/edition noise is stripped; a live/remix/acoustic/... mismatch scales by 0.8, a duration >15 s off by 0.85. Thresholds: song 0.75, album 0.75, artist 0.88 (name only), podcast 0.8. Catalog calls run 4 at a time with a 150 ms pause; 8 failures in a row (or only failures) abort the import.
+- **Stored matches**: `import_match` (source, source_uri) -> target id, score and the matched track/item as JSON; "no match" is stored too, so a re-import never searches again (`Options.RetryUnmatched` overrides). `import_playlist` links a Spotify playlist key to its local playlist: a re-import replaces that playlist's entries instead of duplicating it. Likes use `SetRating` (no fake play rows; already-liked tracks are left alone), albums/artists/podcasts use `Save`.
+- **API**: `importer.New(lib, catalog, logger)`, `Preview(source)`, `Run(ctx, source, Options, onProgress)`, `Start`/`Cancel` for background runs (one import at a time). Desktop: `app_import.go` + `spotify-import-*` events; mobile: `core/mobile/importer.go` (path-based, JSON + `ImportListener`).
 
 ## Commands
 
