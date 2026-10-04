@@ -12,13 +12,13 @@
 	}: {
 		playing: boolean;
 		label: string;
-		size?: 'sm' | 'md';
+		size?: 'sm' | 'md' | 'lg';
 		class?: ClassValue;
 		onclick: (event: MouseEvent) => void;
 	} = $props();
 
-	const sizeClasses = { sm: 'size-8', md: 'size-12' };
-	const iconSizes = { sm: 14, md: 20 };
+	const sizeClasses = { sm: 'size-8', md: 'size-12', lg: 'size-14' };
+	const iconSizes = { sm: 14, md: 20, lg: 24 };
 </script>
 
 <button

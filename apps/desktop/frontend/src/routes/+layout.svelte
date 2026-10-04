@@ -7,7 +7,9 @@
 	import { FloatingScrollbar } from '@neoworks-dev/ui';
 	import LibrarySidebar from '#lib/components/LibrarySidebar.svelte';
 	import PlayerBar from '#lib/components/PlayerBar.svelte';
+	import QueuePanel from '#lib/components/QueuePanel.svelte';
 	import TopBar from '#lib/components/TopBar.svelte';
+	import { panels } from '#lib/layout/panels.svelte.ts';
 	import { library } from '#lib/library/library.svelte.ts';
 
 	let { children } = $props();
@@ -28,6 +30,9 @@
 				{@render children()}
 			</main>
 		</FloatingScrollbar>
+		{#if panels.queueOpen}
+			<QueuePanel />
+		{/if}
 	</div>
 	<PlayerBar />
 </div>

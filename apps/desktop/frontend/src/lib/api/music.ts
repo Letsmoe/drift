@@ -1,5 +1,5 @@
 import { StreamURL } from '#lib/wailsjs/go/main/App.js';
-import type { music } from '#lib/wailsjs/go/models.ts';
+import { music } from '#lib/wailsjs/go/models.ts';
 
 // Components import from here, never from the generated bindings directly.
 export type Track = music.Track;
@@ -24,4 +24,23 @@ export type ItemKind = 'song' | 'album' | 'playlist' | 'artist' | 'podcast' | 'e
 /** URL of the core's local stream proxy for an <audio> element. */
 export function streamUrl(videoId: string): Promise<string> {
 	return StreamURL(videoId);
+}
+
+/** Builds a library item for a page the user can save, such as an album or an artist. */
+export function createItem(
+	kind: ItemKind,
+	id: string,
+	title: string,
+	subtitle: string,
+	thumbnails: Thumbnail[]
+): Item {
+	return music.Item.createFrom({ kind, id, title, subtitle, thumbnails });
+}
+
+/** Copies a track with some fields replaced, e.g. an album track given the album's cover. */
+export function createTrack(
+	track: Track,
+	changes: Partial<Pick<Track, 'thumbnails' | 'album'>>
+): Track {
+	return music.Track.createFrom({ ...track, ...changes });
 }
