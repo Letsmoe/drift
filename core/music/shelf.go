@@ -9,17 +9,19 @@ const (
 	ItemKindAlbum    ItemKind = "album"
 	ItemKindPlaylist ItemKind = "playlist"
 	ItemKindArtist   ItemKind = "artist"
+	ItemKindPodcast  ItemKind = "podcast"
+	ItemKindEpisode  ItemKind = "episode"
 )
 
 // Item is one entry on a shelf.
 type Item struct {
 	Kind ItemKind `json:"kind"`
-	// ID is the video ID for songs and the browse ID for albums, playlists and artists.
+	// ID is the video ID for songs and episodes, and the browse ID otherwise.
 	ID         string      `json:"id"`
 	Title      string      `json:"title"`
 	Subtitle   string      `json:"subtitle"`
 	Thumbnails []Thumbnail `json:"thumbnails"`
-	// Track is set for songs only.
+	// Track is set for songs and episodes, the playable kinds.
 	Track *Track `json:"track,omitempty"`
 }
 

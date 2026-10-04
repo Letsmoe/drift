@@ -25,16 +25,8 @@ func (client *Client) HomeContinuation(ctx context.Context, continuation string)
 }
 
 func (client *Client) homePage(ctx context.Context, request browseRequest) (music.HomePage, error) {
-	call, err := client.visitorCall(ctx, WebRemix, "browse", func(context requestContext) any {
-		request.Context = context
-		return request
-	})
-	if err != nil {
-		return music.HomePage{}, err
-	}
-
 	var response browseResponse
-	if err := client.post(ctx, call, &response); err != nil {
+	if err := client.browse(ctx, request, &response); err != nil {
 		return music.HomePage{}, err
 	}
 	list := response.sectionList()
@@ -42,4 +34,16 @@ func (client *Client) homePage(ctx context.Context, request browseRequest) (musi
 		Shelves:      parseShelves(list.Contents),
 		Continuation: list.continuation(),
 	}, nil
+}
+
+// browse posts request to the browse endpoint and decodes the answer into response.
+func (client *Client) browse(ctx context.Context, request browseRequest, response any) error {
+	call, err := client.visitorCall(ctx, WebRemix, "browse", func(context requestContext) any {
+		request.Context = context
+		return request
+	})
+	if err != nil {
+		return err
+	}
+	return client.post(ctx, call, response)
 }

@@ -1,0 +1,224 @@
+{
+	"contents": {
+		"twoColumnBrowseResultsRenderer": {
+			"secondaryContents": {
+				"sectionListRenderer": {
+					"contents": [
+						{
+							"musicShelfRenderer": {
+								"contents": [
+									{
+										"musicResponsiveListItemRenderer": {
+											"flexColumns": [
+												{
+													"musicResponsiveListItemFlexColumnRenderer": {
+														"text": {
+															"runs": [
+																{
+																	"text": "Overture (From \"TRON: Legacy\"/Score)",
+																	"navigationEndpoint": {
+																		"watchEndpoint": {
+																			"videoId": "mGCnOLGwzg0",
+																			"playlistId": "OLAK5uy_k8XkxQFGZhSX8gENqaH6pg1xz8vOTnzQs",
+																			"watchEndpointMusicSupportedConfigs": {
+																				"watchEndpointMusicConfig": {
+																					"musicVideoType": "MUSIC_VIDEO_TYPE_ATV"
+																				}
+																			}
+																		}
+																	}
+																}
+															]
+														}
+													}
+												},
+												{ "musicResponsiveListItemFlexColumnRenderer": { "text": {} } },
+												{
+													"musicResponsiveListItemFlexColumnRenderer": {
+														"text": { "runs": [{ "text": "16M plays" }] }
+													}
+												}
+											],
+											"fixedColumns": [
+												{
+													"musicResponsiveListItemFixedColumnRenderer": {
+														"text": { "runs": [{ "text": "2:29" }] },
+														"size": "MUSIC_RESPONSIVE_LIST_ITEM_FIXED_COLUMN_SIZE_SMALL"
+													}
+												}
+											],
+											"playlistItemData": { "videoId": "mGCnOLGwzg0" }
+										}
+									},
+									{
+										"musicResponsiveListItemRenderer": {
+											"flexColumns": [
+												{
+													"musicResponsiveListItemFlexColumnRenderer": {
+														"text": {
+															"runs": [
+																{
+																	"text": "The Grid (From \"TRON: Legacy\"/Score)",
+																	"navigationEndpoint": {
+																		"watchEndpoint": {
+																			"videoId": "4-J4duzP8Ng",
+																			"playlistId": "OLAK5uy_k8XkxQFGZhSX8gENqaH6pg1xz8vOTnzQs",
+																			"watchEndpointMusicSupportedConfigs": {
+																				"watchEndpointMusicConfig": {
+																					"musicVideoType": "MUSIC_VIDEO_TYPE_ATV"
+																				}
+																			}
+																		}
+																	}
+																}
+															]
+														}
+													}
+												},
+												{ "musicResponsiveListItemFlexColumnRenderer": { "text": {} } },
+												{
+													"musicResponsiveListItemFlexColumnRenderer": {
+														"text": { "runs": [{ "text": "15M plays" }] }
+													}
+												}
+											],
+											"fixedColumns": [
+												{
+													"musicResponsiveListItemFixedColumnRenderer": {
+														"text": { "runs": [{ "text": "1:37" }] },
+														"size": "MUSIC_RESPONSIVE_LIST_ITEM_FIXED_COLUMN_SIZE_SMALL"
+													}
+												}
+											],
+											"playlistItemData": { "videoId": "4-J4duzP8Ng" }
+										}
+									},
+									{
+										"musicResponsiveListItemRenderer": {
+											"flexColumns": [
+												{
+													"musicResponsiveListItemFlexColumnRenderer": {
+														"text": {
+															"runs": [
+																{
+																	"text": "The Son of Flynn (From \"TRON: Legacy\"/Score)",
+																	"navigationEndpoint": {
+																		"watchEndpoint": {
+																			"videoId": "mqgEYRtWMJU",
+																			"playlistId": "OLAK5uy_k8XkxQFGZhSX8gENqaH6pg1xz8vOTnzQs",
+																			"watchEndpointMusicSupportedConfigs": {
+																				"watchEndpointMusicConfig": {
+																					"musicVideoType": "MUSIC_VIDEO_TYPE_ATV"
+																				}
+																			}
+																		}
+																	}
+																}
+															]
+														}
+													}
+												},
+												{ "musicResponsiveListItemFlexColumnRenderer": { "text": {} } },
+												{
+													"musicResponsiveListItemFlexColumnRenderer": {
+														"text": { "runs": [{ "text": "21M plays" }] }
+													}
+												}
+											],
+											"fixedColumns": [
+												{
+													"musicResponsiveListItemFixedColumnRenderer": {
+														"text": { "runs": [{ "text": "1:36" }] },
+														"size": "MUSIC_RESPONSIVE_LIST_ITEM_FIXED_COLUMN_SIZE_SMALL"
+													}
+												}
+											],
+											"playlistItemData": { "videoId": "mqgEYRtWMJU" }
+										}
+									}
+								]
+							}
+						}
+					]
+				}
+			},
+			"tabs": [
+				{
+					"tabRenderer": {
+						"content": {
+							"sectionListRenderer": {
+								"contents": [
+									{
+										"musicResponsiveHeaderRenderer": {
+											"thumbnail": {
+												"musicThumbnailRenderer": {
+													"thumbnail": {
+														"thumbnails": [
+															{
+																"url": "https://yt3.googleusercontent.com/wY7kATQ2X8UkxWku6-JuLMCfjoIP4V5Mc9B24wV_bNcombU5iOTEPIgRax9iuIpgGcBbsTuF2lhsSyPO=w60-h60-l90-rj",
+																"width": 60,
+																"height": 60
+															},
+															{
+																"url": "https://yt3.googleusercontent.com/wY7kATQ2X8UkxWku6-JuLMCfjoIP4V5Mc9B24wV_bNcombU5iOTEPIgRax9iuIpgGcBbsTuF2lhsSyPO=w120-h120-l90-rj",
+																"width": 120,
+																"height": 120
+															}
+														]
+													}
+												}
+											},
+											"buttons": [
+												{
+													"musicPlayButtonRenderer": {
+														"playNavigationEndpoint": {
+															"watchPlaylistEndpoint": {
+																"playlistId": "OLAK5uy_k8XkxQFGZhSX8gENqaH6pg1xz8vOTnzQs"
+															}
+														}
+													}
+												}
+											],
+											"title": { "runs": [{ "text": "TRON: Legacy" }] },
+											"subtitle": {
+												"runs": [{ "text": "Album" }, { "text": " \u2022 " }, { "text": "2010" }]
+											},
+											"straplineTextOne": {
+												"runs": [
+													{
+														"text": "Daft Punk",
+														"navigationEndpoint": {
+															"browseEndpoint": {
+																"browseId": "UCRr1xG_2WIDs18a6cIiCxeA",
+																"browseEndpointContextSupportedConfigs": {
+																	"browseEndpointContextMusicConfig": {
+																		"pageType": "MUSIC_PAGE_TYPE_ARTIST"
+																	}
+																}
+															}
+														}
+													}
+												]
+											},
+											"description": {
+												"musicDescriptionShelfRenderer": {
+													"description": {
+														"runs": [
+															{
+																"text": "Tron: Legacy is the soundtrack album to the 2010 film of the same name, with twenty-two tracks featuring music by French electronic music duo Daft Punk. The first film score written by Daft Punk, the music was composed and produced by Thomas Bangalter and Guy-Manuel de Homem-Christo, arranged and orchestrated by Joseph Trapanese, and conducted by Gavin Greenaway.\nWalt Disney Records released the album on December 3, 2010, and has since released several editions of the soundtrack with an additional nine tracks since then. The album also includes \"Derezzed\", which was released as a single on December 8.\nDaft Punk's score received generally positive reviews, receiving praise for its interpolation of orchestral and electronic music. Daft Punk received a nomination for the Grammy Award for Best Score Soundtrack for Visual Media for the score. The album debuted at number 10 on the Billboard 200 chart, peaking at number 4 on the aforementioned chart by its fifth week of release. The album has been certified Platinum by the Recording Industry Association of America.\n\nFrom Wikipedia ("
+															}
+														]
+													}
+												}
+											}
+										}
+									}
+								]
+							}
+						}
+					}
+				}
+			]
+		}
+	}
+}

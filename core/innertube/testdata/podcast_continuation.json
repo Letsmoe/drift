@@ -1,0 +1,155 @@
+{
+	"continuationContents": {
+		"musicShelfContinuation": {
+			"contents": [
+				{
+					"musicMultiRowListItemRenderer": {
+						"thumbnail": {
+							"musicThumbnailRenderer": {
+								"thumbnail": {
+									"thumbnails": [
+										{
+											"url": "https://i.ytimg.com/vi/iEzM0wyDoZU/sddefault.jpg?sqp=-oaymwElCIAFEOgCIAQqCghQELAEGAAg4ANIWvKriqkDCZoCBggpECkYKQ&rs=AMzJL3kha9aAjy8SwQysMcQsgkLZ-N-MLA",
+											"width": 640,
+											"height": 360
+										},
+										{
+											"url": "https://i.ytimg.com/vi/iEzM0wyDoZU/hq720.jpg?sqp=-oaymwEmCIAKENAFIAQqCwiYAhDoBxgAINAFSFryq4qpAwmaAgYIKRApGCk&rs=AMzJL3mwwsmH3yWNPRQkRnMY4Ni6QACp1g",
+											"width": 1280,
+											"height": 720
+										}
+									]
+								}
+							}
+						},
+						"onTap": {
+							"watchEndpoint": {
+								"videoId": "iEzM0wyDoZU",
+								"watchEndpointMusicSupportedConfigs": {
+									"watchEndpointMusicConfig": {
+										"musicVideoType": "MUSIC_VIDEO_TYPE_PODCAST_EPISODE"
+									}
+								}
+							}
+						},
+						"subtitle": {
+							"runs": [{ "text": "7 views" }, { "text": " \u2022 " }, { "text": "Aug 30" }]
+						},
+						"playbackProgress": {
+							"musicPlaybackProgressRenderer": {
+								"playbackProgressPercentage": 0,
+								"playbackProgressText": { "runs": [{ "text": " \u2022 " }, { "text": "34 min" }] },
+								"videoPlaybackPositionFeedbackToken": "AB9zfpLg5wmZGgMlps2SJLCNktS5yoFtsbpcJG-fewznrQVz7BD8MwdcD5acbsOob_8aj_i8qKazqLWe_Qc60EiB7bngWmB3nw",
+								"durationText": { "runs": [{ "text": " \u2022 " }, { "text": "34 min" }] },
+								"playedText": {
+									"runs": [{ "text": " \u2022 " }, { "text": "Played", "textColor": 4294921797 }]
+								}
+							}
+						},
+						"title": {
+							"runs": [
+								{
+									"text": "Krapopolis Chicken Time",
+									"navigationEndpoint": {
+										"browseEndpoint": {
+											"browseId": "MPEDiEzM0wyDoZU",
+											"browseEndpointContextSupportedConfigs": {
+												"browseEndpointContextMusicConfig": {
+													"pageType": "MUSIC_PAGE_TYPE_NON_MUSIC_AUDIO_TRACK_PAGE"
+												}
+											}
+										}
+									}
+								}
+							]
+						},
+						"description": {
+							"runs": [
+								{
+									"text": "In this week's episode, Joel discusses the Disney Animated Canon, one of the worst oldest films in said canon (Melody Time), FOX's Krapopolis, NFTs, and why Jollibee is a bit disappointing.\n\n\n\n\n\n\n\n\nSo"
+								}
+							]
+						}
+					}
+				},
+				{
+					"musicMultiRowListItemRenderer": {
+						"thumbnail": {
+							"musicThumbnailRenderer": {
+								"thumbnail": {
+									"thumbnails": [
+										{
+											"url": "https://i.ytimg.com/vi/Wx5uKa1JdS8/sddefault.jpg?sqp=-oaymwElCIAFEOgCIAQqCghQELAEGAAg4ANIWvKriqkDCZoCBggpECkYKQ&rs=AMzJL3kNvgYl97pZWynQNIWehn4DmqFh4w",
+											"width": 640,
+											"height": 360
+										},
+										{
+											"url": "https://i.ytimg.com/vi/Wx5uKa1JdS8/hq720.jpg?sqp=-oaymwEmCIAKENAFIAQqCwiYAhDoBxgAINAFSFryq4qpAwmaAgYIKRApGCk&rs=AMzJL3kI11Uj9OBO70GFmokrRf9zUl-dEA",
+											"width": 1280,
+											"height": 720
+										}
+									]
+								}
+							}
+						},
+						"onTap": {
+							"watchEndpoint": {
+								"videoId": "Wx5uKa1JdS8",
+								"watchEndpointMusicSupportedConfigs": {
+									"watchEndpointMusicConfig": {
+										"musicVideoType": "MUSIC_VIDEO_TYPE_PODCAST_EPISODE"
+									}
+								}
+							}
+						},
+						"subtitle": {
+							"runs": [{ "text": "4 views" }, { "text": " \u2022 " }, { "text": "Aug 30" }]
+						},
+						"playbackProgress": {
+							"musicPlaybackProgressRenderer": {
+								"playbackProgressPercentage": 0,
+								"playbackProgressText": { "runs": [{ "text": " \u2022 " }, { "text": "43 min" }] },
+								"videoPlaybackPositionFeedbackToken": "AB9zfpKUvTd5UFEVvYyFF0oZOgAui3PPiCEGu62iKyd_YK7HEgdSjyuWKuInTbCuuBalzIggbfwcoqxAmURnP1U_nOpX98s6Pw",
+								"durationText": { "runs": [{ "text": " \u2022 " }, { "text": "43 min" }] },
+								"playedText": {
+									"runs": [{ "text": " \u2022 " }, { "text": "Played", "textColor": 4294921797 }]
+								}
+							}
+						},
+						"title": {
+							"runs": [
+								{
+									"text": "Law & Order: Ghostly Coyote Unit",
+									"navigationEndpoint": {
+										"browseEndpoint": {
+											"browseId": "MPEDWx5uKa1JdS8",
+											"browseEndpointContextSupportedConfigs": {
+												"browseEndpointContextMusicConfig": {
+													"pageType": "MUSIC_PAGE_TYPE_NON_MUSIC_AUDIO_TRACK_PAGE"
+												}
+											}
+										}
+									}
+								}
+							]
+						},
+						"description": {
+							"runs": [
+								{
+									"text": "In this week's episode, Joel highlights the Law & Order: SVU and Danny Phantom crossover fanfiction Human by Jaybie Jarrett (https://www.fanfiction.net/s/7512065/3/Human) , the SVU spinoff Law & Order"
+								}
+							]
+						}
+					}
+				}
+			],
+			"continuations": [
+				{
+					"nextContinuationData": {
+						"continuation": "4qmFsgJREhFNUFNQUExPck5VNmFRY19aNBo8ZWg1UVZEcERTR2RwUlVWYVJWRlVVa1JTVkdzMVVsUmFSRTVGVVhsU2EwMlNBUU1JMlFqYUNBUUlBaEFC"
+					}
+				}
+			]
+		}
+	}
+}

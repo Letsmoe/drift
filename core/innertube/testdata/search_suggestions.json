@@ -1,0 +1,32 @@
+{
+	"contents": [
+		{
+			"searchSuggestionsSectionRenderer": {
+				"contents": [
+					{
+						"searchSuggestionRenderer": {
+							"suggestion": { "runs": [{ "text": "daft p", "bold": true }, { "text": "unk" }] },
+							"navigationEndpoint": { "searchEndpoint": { "query": "daft punk" } }
+						}
+					},
+					{
+						"searchSuggestionRenderer": {
+							"suggestion": {
+								"runs": [{ "text": "daft p", "bold": true }, { "text": "unk one more time" }]
+							},
+							"navigationEndpoint": { "searchEndpoint": { "query": "daft punk one more time" } }
+						}
+					},
+					{
+						"searchSuggestionRenderer": {
+							"suggestion": {
+								"runs": [{ "text": "daft p", "bold": true }, { "text": "unk veridis quo" }]
+							},
+							"navigationEndpoint": { "searchEndpoint": { "query": "daft punk veridis quo" } }
+						}
+					}
+				]
+			}
+		}
+	]
+}

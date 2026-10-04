@@ -1,13 +1,19 @@
 package innertube
 
-import "github.com/neoworks/otter-music/core/music"
+import (
+	"strings"
+
+	"github.com/neoworks/otter-music/core/music"
+)
 
 // itemKinds maps the page a card opens to its kind; cards opening anything else
-// (podcasts, audiobooks, moods) are skipped.
+// (audiobooks, moods, profiles) are skipped.
 var itemKinds = map[string]music.ItemKind{
 	pageTypeAlbum:    music.ItemKindAlbum,
 	pageTypePlaylist: music.ItemKindPlaylist,
 	pageTypeArtist:   music.ItemKindArtist,
+	pageTypePodcast:  music.ItemKindPodcast,
+	pageTypeEpisode:  music.ItemKindEpisode,
 }
 
 func parseShelves(sections []section) []music.Shelf {
@@ -61,6 +67,9 @@ func parseCard(card twoRowItem) (music.Item, bool) {
 	subtitle := joinText(card.Subtitle.Runs)
 	thumbnails := parseThumbnails(card.thumbnails())
 
+	if card.NavigationEndpoint.isEpisode() {
+		return parseEpisodeCard(card, title, subtitle), true
+	}
 	if videoID := card.videoID(); videoID != "" {
 		track := music.Track{
 			VideoID:    videoID,
@@ -85,6 +94,18 @@ func parseCard(card twoRowItem) (music.Item, bool) {
 	}, true
 }
 
+func parseEpisodeCard(card twoRowItem, title, subtitle string) music.Item {
+	videoID := card.videoID()
+	if videoID == "" {
+		videoID = strings.TrimPrefix(card.NavigationEndpoint.BrowseEndpoint.BrowseID, episodeBrowsePrefix)
+	}
+	track := parseEpisodeTrack(videoID, title, card.Subtitle.Runs, card.thumbnails())
+	return episodeItem(track, subtitle)
+}
+
+// episodeBrowsePrefix precedes the video ID in an episode's browse ID.
+const episodeBrowsePrefix = "MPED"
+
 func songItem(track music.Track, subtitle string) music.Item {
 	return music.Item{
 		Kind:       music.ItemKindSong,
@@ -94,6 +115,31 @@ func songItem(track music.Track, subtitle string) music.Item {
 		Thumbnails: track.Thumbnails,
 		Track:      &track,
 	}
+}
+
+func episodeItem(track music.Track, subtitle string) music.Item {
+	item := songItem(track, subtitle)
+	item.Kind = music.ItemKindEpisode
+	return item
+}
+
+// parseEpisodeTrack builds the playable track of an episode; the show is the
+// podcast link among the subtitle runs, e.g. "Episode • Aug 30 • The Show".
+func parseEpisodeTrack(videoID, title string, subtitle []run, thumbnails []thumbnail) music.Track {
+	track := music.Track{
+		VideoID:    videoID,
+		Title:      title,
+		Artists:    []music.Artist{},
+		Thumbnails: parseThumbnails(thumbnails),
+	}
+	for _, textRun := range subtitle {
+		if textRun.pageType() == pageTypePodcast {
+			track.Artists = []music.Artist{{Name: textRun.Text}}
+			track.Album = &music.Album{ID: textRun.browseID(), Name: textRun.Text}
+			break
+		}
+	}
+	return track
 }
 
 // parseLinkedArtists picks the artist links out of a card subtitle like "Song • Artist • 1.2M views".

@@ -23,22 +23,54 @@ func parseSongs(items []listItem) []music.Track {
 }
 
 func parseSong(item listItem) (music.Track, bool) {
-	videoID := item.PlaylistItemData.VideoID
+	videoID := item.videoID()
 	title := joinText(item.column(0))
 	if videoID == "" || title == "" {
 		return music.Track{}, false
 	}
 
-	segments := splitSegments(item.column(1))
+	segments := splitSegments(item.subtitleRuns())
 	return music.Track{
 		VideoID: videoID,
 		Title:   title,
 		Artists: parseArtists(segments),
-		// Search puts the album in the subtitle column, the home feed in a column of its own.
-		Album:           parseAlbum(slices.Concat(item.column(1), item.column(2))),
-		DurationSeconds: parseDuration(segments),
+		// Search puts the album in the subtitle column, the home feed and artist pages in columns of their own.
+		Album:           parseAlbum(slices.Concat(item.subtitleRuns(), item.column(2), item.column(3))),
+		DurationSeconds: parseRowDuration(item, segments),
 		Thumbnails:      parseThumbnails(item.thumbnails()),
 	}, true
+}
+
+// typeLabels are the leading "Song • " style segments unfiltered search puts before the details.
+var typeLabels = map[string]bool{
+	"Song": true, "Video": true, "Episode": true, "Album": true, "Single": true,
+	"EP": true, "Playlist": true, "Artist": true, "Podcast": true, "Profile": true,
+}
+
+// dropTypeLabel removes a leading type label and its separator from subtitle runs.
+func dropTypeLabel(runs []run) []run {
+	if len(runs) < 2 || runs[0].NavigationEndpoint != nil {
+		return runs
+	}
+	if !typeLabels[runs[0].Text] || runs[1].Text != segmentSeparator {
+		return runs
+	}
+	return runs[2:]
+}
+
+// subtitleRuns is the second column without the type label.
+func (item listItem) subtitleRuns() []run {
+	return dropTypeLabel(item.column(1))
+}
+
+// parseRowDuration reads the duration from the subtitle, else from the fixed
+// column album and playlist rows keep it in.
+func parseRowDuration(item listItem, segments [][]run) int {
+	duration := parseDuration(segments)
+	if duration > 0 {
+		return duration
+	}
+	return parseDuration([][]run{item.fixedColumn(0)})
 }
 
 func splitSegments(runs []run) [][]run {
@@ -57,6 +89,10 @@ func splitSegments(runs []run) [][]run {
 // parseArtists reads the first segment, e.g. "Daft Punk", ", ", "Pharrell Williams", " & ", "Nile Rodgers".
 func parseArtists(segments [][]run) []music.Artist {
 	artists := []music.Artist{}
+	// Rows without credited artists start with the duration instead.
+	if len(segments) == 1 && parseDuration(segments) > 0 {
+		return artists
+	}
 	for _, textRun := range segments[0] {
 		if isArtistJoiner(textRun.Text) {
 			continue

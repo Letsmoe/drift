@@ -1,0 +1,226 @@
+{
+	"onResponseReceivedActions": [
+		{
+			"appendContinuationItemsAction": {
+				"continuationItems": [
+					{
+						"musicResponsiveListItemRenderer": {
+							"thumbnail": {
+								"musicThumbnailRenderer": {
+									"thumbnail": {
+										"thumbnails": [
+											{
+												"url": "https://i.ytimg.com/vi/lcOxhH8N3Bo/hqdefault.jpg?sqp=-oaymwEWCJADEOEBIAQqCggAEOADGC0guwJIWg&rs=AMzJL3l1xIhaYbxKWED1A781V30diE8jew",
+												"width": 400,
+												"height": 225
+											}
+										]
+									}
+								}
+							},
+							"flexColumns": [
+								{
+									"musicResponsiveListItemFlexColumnRenderer": {
+										"text": {
+											"runs": [
+												{
+													"text": "Total Eclipse of the Heart",
+													"navigationEndpoint": {
+														"watchEndpoint": {
+															"videoId": "lcOxhH8N3Bo",
+															"playlistId": "RDCLAK5uy_k1Wu8QbZASiGVqr1wmie9NIYo38aBqscQ",
+															"watchEndpointMusicSupportedConfigs": {
+																"watchEndpointMusicConfig": {
+																	"musicVideoType": "MUSIC_VIDEO_TYPE_OMV"
+																}
+															}
+														}
+													}
+												}
+											]
+										}
+									}
+								},
+								{
+									"musicResponsiveListItemFlexColumnRenderer": {
+										"text": {
+											"runs": [
+												{
+													"text": "Bonnie Tyler",
+													"navigationEndpoint": {
+														"browseEndpoint": {
+															"browseId": "UC0BdKEjWDC0hw4Bex9fTnMA",
+															"browseEndpointContextSupportedConfigs": {
+																"browseEndpointContextMusicConfig": {
+																	"pageType": "MUSIC_PAGE_TYPE_ARTIST"
+																}
+															}
+														}
+													}
+												}
+											]
+										}
+									}
+								},
+								{ "musicResponsiveListItemFlexColumnRenderer": { "text": {} } }
+							],
+							"fixedColumns": [
+								{
+									"musicResponsiveListItemFixedColumnRenderer": {
+										"text": { "runs": [{ "text": "5:34" }] },
+										"size": "MUSIC_RESPONSIVE_LIST_ITEM_FIXED_COLUMN_SIZE_SMALL"
+									}
+								}
+							],
+							"playlistItemData": { "videoId": "lcOxhH8N3Bo" }
+						}
+					},
+					{
+						"musicResponsiveListItemRenderer": {
+							"thumbnail": {
+								"musicThumbnailRenderer": {
+									"thumbnail": {
+										"thumbnails": [
+											{
+												"url": "https://i.ytimg.com/vi/djV11Xbc914/hqdefault.jpg?sqp=-oaymwEWCJADEOEBIAQqCggAEOADGC0guwJIWg&rs=AMzJL3lnYP0tGrb4rgHWpUKN6xzNJ9uXaw",
+												"width": 400,
+												"height": 225
+											}
+										]
+									}
+								}
+							},
+							"flexColumns": [
+								{
+									"musicResponsiveListItemFlexColumnRenderer": {
+										"text": {
+											"runs": [
+												{
+													"text": "Take On Me",
+													"navigationEndpoint": {
+														"watchEndpoint": {
+															"videoId": "djV11Xbc914",
+															"playlistId": "RDCLAK5uy_k1Wu8QbZASiGVqr1wmie9NIYo38aBqscQ",
+															"watchEndpointMusicSupportedConfigs": {
+																"watchEndpointMusicConfig": {
+																	"musicVideoType": "MUSIC_VIDEO_TYPE_OMV"
+																}
+															}
+														}
+													}
+												}
+											]
+										}
+									}
+								},
+								{
+									"musicResponsiveListItemFlexColumnRenderer": {
+										"text": {
+											"runs": [
+												{
+													"text": "a-ha",
+													"navigationEndpoint": {
+														"browseEndpoint": {
+															"browseId": "UCx00XxqRCfPS6zaTzRm3H2A",
+															"browseEndpointContextSupportedConfigs": {
+																"browseEndpointContextMusicConfig": {
+																	"pageType": "MUSIC_PAGE_TYPE_ARTIST"
+																}
+															}
+														}
+													}
+												}
+											]
+										}
+									}
+								},
+								{ "musicResponsiveListItemFlexColumnRenderer": { "text": {} } }
+							],
+							"fixedColumns": [
+								{
+									"musicResponsiveListItemFixedColumnRenderer": {
+										"text": { "runs": [{ "text": "4:04" }] },
+										"size": "MUSIC_RESPONSIVE_LIST_ITEM_FIXED_COLUMN_SIZE_SMALL"
+									}
+								}
+							],
+							"playlistItemData": { "videoId": "djV11Xbc914" }
+						}
+					},
+					{
+						"musicResponsiveListItemRenderer": {
+							"thumbnail": {
+								"musicThumbnailRenderer": {
+									"thumbnail": {
+										"thumbnails": [
+											{
+												"url": "https://i.ytimg.com/vi/88sARuFu-tc/hqdefault.jpg?sqp=-oaymwEWCJADEOEBIAQqCggAEOADGC0guwJIWg&rs=AMzJL3nb4qjb7UCTOTUf-T74YcN4iM40Bw",
+												"width": 400,
+												"height": 225
+											}
+										]
+									}
+								}
+							},
+							"flexColumns": [
+								{
+									"musicResponsiveListItemFlexColumnRenderer": {
+										"text": {
+											"runs": [
+												{
+													"text": "Smalltown Boy",
+													"navigationEndpoint": {
+														"watchEndpoint": {
+															"videoId": "88sARuFu-tc",
+															"playlistId": "RDCLAK5uy_k1Wu8QbZASiGVqr1wmie9NIYo38aBqscQ",
+															"watchEndpointMusicSupportedConfigs": {
+																"watchEndpointMusicConfig": {
+																	"musicVideoType": "MUSIC_VIDEO_TYPE_OMV"
+																}
+															}
+														}
+													}
+												}
+											]
+										}
+									}
+								},
+								{
+									"musicResponsiveListItemFlexColumnRenderer": {
+										"text": {
+											"runs": [
+												{
+													"text": "Bronski Beat",
+													"navigationEndpoint": {
+														"browseEndpoint": {
+															"browseId": "UChd-WHoVlFDJdnZslKjIqwA",
+															"browseEndpointContextSupportedConfigs": {
+																"browseEndpointContextMusicConfig": {
+																	"pageType": "MUSIC_PAGE_TYPE_ARTIST"
+																}
+															}
+														}
+													}
+												}
+											]
+										}
+									}
+								},
+								{ "musicResponsiveListItemFlexColumnRenderer": { "text": {} } }
+							],
+							"fixedColumns": [
+								{
+									"musicResponsiveListItemFixedColumnRenderer": {
+										"text": { "runs": [{ "text": "5:04" }] },
+										"size": "MUSIC_RESPONSIVE_LIST_ITEM_FIXED_COLUMN_SIZE_SMALL"
+									}
+								}
+							],
+							"playlistItemData": { "videoId": "88sARuFu-tc" }
+						}
+					}
+				]
+			}
+		}
+	]
+}
