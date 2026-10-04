@@ -18,7 +18,7 @@
 </script>
 
 <div
-	class="group duration-fast flex gap-4 rounded-lg p-4 transition-colors focus-within:bg-hover hover:bg-hover"
+	class="group/episode duration-fast flex gap-4 rounded-lg p-4 transition-colors focus-within:bg-hover hover:bg-hover"
 >
 	<Cover thumbnails={track.thumbnails} size={96} class="size-24 shrink-0 rounded-md" />
 	<div class="flex min-w-0 flex-1 flex-col gap-1">

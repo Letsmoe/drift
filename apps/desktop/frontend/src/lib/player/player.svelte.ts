@@ -136,15 +136,16 @@ export class Player {
 	/** Called by the <audio> element when the track finished. */
 	async trackEnded(): Promise<void> {
 		this.#reportPlay(true);
+		// The queue event can land before the call returns, so remember the entry from before.
+		const endedEntryId = this.entry?.id;
 		try {
 			const step = await queueAdvance();
-			const sameEntry = step.state.entries[step.state.index]?.id === this.#loadedEntryId;
 			this.#applyState(step.state);
 			if (!step.moved) {
 				this.#stopAtEnd();
 				return;
 			}
-			if (sameEntry) {
+			if (this.entry?.id === endedEntryId) {
 				this.#restartCurrent();
 			}
 		} catch (error) {
