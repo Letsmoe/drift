@@ -3,6 +3,7 @@
 import {music} from '../models';
 import {library} from '../models';
 import {browsercookies} from '../models';
+import {download} from '../models';
 import {queue} from '../models';
 import {main} from '../models';
 import {recommend} from '../models';
@@ -15,15 +16,37 @@ export function Album(arg1:string):Promise<music.AlbumPage>;
 
 export function Artist(arg1:string):Promise<music.ArtistPage>;
 
+export function CancelDownload(arg1:string):Promise<void>;
+
 export function CancelImport():Promise<void>;
 
 export function ClearSearches():Promise<void>;
 
 export function CreatePlaylist(arg1:string):Promise<library.Playlist>;
 
+export function DeleteAllDownloads():Promise<void>;
+
+export function DeleteDownload(arg1:string):Promise<void>;
+
 export function DeletePlaylist(arg1:string):Promise<void>;
 
 export function DetectBrowserSessions():Promise<Array<browsercookies.BrowserSession>>;
+
+export function DownloadCollection(arg1:string,arg2:string,arg3:boolean):Promise<void>;
+
+export function DownloadQueue():Promise<Array<download.Item>>;
+
+export function DownloadStates(arg1:Array<string>):Promise<Record<string, download.Status>>;
+
+export function DownloadSummary():Promise<download.Summary>;
+
+export function DownloadTracks(arg1:Array<music.Track>,arg2:string):Promise<void>;
+
+export function DownloadedCollections():Promise<Array<download.Collection>>;
+
+export function DownloadedItems():Promise<Array<download.Item>>;
+
+export function DownloadedTracks():Promise<Array<music.Track>>;
 
 export function Home():Promise<music.HomePage>;
 
@@ -36,6 +59,8 @@ export function LibraryPlaylist(arg1:string):Promise<library.Playlist>;
 export function LikedTracks():Promise<Array<music.Track>>;
 
 export function MovePlaylistEntry(arg1:string,arg2:number,arg3:number):Promise<void>;
+
+export function PauseDownloads():Promise<void>;
 
 export function PickSpotifyExport():Promise<string>;
 
@@ -93,11 +118,19 @@ export function RecommendedRows(arg1:number,arg2:number):Promise<Array<recommend
 
 export function RecordImpressions(arg1:Array<library.Impression>):Promise<void>;
 
+export function RefreshDownloadedCollection(arg1:string,arg2:string):Promise<void>;
+
+export function RemoveDownloadedCollection(arg1:string,arg2:string):Promise<void>;
+
 export function RemoveFromPlaylist(arg1:string,arg2:number):Promise<void>;
 
 export function RenamePlaylist(arg1:string,arg2:string,arg3:string):Promise<void>;
 
+export function ResumeDownloads():Promise<void>;
+
 export function ResumePosition(arg1:string):Promise<main.ResumePosition>;
+
+export function RetryDownload(arg1:string):Promise<void>;
 
 export function Save(arg1:music.Item):Promise<void>;
 
@@ -109,6 +142,8 @@ export function SearchSongs(arg1:string):Promise<Array<music.Track>>;
 
 export function SearchSuggestions(arg1:string):Promise<Array<string>>;
 
+export function SetKeepDownloaded(arg1:string,arg2:string,arg3:boolean):Promise<void>;
+
 export function SetRating(arg1:music.Track,arg2:string,arg3:number):Promise<void>;
 
 export function SpotifyImport(arg1:string,arg2:string,arg3:importer.Options):Promise<void>;
@@ -118,6 +153,8 @@ export function SpotifyPreviewExport(arg1:string):Promise<importer.Summary>;
 export function SpotifyPreviewURL(arg1:string):Promise<importer.Summary>;
 
 export function StartPlay(arg1:music.Track,arg2:string,arg3:string):Promise<number>;
+
+export function StorageUsage():Promise<download.Usage>;
 
 export function StreamURL(arg1:string):Promise<string>;
 

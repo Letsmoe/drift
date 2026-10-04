@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"path/filepath"
+	"slices"
 	"strings"
 	"testing"
 	"time"
@@ -90,8 +91,8 @@ func TestOpenIsIdempotent(t *testing.T) {
 	if err = second.DB().QueryRowContext(ctx, `SELECT COUNT(*) FROM _migration`).Scan(&applied); err != nil {
 		t.Fatal(err)
 	}
-	if applied != 3 {
-		t.Fatalf("applied migrations = %d, want 3", applied)
+	if applied != 4 {
+		t.Fatalf("applied migrations = %d, want 4", applied)
 	}
 	tracks, err := second.Tracks(ctx, []string{"a"})
 	if err != nil || len(tracks) != 1 {
@@ -536,5 +537,42 @@ func TestYouTubeSessionLifecycle(t *testing.T) {
 	_, found, _ = lib.YouTubeSession(ctx)
 	if found {
 		t.Error("session still stored after sign-out")
+	}
+}
+
+func TestOnChangeReportsLikesAndPlaylistEdits(t *testing.T) {
+	ctx := t.Context()
+	lib, err := Open(ctx, filepath.Join(t.TempDir(), "library.db"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() { _ = lib.Close() }()
+	var changes []Change
+	lib.OnChange(func(change Change) { changes = append(changes, change) })
+
+	err = lib.SetRating(ctx, music.Track{VideoID: "a", Title: "A"}, music.ItemKindSong, RatingLike)
+	if err != nil {
+		t.Fatal(err)
+	}
+	playlist, err := lib.CreatePlaylist(ctx, "Mix")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = lib.AddToPlaylist(ctx, playlist.ID, []music.Track{{VideoID: "a", Title: "A"}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = lib.DeletePlaylist(ctx, playlist.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	want := []Change{
+		{Kind: ChangeLikes},
+		{Kind: ChangePlaylist, ID: playlist.ID},
+		{Kind: ChangePlaylist, ID: playlist.ID},
+	}
+	if !slices.Equal(changes, want) {
+		t.Errorf("changes = %v, want %v", changes, want)
 	}
 }

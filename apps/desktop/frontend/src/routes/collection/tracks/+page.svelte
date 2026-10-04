@@ -1,8 +1,10 @@
 <script lang="ts">
 	import HeartIcon from 'phosphor-svelte/lib/HeartIcon';
 	import type { Track } from '#lib/api/music.ts';
+	import { likedCollectionId } from '#lib/api/downloads.ts';
 	import { likedTracks } from '#lib/api/library.ts';
 	import { library } from '#lib/library/library.svelte.ts';
+	import CollectionDownloadButton from '#lib/components/CollectionDownloadButton.svelte';
 	import MoreMenuButton from '#lib/components/MoreMenuButton.svelte';
 	import PageHeader from '#lib/components/PageHeader.svelte';
 	import PageShell from '#lib/components/PageShell.svelte';
@@ -53,6 +55,7 @@
 			{/snippet}
 		</PageHeader>
 		<PlaylistActionRow {context} title="Liked Songs" onplay={() => playContext(tracks, context)}>
+			<CollectionDownloadButton kind="likes" id={likedCollectionId} title="Liked Songs" />
 			<MoreMenuButton buildEntries={() => collectionMenuEntries(tracks)} />
 		</PlaylistActionRow>
 		{#if tracks.length === 0}

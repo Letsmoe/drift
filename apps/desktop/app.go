@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/neoworks/otter-music/core/account"
+	"github.com/neoworks/otter-music/core/download"
 	"github.com/neoworks/otter-music/core/importer"
 	"github.com/neoworks/otter-music/core/innertube"
 	"github.com/neoworks/otter-music/core/library"
@@ -28,6 +29,7 @@ type App struct {
 	ctx       context.Context
 	logger    *slog.Logger
 	innertube *innertube.Client
+	resolver  *stream.Resolver
 	proxy     *stream.Proxy
 	// library and engine stay nil when the library database could not be opened.
 	library  *library.Library
@@ -35,6 +37,9 @@ type App struct {
 	importer *importer.Importer
 	account  *account.Service
 	queue    *queue.Queue
+	// downloads stays nil when the library could not be opened.
+	downloads     *download.Manager
+	dataDirectory string
 
 	streamServer  *http.Server
 	streamBaseURL string
@@ -43,10 +48,12 @@ type App struct {
 // NewApp creates the bound application.
 func NewApp(logger *slog.Logger) *App {
 	innertubeClient := innertube.NewClient()
+	resolver := stream.NewResolver(innertubeClient)
 	app := &App{
 		logger:    logger,
 		innertube: innertubeClient,
-		proxy:     stream.NewProxy(stream.NewResolver(innertubeClient), logger),
+		resolver:  resolver,
+		proxy:     stream.NewProxy(resolver, logger),
 	}
 	app.queue = app.newQueue()
 	return app
@@ -60,6 +67,7 @@ func (app *App) startup(ctx context.Context) {
 	if err := app.startStreamServer(); err != nil {
 		app.logger.Error("stream server failed to start", "error", err)
 	}
+	app.startDownloads()
 }
 
 // openLibrary opens the local database and builds the recommendation engine on
@@ -70,6 +78,7 @@ func (app *App) openLibrary() {
 		app.logger.Error("library path", "error", err)
 		return
 	}
+	app.dataDirectory = filepath.Dir(path)
 	lib, err := library.Open(app.ctx, path)
 	if err != nil {
 		app.logger.Error("library failed to open", "path", path, "error", err)
@@ -95,6 +104,9 @@ func libraryPath() (string, error) {
 }
 
 func (app *App) shutdown(_ context.Context) {
+	if app.downloads != nil {
+		app.downloads.Close()
+	}
 	app.closeLibrary()
 	if app.streamServer == nil {
 		return

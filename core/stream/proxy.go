@@ -8,6 +8,7 @@ import (
 	"log/slog"
 	"net/http"
 	"net/url"
+	"sync/atomic"
 )
 
 // forwardedHeaders are copied from the CDN response so the player can seek.
@@ -24,6 +25,7 @@ type Proxy struct {
 	resolver   *Resolver
 	httpClient *http.Client
 	logger     *slog.Logger
+	local      atomic.Pointer[LocalFiles]
 }
 
 // NewProxy creates a proxy for resolver's streams.
@@ -45,11 +47,15 @@ func Path(videoID string) string {
 func (proxy *Proxy) Handler() http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /stream/{videoId}", proxy.serveStream)
+	mux.HandleFunc("GET /cover/{videoId}", proxy.serveCover)
 	return mux
 }
 
 func (proxy *Proxy) serveStream(writer http.ResponseWriter, request *http.Request) {
 	videoID := request.PathValue("videoId")
+	if proxy.serveLocalAudio(writer, request, videoID) {
+		return
+	}
 	clientRange := request.Header.Get("Range")
 
 	upstream, err := proxy.openUpstream(request.Context(), videoID, upstreamRange(clientRange))

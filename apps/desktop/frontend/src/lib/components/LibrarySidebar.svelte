@@ -2,11 +2,14 @@
 	import { goto } from '$app/navigation';
 	import { Button, FloatingScrollbar } from '@neoworks-dev/ui';
 	import BooksIcon from 'phosphor-svelte/lib/BooksIcon';
+	import ArrowCircleDownIcon from 'phosphor-svelte/lib/ArrowCircleDownIcon';
 	import HeartIcon from 'phosphor-svelte/lib/HeartIcon';
 	import PlusIcon from 'phosphor-svelte/lib/PlusIcon';
 	import MusicImportDialog from '#lib/components/MusicImportDialog.svelte';
 	import Chip from '#lib/components/Chip.svelte';
 	import LibraryRow from '#lib/components/LibraryRow.svelte';
+	import { downloads } from '#lib/downloads/downloads.svelte.ts';
+	import { formatSongCount } from '#lib/format.ts';
 	import { library } from '#lib/library/library.svelte.ts';
 	import { LibraryListing, libraryFilters } from '#lib/library/libraryListing.svelte.ts';
 
@@ -19,6 +22,14 @@
 		!listing.hasKind('podcast') && (listing.filter === 'all' || listing.filter === 'podcast')
 	);
 	const showLikedSongs = $derived(listing.filter === 'all' || listing.filter === 'playlist');
+
+	function downloadsSubtitle(): string {
+		const active = downloads.summary.queued + downloads.summary.downloading;
+		if (active > 0) {
+			return `${active} downloading`;
+		}
+		return `${formatSongCount(downloads.summary.done)} offline`;
+	}
 
 	async function createPlaylist() {
 		const created = await library.createNumberedPlaylist();
@@ -57,6 +68,22 @@
 							class="flex size-12 shrink-0 items-center justify-center rounded-md bg-linear-to-br from-violet to-blue text-white"
 						>
 							<HeartIcon size={20} weight="fill" />
+						</div>
+					{/snippet}
+				</LibraryRow>
+			{/if}
+			{#if showLikedSongs}
+				<LibraryRow
+					href="/downloads"
+					title="Downloads"
+					subtitle={downloadsSubtitle()}
+					context="downloads"
+				>
+					{#snippet cover()}
+						<div
+							class="flex size-12 shrink-0 items-center justify-center rounded-md bg-linear-to-br from-green to-blue text-white"
+						>
+							<ArrowCircleDownIcon size={22} weight="fill" />
 						</div>
 					{/snippet}
 				</LibraryRow>

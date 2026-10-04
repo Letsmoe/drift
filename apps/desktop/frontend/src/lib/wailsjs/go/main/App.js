@@ -14,6 +14,10 @@ export function Artist(arg1) {
   return window['go']['main']['App']['Artist'](arg1);
 }
 
+export function CancelDownload(arg1) {
+  return window['go']['main']['App']['CancelDownload'](arg1);
+}
+
 export function CancelImport() {
   return window['go']['main']['App']['CancelImport']();
 }
@@ -26,12 +30,52 @@ export function CreatePlaylist(arg1) {
   return window['go']['main']['App']['CreatePlaylist'](arg1);
 }
 
+export function DeleteAllDownloads() {
+  return window['go']['main']['App']['DeleteAllDownloads']();
+}
+
+export function DeleteDownload(arg1) {
+  return window['go']['main']['App']['DeleteDownload'](arg1);
+}
+
 export function DeletePlaylist(arg1) {
   return window['go']['main']['App']['DeletePlaylist'](arg1);
 }
 
 export function DetectBrowserSessions() {
   return window['go']['main']['App']['DetectBrowserSessions']();
+}
+
+export function DownloadCollection(arg1, arg2, arg3) {
+  return window['go']['main']['App']['DownloadCollection'](arg1, arg2, arg3);
+}
+
+export function DownloadQueue() {
+  return window['go']['main']['App']['DownloadQueue']();
+}
+
+export function DownloadStates(arg1) {
+  return window['go']['main']['App']['DownloadStates'](arg1);
+}
+
+export function DownloadSummary() {
+  return window['go']['main']['App']['DownloadSummary']();
+}
+
+export function DownloadTracks(arg1, arg2) {
+  return window['go']['main']['App']['DownloadTracks'](arg1, arg2);
+}
+
+export function DownloadedCollections() {
+  return window['go']['main']['App']['DownloadedCollections']();
+}
+
+export function DownloadedItems() {
+  return window['go']['main']['App']['DownloadedItems']();
+}
+
+export function DownloadedTracks() {
+  return window['go']['main']['App']['DownloadedTracks']();
 }
 
 export function Home() {
@@ -56,6 +100,10 @@ export function LikedTracks() {
 
 export function MovePlaylistEntry(arg1, arg2, arg3) {
   return window['go']['main']['App']['MovePlaylistEntry'](arg1, arg2, arg3);
+}
+
+export function PauseDownloads() {
+  return window['go']['main']['App']['PauseDownloads']();
 }
 
 export function PickSpotifyExport() {
@@ -170,6 +218,14 @@ export function RecordImpressions(arg1) {
   return window['go']['main']['App']['RecordImpressions'](arg1);
 }
 
+export function RefreshDownloadedCollection(arg1, arg2) {
+  return window['go']['main']['App']['RefreshDownloadedCollection'](arg1, arg2);
+}
+
+export function RemoveDownloadedCollection(arg1, arg2) {
+  return window['go']['main']['App']['RemoveDownloadedCollection'](arg1, arg2);
+}
+
 export function RemoveFromPlaylist(arg1, arg2) {
   return window['go']['main']['App']['RemoveFromPlaylist'](arg1, arg2);
 }
@@ -178,8 +234,16 @@ export function RenamePlaylist(arg1, arg2, arg3) {
   return window['go']['main']['App']['RenamePlaylist'](arg1, arg2, arg3);
 }
 
+export function ResumeDownloads() {
+  return window['go']['main']['App']['ResumeDownloads']();
+}
+
 export function ResumePosition(arg1) {
   return window['go']['main']['App']['ResumePosition'](arg1);
+}
+
+export function RetryDownload(arg1) {
+  return window['go']['main']['App']['RetryDownload'](arg1);
 }
 
 export function Save(arg1) {
@@ -202,6 +266,10 @@ export function SearchSuggestions(arg1) {
   return window['go']['main']['App']['SearchSuggestions'](arg1);
 }
 
+export function SetKeepDownloaded(arg1, arg2, arg3) {
+  return window['go']['main']['App']['SetKeepDownloaded'](arg1, arg2, arg3);
+}
+
 export function SetRating(arg1, arg2, arg3) {
   return window['go']['main']['App']['SetRating'](arg1, arg2, arg3);
 }
@@ -220,6 +288,10 @@ export function SpotifyPreviewURL(arg1) {
 
 export function StartPlay(arg1, arg2, arg3) {
   return window['go']['main']['App']['StartPlay'](arg1, arg2, arg3);
+}
+
+export function StorageUsage() {
+  return window['go']['main']['App']['StorageUsage']();
 }
 
 export function StreamURL(arg1) {

@@ -1,9 +1,11 @@
 import { goto } from '$app/navigation';
 import type { Artist, ItemKind, Track } from '#lib/api/music.ts';
+import { downloads } from '#lib/downloads/downloads.svelte.ts';
 import { itemHref } from '#lib/format.ts';
 import { library } from '#lib/library/library.svelte.ts';
 import type { MenuEntry } from '#lib/menu/menuEntry.ts';
 import { player } from '#lib/player/player.svelte.ts';
+import ArrowCircleDownIcon from 'phosphor-svelte/lib/ArrowCircleDownIcon';
 import DiscIcon from 'phosphor-svelte/lib/DiscIcon';
 import HeartIcon from 'phosphor-svelte/lib/HeartIcon';
 import ListPlusIcon from 'phosphor-svelte/lib/ListPlusIcon';
@@ -28,6 +30,7 @@ export function buildTrackMenuEntries(track: Track, options: TrackMenuOptions = 
 		{ label: 'Play next', icon: ListPlusIcon, onselect: () => player.playNext([track]) },
 		...navigationEntries(track),
 		likeEntry(track, kind),
+		downloadEntry(track, kind),
 		{
 			label: 'Not interested',
 			icon: ProhibitIcon,
@@ -119,5 +122,20 @@ function likeEntry(track: Track, kind: ItemKind): MenuEntry {
 		icon: HeartIcon,
 		separatorBefore: true,
 		onselect: () => library.toggleLike(track, kind)
+	};
+}
+
+function downloadEntry(track: Track, kind: ItemKind): MenuEntry {
+	if (downloads.stateOf(track.videoId) === '') {
+		return {
+			label: 'Download',
+			icon: ArrowCircleDownIcon,
+			onselect: () => downloads.download(track, kind)
+		};
+	}
+	return {
+		label: 'Remove download',
+		icon: ArrowCircleDownIcon,
+		onselect: () => downloads.remove(track.videoId)
 	};
 }

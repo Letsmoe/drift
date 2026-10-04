@@ -2,6 +2,7 @@
 	import { page } from '$app/state';
 	import { playlist, playlistContinuation } from '#lib/api/catalog.ts';
 	import { createItem, type PlaylistPage, type Track } from '#lib/api/music.ts';
+	import CollectionDownloadButton from '#lib/components/CollectionDownloadButton.svelte';
 	import LoadMoreSentinel from '#lib/components/LoadMoreSentinel.svelte';
 	import MoreMenuButton from '#lib/components/MoreMenuButton.svelte';
 	import PageHeader from '#lib/components/PageHeader.svelte';
@@ -66,6 +67,7 @@
 					playlistPage.thumbnails
 				)}
 			/>
+			<CollectionDownloadButton kind="playlist" id={playlistId} title={playlistPage.title} />
 			<MoreMenuButton buildEntries={() => collectionMenuEntries(trackList.items)} />
 		</PlaylistActionRow>
 		<TrackTable tracks={trackList.items} {context} />

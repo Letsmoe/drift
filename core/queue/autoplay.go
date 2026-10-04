@@ -2,6 +2,8 @@ package queue
 
 import (
 	"context"
+	"errors"
+	"net"
 
 	"github.com/neoworks/otter-music/core/music"
 )
@@ -50,9 +52,19 @@ func (queue *Queue) startExtension(request *extensionRequest) {
 func (queue *Queue) runExtension(request extensionRequest) {
 	tracks, err := queue.extender.Extend(context.Background(), request.upcoming, request.history)
 	if err != nil {
-		queue.logger.Error("queue: autoplay extension failed", "error", err)
+		queue.logExtensionFailure(err)
 	}
 	queue.finishExtension(request.generation, tracks, err == nil)
+}
+
+// logExtensionFailure keeps being offline quiet: autoplay simply has nothing to add then.
+func (queue *Queue) logExtensionFailure(err error) {
+	var networkError net.Error
+	if errors.As(err, &networkError) {
+		queue.logger.Debug("queue: autoplay extension skipped, offline", "error", err)
+		return
+	}
+	queue.logger.Error("queue: autoplay extension failed", "error", err)
 }
 
 // finishExtension appends the extension to the queue it was made for. When the

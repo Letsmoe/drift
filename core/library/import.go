@@ -86,6 +86,7 @@ func (library *Library) ImportPlaylist(ctx context.Context, imported ImportedPla
 	if err != nil {
 		return "", err
 	}
+	library.emitChange(Change{Kind: ChangePlaylist, ID: playlistID})
 	return playlistID, nil
 }
 

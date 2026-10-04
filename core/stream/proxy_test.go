@@ -78,10 +78,20 @@ type proxyResponse struct {
 
 func requestRange(t *testing.T, proxy *Proxy, rangeHeader string) proxyResponse {
 	t.Helper()
+	return fetchProxy(t, proxy, Path("video"), rangeHeader)
+}
+
+func requestPath(t *testing.T, proxy *Proxy, path string) proxyResponse {
+	t.Helper()
+	return fetchProxy(t, proxy, path, "")
+}
+
+func fetchProxy(t *testing.T, proxy *Proxy, path, rangeHeader string) proxyResponse {
+	t.Helper()
 	server := httptest.NewServer(proxy.Handler())
 	t.Cleanup(server.Close)
 
-	request, err := http.NewRequestWithContext(t.Context(), http.MethodGet, server.URL+Path("video"), nil)
+	request, err := http.NewRequestWithContext(t.Context(), http.MethodGet, server.URL+path, nil)
 	if err != nil {
 		t.Fatal(err)
 	}

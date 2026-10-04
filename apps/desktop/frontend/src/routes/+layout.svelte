@@ -9,12 +9,14 @@
 	import PlayerBar from '#lib/components/PlayerBar.svelte';
 	import QueuePanel from '#lib/components/QueuePanel.svelte';
 	import TopBar from '#lib/components/TopBar.svelte';
+	import { downloads } from '#lib/downloads/downloads.svelte.ts';
 	import { panels } from '#lib/layout/panels.svelte.ts';
 	import { library } from '#lib/library/library.svelte.ts';
 
 	let { children } = $props();
 
 	library.load();
+	downloads.start();
 </script>
 
 <svelte:head>

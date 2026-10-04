@@ -7,6 +7,8 @@
 	import type { ItemKind, Track } from '#lib/api/music.ts';
 	import ArtistLinks from '#lib/components/ArtistLinks.svelte';
 	import Cover from '#lib/components/Cover.svelte';
+	import DownloadButton from '#lib/components/DownloadButton.svelte';
+	import DownloadedIndicator from '#lib/components/DownloadedIndicator.svelte';
 	import Menu from '#lib/components/Menu.svelte';
 	import { formatDuration, itemHref } from '#lib/format.ts';
 	import { library } from '#lib/library/library.svelte.ts';
@@ -111,7 +113,10 @@
 			<Cover thumbnails={track.thumbnails} size={40} class="size-10 shrink-0 rounded-sm" />
 		{/if}
 		<div class="min-w-0">
-			<p class={['truncate text-base', current && 'text-green']}>{track.title}</p>
+			<div class="flex min-w-0 items-center gap-1.5">
+				<p class={['truncate text-base', current && 'text-green']}>{track.title}</p>
+				<DownloadedIndicator videoId={track.videoId} />
+			</div>
 			<p class="truncate text-sm text-dim"><ArtistLinks artists={track.artists} /></p>
 		</div>
 	</div>
@@ -131,6 +136,7 @@
 	{/if}
 
 	<div class="flex items-center justify-end gap-3 text-dim">
+		<DownloadButton {track} {kind} />
 		<button
 			type="button"
 			aria-label={likeLabel}
