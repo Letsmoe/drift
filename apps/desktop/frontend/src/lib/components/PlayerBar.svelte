@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { Button, LoadingSpinner } from '@neoworks-dev/ui';
+	import HeartIcon from 'phosphor-svelte/lib/HeartIcon';
+	import QueueIcon from 'phosphor-svelte/lib/QueueIcon';
 	import RepeatIcon from 'phosphor-svelte/lib/RepeatIcon';
 	import RepeatOnceIcon from 'phosphor-svelte/lib/RepeatOnceIcon';
 	import ShuffleIcon from 'phosphor-svelte/lib/ShuffleIcon';
@@ -11,10 +13,17 @@
 	import Cover from '#lib/components/Cover.svelte';
 	import PlayOverlayButton from '#lib/components/PlayOverlayButton.svelte';
 	import RangeSlider from '#lib/components/RangeSlider.svelte';
-	import { formatArtists, formatDuration } from '#lib/format.ts';
+	import TrackCredits from '#lib/components/TrackCredits.svelte';
+	import { formatDuration } from '#lib/format.ts';
+	import { panels } from '#lib/layout/panels.svelte.ts';
+	import { library } from '#lib/library/library.svelte.ts';
 	import { player } from '#lib/player/player.svelte.ts';
+	import type { ItemKind } from '#lib/api/music.ts';
 
 	const VolumeIcon = $derived(pickVolumeIcon());
+	const liked = $derived(player.track !== null && library.isLiked(player.track.videoId));
+	const likeLabel = $derived(buildLikeLabel());
+	const likeWeight = $derived(buildLikeWeight());
 	const RepeatButtonIcon = $derived(pickRepeatIcon());
 
 	function pickRepeatIcon() {
@@ -41,6 +50,42 @@
 		return 'Pause';
 	}
 
+	function buildLikeLabel(): string {
+		if (liked) {
+			return 'Remove from Liked Songs';
+		}
+		return 'Save to Liked Songs';
+	}
+
+	function buildLikeWeight(): 'fill' | 'regular' {
+		if (liked) {
+			return 'fill';
+		}
+		return 'regular';
+	}
+
+	function toggleLikeOfCurrent(): void {
+		if (!player.track || !player.entry) {
+			return;
+		}
+		library.toggleLike(player.track, player.entry.kind as ItemKind);
+	}
+
+	function isTypingTarget(target: EventTarget | null): boolean {
+		if (!(target instanceof HTMLElement)) {
+			return false;
+		}
+		return target.closest('input, textarea, select, button, a, [contenteditable]') !== null;
+	}
+
+	function handleKeydown(event: KeyboardEvent): void {
+		if (event.code !== 'Space' || isTypingTarget(event.target)) {
+			return;
+		}
+		event.preventDefault();
+		player.toggle();
+	}
+
 	function shownVolume(): number {
 		if (player.muted) {
 			return 0;
@@ -48,6 +93,8 @@
 		return player.volume;
 	}
 </script>
+
+<svelte:window onkeydown={handleKeydown} />
 
 <audio
 	src={player.source}
@@ -68,9 +115,21 @@
 		{#if player.track}
 			<Cover thumbnails={player.track.thumbnails} size={56} class="size-14 shrink-0 rounded-md" />
 			<div class="min-w-0">
-				<p class="truncate text-base font-medium">{player.track.title}</p>
-				<p class="truncate text-sm text-dim">{formatArtists(player.track.artists)}</p>
+				<TrackCredits track={player.track} />
 			</div>
+			<button
+				type="button"
+				aria-label={likeLabel}
+				aria-pressed={liked}
+				onclick={toggleLikeOfCurrent}
+				class={[
+					'rounded-full p-1.5 hover:text-default',
+					liked && 'text-green',
+					!liked && 'text-dim'
+				]}
+			>
+				<HeartIcon size={18} weight={likeWeight} />
+			</button>
 		{/if}
 	</div>
 
@@ -142,6 +201,15 @@
 	</div>
 
 	<div class="flex items-center justify-end gap-1 pr-2">
+		<span class={[panels.queueOpen && '[&>button]:text-green']}>
+			<Button
+				round
+				size="sm"
+				variant="ghost"
+				icon={QueueIcon}
+				onclick={() => panels.toggleQueue()}
+			/>
+		</span>
 		<Button round size="sm" variant="ghost" icon={VolumeIcon} onclick={() => player.toggleMute()} />
 		<div class="w-24">
 			<RangeSlider

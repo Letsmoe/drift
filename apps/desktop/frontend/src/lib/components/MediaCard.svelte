@@ -2,11 +2,21 @@
 	import type { Item, ItemKind } from '#lib/api/music.ts';
 	import Cover from '#lib/components/Cover.svelte';
 	import PlayOverlayButton from '#lib/components/PlayOverlayButton.svelte';
+	import { itemHref } from '#lib/format.ts';
 	import { player } from '#lib/player/player.svelte.ts';
 
-	let { item }: { item: Item } = $props();
+	let { item, context = 'home' }: { item: Item; context?: string } = $props();
 
 	const playing = $derived(isTrackPlaying());
+	// Songs and episodes play in place; every other kind opens its page.
+	const pageHref = $derived(hrefOf(item));
+
+	function hrefOf(shown: Item): string | undefined {
+		if (shown.track) {
+			return undefined;
+		}
+		return itemHref(shown.kind, shown.id);
+	}
 
 	function isTrackPlaying(): boolean {
 		if (!item.track) {
@@ -17,14 +27,12 @@
 
 	function playTrack() {
 		if (item.track) {
-			player.playOrToggle(item.track, [item.track], 0, 'home', item.kind as ItemKind);
+			player.playOrToggle(item.track, [item.track], 0, context, item.kind as ItemKind);
 		}
 	}
 </script>
 
-<article
-	class="group duration-fast flex w-44 shrink-0 flex-col gap-2 rounded-lg p-3 transition-colors hover:bg-hover"
->
+{#snippet card()}
 	<div class="relative">
 		<Cover
 			thumbnails={item.thumbnails}
@@ -42,7 +50,8 @@
 				onclick={playTrack}
 				class={[
 					'absolute right-2 bottom-2',
-					!playing && 'translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100'
+					!playing &&
+						'translate-y-2 opacity-0 group-hover/card:translate-y-0 group-hover/card:opacity-100'
 				]}
 			/>
 		{/if}
@@ -51,4 +60,18 @@
 		<h3 class="truncate text-base font-medium">{item.title}</h3>
 		<p class="line-clamp-2 text-sm text-dim">{item.subtitle}</p>
 	</div>
-</article>
+{/snippet}
+
+{#if pageHref}
+	<a
+		href={pageHref}
+		class="group/card duration-fast flex w-44 shrink-0 flex-col gap-2 rounded-lg p-3 transition-colors hover:bg-hover"
+		>{@render card()}</a
+	>
+{:else}
+	<article
+		class="group/card duration-fast flex w-44 shrink-0 flex-col gap-2 rounded-lg p-3 transition-colors hover:bg-hover"
+	>
+		{@render card()}
+	</article>
+{/if}

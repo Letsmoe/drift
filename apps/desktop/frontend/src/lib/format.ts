@@ -1,4 +1,4 @@
-import type { Artist, Thumbnail } from '#lib/api/music.ts';
+import type { Artist, Thumbnail, Track } from '#lib/api/music.ts';
 
 export function formatDuration(totalSeconds: number): string {
 	// <audio> reports NaN until a source is loaded.
@@ -36,4 +36,34 @@ export function describeError(error: unknown): string {
 		return error;
 	}
 	return 'Something went wrong.';
+}
+
+export function formatTotalDuration(tracks: Track[]): string {
+	const totalSeconds = tracks.reduce((sum, track) => sum + track.durationSeconds, 0);
+	const totalMinutes = Math.round(totalSeconds / 60);
+	if (totalMinutes < 60) {
+		return `${totalMinutes} min`;
+	}
+	const hours = Math.floor(totalMinutes / 60);
+	return `${hours} hr ${totalMinutes % 60} min`;
+}
+
+export function formatSongCount(count: number): string {
+	if (count === 1) {
+		return '1 song';
+	}
+	return `${count} songs`;
+}
+
+/** Formats a timestamp from the core, or returns an empty string when it is not a date. */
+export function formatDate(timestamp: unknown): string {
+	const date = new Date(String(timestamp));
+	if (Number.isNaN(date.getTime())) {
+		return '';
+	}
+	return date.toLocaleDateString('en', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+export function itemHref(kind: string, id: string): string {
+	return `/${kind}/${encodeURIComponent(id)}`;
 }

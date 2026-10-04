@@ -98,6 +98,11 @@ export class LibraryState {
 		return created;
 	}
 
+	/** Creates "My Playlist #N", numbered after the playlists that exist. */
+	async createNumberedPlaylist(): Promise<Playlist> {
+		return this.createPlaylist(`My Playlist #${this.playlists.length + 1}`);
+	}
+
 	async addToPlaylist(id: string, tracks: Track[]): Promise<void> {
 		await addToPlaylist(id, tracks);
 		await this.refreshPlaylists();
