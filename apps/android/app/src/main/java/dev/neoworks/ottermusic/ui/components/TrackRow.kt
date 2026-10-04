@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -30,6 +31,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.neoworks.ottermusic.core.model.ItemKind
 import dev.neoworks.ottermusic.core.model.Track
 import dev.neoworks.ottermusic.ui.LocalAppContainer
+import dev.neoworks.ottermusic.ui.formatDuration
 import dev.neoworks.ottermusic.ui.icons.OtterIcons
 import dev.neoworks.ottermusic.ui.theme.OtterTheme
 
@@ -39,6 +41,10 @@ import dev.neoworks.ottermusic.ui.theme.OtterTheme
  *
  * @param subtitle replaces the default "Artist • Album" line (e.g. only the artist on album pages).
  * @param showCover hide the cover for album track lists.
+ * @param trackNumber shows a number slot before the cover (album and artist lists); the playing
+ * indicator replaces the number for the current track.
+ * @param showDuration shows the track length before the "more" button.
+ * @param trailing extra content before the "more" button, e.g. a drag handle.
  * @param onRemoveFromPlaylist adds "Remove from playlist" to the action sheet.
  */
 @Composable
@@ -49,6 +55,9 @@ fun TrackRow(
     kind: ItemKind = ItemKind.Song,
     subtitle: String = trackSubtitle(track),
     showCover: Boolean = true,
+    trackNumber: Int? = null,
+    showDuration: Boolean = false,
+    trailing: (@Composable () -> Unit)? = null,
     onRemoveFromPlaylist: (() -> Unit)? = null,
 ) {
     val container = LocalAppContainer.current
@@ -69,8 +78,11 @@ fun TrackRow(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
+        if (trackNumber != null) {
+            TrackNumber(number = trackNumber, isCurrent = isCurrent, isPlaying = isPlaying)
+        }
         if (showCover) {
-            TrackCover(track = track, isCurrent = isCurrent, isPlaying = isPlaying)
+            TrackCover(track = track, isCurrent = isCurrent && trackNumber == null, isPlaying = isPlaying)
         }
         Column(modifier = Modifier.weight(1f)) {
             Text(
@@ -80,13 +92,15 @@ fun TrackRow(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
-            Text(
-                text = subtitle,
-                style = MaterialTheme.typography.bodySmall,
-                color = OtterTheme.colors.textDim,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
+            if (subtitle.isNotEmpty()) {
+                Text(
+                    text = subtitle,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = OtterTheme.colors.textDim,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
         }
         if (track.videoId in likedVideoIds) {
             Icon(
@@ -96,6 +110,14 @@ fun TrackRow(
                 modifier = Modifier.size(16.dp),
             )
         }
+        if (showDuration && track.durationSeconds > 0) {
+            Text(
+                text = formatDuration(track.durationSeconds),
+                style = MaterialTheme.typography.bodySmall,
+                color = OtterTheme.colors.textDim,
+            )
+        }
+        trailing?.invoke()
         IconButton(onClick = { showActions = true }) {
             Icon(OtterIcons.More.outline, contentDescription = "More", tint = OtterTheme.colors.textMuted)
         }
@@ -107,6 +129,21 @@ fun TrackRow(
             kind = kind,
             onDismiss = { showActions = false },
             onRemoveFromPlaylist = onRemoveFromPlaylist,
+        )
+    }
+}
+
+@Composable
+private fun TrackNumber(number: Int, isCurrent: Boolean, isPlaying: Boolean) {
+    Box(modifier = Modifier.width(28.dp), contentAlignment = Alignment.Center) {
+        if (isCurrent) {
+            PlayingIndicator(isPlaying = isPlaying, color = MaterialTheme.colorScheme.primary, size = 16.dp)
+            return@Box
+        }
+        Text(
+            text = number.toString(),
+            style = MaterialTheme.typography.bodyMedium,
+            color = OtterTheme.colors.textDim,
         )
     }
 }

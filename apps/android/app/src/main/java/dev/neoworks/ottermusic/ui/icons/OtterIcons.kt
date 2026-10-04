@@ -5,6 +5,8 @@ import com.adamglin.PhosphorIcons
 import com.adamglin.phosphoricons.Fill
 import com.adamglin.phosphoricons.Regular
 import com.adamglin.phosphoricons.fill.ArrowLeft as FillArrowleft
+import com.adamglin.phosphoricons.fill.ArrowUpLeft as FillArrowupleft
+import com.adamglin.phosphoricons.regular.ArrowUpLeft as RegularArrowupleft
 import com.adamglin.phosphoricons.regular.ArrowLeft as RegularArrowleft
 import com.adamglin.phosphoricons.fill.BookmarkSimple as FillBookmarksimple
 import com.adamglin.phosphoricons.regular.BookmarkSimple as RegularBookmarksimple
@@ -99,6 +101,7 @@ object OtterIcons {
     val Queue = OtterIcon(PhosphorIcons.Regular.RegularQueue, PhosphorIcons.Fill.FillQueue)
     val More = OtterIcon(PhosphorIcons.Regular.RegularDotsthreevertical, PhosphorIcons.Fill.FillDotsthreevertical)
     val ChevronDown = OtterIcon(PhosphorIcons.Regular.RegularCaretdown, PhosphorIcons.Fill.FillCaretdown)
+    val FillIntoField = OtterIcon(PhosphorIcons.Regular.RegularArrowupleft, PhosphorIcons.Fill.FillArrowupleft)
     val Back = OtterIcon(PhosphorIcons.Regular.RegularArrowleft, PhosphorIcons.Fill.FillArrowleft)
     val Playlist = OtterIcon(PhosphorIcons.Regular.RegularPlaylist, PhosphorIcons.Fill.FillPlaylist)
     val Radio = OtterIcon(PhosphorIcons.Regular.RegularRadio, PhosphorIcons.Fill.FillRadio)
