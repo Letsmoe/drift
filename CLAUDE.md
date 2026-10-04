@@ -80,6 +80,11 @@ Run from the repo root:
 | `bun run desktop:install` | build, then install for the current user (`scripts/install-desktop.ts`: Linux → `~/.local/bin` + desktop entry, macOS → `/Applications`) |
 | `bun run bindings`        | regenerate `frontend/src/lib/wailsjs` after changing bound Go methods                                                                    |
 | `bun run android:core`    | build `apps/android/app/libs/otter-core.aar` from `core/mobile` (needs gomobile + Android SDK/NDK; skips when up to date)                |
+| `bun run android:build`   | debug APK (`gradlew assembleDebug`; builds the core AAR first)                                                                           |
+| `bun run android:install` | install the debug build on the connected device/emulator                                                                                 |
+| `bun run android:start`   | install, then launch the app                                                                                                             |
+| `bun run android:logs`    | logcat of the running app only                                                                                                           |
+| `bun run android:lint`    | Android lint                                                                                                                             |
 | `bun run test`            | Go tests for core                                                                                                                        |
 | `bun run test:live`       | live tests against real YouTube (`-tags live`), same as the daily canary                                                                 |
 | `bun run lint`            | golangci-lint (core + desktop), prettier, eslint, svelte-check                                                                           |
