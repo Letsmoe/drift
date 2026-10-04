@@ -6,6 +6,7 @@ import path from 'node:path';
 
 const appName = 'otter-music';
 const buildDirectory = path.resolve(import.meta.dirname, '../apps/desktop/build/bin');
+const appIcon = path.resolve(import.meta.dirname, '../apps/desktop/build/appicon.png');
 
 function requireBuild(buildPath: string): void {
 	if (existsSync(buildPath)) {
@@ -15,13 +16,16 @@ function requireBuild(buildPath: string): void {
 	process.exit(1);
 }
 
-function desktopEntry(binaryPath: string): string {
+function desktopEntry(binaryPath: string, iconPath: string): string {
 	return [
 		'[Desktop Entry]',
 		'Type=Application',
 		'Name=Otter Music',
 		'Comment=YouTube Music player',
 		`Exec=${binaryPath}`,
+		`Icon=${iconPath}`,
+		// Matches the GTK program name set in main.go, so the window groups under this entry.
+		'StartupWMClass=otter-music',
 		'Categories=AudioVideo;Audio;Player;',
 		'Terminal=false',
 		''
@@ -34,18 +38,22 @@ async function installLinux(): Promise<void> {
 
 	const binaryDirectory = path.join(homedir(), '.local/bin');
 	const applicationsDirectory = path.join(homedir(), '.local/share/applications');
+	const dataDirectory = path.join(homedir(), '.local/share', appName);
 	const installedBinary = path.join(binaryDirectory, appName);
+	const installedIcon = path.join(dataDirectory, 'icon.png');
 
 	await mkdir(binaryDirectory, { recursive: true });
 	await mkdir(applicationsDirectory, { recursive: true });
+	await mkdir(dataDirectory, { recursive: true });
 	await copyFile(builtBinary, installedBinary);
 	await chmod(installedBinary, 0o755);
+	await copyFile(appIcon, installedIcon);
 	await writeFile(
 		path.join(applicationsDirectory, `${appName}.desktop`),
-		desktopEntry(installedBinary)
+		desktopEntry(installedBinary, installedIcon)
 	);
 
-	console.log(`Installed ${installedBinary} and its desktop entry.`);
+	console.log(`Installed ${installedBinary}, its icon and its desktop entry.`);
 }
 
 async function installMacOS(): Promise<void> {

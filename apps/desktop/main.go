@@ -11,12 +11,18 @@ import (
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
+	"github.com/wailsapp/wails/v2/pkg/options/linux"
 )
 
 // frontend/build is the SvelteKit static build (`bun run build` in frontend/).
 //
 //go:embed all:frontend/build
 var assets embed.FS
+
+// build/appicon.png is the app icon; `wails build` also turns it into the macOS and Windows icons.
+//
+//go:embed build/appicon.png
+var appIcon []byte
 
 func main() {
 	logger := slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: logLevel()}))
@@ -33,6 +39,10 @@ func main() {
 		OnStartup:        app.startup,
 		OnShutdown:       app.shutdown,
 		Bind:             []any{app},
+		Linux: &linux.Options{
+			Icon:        appIcon,
+			ProgramName: "otter-music",
+		},
 	})
 	if err != nil {
 		log.Fatal(err)
