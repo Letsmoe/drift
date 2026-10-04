@@ -3,6 +3,8 @@
 	import XIcon from 'phosphor-svelte/lib/XIcon';
 	import type { QueueEntry } from '#lib/api/queue.ts';
 	import Cover from '#lib/components/Cover.svelte';
+	import DownloadedIndicator from '#lib/components/DownloadedIndicator.svelte';
+	import { downloads } from '#lib/downloads/downloads.svelte.ts';
 	import { formatArtists } from '#lib/format.ts';
 	import { player } from '#lib/player/player.svelte.ts';
 
@@ -25,6 +27,10 @@
 		ondrop?: (event: DragEvent) => void;
 		ondragend?: (event: DragEvent) => void;
 	} = $props();
+
+	$effect(() => {
+		downloads.ensureStates([entry.track.videoId]);
+	});
 </script>
 
 <div
@@ -41,7 +47,10 @@
 >
 	<Cover thumbnails={entry.track.thumbnails} size={40} class="size-10 shrink-0 rounded" />
 	<div class="min-w-0 flex-1">
-		<p class={['truncate text-sm font-medium', current && 'text-green']}>{entry.track.title}</p>
+		<div class="flex min-w-0 items-center gap-1.5">
+			<p class={['truncate text-sm font-medium', current && 'text-green']}>{entry.track.title}</p>
+			<DownloadedIndicator videoId={entry.track.videoId} size={12} />
+		</div>
 		<p class="truncate text-xs text-dim">{formatArtists(entry.track.artists)}</p>
 	</div>
 	{#if !current}

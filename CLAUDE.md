@@ -20,6 +20,7 @@ core/               Go module github.com/neoworks/otter-music/core: the shared, 
   account/          optional YouTube Music sign-in: validates + stores the session in the library, hands the importer an authenticated reader
   browsercookies/   desktop-only, UI-free: reads a signed-in browser session (Firefox family, Chromium family) or parses pasted cookies; runs only on the user's click
   recommend/        recommendation engine over the library + a Catalog (the innertube client): candidates → weighted ranking → diversity re-ranking; also the queue's autoplay Extender
+  download/         offline downloads: persistent resumable queue, collections kept in sync, local files served by the stream proxy
   mobile/           gomobile adapter: the whole core behind one `Core` object, complex values as JSON strings (Android AAR)
 apps/desktop/       Wails v2 app (Go module …/apps/desktop), binds core to the webview
   frontend/         SvelteKit 3 + Tailwind 4 UI (static SPA, embedded into the binary)
@@ -44,7 +45,7 @@ apps/ios/           planned: Swift + SwiftUI + AVPlayer, core via gomobile xcfra
 
 Profile identities (versions, user agents) mirror yt-dlp's `INNERTUBE_CLIENTS` in `yt_dlp/extractor/youtube/_base.py`; when YouTube rejects a profile, check there first.
 
-**Playback path:** `<audio src>` → `StreamURL(videoId)` → loopback proxy `GET /stream/{videoId}` → resolver → CDN. The proxy forwards `Range` for seeking and re-resolves once when the CDN answers 403/410. It always sends a `Range` upstream (`bytes=0-` when the player sends none, as GStreamer does on its first request): without one the CDN throttles to about playback speed and songs take seconds to start. Set `OTTER_MUSIC_LOG=debug` to log every stream request. Desktop serves it on `127.0.0.1:<random>` instead of the Wails asset server because WebKitGTK's media pipeline does not seek reliably over custom URI schemes. Mobile will reuse the same proxy.
+**Playback path:** `<audio src>` → `StreamURL(videoId)` → loopback proxy `GET /stream/{videoId}` → resolver → CDN. The proxy forwards `Range` for seeking and re-resolves once when the CDN answers 403/410. It always sends a `Range` upstream (`bytes=0-` when the player sends none, as GStreamer does on its first request): without one the CDN throttles to about playback speed and songs take seconds to start. Set `OTTER_MUSIC_LOG=debug` to log every stream request. Desktop serves it on `127.0.0.1:<random>` instead of the Wails asset server because WebKitGTK's media pipeline does not seek reliably over custom URI schemes. Mobile will reuse the same proxy. When a video is downloaded (see Downloads) the proxy serves the local file with `http.ServeContent` instead, so seeking and offline playback work with no player change; downloaded covers are at `GET /cover/{videoId}`.
 
 Don't copy code from zemer-cipher or InnerTubeX (GPL-3.0, would make this app GPL) or MetrolistGroup/faraday (no license). Read them for reference only.
 
@@ -78,6 +79,16 @@ Optional sign-in whose only job is reading the user's own library for import and
 - **Endpoints** (ytmusicapi `mixins/library.py`; parsers reuse `parseCard`/`parseSongs`, fixtures in `testdata/` are hand-synthesized in ytmusicapi's shapes, no real signed-in capture exists, so verify with `OTTER_MUSIC_TEST_COOKIES=<cookie header> bun run test:live` after touching them): liked songs = browse `VLLM` (playlist continuations), `FEmusic_liked_playlists` (grid; `LM`/`SE` auto playlists skipped), `FEmusic_liked_albums` (grid), `FEmusic_library_corpus_artists` (subscriptions, list rows), `FEmusic_library_non_music_audio_list` (podcasts, grid), `account/account_menu` (name, handle, email, photo). Grids and lists follow `nextContinuationData`, `continuationItemRenderer` and `appendContinuationItemsAction` continuations.
 - **Import**: source kind `youtube-account`, exact IDs, no `import_match`. Liked songs are liked oldest first (the newest YouTube like stays the newest local like; already-liked tracks are left alone), playlists mirror into local playlists via `ImportPlaylist` (source `youtube`, key = playlist ID without `VL`), albums/artists/podcasts use `Save`. Re-sync is running it again; `library.MarkYouTubeSynced` records the time.
 - **Storage**: migration `003_youtube_session.sql`, one row (`youtube_session`: cookie header, account name/handle/email/photo, created/validated/last-synced). The cookie header is a credential: `Session` and `library.YouTubeSession` redact themselves in logs and formatting, errors never carry it. Sign-out deletes the row.
+
+## Downloads
+
+`core/download` is an in-app offline cache (like YouTube Music Premium), not exported music: the resolver's best audio stream is stored as-is under `<dataDir>/downloads/<videoId>.<webm|m4a>` next to a cover image (`<videoId>.cover.jpg`), `dataDir` being the directory of `library.db`.
+
+- **Queue**: the `download` table (migration 004) is the persistent queue; states `queued`/`downloading`/`done`/`failed` (`paused` is only reported while the queue is paused or blocked). 2 workers, each streams into `<file>.part` with `Range` (always sent, like the proxy), resumes from the partial file, retries 4 times with backoff and re-resolves the URL when the CDN answers 403/410. Interrupted downloads continue at the next start. Progress events are throttled to ~4/s per download in core; the apps only forward them (desktop: Wails event `downloads`, mobile: `DownloadListener`).
+- **Collections**: albums, YouTube playlists, local playlists and Liked Songs (`album`, `playlist`, `local`, `likes` with id `liked`). A collection's tracks are recorded in `download_collection_track`; a file is deleted when it is neither downloaded explicitly (single-track download) nor listed by any collection (reference counting). **Keep downloaded** collections sync: local playlist/likes edits via `library.OnChange` (immediately), YouTube albums/playlists at startup, every 6 h and when their page opens (`RefreshCollection`).
+- **Offline**: Liked Songs, local playlists, downloaded lists and the queue work for downloaded tracks; `Downloaded()` lists carry the local cover as thumbnail. Catalog pages fail as before; autoplay and recommendation sources log network failures at debug level only.
+- **Network policy**: `SetAllowDownloads(false)` (mobile "Download only on Wi-Fi") interrupts like pause; the setting itself lives in the app.
+- Tests use an `httptest` fake CDN (Range, 403, cut transfers); `TestLiveDownloadsASearchedTrack` runs with `bun run test:live`.
 
 ## Commands
 

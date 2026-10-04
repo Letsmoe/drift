@@ -2,6 +2,7 @@
 	import { page } from '$app/state';
 	import { album } from '#lib/api/catalog.ts';
 	import { createItem, createTrack, type AlbumPage, type Track } from '#lib/api/music.ts';
+	import CollectionDownloadButton from '#lib/components/CollectionDownloadButton.svelte';
 	import ArtistLinks from '#lib/components/ArtistLinks.svelte';
 	import MoreMenuButton from '#lib/components/MoreMenuButton.svelte';
 	import PageHeader from '#lib/components/PageHeader.svelte';
@@ -70,6 +71,7 @@
 					albumPage.thumbnails
 				)}
 			/>
+			<CollectionDownloadButton kind="album" id={albumId} title={albumPage.title} />
 			<MoreMenuButton buildEntries={() => collectionMenuEntries(tracks)} />
 		</PlaylistActionRow>
 		<TrackTable {tracks} {context} showCover={false} showAlbum={false} />

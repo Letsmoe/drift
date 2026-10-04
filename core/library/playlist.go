@@ -84,7 +84,8 @@ func (library *Library) DeletePlaylist(ctx context.Context, id string) error {
 	if err != nil {
 		return fmt.Errorf("library: delete playlist %s: %w", id, err)
 	}
-	return requireAffected(result, "playlist "+id)
+	err = requireAffected(result, "playlist "+id)
+	return library.notifyChange(err, Change{Kind: ChangePlaylist, ID: id})
 }
 
 func requireAffected(result sql.Result, subject string) error {
@@ -214,13 +215,14 @@ func scanPlaylistEntry(row rowScanner) (PlaylistEntry, error) {
 
 // AddToPlaylist appends tracks to a playlist and caches their metadata.
 func (library *Library) AddToPlaylist(ctx context.Context, id string, tracks []music.Track) error {
-	return library.inTransaction(ctx, func(tx *sql.Tx) error {
+	err := library.inTransaction(ctx, func(tx *sql.Tx) error {
 		err := library.touchPlaylist(ctx, tx, id)
 		if err != nil {
 			return err
 		}
 		return library.appendEntries(ctx, tx, id, tracks)
 	})
+	return library.notifyChange(err, Change{Kind: ChangePlaylist, ID: id})
 }
 
 func (library *Library) appendEntries(ctx context.Context, tx *sql.Tx, id string, tracks []music.Track) error {
@@ -274,6 +276,11 @@ func (library *Library) MovePlaylistEntry(ctx context.Context, id string, entryI
 // reorder loads the playlist's entry order, lets arrange produce the new
 // order and rewrites dense positions; removedEntryID (if not 0) is deleted.
 func (library *Library) reorder(ctx context.Context, id string, arrange func([]int64) ([]int64, error), removedEntryID int64) error {
+	err := library.rewriteOrder(ctx, id, arrange, removedEntryID)
+	return library.notifyChange(err, Change{Kind: ChangePlaylist, ID: id})
+}
+
+func (library *Library) rewriteOrder(ctx context.Context, id string, arrange func([]int64) ([]int64, error), removedEntryID int64) error {
 	return library.inTransaction(ctx, func(tx *sql.Tx) error {
 		err := library.touchPlaylist(ctx, tx, id)
 		if err != nil {

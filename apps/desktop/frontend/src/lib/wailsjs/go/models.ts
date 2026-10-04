@@ -62,6 +62,156 @@ export namespace browsercookies {
 
 }
 
+export namespace download {
+	
+	export class Collection {
+	    kind: string;
+	    id: string;
+	    title: string;
+	    keep: boolean;
+	    trackCount: number;
+	    doneCount: number;
+	    failedCount: number;
+	    // Go type: time
+	    syncedAt: any;
+	
+	    static createFrom(source: any = {}) {
+	        return new Collection(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.kind = source["kind"];
+	        this.id = source["id"];
+	        this.title = source["title"];
+	        this.keep = source["keep"];
+	        this.trackCount = source["trackCount"];
+	        this.doneCount = source["doneCount"];
+	        this.failedCount = source["failedCount"];
+	        this.syncedAt = this.convertValues(source["syncedAt"], null);
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	export class Status {
+	    videoId: string;
+	    state: string;
+	    bytesDone: number;
+	    bytesTotal: number;
+	    error: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new Status(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.videoId = source["videoId"];
+	        this.state = source["state"];
+	        this.bytesDone = source["bytesDone"];
+	        this.bytesTotal = source["bytesTotal"];
+	        this.error = source["error"];
+	    }
+	}
+	export class Item {
+	    track: music.Track;
+	    kind: string;
+	    status: Status;
+	    explicit: boolean;
+	    format: string;
+	    sizeBytes: number;
+	    // Go type: time
+	    downloadedAt: any;
+	
+	    static createFrom(source: any = {}) {
+	        return new Item(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.track = this.convertValues(source["track"], music.Track);
+	        this.kind = source["kind"];
+	        this.status = this.convertValues(source["status"], Status);
+	        this.explicit = source["explicit"];
+	        this.format = source["format"];
+	        this.sizeBytes = source["sizeBytes"];
+	        this.downloadedAt = this.convertValues(source["downloadedAt"], null);
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	
+	export class Summary {
+	    queued: number;
+	    downloading: number;
+	    failed: number;
+	    done: number;
+	    paused: boolean;
+	    blocked: boolean;
+	
+	    static createFrom(source: any = {}) {
+	        return new Summary(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.queued = source["queued"];
+	        this.downloading = source["downloading"];
+	        this.failed = source["failed"];
+	        this.done = source["done"];
+	        this.paused = source["paused"];
+	        this.blocked = source["blocked"];
+	    }
+	}
+	export class Usage {
+	    bytes: number;
+	    count: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new Usage(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.bytes = source["bytes"];
+	        this.count = source["count"];
+	    }
+	}
+
+}
+
 export namespace importer {
 	
 	export class Options {

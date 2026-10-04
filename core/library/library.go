@@ -15,6 +15,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	_ "modernc.org/sqlite" // pure Go driver, registers "sqlite"
@@ -35,6 +36,9 @@ var ErrNotFound = errors.New("library: not found")
 type Library struct {
 	db  *sql.DB
 	now func() time.Time
+
+	listenerMutex  sync.RWMutex
+	changeListener func(Change)
 }
 
 // Option configures Open.

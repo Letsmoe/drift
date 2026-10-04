@@ -13,9 +13,11 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"sync/atomic"
 	"time"
 
 	"github.com/neoworks/otter-music/core/account"
+	"github.com/neoworks/otter-music/core/download"
 	"github.com/neoworks/otter-music/core/importer"
 	"github.com/neoworks/otter-music/core/innertube"
 	"github.com/neoworks/otter-music/core/library"
@@ -40,18 +42,23 @@ type Listener interface {
 
 // Core is the whole otter-music core behind one gomobile-friendly object.
 type Core struct {
-	ctx       context.Context
-	cancel    context.CancelFunc
-	logger    *slog.Logger
-	listener  Listener
-	innertube *innertube.Client
-	proxy     *stream.Proxy
+	ctx      context.Context
+	cancel   context.CancelFunc
+	logger   *slog.Logger
+	listener Listener
+	// downloadListener is set by SetDownloadListener while downloads run.
+	downloadListener atomic.Pointer[DownloadListener]
+	resolver         *stream.Resolver
+	innertube        *innertube.Client
+	proxy            *stream.Proxy
 	// library and engine stay nil when the library database could not be opened.
 	library  *library.Library
 	engine   *recommend.Engine
 	importer *importer.Importer
 	account  *account.Service
 	queue    *queue.Queue
+	// downloads stays nil when the library could not be opened.
+	downloads *download.Manager
 
 	streamServer  *http.Server
 	streamBaseURL string
@@ -65,13 +72,15 @@ func Open(dataDir string, listener Listener) (*Core, error) {
 	logger := slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: logLevel()}))
 	ctx, cancel := context.WithCancel(context.Background())
 	innertubeClient := innertube.NewClient()
+	resolver := stream.NewResolver(innertubeClient)
 	core := &Core{
 		ctx:       ctx,
 		cancel:    cancel,
 		logger:    logger,
 		listener:  listener,
 		innertube: innertubeClient,
-		proxy:     stream.NewProxy(stream.NewResolver(innertubeClient), logger),
+		resolver:  resolver,
+		proxy:     stream.NewProxy(resolver, logger),
 	}
 	core.queue = core.newQueue()
 	core.openLibrary(dataDir)
@@ -80,6 +89,7 @@ func Open(dataDir string, listener Listener) (*Core, error) {
 		core.Close()
 		return nil, err
 	}
+	core.startDownloads(dataDir)
 	return core, nil
 }
 
@@ -133,6 +143,9 @@ func (core *Core) startStreamServer() error {
 
 // Close stops the stream server, closes the library and cancels running calls.
 func (core *Core) Close() {
+	if core.downloads != nil {
+		core.downloads.Close()
+	}
 	core.stopStreamServer()
 	if core.library != nil {
 		err := core.library.Close()

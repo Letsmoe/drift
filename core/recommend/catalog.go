@@ -2,8 +2,10 @@ package recommend
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
+	"net"
 	"sync"
 	"time"
 
@@ -76,6 +78,16 @@ type fetchTask struct {
 	run  func(ctx context.Context) error
 }
 
+// logSourceFailure keeps being offline quiet; any other failure is a warning.
+func logSourceFailure(logger *slog.Logger, source string, err error) {
+	var networkError net.Error
+	if errors.As(err, &networkError) {
+		logger.Debug("recommend: source offline, skipping", "source", source, "error", err)
+		return
+	}
+	logger.Warn("recommend: source failed, skipping", "source", source, "error", err)
+}
+
 // runLimited runs the tasks concurrently, at most fetchConcurrency at a time.
 // A failing task is logged and skipped.
 func runLimited(ctx context.Context, logger *slog.Logger, tasks []fetchTask) {
@@ -89,7 +101,7 @@ func runLimited(ctx context.Context, logger *slog.Logger, tasks []fetchTask) {
 			defer func() { <-slots }()
 			err := task.run(ctx)
 			if err != nil {
-				logger.Warn("recommend: source failed, skipping", "source", task.name, "error", err)
+				logSourceFailure(logger, task.name, err)
 			}
 		}()
 	}

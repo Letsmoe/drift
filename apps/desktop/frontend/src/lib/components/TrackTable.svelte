@@ -2,6 +2,7 @@
 	import ClockIcon from 'phosphor-svelte/lib/ClockIcon';
 	import type { ItemKind, Track } from '#lib/api/music.ts';
 	import TrackTableRow from '#lib/components/TrackTableRow.svelte';
+	import { downloads } from '#lib/downloads/downloads.svelte.ts';
 	import { library } from '#lib/library/library.svelte.ts';
 	import { player } from '#lib/player/player.svelte.ts';
 
@@ -37,6 +38,7 @@
 
 	$effect(() => {
 		library.ensureRatings(visibleTracks.map((track) => track.videoId));
+		downloads.ensureStates(visibleTracks.map((track) => track.videoId));
 	});
 
 	function gridClassFor(withAlbum: boolean, withDate: boolean): string {

@@ -5,6 +5,7 @@
 	import TrashIcon from 'phosphor-svelte/lib/TrashIcon';
 	import { libraryPlaylist, type Playlist } from '#lib/api/library.ts';
 	import type { Thumbnail, Track } from '#lib/api/music.ts';
+	import CollectionDownloadButton from '#lib/components/CollectionDownloadButton.svelte';
 	import ConfirmDialog from '#lib/components/ConfirmDialog.svelte';
 	import EditPlaylistDialog from '#lib/components/EditPlaylistDialog.svelte';
 	import MoreMenuButton from '#lib/components/MoreMenuButton.svelte';
@@ -109,6 +110,7 @@
 			{/snippet}
 		</PageHeader>
 		<PlaylistActionRow {context} title={playlist.name} onplay={() => playContext(tracks, context)}>
+			<CollectionDownloadButton kind="local" id={playlistId} title={playlist.name} />
 			<MoreMenuButton buildEntries={menuEntries} />
 		</PlaylistActionRow>
 		{#if tracks.length === 0}
