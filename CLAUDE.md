@@ -15,6 +15,7 @@ core/               Go module github.com/neoworks/otter-music/core: the shared, 
   stream/           resolver (profile chain → best audio URL, cached until expiry) + local HTTP proxy
   library/          local SQLite store (ratings, playlists, saved items, play + search history, impressions, response cache), embedded migrations
   queue/            playback queue: shuffle, repeat, autoplay extension through an Extender; UI-free, apps only render its State
+  recommend/        recommendation engine over the library + a Catalog (the innertube client): candidates → weighted ranking → diversity re-ranking; also the queue's autoplay Extender
 apps/desktop/       Wails v2 app (Go module …/apps/desktop), binds core to the webview
   frontend/         SvelteKit 3 + Tailwind 4 UI (static SPA, embedded into the binary)
 apps/android/       planned: Kotlin + Jetpack Compose + Media3, core via gomobile .aar
@@ -41,6 +42,16 @@ Profile identities (versions, user agents) mirror yt-dlp's `INNERTUBE_CLIENTS` i
 **Playback path:** `<audio src>` → `StreamURL(videoId)` → loopback proxy `GET /stream/{videoId}` → resolver → CDN. The proxy forwards `Range` for seeking and re-resolves once when the CDN answers 403/410. It always sends a `Range` upstream (`bytes=0-` when the player sends none, as GStreamer does on its first request): without one the CDN throttles to about playback speed and songs take seconds to start. Set `OTTER_MUSIC_LOG=debug` to log every stream request. Desktop serves it on `127.0.0.1:<random>` instead of the Wails asset server because WebKitGTK's media pipeline does not seek reliably over custom URI schemes. Mobile will reuse the same proxy.
 
 Don't copy code from zemer-cipher or InnerTubeX (GPL-3.0, would make this app GPL) or MetrolistGroup/faraday (no license). Read them for reference only.
+
+## Recommendations
+
+`core/recommend` runs candidate generation → ranking → re-ranking per request; no ML, no account. Every tunable is in `weights.go`.
+
+- **Signals** (per track, decay half-life 30 days, 6-half-life window, each play row its own signal): like 3, completed play (flag or ≥80%) 2, added to a playlist 1.5, partial play 1, clicked impression 0.5; negative: ignored impression −0.15 (cap 3), early skip −1.5 (stopped before 30 s and 50%, plays older than 5 min), dislike −3 (also excluded from all output, with no time window). Followed artists and saved albums add a fixed boost to their affinity.
+- **Profile**: computed on demand, never stored. A track's weight goes fully to its first linked artist (÷√n to featured ones) and its album; each dimension is normalized to [−1, 1]. Seeds = strongest tracks with weight ≥ 1, top 8.
+- **Candidate sources** (each item tagged with one, prior in `weights.go`): `related:radio` (radio of each seed), `affinity:artist` (top songs of the top 5 artists), `explore:artist` (top songs of up to 4 related artists the profile doesn't know), `rediscover` (liked/completed tracks unplayed for 30 days), `search` (last 3 searches), `youtube` (home feed songs; the cold-start source). Catalog calls run 4 at a time with a timeout, responses are cached in the library (radio/artist/search 24 h, home 1 h), and a failing source is logged and skipped.
+- **Ranking**: `affinity + 0.6·prior − penalties` (played in the last day/week, fatigue from ignored impressions); disliked tracks are excluded. **Re-ranking** per 24-item page: ≤2 per artist, ≤3 per album, no source more than twice in a row, every 7th slot exploration; constraints drop weakest first.
+- `Feed` memoizes the ranking (first page 10 min, later pages 30 min, `refresh` forces a re-rank); `Rows` groups by reason ("Because you listened to X", "More from <artist>") and drops thin and youtube-only rows. `Extend` (queue autoplay) takes the radio of the last played track, drops disliked/queued/played tracks and ranks by taste.
 
 ## Commands
 
