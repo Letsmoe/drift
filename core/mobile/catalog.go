@@ -69,6 +69,15 @@ func (core *Core) Radio(videoID string) (string, error) {
 	return encodeResult(tracks, err)
 }
 
+// Lyrics returns music.Lyrics JSON, or "null" when the track has no lyrics.
+func (core *Core) Lyrics(videoID string) (string, error) {
+	lyrics, found, err := core.innertube.Lyrics(core.ctx, videoID)
+	if err != nil || !found {
+		return encodeResult(nil, err)
+	}
+	return encodeResult(lyrics, nil)
+}
+
 // Podcast returns music.PodcastPage JSON.
 func (core *Core) Podcast(browseID string) (string, error) {
 	page, err := core.innertube.Podcast(core.ctx, browseID)

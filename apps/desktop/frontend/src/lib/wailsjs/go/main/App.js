@@ -102,6 +102,10 @@ export function LikedTracks() {
   return window['go']['main']['App']['LikedTracks']();
 }
 
+export function Lyrics(arg1) {
+  return window['go']['main']['App']['Lyrics'](arg1);
+}
+
 export function MovePlaylistEntry(arg1, arg2, arg3) {
   return window['go']['main']['App']['MovePlaylistEntry'](arg1, arg2, arg3);
 }

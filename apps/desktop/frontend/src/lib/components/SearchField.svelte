@@ -38,7 +38,7 @@
 <form
 	role="search"
 	onsubmit={handleSubmit}
-	class="duration-fast flex h-12 items-center gap-3 rounded-full border border-transparent bg-surface px-4 transition-colors focus-within:border-line-strong hover:border-line hover:bg-raised"
+	class="duration-fast glass flex h-12 items-center gap-3 rounded-full border border-transparent px-4 transition-colors focus-within:border-line-strong hover:border-line hover:bg-raised"
 >
 	<MagnifyingGlassIcon size={20} class="shrink-0 text-dim" />
 	<input

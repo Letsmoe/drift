@@ -1,0 +1,26 @@
+{
+	"contents": {
+		"sectionListRenderer": {
+			"contents": [
+				{
+					"musicDescriptionShelfRenderer": {
+						"description": {
+							"runs": [
+								{
+									"text": "First line of the song\nSecond line of the song\n\nChorus line one\nChorus line two"
+								}
+							]
+						},
+						"footer": {
+							"runs": [
+								{
+									"text": "Source: Musixmatch"
+								}
+							]
+						}
+					}
+				}
+			]
+		}
+	}
+}

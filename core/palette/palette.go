@@ -6,9 +6,10 @@ import (
 	"fmt"
 	"image"
 	"math"
+	"sort"
 )
 
-// Palette holds the colors of one image as "#rrggbb"; both are empty when the
+// Palette holds the colors of one image as "#rrggbb"; all are empty when the
 // image has no visible pixels.
 type Palette struct {
 	// Dominant is the most common color, ignoring near-black and near-white.
@@ -16,6 +17,9 @@ type Palette struct {
 	// Vibrant is the strongest saturated color that covers a visible part of the
 	// image; it falls back to Dominant for greyscale images.
 	Vibrant string `json:"vibrant"`
+	// Colors are up to maxColors clearly different colors, most common first,
+	// for backgrounds that blend several colors of the cover.
+	Colors []string `json:"colors"`
 }
 
 const (
@@ -31,6 +35,13 @@ const (
 	vibrantMinimumShare = 0.01
 	vibrantMinimumSat   = 0.3
 	vibrantMinimumValue = 0.25
+
+	maxColors = 4
+	// A color covering less than this share of the cover is not worth a blob.
+	colorMinimumShare = 0.02
+	// Two colors differ when their hues or brightness are at least this far apart.
+	distinctHueDegrees = 30
+	distinctValue      = 0.3
 
 	nearBlackValue      = 0.12
 	nearWhiteValue      = 0.92
@@ -70,7 +81,65 @@ func Extract(img image.Image) Palette {
 	if !found {
 		vibrant = dominant
 	}
-	return Palette{Dominant: hex(dominant), Vibrant: hex(vibrant)}
+	return Palette{
+		Dominant: hex(dominant),
+		Vibrant:  hex(vibrant),
+		Colors:   pickDistinct(bins, total, dominant),
+	}
+}
+
+// pickDistinct returns the most common colors that differ clearly from each
+// other, starting with dominant.
+func pickDistinct(bins map[int]*bin, total int, dominant rgb) []string {
+	picked := []hsv{toHSV(dominant)}
+	colors := []string{hex(dominant)}
+	for _, cell := range binsByCount(bins) {
+		if len(colors) == maxColors {
+			break
+		}
+		color := cell.average()
+		shade := toHSV(color)
+		if float64(cell.count)/float64(total) < colorMinimumShare || isExtreme(shade) {
+			continue
+		}
+		if !differsFromAll(shade, picked) {
+			continue
+		}
+		picked = append(picked, shade)
+		colors = append(colors, hex(color))
+	}
+	return colors
+}
+
+func binsByCount(bins map[int]*bin) []*bin {
+	sorted := make([]*bin, 0, len(bins))
+	for _, cell := range bins {
+		sorted = append(sorted, cell)
+	}
+	sort.Slice(sorted, func(first, second int) bool {
+		return sorted[first].count > sorted[second].count
+	})
+	return sorted
+}
+
+func differsFromAll(shade hsv, picked []hsv) bool {
+	for _, other := range picked {
+		if !differs(shade, other) {
+			return false
+		}
+	}
+	return true
+}
+
+func differs(first, second hsv) bool {
+	hueDistance := math.Abs(first.hue - second.hue)
+	hueDistance = math.Min(hueDistance, 360-hueDistance)
+	// Hue means little for washed-out colors; compare those by brightness only.
+	bothColorful := first.saturation >= vibrantMinimumSat && second.saturation >= vibrantMinimumSat
+	if bothColorful && hueDistance >= distinctHueDegrees {
+		return true
+	}
+	return math.Abs(first.value-second.value) >= distinctValue
 }
 
 // sample buckets a grid of opaque pixels by hue, saturation and value.

@@ -167,3 +167,24 @@ func findLivePodcast(t *testing.T, client *Client) string {
 	t.Fatal("search found no podcast")
 	return ""
 }
+
+func TestLiveLyrics(t *testing.T) {
+	client := NewClient()
+
+	lyrics, found, err := client.Lyrics(t.Context(), "60ItHLz5WEA") // Alan Walker, Faded
+	if err != nil {
+		t.Fatalf("lyrics: %v", err)
+	}
+	if !found || len(lyrics.Lines) < 4 {
+		t.Fatalf("expected lyrics, got found=%v %+v", found, lyrics)
+	}
+	t.Logf("%d lines, source %q", len(lyrics.Lines), lyrics.Source)
+
+	_, found, err = client.Lyrics(t.Context(), liveVideoID) // an instrumental score
+	if err != nil {
+		t.Fatalf("lyrics of instrumental: %v", err)
+	}
+	if found {
+		t.Error("instrumental track unexpectedly has lyrics")
+	}
+}

@@ -4,39 +4,65 @@
 /* Tailwind skips node_modules; scan the linked ui components for their classes. */
 @source '../node_modules/@neoworks-dev/ui/src';
 
-/* Cover-art colors of the playing track, set on the shell by nowPlayingPalette. Registered so they fade between songs. */
+/* Cover-art colors of the playing track, set on the shell by nowPlayingPalette (--art-1 is the most
+   common color). Registered so they fade between songs; the defaults are the untinted dark theme. */
 @property --art-vibrant {
 	syntax: '<color>';
 	inherits: true;
-	initial-value: #262628;
+	initial-value: #3f3f46;
 }
 
-@property --art-dominant {
+@property --art-1 {
 	syntax: '<color>';
 	inherits: true;
 	initial-value: #1c1c1e;
 }
 
-.art-shell {
-	transition:
-		--art-vibrant 900ms ease,
-		--art-dominant 900ms ease;
+@property --art-2 {
+	syntax: '<color>';
+	inherits: true;
+	initial-value: #18181b;
 }
 
-/* Ambient wash at the top of the content panel. */
-.art-wash {
-	background: linear-gradient(
-		to bottom,
-		color-mix(in oklab, var(--art-dominant) 35%, var(--surface)),
-		var(--surface) 420px
-	);
+@property --art-3 {
+	syntax: '<color>';
+	inherits: true;
+	initial-value: #1c1c1e;
+}
+
+@property --art-4 {
+	syntax: '<color>';
+	inherits: true;
+	initial-value: #141416;
+}
+
+.art-shell {
+	transition:
+		--art-vibrant 1200ms ease,
+		--art-1 1200ms ease,
+		--art-2 1200ms ease,
+		--art-3 1200ms ease,
+		--art-4 1200ms ease;
+}
+
+/* With a cover playing, the accent is its vibrant color lifted towards white so it reads on dark panels. */
+.art-shell[data-art] {
+	--primary: color-mix(in oklab, var(--art-vibrant) 65%, white);
+	--primary-hover: color-mix(in oklab, var(--art-vibrant) 45%, white);
+	--color-action: var(--primary);
+	--color-action-hover: var(--primary-hover);
+}
+
+/* Panels let the backdrop show through. */
+.glass {
+	background: color-mix(in oklab, var(--surface) 68%, transparent);
 }
 
 /* Stronger color behind the now-playing cover. */
 .art-wash-strong {
 	background: linear-gradient(
 		to bottom,
-		color-mix(in oklab, var(--art-vibrant) 55%, var(--surface)),
-		var(--surface) 75%
+		color-mix(in oklab, var(--art-vibrant) 45%, transparent),
+		color-mix(in oklab, var(--surface) 68%, transparent) 75%
 	);
 }

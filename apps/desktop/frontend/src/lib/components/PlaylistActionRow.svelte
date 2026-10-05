@@ -2,6 +2,7 @@
 	import type { Snippet } from 'svelte';
 	import PlayOverlayButton from '#lib/components/PlayOverlayButton.svelte';
 	import { isContextPlaying } from '#lib/player/contextPlayback.ts';
+	import { rememberContextTitle } from '#lib/queue/contextLabel.ts';
 
 	let {
 		context,
@@ -15,6 +16,10 @@
 		/** Save, follow and "..." controls next to the play button. */
 		children?: Snippet;
 	} = $props();
+
+	$effect(() => {
+		rememberContextTitle(context, title);
+	});
 </script>
 
 <div class="flex items-center gap-4 py-4">

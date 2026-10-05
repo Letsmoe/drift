@@ -264,3 +264,55 @@ func pageShelfTitles(shelves []music.Shelf) []string {
 	}
 	return titles
 }
+
+func TestLyrics(t *testing.T) {
+	server := newFakeServer(t)
+	server.respondWithFixture(t, "next", "testdata/next_tabs.json")
+	server.respondWithFixture(t, "browse", "testdata/lyrics.json")
+
+	lyrics, found, err := server.client().Lyrics(t.Context(), "dQw4w9WgXcQ")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !found {
+		t.Fatal("lyrics not found")
+	}
+	if body := server.lastRequest(t, "browse").body; body["browseId"] != "MPLYt_6AEOVn4k62q" {
+		t.Errorf("browse body = %v", body)
+	}
+	if lyrics.Source != "Musixmatch" || lyrics.Synced {
+		t.Errorf("source %q synced %v", lyrics.Source, lyrics.Synced)
+	}
+	wantTexts := []string{"First line of the song", "Second line of the song", "", "Chorus line one", "Chorus line two"}
+	var gotTexts []string
+	for _, line := range lyrics.Lines {
+		gotTexts = append(gotTexts, line.Text)
+	}
+	if !reflect.DeepEqual(gotTexts, wantTexts) {
+		t.Errorf("lines = %q", gotTexts)
+	}
+}
+
+func TestLyricsWithoutLyricsTab(t *testing.T) {
+	server := newFakeServer(t)
+	server.respondWithFixture(t, "next", "testdata/next_tabs_no_lyrics.json")
+
+	_, found, err := server.client().Lyrics(t.Context(), "dQw4w9WgXcQ")
+	if err != nil || found {
+		t.Fatalf("found %v, err %v", found, err)
+	}
+	if server.requestCount("browse") != 0 {
+		t.Error("browsed a lyrics page that does not exist")
+	}
+}
+
+func TestLyricsUnavailable(t *testing.T) {
+	server := newFakeServer(t)
+	server.respondWithFixture(t, "next", "testdata/next_tabs.json")
+	server.respondWithFixture(t, "browse", "testdata/lyrics_unavailable.json")
+
+	_, found, err := server.client().Lyrics(t.Context(), "dQw4w9WgXcQ")
+	if err != nil || found {
+		t.Fatalf("found %v, err %v", found, err)
+	}
+}

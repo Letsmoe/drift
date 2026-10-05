@@ -79,7 +79,7 @@
 		href="/"
 		aria-label="Home"
 		aria-current={onHome ? 'page' : undefined}
-		class="duration-fast flex size-12 shrink-0 items-center justify-center rounded-full bg-surface text-dim transition-colors hover:bg-hover hover:text-default aria-[current=page]:text-default"
+		class="duration-fast glass flex size-12 shrink-0 items-center justify-center rounded-full text-dim transition-colors hover:bg-hover hover:text-default aria-[current=page]:text-default"
 	>
 		<HouseIcon size={22} weight={onHome ? 'fill' : 'regular'} />
 	</a>
