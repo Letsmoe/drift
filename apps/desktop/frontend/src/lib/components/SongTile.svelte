@@ -41,7 +41,7 @@
 >
 	<Cover thumbnails={track.thumbnails} size={64} class="h-full shrink-0" />
 	<div class="min-w-0 flex-1">
-		<p class="truncate text-base font-semibold" class:text-green={current}>{track.title}</p>
+		<p class="truncate text-base font-semibold" class:text-action={current}>{track.title}</p>
 		<p class="truncate text-sm text-dim">{formatArtists(track.artists)}</p>
 	</div>
 	<PlayOverlayButton

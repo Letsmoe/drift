@@ -26,6 +26,10 @@ export function ClearSearches() {
   return window['go']['main']['App']['ClearSearches']();
 }
 
+export function CoverColors(arg1) {
+  return window['go']['main']['App']['CoverColors'](arg1);
+}
+
 export function CreatePlaylist(arg1) {
   return window['go']['main']['App']['CreatePlaylist'](arg1);
 }

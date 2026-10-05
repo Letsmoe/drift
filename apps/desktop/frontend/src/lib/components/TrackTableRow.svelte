@@ -87,7 +87,9 @@
 	]}
 >
 	<div class="flex w-4 items-center justify-end text-sm text-dim tabular-nums">
-		<span class={['group-focus-within/row:hidden group-hover/row:hidden', current && 'text-green']}>
+		<span
+			class={['group-focus-within/row:hidden group-hover/row:hidden', current && 'text-action']}
+		>
 			{#if playing}
 				<SpeakerHighIcon size={16} weight="fill" />
 			{:else}
@@ -114,7 +116,7 @@
 		{/if}
 		<div class="min-w-0">
 			<div class="flex min-w-0 items-center gap-1.5">
-				<p class={['truncate text-base', current && 'text-green']}>{track.title}</p>
+				<p class={['truncate text-base', current && 'text-action']}>{track.title}</p>
 				<DownloadedIndicator videoId={track.videoId} />
 			</div>
 			<p class="truncate text-sm text-dim"><ArtistLinks artists={track.artists} /></p>
@@ -145,7 +147,7 @@
 			class={[
 				'group-hover/row:opacity-100 hover:text-default focus-visible:opacity-100',
 				!liked && 'opacity-0',
-				liked && 'text-green hover:text-green'
+				liked && 'text-action hover:text-action'
 			]}
 		>
 			<HeartIcon size={18} weight={heartWeightFor(liked)} />

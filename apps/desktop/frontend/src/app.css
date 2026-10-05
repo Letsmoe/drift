@@ -3,3 +3,40 @@
 
 /* Tailwind skips node_modules; scan the linked ui components for their classes. */
 @source '../node_modules/@neoworks-dev/ui/src';
+
+/* Cover-art colors of the playing track, set on the shell by nowPlayingPalette. Registered so they fade between songs. */
+@property --art-vibrant {
+	syntax: '<color>';
+	inherits: true;
+	initial-value: #262628;
+}
+
+@property --art-dominant {
+	syntax: '<color>';
+	inherits: true;
+	initial-value: #1c1c1e;
+}
+
+.art-shell {
+	transition:
+		--art-vibrant 900ms ease,
+		--art-dominant 900ms ease;
+}
+
+/* Ambient wash at the top of the content panel. */
+.art-wash {
+	background: linear-gradient(
+		to bottom,
+		color-mix(in oklab, var(--art-dominant) 35%, var(--surface)),
+		var(--surface) 420px
+	);
+}
+
+/* Stronger color behind the now-playing cover. */
+.art-wash-strong {
+	background: linear-gradient(
+		to bottom,
+		color-mix(in oklab, var(--art-vibrant) 55%, var(--surface)),
+		var(--surface) 75%
+	);
+}

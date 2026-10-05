@@ -49,9 +49,7 @@
 <PageShell seed="Downloads">
 	<PageHeader label="Library" title="Downloads">
 		{#snippet cover()}
-			<div
-				class="flex size-full items-center justify-center bg-linear-to-br from-green to-blue text-white"
-			>
+			<div class="flex size-full items-center justify-center bg-hover text-default">
 				<ArrowCircleDownIcon size={96} weight="fill" />
 			</div>
 		{/snippet}

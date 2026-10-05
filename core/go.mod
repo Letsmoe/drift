@@ -4,6 +4,7 @@ go 1.27.1
 
 require (
 	github.com/godbus/dbus/v5 v5.1.0
+	golang.org/x/image v0.46.0
 	modernc.org/sqlite v1.60.1
 )
 

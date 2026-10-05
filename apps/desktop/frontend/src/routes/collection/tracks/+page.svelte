@@ -44,9 +44,7 @@
 	<PageShell seed="Liked Songs">
 		<PageHeader label="Playlist" title="Liked Songs">
 			{#snippet cover()}
-				<div
-					class="flex size-full items-center justify-center bg-linear-to-br from-violet to-blue text-white"
-				>
+				<div class="flex size-full items-center justify-center bg-hover text-default">
 					<HeartIcon size={96} weight="fill" />
 				</div>
 			{/snippet}

@@ -16,7 +16,7 @@
 	onclick={() => library.toggleSaved(item)}
 	class={[
 		'duration-fast transition-transform hover:scale-105',
-		saved && 'text-green',
+		saved && 'text-action',
 		!saved && 'text-dim hover:text-default'
 	]}
 >

@@ -44,10 +44,10 @@
 		/>
 	{/if}
 	<div class="min-w-0 flex-1">
-		<p class={['truncate text-base font-medium', current && 'text-green']}>{title}</p>
+		<p class={['truncate text-base font-medium', current && 'text-action']}>{title}</p>
 		<p class="truncate text-sm text-dim">{subtitle}</p>
 	</div>
 	{#if isContextPlaying(context)}
-		<SpeakerHighIcon size={16} weight="fill" class="shrink-0 text-green" />
+		<SpeakerHighIcon size={16} weight="fill" class="shrink-0 text-action" />
 	{/if}
 </a>

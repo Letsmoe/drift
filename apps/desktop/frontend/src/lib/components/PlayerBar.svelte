@@ -145,7 +145,7 @@
 				onclick={toggleLikeOfCurrent}
 				class={[
 					'rounded-full p-1.5 hover:text-default',
-					liked && 'text-green',
+					liked && 'text-action',
 					!liked && 'text-dim'
 				]}
 			>
@@ -156,7 +156,7 @@
 
 	<div class="flex flex-col items-center gap-1">
 		<div class="flex items-center gap-2">
-			<span class={[player.queue.shuffle && '[&>button]:text-green']}>
+			<span class={[player.queue.shuffle && '[&>button]:text-action']}>
 				<Button
 					round
 					size="sm"
@@ -189,7 +189,7 @@
 				icon={SkipForwardIcon}
 				onclick={() => player.next()}
 			/>
-			<span class={[player.queue.repeat !== 'off' && '[&>button]:text-green']}>
+			<span class={[player.queue.repeat !== 'off' && '[&>button]:text-action']}>
 				<Button
 					round
 					size="sm"
@@ -222,7 +222,7 @@
 	</div>
 
 	<div class="flex items-center justify-end gap-1 pr-2">
-		<span class={[panels.queueOpen && '[&>button]:text-green']}>
+		<span class={[panels.queueOpen && '[&>button]:text-action']}>
 			<Button
 				round
 				size="sm"

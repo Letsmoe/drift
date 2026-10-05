@@ -49,7 +49,7 @@
 		</p>
 		{#if status.state === 'downloading'}
 			<div class="h-1 overflow-hidden rounded-full bg-raised">
-				<div class="h-full bg-green" style:width="{percent}%"></div>
+				<div class="h-full bg-action" style:width="{percent}%"></div>
 			</div>
 		{/if}
 	</div>

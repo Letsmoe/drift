@@ -2,7 +2,9 @@
 	import { FloatingScrollbar } from '@neoworks-dev/ui';
 	import BroomIcon from 'phosphor-svelte/lib/BroomIcon';
 	import SparkleIcon from 'phosphor-svelte/lib/SparkleIcon';
+	import Cover from '#lib/components/Cover.svelte';
 	import QueueRow from '#lib/components/QueueRow.svelte';
+	import TrackCredits from '#lib/components/TrackCredits.svelte';
 	import { player } from '#lib/player/player.svelte.ts';
 	import { contextLabel } from '#lib/queue/contextLabel.ts';
 	import { splitQueue, type UpcomingEntry } from '#lib/queue/queueSections.ts';
@@ -74,9 +76,9 @@
 	</div>
 {/snippet}
 
-<aside class="flex w-80 shrink-0 flex-col rounded-lg bg-surface">
+<aside class="art-wash-strong flex w-80 shrink-0 flex-col rounded-2xl">
 	<header class="flex h-12 shrink-0 items-center justify-between gap-2 px-4">
-		<h2 class="text-base font-semibold">Queue</h2>
+		<h2 class="text-base font-semibold">Now playing</h2>
 		<div class="flex items-center gap-1">
 			<button
 				type="button"
@@ -84,7 +86,7 @@
 				onclick={() => player.toggleAutoplay()}
 				class={[
 					'duration-fast flex items-center gap-1 rounded-full px-2 py-1 text-xs transition-colors hover:bg-hover',
-					player.queue.autoplay && 'text-green',
+					player.queue.autoplay && 'text-action',
 					!player.queue.autoplay && 'text-dim'
 				]}
 			>
@@ -107,9 +109,15 @@
 	<FloatingScrollbar class="min-h-0 flex-1">
 		<div class="flex flex-col gap-4 px-2 pb-4">
 			{#if sections.nowPlaying}
-				<section class="flex flex-col gap-1">
-					<h3 class="px-1.5 text-sm font-semibold text-muted">Now playing</h3>
-					<QueueRow entry={sections.nowPlaying} current />
+				<section class="flex flex-col gap-3 px-2">
+					<Cover
+						thumbnails={sections.nowPlaying.track.thumbnails}
+						size={288}
+						class="w-full rounded-xl shadow-lg"
+					/>
+					<div class="min-w-0 [&>p:first-child]:text-lg [&>p:first-child]:font-semibold">
+						<TrackCredits track={sections.nowPlaying.track} />
+					</div>
 				</section>
 			{:else}
 				<p class="px-2 py-8 text-center text-sm text-dim">

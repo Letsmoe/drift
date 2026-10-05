@@ -2,6 +2,8 @@ package recommend
 
 import (
 	"context"
+	"fmt"
+	"slices"
 	"testing"
 	"time"
 
@@ -209,10 +211,13 @@ func TestRowsGroupByReason(t *testing.T) {
 		makeTrack("top1", "artist:seed", "album:t1"), makeTrack("top2", "artist:seed", "album:t2"), makeTrack("top3", "artist:seed", "album:t3"),
 	}}
 
-	rows, err := environment.engine.Rows(context.Background(), 10, 10)
+	// The test catalog is smaller than the Made for you block, so Rows itself
+	// would leave everything out; group the full ranking instead.
+	feed, err := environment.engine.rankedFeed(context.Background(), feedCacheTTL)
 	if err != nil {
-		t.Fatalf("rows: %v", err)
+		t.Fatalf("feed: %v", err)
 	}
+	rows := groupRows(feed.scored, nil, 10, 10)
 	titles := map[string]int{}
 	for _, row := range rows {
 		titles[row.Title] = len(row.Items)
@@ -236,7 +241,7 @@ func TestGroupRowsTrimsAndDropsThinRows(t *testing.T) {
 	}
 	scored = append(scored, Item{Track: makeTrack("b1", "", ""), Reason: searchReason("thin"), Score: 2})
 
-	rows := groupRows(scored, 5, 2)
+	rows := groupRows(scored, nil, 5, 2)
 	if len(rows) != 1 || len(rows[0].Items) != 2 {
 		t.Fatalf("rows = %+v, want one row trimmed to 2 items", rows)
 	}
@@ -254,4 +259,93 @@ func TestPenaltiesSinkRecentPlaysAndIgnoredShows(t *testing.T) {
 	assertClose(t, "shown four times", penalties("shown", state), 3*penaltyFatiguePerShow)
 	assertClose(t, "shown once is free", penalties("once", state), 0)
 	assertClose(t, "unknown track", penalties("new", state), 0)
+}
+
+func makeRowItems(prefix string, reason Reason, score float64, count int) []Item {
+	items := []Item{}
+	for index := range count {
+		videoID := fmt.Sprintf("%s%d", prefix, index)
+		items = append(items, Item{Track: makeTrack(videoID, "", ""), Reason: reason, Score: score})
+	}
+	return items
+}
+
+// TestGroupRowsCapsRelatedRowsKeepingStrongest checks the seed row cap.
+func TestGroupRowsCapsRelatedRowsKeepingStrongest(t *testing.T) {
+	scored := []Item{}
+	for index, score := range []float64{1, 5, 3, 4} {
+		seed := Seed{VideoID: fmt.Sprintf("seed%d", index), Title: fmt.Sprintf("Seed %d", index)}
+		scored = append(scored, makeRowItems(fmt.Sprintf("r%d-", index), relatedReason(seed), score, 3)...)
+	}
+
+	rows := groupRows(scored, nil, 10, 10)
+	if len(rows) != maxRelatedRows {
+		t.Fatalf("rows = %d, want %d", len(rows), maxRelatedRows)
+	}
+	if rows[0].Reason.EntityID != "seed1" || rows[1].Reason.EntityID != "seed3" {
+		t.Errorf("kept %s and %s, want the strongest seeds seed1 and seed3", rows[0].Reason.EntityID, rows[1].Reason.EntityID)
+	}
+}
+
+// TestGroupRowsInterleavesKinds checks same-kind rows are not adjacent.
+func TestGroupRowsInterleavesKinds(t *testing.T) {
+	scored := []Item{}
+	scored = append(scored, makeRowItems("a-", relatedReason(Seed{VideoID: "s1", Title: "One"}), 9, 3)...)
+	scored = append(scored, makeRowItems("b-", relatedReason(Seed{VideoID: "s2", Title: "Two"}), 8, 3)...)
+	scored = append(scored, makeRowItems("c-", artistReason("artist:1", "Artist 1"), 7, 3)...)
+	scored = append(scored, makeRowItems("d-", artistReason("artist:2", "Artist 2"), 6, 3)...)
+	scored = append(scored, makeRowItems("e-", rediscoverReason(), 5, 3)...)
+
+	rows := groupRows(scored, nil, 10, 10)
+	kinds := []string{}
+	for _, row := range rows {
+		kinds = append(kinds, row.Reason.Kind)
+	}
+	want := []string{ReasonRelated, ReasonArtist, ReasonRediscover, ReasonRelated, ReasonArtist}
+	if !slices.Equal(kinds, want) {
+		t.Errorf("kinds = %v, want %v", kinds, want)
+	}
+}
+
+// TestGroupRowsDedupesTracks checks excluded tracks and repeats across rows.
+func TestGroupRowsDedupesTracks(t *testing.T) {
+	scored := makeRowItems("a-", rediscoverReason(), 9, 4)
+	scored = append(scored, makeRowItems("b-", artistReason("artist:1", "Artist 1"), 5, 4)...)
+	scored = append(scored, Item{Track: makeTrack("a-0", "", ""), Reason: artistReason("artist:1", "Artist 1"), Score: 1})
+
+	rows := groupRows(scored, map[string]bool{"a-1": true, "b-0": true}, 10, 10)
+	seen := map[string]bool{}
+	for _, row := range rows {
+		for _, item := range row.Items {
+			videoID := item.Track.VideoID
+			if videoID == "a-1" || videoID == "b-0" || seen[videoID] {
+				t.Errorf("%s must not appear (excluded or repeated)", videoID)
+			}
+			seen[videoID] = true
+		}
+	}
+	if len(rows) != 2 {
+		t.Errorf("rows = %d, want 2 (both keep 3 tracks)", len(rows))
+	}
+
+	thin := groupRows(scored, map[string]bool{"a-0": true, "a-1": true}, 10, 10)
+	if len(thin) != 1 || thin[0].Reason.Kind != ReasonArtist {
+		t.Errorf("rows = %+v, want the rediscover row dropped as thin", thin)
+	}
+}
+
+// TestRowsLeaveOutMadeForYou checks Rows skips the feed's first page.
+func TestRowsLeaveOutMadeForYou(t *testing.T) {
+	environment := newTestEnvironment(t)
+	seedListening(t, environment)
+	rows, err := environment.engine.Rows(context.Background(), 10, 10)
+	if err != nil || len(rows) != 0 {
+		t.Errorf("rows = %+v, %v; every candidate is in the Made for you block, want none", rows, err)
+	}
+
+	ranked := makeRowItems("m-", rediscoverReason(), 1, madeForYouSize+2)
+	excluded := madeForYouTracks(ranked)
+	if len(excluded) != madeForYouSize || excluded["m-"+fmt.Sprint(madeForYouSize)] {
+		t.Errorf("excluded %d tracks, want the first %d only", len(excluded), madeForYouSize)
+	}
 }
