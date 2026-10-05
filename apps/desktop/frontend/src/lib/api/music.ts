@@ -17,6 +17,8 @@ export type ArtistPage = music.ArtistPage;
 export type PodcastPage = music.PodcastPage;
 export type PodcastEpisodes = music.PodcastEpisodes;
 export type Episode = music.Episode;
+export type Lyrics = music.Lyrics;
+export type LyricLine = music.LyricLine;
 
 /** What an item is: songs and episodes play, the others open a page. */
 export type ItemKind = 'song' | 'album' | 'playlist' | 'artist' | 'podcast' | 'episode';

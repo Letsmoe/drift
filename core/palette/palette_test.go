@@ -8,6 +8,7 @@ import (
 	"image/png"
 	"net/http"
 	"net/http/httptest"
+	"slices"
 	"sync/atomic"
 	"testing"
 )
@@ -53,6 +54,24 @@ func TestExtractFindsDominantAndVibrant(t *testing.T) {
 	if result.Vibrant != "#f0281e" {
 		t.Errorf("vibrant = %s, want #f0281e", result.Vibrant)
 	}
+	// Black is skipped; slate and red differ, so both are listed, slate first.
+	if !slices.Equal(result.Colors, []string{"#3c465a", "#f0281e"}) {
+		t.Errorf("colors = %v, want [#3c465a #f0281e]", result.Colors)
+	}
+}
+
+func TestExtractMergesSimilarColors(t *testing.T) {
+	img := paint([]region{
+		{0.5, color.RGBA{200, 40, 40, 255}},
+		{0.3, color.RGBA{210, 60, 50, 255}}, // a slightly different red
+		{0.2, color.RGBA{30, 60, 200, 255}},
+	})
+
+	result := Extract(img)
+
+	if len(result.Colors) != 2 {
+		t.Errorf("colors = %v, want one red and one blue", result.Colors)
+	}
 }
 
 func TestExtractIgnoresSpecksForVibrant(t *testing.T) {
@@ -81,7 +100,7 @@ func TestExtractFallsBackOnBlackImage(t *testing.T) {
 func TestExtractTransparentImageIsEmpty(t *testing.T) {
 	result := Extract(image.NewRGBA(image.Rect(0, 0, 10, 10)))
 
-	if result != (Palette{}) {
+	if result.Dominant != "" || result.Vibrant != "" || len(result.Colors) != 0 {
 		t.Errorf("got %+v, want empty", result)
 	}
 }

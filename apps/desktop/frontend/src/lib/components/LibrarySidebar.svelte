@@ -41,7 +41,7 @@
 	}
 </script>
 
-<aside class="flex min-h-0 w-80 shrink-0 flex-col gap-2 rounded-2xl bg-surface p-2">
+<aside class="glass flex min-h-0 w-80 shrink-0 flex-col gap-2 rounded-2xl p-2">
 	<header class="flex h-12 items-center gap-3 px-2 text-dim">
 		<BooksIcon size={22} />
 		<h2 class="flex-1 text-base font-semibold">Your Library</h2>

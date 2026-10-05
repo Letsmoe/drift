@@ -134,7 +134,14 @@
 <footer class="grid h-18 shrink-0 grid-cols-[1fr_minmax(0,2fr)_1fr] items-center gap-4 px-2">
 	<div class="flex min-w-0 items-center gap-3">
 		{#if player.track}
-			<Cover thumbnails={player.track.thumbnails} size={56} class="size-14 shrink-0 rounded-md" />
+			<button
+				type="button"
+				aria-label="Open full-screen player"
+				onclick={() => panels.toggleFullPlayer()}
+				class="shrink-0 cursor-pointer rounded-md"
+			>
+				<Cover thumbnails={player.track.thumbnails} size={56} class="size-14 rounded-md" />
+			</button>
 			<div class="min-w-0">
 				<TrackCredits track={player.track} />
 			</div>

@@ -229,3 +229,42 @@ func (header pageHeader) playlistID() string {
 func (header pageHeader) description() string {
 	return joinText(header.Description.MusicDescriptionShelfRenderer.Description.Runs)
 }
+
+// watchTabsResponse is the answer of the next endpoint, read for the tab endpoints only.
+type watchTabsResponse struct {
+	Contents struct {
+		SingleColumnMusicWatchNextResultsRenderer struct {
+			TabbedRenderer struct {
+				WatchNextTabbedResultsRenderer struct {
+					Tabs []struct {
+						TabRenderer struct {
+							Endpoint struct {
+								BrowseEndpoint struct {
+									BrowseID string
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+// lyricsResponse is the browse answer for a lyrics page (MPLYt...).
+type lyricsResponse struct {
+	Contents struct {
+		SectionListRenderer struct {
+			Contents []struct {
+				MusicDescriptionShelfRenderer *struct {
+					Description struct {
+						Runs []run
+					}
+					Footer struct {
+						Runs []run
+					}
+				}
+			}
+		}
+	}
+}

@@ -1,0 +1,25 @@
+{
+	"contents": {
+		"messageRenderer": {
+			"text": {
+				"runs": [
+					{
+						"text": "Lyrics not available"
+					}
+				]
+			},
+			"trackingParams": "CAEQljsiEwj-rvPE_aOXAxW4mXwGHRZsNj8=",
+			"subtext": {
+				"messageSubtextRenderer": {
+					"text": {
+						"runs": [
+							{
+								"text": "If the song has lyrics, they'll show up here when they become available"
+							}
+						]
+					}
+				}
+			}
+		}
+	}
+}

@@ -5,6 +5,8 @@
 	import '@fontsource/geist-sans/700.css';
 	import '../app.css';
 	import { FloatingScrollbar } from '@neoworks-dev/ui';
+	import ArtBackdrop from '#lib/components/ArtBackdrop.svelte';
+	import FullPlayer from '#lib/components/FullPlayer.svelte';
 	import LibrarySidebar from '#lib/components/LibrarySidebar.svelte';
 	import PlayerBar from '#lib/components/PlayerBar.svelte';
 	import QueuePanel from '#lib/components/QueuePanel.svelte';
@@ -20,6 +22,14 @@
 	library.load();
 	downloads.start();
 
+	// Present only while a cover tints the shell; app.css switches the accent on it.
+	function artAttribute(): string | undefined {
+		if (nowPlayingPalette.hasColors()) {
+			return '';
+		}
+		return undefined;
+	}
+
 	$effect(() => {
 		if (player.track === null) {
 			nowPlayingPalette.load([]);
@@ -34,13 +44,15 @@
 </svelte:head>
 
 <div
-	class="art-shell flex h-screen flex-col gap-2 overflow-hidden bg-canvas p-2 text-default"
+	class="art-shell relative isolate flex h-screen flex-col gap-2 overflow-hidden bg-canvas p-2 text-default"
 	style={nowPlayingPalette.style()}
+	data-art={artAttribute()}
 >
+	<ArtBackdrop class="-z-10" />
 	<TopBar />
 	<div class="flex min-h-0 flex-1 gap-2">
 		<LibrarySidebar />
-		<FloatingScrollbar class="art-wash min-w-0 flex-1 rounded-2xl">
+		<FloatingScrollbar class="glass min-w-0 flex-1 rounded-2xl">
 			<main class="px-3 py-4">
 				{@render children()}
 			</main>
@@ -50,4 +62,7 @@
 		{/if}
 	</div>
 	<PlayerBar />
+	{#if panels.fullPlayerOpen}
+		<FullPlayer />
+	{/if}
 </div>

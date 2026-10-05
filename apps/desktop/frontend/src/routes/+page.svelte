@@ -1,11 +1,11 @@
 <script lang="ts">
+	import LoadMoreSentinel from '#lib/components/LoadMoreSentinel.svelte';
 	import { Button, LoadingSpinner } from '@neoworks-dev/ui';
 	import ArrowClockwiseIcon from 'phosphor-svelte/lib/ArrowClockwiseIcon';
 	import RecommendationSection from '#lib/components/RecommendationSection.svelte';
 	import ShelfRow from '#lib/components/ShelfRow.svelte';
 	import { HomeFeed, type HomeFilter } from '#lib/home/homeFeed.svelte.ts';
 	import { Recommendations } from '#lib/recommend/recommendations.svelte.ts';
-	import { whenVisible } from '#lib/whenVisible.ts';
 
 	const feed = new HomeFeed();
 	const recommendations = new Recommendations();
@@ -96,10 +96,5 @@
 </div>
 
 {#if feed.status === 'done' && feed.hasMore}
-	<!-- Re-created per page so it fires again when it is still in view after loading. -->
-	{#key feed.shelves.length}
-		<div class="flex justify-center py-8" {@attach whenVisible(() => feed.loadMore())}>
-			<LoadingSpinner />
-		</div>
-	{/key}
+	<LoadMoreSentinel itemCount={feed.shelves.length} onvisible={() => feed.loadMore()} />
 {/if}
