@@ -63,7 +63,7 @@
 		'flex items-center justify-center hover:text-default focus-visible:opacity-100',
 		'group-hover/row:opacity-100',
 		!alwaysVisible && 'opacity-0',
-		state === 'done' && 'text-green hover:text-green',
+		state === 'done' && 'text-action hover:text-action',
 		state === 'failed' && 'text-red hover:text-red'
 	]}
 >

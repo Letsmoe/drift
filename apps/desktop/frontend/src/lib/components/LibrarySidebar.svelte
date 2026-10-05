@@ -41,7 +41,7 @@
 	}
 </script>
 
-<aside class="flex min-h-0 w-80 shrink-0 flex-col gap-2 rounded-lg bg-surface p-2">
+<aside class="flex min-h-0 w-80 shrink-0 flex-col gap-2 rounded-2xl bg-surface p-2">
 	<header class="flex h-12 items-center gap-3 px-2 text-dim">
 		<BooksIcon size={22} />
 		<h2 class="flex-1 text-base font-semibold">Your Library</h2>
@@ -65,7 +65,7 @@
 				>
 					{#snippet cover()}
 						<div
-							class="flex size-12 shrink-0 items-center justify-center rounded-md bg-linear-to-br from-violet to-blue text-white"
+							class="flex size-12 shrink-0 items-center justify-center rounded-md bg-hover text-default"
 						>
 							<HeartIcon size={20} weight="fill" />
 						</div>
@@ -81,7 +81,7 @@
 				>
 					{#snippet cover()}
 						<div
-							class="flex size-12 shrink-0 items-center justify-center rounded-md bg-linear-to-br from-green to-blue text-white"
+							class="flex size-12 shrink-0 items-center justify-center rounded-md bg-hover text-default"
 						>
 							<ArrowCircleDownIcon size={22} weight="fill" />
 						</div>

@@ -6,7 +6,7 @@
 </script>
 
 {#if downloads.isDownloaded(videoId)}
-	<span title="Downloaded" class="shrink-0 text-green">
+	<span title="Downloaded" class="shrink-0 text-action">
 		<ArrowCircleDownIcon {size} weight="fill" />
 		<span class="sr-only">Downloaded</span>
 	</span>

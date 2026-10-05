@@ -16,6 +16,7 @@ import (
 	"github.com/neoworks/otter-music/core/importer"
 	"github.com/neoworks/otter-music/core/innertube"
 	"github.com/neoworks/otter-music/core/library"
+	"github.com/neoworks/otter-music/core/palette"
 	"github.com/neoworks/otter-music/core/queue"
 	"github.com/neoworks/otter-music/core/recommend"
 	"github.com/neoworks/otter-music/core/stream"
@@ -39,6 +40,7 @@ type App struct {
 	queue    *queue.Queue
 	// downloads stays nil when the library could not be opened.
 	downloads     *download.Manager
+	palette       *palette.Service
 	dataDirectory string
 
 	streamServer  *http.Server
@@ -54,6 +56,7 @@ func NewApp(logger *slog.Logger) *App {
 		innertube: innertubeClient,
 		resolver:  resolver,
 		proxy:     stream.NewProxy(resolver, logger),
+		palette:   newPaletteService(),
 	}
 	app.queue = app.newQueue()
 	return app

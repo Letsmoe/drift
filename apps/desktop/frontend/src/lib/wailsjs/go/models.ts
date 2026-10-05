@@ -1034,6 +1034,25 @@ export namespace music {
 
 }
 
+export namespace palette {
+	
+	export class Palette {
+	    dominant: string;
+	    vibrant: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new Palette(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.dominant = source["dominant"];
+	        this.vibrant = source["vibrant"];
+	    }
+	}
+
+}
+
 export namespace queue {
 	
 	export class Entry {

@@ -51,7 +51,7 @@
 		border-radius: 9999px;
 		background: linear-gradient(
 			to right,
-			var(--text) var(--fill),
+			var(--primary) var(--fill),
 			var(--surface-hover) var(--fill)
 		);
 	}

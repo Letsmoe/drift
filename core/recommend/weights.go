@@ -159,6 +159,13 @@ const (
 	feedFirstPageTTL = 10 * time.Minute
 	// minRowItems drops rows too thin to be worth a shelf.
 	minRowItems = 3
+	// maxRelatedRows caps the "Because you listened to" rows per page, keeping
+	// the strongest seeds, so the page is not five rows of the same kind.
+	maxRelatedRows = 2
+	// madeForYouSize is the size of the "Made for you" feed block the home page
+	// shows above the rows (the desktop requests Feed(20, 0)); rows leave out
+	// those tracks.
+	madeForYouSize = 20
 	// extendLimit is how many autoplay tracks one Extend call returns.
 	extendLimit = 20
 )

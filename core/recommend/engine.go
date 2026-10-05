@@ -99,7 +99,16 @@ func (e *Engine) Rows(ctx context.Context, rowLimit, perRow int) ([]Row, error) 
 	if err != nil {
 		return nil, err
 	}
-	return groupRows(feed.scored, rowLimit, perRow), nil
+	return groupRows(feed.scored, madeForYouTracks(feed.ranked), rowLimit, perRow), nil
+}
+
+// madeForYouTracks returns the video IDs of the feed's first page.
+func madeForYouTracks(ranked []Item) map[string]bool {
+	videoIDs := map[string]bool{}
+	for _, item := range ranked[:min(madeForYouSize, len(ranked))] {
+		videoIDs[item.Track.VideoID] = true
+	}
+	return videoIDs
 }
 
 // Profile returns the current taste profile.

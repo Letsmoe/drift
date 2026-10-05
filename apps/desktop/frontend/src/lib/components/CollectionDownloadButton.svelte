@@ -61,7 +61,7 @@
 	onclick={toggle}
 	class={[
 		'duration-fast flex size-8 items-center justify-center transition-transform hover:scale-105',
-		complete && 'text-green',
+		complete && 'text-action',
 		!complete && 'text-dim hover:text-default'
 	]}
 >

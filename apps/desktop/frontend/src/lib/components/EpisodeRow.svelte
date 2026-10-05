@@ -22,7 +22,7 @@
 >
 	<Cover thumbnails={track.thumbnails} size={96} class="size-24 shrink-0 rounded-md" />
 	<div class="flex min-w-0 flex-1 flex-col gap-1">
-		<h3 class={['truncate text-base font-bold', current && 'text-green']}>{track.title}</h3>
+		<h3 class={['truncate text-base font-bold', current && 'text-action']}>{track.title}</h3>
 		<p class="line-clamp-2 text-sm text-dim">{episode.description}</p>
 		<div class="flex items-center gap-3 pt-2">
 			<PlayOverlayButton size="sm" {playing} label="Play {track.title}" onclick={onplay} />

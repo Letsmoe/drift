@@ -42,13 +42,13 @@
 	{ondragend}
 	class={[
 		'group/queuerow duration-fast flex items-center gap-3 rounded-md p-1.5 transition-colors hover:bg-hover',
-		dropTarget && 'border-t-2 border-green'
+		dropTarget && 'border-t-2 border-action'
 	]}
 >
 	<Cover thumbnails={entry.track.thumbnails} size={40} class="size-10 shrink-0 rounded" />
 	<div class="min-w-0 flex-1">
 		<div class="flex min-w-0 items-center gap-1.5">
-			<p class={['truncate text-sm font-medium', current && 'text-green']}>{entry.track.title}</p>
+			<p class={['truncate text-sm font-medium', current && 'text-action']}>{entry.track.title}</p>
 			<DownloadedIndicator videoId={entry.track.videoId} size={12} />
 		</div>
 		<p class="truncate text-xs text-dim">{formatArtists(entry.track.artists)}</p>

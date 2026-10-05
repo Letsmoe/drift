@@ -12,22 +12,35 @@
 	import { downloads } from '#lib/downloads/downloads.svelte.ts';
 	import { panels } from '#lib/layout/panels.svelte.ts';
 	import { library } from '#lib/library/library.svelte.ts';
+	import { nowPlayingPalette } from '#lib/palette/coverPalette.svelte.ts';
+	import { player } from '#lib/player/player.svelte.ts';
 
 	let { children } = $props();
 
 	library.load();
 	downloads.start();
+
+	$effect(() => {
+		if (player.track === null) {
+			nowPlayingPalette.load([]);
+			return;
+		}
+		nowPlayingPalette.load(player.track.thumbnails);
+	});
 </script>
 
 <svelte:head>
 	<title>Otter Music</title>
 </svelte:head>
 
-<div class="flex h-screen flex-col gap-2 overflow-hidden bg-canvas p-2 text-default">
+<div
+	class="art-shell flex h-screen flex-col gap-2 overflow-hidden bg-canvas p-2 text-default"
+	style={nowPlayingPalette.style()}
+>
 	<TopBar />
 	<div class="flex min-h-0 flex-1 gap-2">
 		<LibrarySidebar />
-		<FloatingScrollbar class="min-w-0 flex-1 rounded-lg bg-surface">
+		<FloatingScrollbar class="art-wash min-w-0 flex-1 rounded-2xl">
 			<main class="px-3 py-4">
 				{@render children()}
 			</main>
