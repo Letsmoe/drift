@@ -4,7 +4,7 @@
 	import PlayOverlayButton from '#lib/components/PlayOverlayButton.svelte';
 	import TrackContextMenu from '#lib/components/TrackContextMenu.svelte';
 	import { PopupMenu } from '#lib/menu/popupMenu.svelte.ts';
-	import { formatArtists, trackHref } from '#lib/format.ts';
+	import { formatTrackByline, trackHref } from '#lib/format.ts';
 	import { player } from '#lib/player/player.svelte.ts';
 	import { whenVisible } from '#lib/whenVisible.ts';
 
@@ -24,12 +24,12 @@
 <div
 	role="group"
 	aria-label={track.title}
-	class="group/card duration-fast relative flex w-40 shrink-0 flex-col gap-2 rounded-lg p-3 transition-colors hover:bg-raised"
+	class="group/card duration-fast relative flex w-52 shrink-0 flex-col gap-2 rounded-lg p-3 transition-colors hover:bg-raised"
 	{@attach whenVisible(reportVisible)}
 	oncontextmenu={(event) => contextMenu.openAtPointer(event)}
 >
 	<div class="relative">
-		<Cover thumbnails={track.thumbnails} size={136} class="w-full rounded-md" />
+		<Cover thumbnails={track.thumbnails} size={184} class="w-full rounded-md" />
 		<PlayOverlayButton
 			{playing}
 			size="md"
@@ -51,7 +51,7 @@
 				{track.title}
 			{/if}
 		</p>
-		<p class="truncate text-xs text-dim">{formatArtists(track.artists)}</p>
+		<p class="truncate text-xs text-dim">{formatTrackByline(track)}</p>
 	</div>
 </div>
 

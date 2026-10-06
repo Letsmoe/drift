@@ -18,6 +18,21 @@ export function formatArtists(artists: Artist[]): string {
 	return artists.map((artist) => artist.name).join(', ');
 }
 
+/** YouTube's "6.2M plays" / "922K views" text, or '' when the track has none. */
+export function playCountOf(track: Track): string {
+	if (track.playCount) {
+		return track.playCount;
+	}
+	return '';
+}
+
+/** "Artist, Featured • 6.2M plays": the artists plus YouTube's play/view count when known. */
+export function formatTrackByline(track: Track): string {
+	return [formatArtists(track.artists), playCountOf(track)]
+		.filter((part) => part !== '')
+		.join(' • ');
+}
+
 /** Picks the smallest thumbnail at least `minimumSize` wide, or the largest one available. */
 export function pickThumbnail(thumbnails: Thumbnail[], minimumSize: number): string | undefined {
 	const bySize = [...thumbnails].sort((first, second) => first.width - second.width);
@@ -71,10 +86,24 @@ export function itemHref(kind: string, id: string): string {
 // Podcast show browse IDs start with this; an episode's "album" is its show.
 const podcastShowPrefix = 'MPSP';
 
+/** Whether the track is a podcast episode: its "album" is a podcast show. */
+export function isEpisodeTrack(track: Track): boolean {
+	const albumId = track.album?.id;
+	return albumId !== undefined && albumId.startsWith(podcastShowPrefix);
+}
+
+/** The kind of a track whose item kind is unknown, e.g. one from a recommendation. */
+export function trackKindOf(track: Track): 'song' | 'episode' {
+	if (isEpisodeTrack(track)) {
+		return 'episode';
+	}
+	return 'song';
+}
+
 /** The page a track opens: its album (an episode's show), else its first linked artist. */
 export function trackHref(track: Track): string | undefined {
 	const albumId = track.album?.id;
-	if (albumId && albumId.startsWith(podcastShowPrefix)) {
+	if (albumId && isEpisodeTrack(track)) {
 		return itemHref('podcast', albumId);
 	}
 	if (albumId) {

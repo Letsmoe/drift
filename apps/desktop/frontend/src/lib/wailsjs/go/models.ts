@@ -601,6 +601,7 @@ export namespace music {
 	    album?: Album;
 	    durationSeconds: number;
 	    thumbnails: Thumbnail[];
+	    playCount?: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new Track(source);
@@ -614,6 +615,7 @@ export namespace music {
 	        this.album = this.convertValues(source["album"], Album);
 	        this.durationSeconds = source["durationSeconds"];
 	        this.thumbnails = this.convertValues(source["thumbnails"], Thumbnail);
+	        this.playCount = source["playCount"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

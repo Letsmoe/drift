@@ -212,6 +212,7 @@ func parseSongCard(card cardShelf, videoID, title string, thumbnails []thumbnail
 		Album:           parseAlbum(subtitle),
 		DurationSeconds: parseDuration(segments),
 		Thumbnails:      parseThumbnails(thumbnails),
+		PlayCount:       parsePlayCount(subtitle),
 	}
 	return songItem(track, joinText(subtitle))
 }

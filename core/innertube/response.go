@@ -200,6 +200,15 @@ func (item listItem) column(index int) []run {
 	return item.FlexColumns[index].MusicResponsiveListItemFlexColumnRenderer.Text.Runs
 }
 
+// allColumnRuns concatenates the runs of every flex column.
+func (item listItem) allColumnRuns() []run {
+	var runs []run
+	for index := range item.FlexColumns {
+		runs = append(runs, item.column(index)...)
+	}
+	return runs
+}
+
 func (item listItem) fixedColumn(index int) []run {
 	if index >= len(item.FixedColumns) {
 		return nil

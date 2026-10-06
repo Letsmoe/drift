@@ -38,6 +38,7 @@ func TestSearchSongs(t *testing.T) {
 		Artists:         []music.Artist{{ID: "UCRr1xG_2WIDs18a6cIiCxeA", Name: "Daft Punk"}},
 		Album:           &music.Album{ID: "MPREb_BQHrCwSBM37", Name: "TRON: Legacy"},
 		DurationSeconds: 163,
+		PlayCount:       "10M plays",
 	}
 	if !reflect.DeepEqual(first, want) {
 		t.Errorf("first track = %+v, want %+v", first, want)

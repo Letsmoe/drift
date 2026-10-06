@@ -6,6 +6,7 @@
 	import SongCard from '#lib/components/SongCard.svelte';
 	import SongTile from '#lib/components/SongTile.svelte';
 	import TileGrid from '#lib/components/TileGrid.svelte';
+	import { trackKindOf } from '#lib/format.ts';
 	import { player } from '#lib/player/player.svelte.ts';
 	import type { Recommendations } from '#lib/recommend/recommendations.svelte.ts';
 
@@ -30,7 +31,7 @@
 	const tracks = $derived(items.map((item) => item.track));
 
 	function playItem(index: number): void {
-		player.playOrToggle(tracks[index], tracks, index, context);
+		player.playOrToggle(tracks[index], tracks, index, context, trackKindOf(tracks[index]));
 	}
 </script>
 

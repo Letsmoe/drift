@@ -11,8 +11,8 @@ export type RecommendedItem = recommend.Item;
 export type RecommendedRow = recommend.Row;
 export type RecommendationReason = recommend.Reason;
 export type RecommendationBlock = library.RecommendationBlock;
-/** What a "Don't recommend" choice applies to: a track (video ID) or an artist (browse ID). */
-export type BlockKind = 'track' | 'artist';
+/** What a "Don't recommend" choice applies to: a track (video ID), an artist or a podcast show (browse ID). */
+export type BlockKind = 'track' | 'artist' | 'podcast';
 
 export function recommendedRows(rowLimit: number, perRow: number): Promise<RecommendedRow[]> {
 	return RecommendedRows(rowLimit, perRow);

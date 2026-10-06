@@ -1,11 +1,13 @@
 import { afterNavigate } from '$app/navigation';
 
-// SvelteKit numbers its history entries under this key of history.state.
-const historyIndexKey = 'sveltekit:history';
+// SvelteKit 3 numbers its history entries in history.state["sveltekit:metadata"].historyIndex
+// (HISTORY_METADATA_KEY in @sveltejs/kit/src/runtime/client/constants.js). Internal: recheck on upgrades.
+const historyMetadataKey = 'sveltekit:metadata';
 
 function currentHistoryIndex(): number {
 	const state = window.history.state as Record<string, unknown> | null;
-	const index = state?.[historyIndexKey];
+	const metadata = state?.[historyMetadataKey] as { historyIndex?: unknown } | undefined;
+	const index = metadata?.historyIndex;
 	if (typeof index === 'number') {
 		return index;
 	}

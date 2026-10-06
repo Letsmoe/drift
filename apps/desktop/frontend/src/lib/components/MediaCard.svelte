@@ -13,6 +13,16 @@
 	const contextMenu = new PopupMenu();
 	// Songs and episodes open their album or show; the play button plays them in place.
 	const pageHref = $derived(hrefOf(item));
+	const subtitle = $derived(subtitleOf(item));
+
+	// Song cards already carry "Artist • 6.2M plays" in YouTube's subtitle; episodes don't.
+	function subtitleOf(shown: Item): string {
+		const playCount = shown.track?.playCount;
+		if (!playCount || shown.subtitle.includes(playCount)) {
+			return shown.subtitle;
+		}
+		return [shown.subtitle, playCount].filter((part) => part !== '').join(' • ');
+	}
 
 	function hrefOf(shown: Item): string | undefined {
 		if (shown.track) {
@@ -43,13 +53,13 @@
 </script>
 
 <article
-	class="group/card duration-fast relative flex w-44 shrink-0 flex-col gap-2 rounded-lg p-3 transition-colors hover:bg-hover"
+	class="group/card duration-fast relative flex w-56 shrink-0 flex-col gap-2 rounded-lg p-3 transition-colors hover:bg-hover"
 	oncontextmenu={openContextMenu}
 >
 	<div class="relative">
 		<Cover
 			thumbnails={item.thumbnails}
-			size={152}
+			size={200}
 			class={[
 				'w-full shadow-md',
 				item.kind === 'artist' && 'rounded-full',
@@ -78,7 +88,7 @@
 				{item.title}
 			{/if}
 		</h3>
-		<p class="line-clamp-2 text-sm text-dim">{item.subtitle}</p>
+		<p class="line-clamp-2 text-sm text-dim">{subtitle}</p>
 	</div>
 </article>
 
