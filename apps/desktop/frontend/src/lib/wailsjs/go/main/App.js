@@ -106,8 +106,8 @@ export function LikedTracks() {
   return window['go']['main']['App']['LikedTracks']();
 }
 
-export function Lyrics(arg1) {
-  return window['go']['main']['App']['Lyrics'](arg1);
+export function Lyrics(arg1, arg2) {
+  return window['go']['main']['App']['Lyrics'](arg1, arg2);
 }
 
 export function MovePlaylistEntry(arg1, arg2, arg3) {

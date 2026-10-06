@@ -185,14 +185,18 @@ func findLivePodcast(t *testing.T, client *Client) string {
 func TestLiveLyrics(t *testing.T) {
 	client := NewClient()
 
-	lyrics, found, err := client.Lyrics(t.Context(), "60ItHLz5WEA") // Alan Walker, Faded
+	// The audio track: YouTube attaches lyrics to it, not to the music video.
+	lyrics, found, err := client.Lyrics(t.Context(), "pIWaVJPl0-c") // Alan Walker, Faded
 	if err != nil {
 		t.Fatalf("lyrics: %v", err)
 	}
 	if !found || len(lyrics.Lines) < 4 {
 		t.Fatalf("expected lyrics, got found=%v %+v", found, lyrics)
 	}
-	t.Logf("%d lines, source %q", len(lyrics.Lines), lyrics.Source)
+	if !lyrics.Synced || lyrics.Lines[len(lyrics.Lines)-1].StartMs == 0 {
+		t.Errorf("expected synced lyrics, got synced=%v", lyrics.Synced)
+	}
+	t.Logf("%d lines, source %q, synced %v", len(lyrics.Lines), lyrics.Source, lyrics.Synced)
 
 	_, found, err = client.Lyrics(t.Context(), liveVideoID) // an instrumental score
 	if err != nil {

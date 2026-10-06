@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { LoadingSpinner } from '@neoworks-dev/ui';
+	import { Checkbox, LoadingSpinner } from '@neoworks-dev/ui';
+	import { lyricsSettings } from '#lib/lyrics/lyricsSettings.svelte.ts';
 	import { lyricsView } from '#lib/lyrics/lyricsView.svelte.ts';
 	import { player } from '#lib/player/player.svelte.ts';
 
@@ -66,6 +67,15 @@
 		}
 		return 'text-default/35 hover:text-default/60';
 	}
+
+	// LRCLIB only matters when YouTube has no synced lyrics, or when it supplied them.
+	function offersLRCLIB(): boolean {
+		const shown = lyricsView.lyrics;
+		if (!shown) {
+			return true;
+		}
+		return !shown.synced || shown.source === 'LRCLIB';
+	}
 </script>
 
 {#snippet lyricLine(text: string, startMs: number, index: number)}
@@ -90,6 +100,22 @@
 	</button>
 {/snippet}
 
+{#snippet lrclibToggle()}
+	<label class="flex max-w-md cursor-pointer items-start gap-3 text-sm text-dim">
+		<span class="pt-0.5">
+			<Checkbox
+				bind:checked={
+					() => lyricsSettings.allowLRCLIB, (allow) => lyricsSettings.setAllowLRCLIB(allow)
+				}
+			/>
+		</span>
+		<span>
+			<span class="block font-medium text-muted">Find synced lyrics on LRCLIB</span>
+			When YouTube has no timed lyrics, the song's title, artist, album and length are sent to lrclib.net.
+		</span>
+	</label>
+{/snippet}
+
 <!-- Wheel, touch and drag scrolling bubble up here; they pause the auto-scroll. -->
 <div
 	role="presentation"
@@ -112,15 +138,20 @@
 			{#if lyricsView.lyrics.source}
 				<p class="pt-8 text-sm text-dim">Source: {lyricsView.lyrics.source}</p>
 			{/if}
+			{#if offersLRCLIB()}
+				<div class="pt-4">{@render lrclibToggle()}</div>
+			{/if}
 		</div>
 	{:else if lyricsView.status === 'failed'}
-		<p class="flex h-full items-center justify-center text-xl font-semibold text-dim">
-			Lyrics could not be loaded
-		</p>
+		<div class="flex h-full flex-col items-center justify-center gap-6">
+			<p class="text-xl font-semibold text-dim">Lyrics could not be loaded</p>
+			{@render lrclibToggle()}
+		</div>
 	{:else}
-		<p class="flex h-full items-center justify-center text-xl font-semibold text-dim">
-			No lyrics for this song
-		</p>
+		<div class="flex h-full flex-col items-center justify-center gap-6">
+			<p class="text-xl font-semibold text-dim">No lyrics for this song</p>
+			{@render lrclibToggle()}
+		</div>
 	{/if}
 </div>
 

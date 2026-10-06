@@ -272,3 +272,35 @@ type lyricsResponse struct {
 		}
 	}
 }
+
+// timedLyricsResponse is the ANDROID_MUSIC browse answer for a lyrics page. Without
+// lyrics the model is a musicMessageModel instead and TimedLyricsModel stays nil.
+type timedLyricsResponse struct {
+	Contents struct {
+		ElementRenderer struct {
+			NewElement struct {
+				Type struct {
+					ComponentType struct {
+						Model struct {
+							TimedLyricsModel *struct {
+								LyricsData timedLyricsData
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+type timedLyricsData struct {
+	TimedLyricsData []struct {
+		LyricLine string
+		CueRange  *lyricCueRange
+	}
+	SourceMessage string
+}
+
+type lyricCueRange struct {
+	StartTimeMilliseconds string
+}

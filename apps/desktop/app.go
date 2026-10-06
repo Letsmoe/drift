@@ -16,6 +16,7 @@ import (
 	"github.com/neoworks/otter-music/core/importer"
 	"github.com/neoworks/otter-music/core/innertube"
 	"github.com/neoworks/otter-music/core/library"
+	"github.com/neoworks/otter-music/core/lyrics"
 	"github.com/neoworks/otter-music/core/palette"
 	"github.com/neoworks/otter-music/core/podcasts"
 	"github.com/neoworks/otter-music/core/queue"
@@ -32,6 +33,7 @@ type App struct {
 	logger    *slog.Logger
 	innertube *innertube.Client
 	podcasts  *podcasts.Directory
+	lyrics    *lyrics.Service
 	resolver  *stream.Resolver
 	proxy     *stream.Proxy
 	// library and engine stay nil when the library database could not be opened.
@@ -57,6 +59,7 @@ func NewApp(logger *slog.Logger) *App {
 		logger:    logger,
 		innertube: innertubeClient,
 		podcasts:  podcasts.New(innertubeClient, logger),
+		lyrics:    lyrics.New(innertubeClient, lyrics.NewLRCLIB(nil, ""), logger),
 		resolver:  resolver,
 		proxy:     stream.NewProxy(resolver, logger),
 		palette:   newPaletteService(),

@@ -14,6 +14,7 @@
 	import PlaylistActionRow from '#lib/components/PlaylistActionRow.svelte';
 	import TrackTable from '#lib/components/TrackTable.svelte';
 	import { formatDuration, itemHref, playCountOf } from '#lib/format.ts';
+	import { lyricsSettings } from '#lib/lyrics/lyricsSettings.svelte.ts';
 	import { buildTrackMenuEntries } from '#lib/menu/trackMenuEntries.ts';
 	import { routeParameter } from '#lib/pages/routeParameter.ts';
 	import { RemoteResource } from '#lib/pages/remoteResource.svelte.ts';
@@ -39,7 +40,9 @@
 	});
 
 	$effect(() => {
-		loadLyrics(videoId);
+		if (song) {
+			loadLyrics(song, lyricsSettings.allowLRCLIB);
+		}
 	});
 
 	function loadedTracks(data: Track[] | undefined): Track[] {
@@ -53,12 +56,12 @@
 		return tracks.find((track) => track.videoId === videoId);
 	}
 
-	async function loadLyrics(forVideoId: string): Promise<void> {
+	async function loadLyrics(forSong: Track, allowLRCLIB: boolean): Promise<void> {
 		songLyrics = null;
 		lyricsExpanded = false;
 		try {
-			const found = await lyrics(forVideoId);
-			if (forVideoId === videoId) {
+			const found = await lyrics(forSong, allowLRCLIB);
+			if (forSong.videoId === videoId) {
 				songLyrics = found;
 			}
 		} catch {

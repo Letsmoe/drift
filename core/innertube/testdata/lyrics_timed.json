@@ -1,0 +1,61 @@
+{
+	"contents": {
+		"elementRenderer": {
+			"newElement": {
+				"type": {
+					"componentType": {
+						"model": {
+							"timedLyricsModel": {
+								"lyricsData": {
+									"timedLyricsData": [
+										{
+											"lyricLine": "♪",
+											"cueRange": {
+												"startTimeMilliseconds": "0",
+												"endTimeMilliseconds": "11030",
+												"metadata": {
+													"id": "0"
+												}
+											}
+										},
+										{
+											"lyricLine": "You were the shadow to my light, did you feel us?",
+											"cueRange": {
+												"startTimeMilliseconds": "11030",
+												"endTimeMilliseconds": "17710",
+												"metadata": {
+													"id": "1"
+												}
+											}
+										},
+										{
+											"lyricLine": "Another star, you fade away",
+											"cueRange": {
+												"startTimeMilliseconds": "17710",
+												"endTimeMilliseconds": "21810",
+												"metadata": {
+													"id": "2"
+												}
+											}
+										},
+										{
+											"lyricLine": "Afraid our aim is out of sight, wanna see us",
+											"cueRange": {
+												"startTimeMilliseconds": "21810",
+												"endTimeMilliseconds": "28280",
+												"metadata": {
+													"id": "3"
+												}
+											}
+										}
+									],
+									"sourceMessage": "Source: Musixmatch"
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}

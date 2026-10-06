@@ -20,11 +20,9 @@
 
 	let activeTab = $state<Tab>('lyrics');
 
-	const videoId = $derived(player.track?.videoId);
-
 	$effect(() => {
-		if (videoId) {
-			lyricsView.load(videoId);
+		if (player.track) {
+			lyricsView.load(player.track);
 		}
 	});
 

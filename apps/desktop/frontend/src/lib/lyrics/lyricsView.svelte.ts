@@ -1,19 +1,23 @@
 import { lyrics as fetchLyrics, type Lyrics } from '#lib/api/lyrics.ts';
+import type { Track } from '#lib/api/music.ts';
+import { lyricsSettings } from '#lib/lyrics/lyricsSettings.svelte.ts';
 
 export type LyricsStatus = 'idle' | 'loading' | 'ready' | 'missing' | 'failed';
 
-/** Lyrics of the track the full-screen player shows, cached per video ID. */
+/** Lyrics of the playing track, cached per video ID and LRCLIB setting. */
 class LyricsView {
 	status = $state<LyricsStatus>('idle');
 	lyrics = $state<Lyrics | null>(null);
 
 	private cache = new Map<string, Lyrics | null>();
-	private requestedVideoId = '';
+	private requestedKey = '';
 
-	/** Loads the lyrics for videoId; a later call for another track wins over a slower earlier one. */
-	async load(videoId: string): Promise<void> {
-		this.requestedVideoId = videoId;
-		const cached = this.cache.get(videoId);
+	/** Loads the lyrics for track; a later call for another track wins over a slower earlier one. */
+	async load(track: Track): Promise<void> {
+		const allowLRCLIB = lyricsSettings.allowLRCLIB;
+		const key = `${track.videoId}:${allowLRCLIB}`;
+		this.requestedKey = key;
+		const cached = this.cache.get(key);
 		if (cached !== undefined) {
 			this.show(cached);
 			return;
@@ -22,11 +26,11 @@ class LyricsView {
 		this.lyrics = null;
 		this.status = 'loading';
 		try {
-			const found = await fetchLyrics(videoId);
-			this.cache.set(videoId, found);
-			this.showIfCurrent(videoId, found);
+			const found = await fetchLyrics(track, allowLRCLIB);
+			this.cache.set(key, found);
+			this.showIfCurrent(key, found);
 		} catch {
-			this.showFailureIfCurrent(videoId);
+			this.showFailureIfCurrent(key);
 		}
 	}
 
@@ -52,15 +56,15 @@ class LyricsView {
 		return activeIndex;
 	}
 
-	private showIfCurrent(videoId: string, found: Lyrics | null): void {
-		if (videoId !== this.requestedVideoId) {
+	private showIfCurrent(key: string, found: Lyrics | null): void {
+		if (key !== this.requestedKey) {
 			return;
 		}
 		this.show(found);
 	}
 
-	private showFailureIfCurrent(videoId: string): void {
-		if (videoId !== this.requestedVideoId) {
+	private showFailureIfCurrent(key: string): void {
+		if (key !== this.requestedKey) {
 			return;
 		}
 		this.lyrics = null;
