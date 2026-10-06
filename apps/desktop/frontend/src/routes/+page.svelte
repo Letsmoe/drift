@@ -33,7 +33,7 @@
 		<button
 			type="button"
 			aria-pressed={feed.filter === option.value}
-			onclick={() => (feed.filter = option.value)}
+			onclick={() => feed.select(option.value)}
 			class={[
 				'duration-fast rounded-full px-4 py-1.5 text-sm font-medium transition-colors',
 				feed.filter === option.value && 'bg-action text-action-fg',
@@ -81,7 +81,7 @@
 		{/if}
 	{/if}
 
-	{#if feed.status === 'loading'}
+	{#if feed.status === 'loading' || feed.status === 'idle'}
 		<div class="flex justify-center py-24"><LoadingSpinner /></div>
 	{:else if feed.status === 'failed'}
 		<p class="py-24 text-center text-sm text-red">{feed.errorMessage}</p>
@@ -96,5 +96,5 @@
 </div>
 
 {#if feed.status === 'done' && feed.hasMore}
-	<LoadMoreSentinel itemCount={feed.shelves.length} onvisible={() => feed.loadMore()} />
+	<LoadMoreSentinel itemCount={feed.shelfCount} onvisible={() => feed.loadMore()} />
 {/if}

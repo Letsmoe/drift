@@ -51,7 +51,25 @@ func parseShelfItem(content carouselItem) (music.Item, bool) {
 	if content.MusicTwoRowItemRenderer != nil {
 		return parseCard(*content.MusicTwoRowItemRenderer)
 	}
+	if content.MusicMultiRowListItemRenderer != nil {
+		return parseEpisodeRowItem(*content.MusicMultiRowListItemRenderer)
+	}
 	return music.Item{}, false
+}
+
+// parseEpisodeRowItem reads an episode row whose secondTitle links its show.
+func parseEpisodeRowItem(row episodeRow) (music.Item, bool) {
+	showRuns := row.SecondTitle.Runs
+	showName := joinText(showRuns)
+	show := podcastShow{Title: showName, Author: music.Artist{Name: showName}}
+	if len(showRuns) > 0 {
+		show.ID = showRuns[0].browseID()
+	}
+	episode, ok := parseShowEpisode(row, show)
+	if !ok {
+		return music.Item{}, false
+	}
+	return episodeItem(episode.Track, show.Title), true
 }
 
 func parseSongRow(row listItem) (music.Item, bool) {

@@ -8,15 +8,25 @@ import (
 
 const homeBrowseID = "FEmusic_home"
 
+// podcastsChipParams selects the "Podcasts" chip of the home feed (chipCloudChipRenderer).
+const podcastsChipParams = "ggNCSgQIDBADSgQIBxABSgQIBRABSgQIChABSgQIDRABSgQICRABSgQICBABSgQIDhABSgQIBhABSgQIBBABSgQIAxAB"
+
 type browseRequest struct {
 	Context      requestContext `json:"context"`
 	BrowseID     string         `json:"browseId,omitempty"`
+	Params       string         `json:"params,omitempty"`
 	Continuation string         `json:"continuation,omitempty"`
 }
 
 // Home returns the first page of the YouTube Music home feed.
 func (client *Client) Home(ctx context.Context) (music.HomePage, error) {
 	return client.homePage(ctx, browseRequest{BrowseID: homeBrowseID})
+}
+
+// PodcastsHome returns the first page of the home feed's "Podcasts" chip: episode
+// shelves by topic. Its continuations go through HomeContinuation.
+func (client *Client) PodcastsHome(ctx context.Context) (music.HomePage, error) {
+	return client.homePage(ctx, browseRequest{BrowseID: homeBrowseID, Params: podcastsChipParams})
 }
 
 // HomeContinuation returns the home feed page after the one that carried continuation.

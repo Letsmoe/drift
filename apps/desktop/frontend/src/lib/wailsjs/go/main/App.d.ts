@@ -17,6 +17,8 @@ export function Album(arg1:string):Promise<music.AlbumPage>;
 
 export function Artist(arg1:string):Promise<music.ArtistPage>;
 
+export function BlockRecommendation(arg1:string,arg2:string,arg3:string):Promise<void>;
+
 export function CancelDownload(arg1:string):Promise<void>;
 
 export function CancelImport():Promise<void>;
@@ -81,6 +83,8 @@ export function Podcast(arg1:string):Promise<music.PodcastPage>;
 
 export function PodcastContinuation(arg1:string):Promise<music.PodcastEpisodes>;
 
+export function PodcastsHome():Promise<music.HomePage>;
+
 export function QueueAdd(arg1:Array<music.Track>):Promise<queue.State>;
 
 export function QueueAdvance():Promise<main.QueueStep>;
@@ -116,6 +120,8 @@ export function Ratings(arg1:Array<string>):Promise<Record<string, number>>;
 export function RecentSearches(arg1:number):Promise<Array<string>>;
 
 export function RecentTracks(arg1:number):Promise<Array<music.Track>>;
+
+export function RecommendationBlocks():Promise<Array<library.RecommendationBlock>>;
 
 export function RecommendedFeed(arg1:number,arg2:number,arg3:boolean):Promise<Array<recommend.Item>>;
 
@@ -162,6 +168,8 @@ export function StartPlay(arg1:music.Track,arg2:string,arg3:string):Promise<numb
 export function StorageUsage():Promise<download.Usage>;
 
 export function StreamURL(arg1:string):Promise<string>;
+
+export function UnblockRecommendation(arg1:string,arg2:string):Promise<void>;
 
 export function Unsave(arg1:string,arg2:string):Promise<void>;
 

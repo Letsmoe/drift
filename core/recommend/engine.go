@@ -117,6 +117,52 @@ func (e *Engine) Profile(ctx context.Context) (*Profile, error) {
 	return profile, err
 }
 
+// Block stores a "Don't recommend" choice for a track (video ID) or an artist
+// (browse ID) and drops it from the memoized feed.
+func (e *Engine) Block(ctx context.Context, kind library.BlockKind, id, name string) error {
+	if err := e.library.BlockRecommendation(ctx, kind, id, name); err != nil {
+		return err
+	}
+	return e.ApplyExclusions(ctx)
+}
+
+// Unblock lifts a block; the item can come back at the next re-rank.
+func (e *Engine) Unblock(ctx context.Context, kind library.BlockKind, id string) error {
+	return e.library.UnblockRecommendation(ctx, kind, id)
+}
+
+// ApplyExclusions drops newly disliked or blocked tracks from the memoized
+// ranking. Call it after a dislike or block: the feed loses those tracks
+// without re-ranking, so nothing else on screen moves.
+func (e *Engine) ApplyExclusions(ctx context.Context) error {
+	profile, _, err := e.profileAt(ctx, e.now())
+	if err != nil {
+		return err
+	}
+	e.mutex.Lock()
+	defer e.mutex.Unlock()
+	if e.cache == nil {
+		return nil
+	}
+	kept := func(item Item) bool { return !profile.excludes(item.Track) }
+	e.cache = &rankedFeed{
+		builtAt: e.cache.builtAt,
+		scored:  filterItems(e.cache.scored, kept),
+		ranked:  filterItems(e.cache.ranked, kept),
+	}
+	return nil
+}
+
+func filterItems(items []Item, keep func(Item) bool) []Item {
+	kept := make([]Item, 0, len(items))
+	for _, item := range items {
+		if keep(item) {
+			kept = append(kept, item)
+		}
+	}
+	return kept
+}
+
 // rankedFeed returns the memoized ranking, rebuilding it when it is older than
 // maxAge.
 func (e *Engine) rankedFeed(ctx context.Context, maxAge time.Duration) (*rankedFeed, error) {

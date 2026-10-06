@@ -17,13 +17,18 @@ func (app *App) requireLibrary() (*library.Library, error) {
 	return app.library, nil
 }
 
-// SetRating rates a track: 1 like, -1 dislike, 0 clears the rating.
+// SetRating rates a track: 1 like, -1 dislike, 0 clears the rating. A dislike
+// also drops the track from the current recommendations.
 func (app *App) SetRating(track music.Track, kind string, rating int) error {
 	lib, err := app.requireLibrary()
 	if err != nil {
 		return err
 	}
-	return lib.SetRating(app.ctx, track, music.ItemKind(kind), library.Rating(rating))
+	err = lib.SetRating(app.ctx, track, music.ItemKind(kind), library.Rating(rating))
+	if err != nil || library.Rating(rating) != library.RatingDislike || app.engine == nil {
+		return err
+	}
+	return app.engine.ApplyExclusions(app.ctx)
 }
 
 // Ratings returns the ratings of the given videos; unrated videos are absent.

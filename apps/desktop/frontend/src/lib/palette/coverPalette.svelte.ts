@@ -41,7 +41,10 @@ export class CoverPalette {
 		if (!this.hasColors()) {
 			return '';
 		}
-		const declarations = [`--art-vibrant: ${this.colors!.vibrant}`];
+		const declarations = [
+			`--art-vibrant: ${this.colors!.vibrant}`,
+			`--art-accent: ${this.colors!.accent}`
+		];
 		for (let slot = 1; slot <= backdropSlots; slot++) {
 			declarations.push(`--art-${slot}: ${this.#colorForSlot(slot)}`);
 		}

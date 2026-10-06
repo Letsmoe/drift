@@ -49,6 +49,14 @@ const lastPlayedQuery = `SELECT video_id, MAX(started_at) FROM play WHERE starte
 
 const savedTasteQuery = `SELECT kind, id, title FROM saved_item WHERE kind IN ('artist', 'album')`
 
+const blocksQuery = `SELECT kind, id FROM recommendation_block`
+
+// blocks holds the "Don't recommend" tracks (video IDs) and artists (browse IDs).
+type blocks struct {
+	tracks  map[string]bool
+	artists map[string]bool
+}
+
 // takeSnapshot reads the profile and the per-track state ranking needs.
 func (e *Engine) takeSnapshot(ctx context.Context) (*snapshot, error) {
 	now := e.now()
@@ -86,7 +94,13 @@ func (e *Engine) profileAt(ctx context.Context, now time.Time) (*Profile, map[st
 	if err != nil {
 		return nil, nil, err
 	}
-	profile := buildProfile(profileInput{signals: signals, tracks: tracks, saved: saved, disliked: disliked, now: now})
+	blocked, err := e.blocks(ctx)
+	if err != nil {
+		return nil, nil, err
+	}
+	profile := buildProfile(profileInput{
+		signals: signals, tracks: tracks, saved: saved, disliked: disliked, blocked: blocked, now: now,
+	})
 	return profile, ignored, nil
 }
 
@@ -134,6 +148,25 @@ func (e *Engine) dislikedTracks(ctx context.Context) (map[string]bool, error) {
 		return wrapScan(err)
 	})
 	return disliked, err
+}
+
+// blocks reads every "Don't recommend" choice.
+func (e *Engine) blocks(ctx context.Context) (blocks, error) {
+	blocked := blocks{tracks: map[string]bool{}, artists: map[string]bool{}}
+	err := e.queryRows(ctx, blocksQuery, nil, func(rows *sql.Rows) error {
+		var kind, id string
+		err := rows.Scan(&kind, &id)
+		if err != nil {
+			return fmt.Errorf("scan recommendation block: %w", err)
+		}
+		if library.BlockKind(kind) == library.BlockArtist {
+			blocked.artists[id] = true
+			return nil
+		}
+		blocked.tracks[id] = true
+		return nil
+	})
+	return blocked, err
 }
 
 // savedTaste reads the followed artists and saved albums.

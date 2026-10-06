@@ -95,6 +95,10 @@ type episodeRow struct {
 	Subtitle struct {
 		Runs []run
 	}
+	// SecondTitle links the show; only set outside the show's own page.
+	SecondTitle struct {
+		Runs []run
+	}
 	Thumbnail thumbnailContainer
 	OnTap     navigationEndpoint
 	// PlaybackProgress carries the duration as text, e.g. "1 hr 5 min".

@@ -1,8 +1,9 @@
 <script lang="ts">
-	import { FloatingScrollbar } from '@neoworks-dev/ui';
 	import type { Item, Shelf, Track } from '#lib/api/music.ts';
 	import MediaCard from '#lib/components/MediaCard.svelte';
+	import ScrollRow from '#lib/components/ScrollRow.svelte';
 	import SongTile from '#lib/components/SongTile.svelte';
+	import TileGrid from '#lib/components/TileGrid.svelte';
 
 	let { shelf }: { shelf: Shelf } = $props();
 
@@ -24,18 +25,16 @@
 <section class="flex flex-col gap-2">
 	<h2 class="px-3 text-2xl font-bold">{shelf.title}</h2>
 	{#if tracks}
-		<div class="grid grid-cols-2 gap-2 px-3 xl:grid-cols-3 2xl:grid-cols-4">
-			{#each tracks as track, index (track.videoId)}
-				<SongTile {track} {tracks} {index} context="home" />
-			{/each}
-		</div>
+		<TileGrid count={tracks.length}>
+			{#snippet tile(index)}
+				<SongTile track={tracks[index]} {tracks} {index} context="home" />
+			{/snippet}
+		</TileGrid>
 	{:else}
-		<FloatingScrollbar axis="horizontal">
-			<div class="flex">
-				{#each shelf.items as item (item.id)}
-					<MediaCard {item} />
-				{/each}
-			</div>
-		</FloatingScrollbar>
+		<ScrollRow>
+			{#each shelf.items as item (item.id)}
+				<MediaCard {item} />
+			{/each}
+		</ScrollRow>
 	{/if}
 </section>
