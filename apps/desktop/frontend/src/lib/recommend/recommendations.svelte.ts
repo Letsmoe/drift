@@ -7,6 +7,7 @@ import {
 } from '#lib/api/recommend.ts';
 import { describeError } from '#lib/format.ts';
 import { logClick, logImpression } from '#lib/recommend/impressions.ts';
+import { recommendationFeedback } from '#lib/recommend/recommendationFeedback.svelte.ts';
 
 export type SectionStatus = 'loading' | 'done' | 'failed';
 
@@ -15,12 +16,20 @@ const itemsPerRow = 12;
 const feedSize = 20;
 const surface = 'home';
 
+function withoutHiddenItems(row: RecommendedRow): RecommendedRow {
+	const items = row.items.filter((item) => !recommendationFeedback.hides(item.track));
+	return { ...row, items } as RecommendedRow;
+}
+
 /** Personalised home content: the "Made for you" feed and the reason rows, each loading on its own. */
 export class Recommendations {
-	feed = $state<RecommendedItem[]>([]);
+	#loadedFeed = $state<RecommendedItem[]>([]);
+	#loadedRows = $state<RecommendedRow[]>([]);
+	// Disliked and "Don't recommend" tracks leave the lists at once, not at the next load.
+	feed = $derived(this.#loadedFeed.filter((item) => !recommendationFeedback.hides(item.track)));
+	rows = $derived(this.#loadedRows.map(withoutHiddenItems).filter((row) => row.items.length > 0));
 	feedStatus = $state<SectionStatus>('loading');
 	feedError = $state('');
-	rows = $state<RecommendedRow[]>([]);
 	rowsStatus = $state<SectionStatus>('loading');
 	rowsError = $state('');
 
@@ -53,7 +62,7 @@ export class Recommendations {
 	async #loadFeed(refresh: boolean): Promise<void> {
 		this.feedStatus = 'loading';
 		try {
-			this.feed = await recommendedFeed(feedSize, 0, refresh);
+			this.#loadedFeed = await recommendedFeed(feedSize, 0, refresh);
 			this.feedStatus = 'done';
 		} catch (error) {
 			this.feedError = describeError(error);
@@ -64,7 +73,7 @@ export class Recommendations {
 	async #loadRows(): Promise<void> {
 		this.rowsStatus = 'loading';
 		try {
-			this.rows = await recommendedRows(rowLimit, itemsPerRow);
+			this.#loadedRows = await recommendedRows(rowLimit, itemsPerRow);
 			this.rowsStatus = 'done';
 		} catch (error) {
 			this.rowsError = describeError(error);

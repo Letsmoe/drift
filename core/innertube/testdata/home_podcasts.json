@@ -1,0 +1,212 @@
+{
+	"contents": {
+		"singleColumnBrowseResultsRenderer": {
+			"tabs": [
+				{
+					"tabRenderer": {
+						"content": {
+							"sectionListRenderer": {
+								"contents": [
+									{
+										"musicCarouselShelfRenderer": {
+											"header": {
+												"musicCarouselShelfBasicHeaderRenderer": {
+													"title": {
+														"runs": [
+															{
+																"text": "History"
+															}
+														]
+													}
+												}
+											},
+											"contents": [
+												{
+													"musicMultiRowListItemRenderer": {
+														"title": {
+															"runs": [
+																{
+																	"text": "5. THE EPIC OF GILGAMESH - The Entire Story"
+																}
+															]
+														},
+														"secondTitle": {
+															"runs": [
+																{
+																	"text": "Deep Dive History",
+																	"navigationEndpoint": {
+																		"browseEndpoint": {
+																			"browseId": "MPSPPLc-YUx4BNhJZFkHcZT-TPTR_6X8GhTApW",
+																			"browseEndpointContextSupportedConfigs": {
+																				"browseEndpointContextMusicConfig": {
+																					"pageType": "MUSIC_PAGE_TYPE_PODCAST_SHOW_DETAIL_PAGE"
+																				}
+																			}
+																		}
+																	}
+																}
+															]
+														},
+														"subtitle": {
+															"runs": [
+																{
+																	"text": "922K views"
+																},
+																{
+																	"text": " • "
+																},
+																{
+																	"text": "Jul 29"
+																}
+															]
+														},
+														"description": {
+															"runs": [
+																{
+																	"text": "The Epic of Gilgamesh is the oldest surviving story in human history. Written in"
+																}
+															]
+														},
+														"thumbnail": {
+															"musicThumbnailRenderer": {
+																"thumbnail": {
+																	"thumbnails": [
+																		{
+																			"url": "https://i.ytimg.com/vi/BrIoPtoWims/hqdefault.jpg?sqp=-oaymwEWCJADEOEBIAQqCggAEOADGC0guwJIWg&rs=AMzJL3mEXmjHN_XwWOcv9nkPXOXnd0ncZw",
+																			"width": 400,
+																			"height": 225
+																		}
+																	]
+																}
+															}
+														},
+														"onTap": {
+															"watchEndpoint": {
+																"videoId": "BrIoPtoWims",
+																"watchEndpointMusicSupportedConfigs": {
+																	"watchEndpointMusicConfig": {
+																		"musicVideoType": "MUSIC_VIDEO_TYPE_PODCAST_EPISODE"
+																	}
+																}
+															}
+														},
+														"playbackProgress": {
+															"musicPlaybackProgressRenderer": {
+																"durationText": {
+																	"runs": [
+																		{
+																			"text": " • "
+																		},
+																		{
+																			"text": "1 hr 51 min"
+																		}
+																	]
+																}
+															}
+														}
+													}
+												},
+												{
+													"musicMultiRowListItemRenderer": {
+														"title": {
+															"runs": [
+																{
+																	"text": "Two Hours Of History Facts To Help You Be Productive [NO AI]"
+																}
+															]
+														},
+														"secondTitle": {
+															"runs": [
+																{
+																	"text": "Chat History's Super Ultra Mega Sleepy-time Playlist",
+																	"navigationEndpoint": {
+																		"browseEndpoint": {
+																			"browseId": "MPSPPL63mCnmmPHGKIrJy8Z0yrRlCm5fE_vHJ0",
+																			"browseEndpointContextSupportedConfigs": {
+																				"browseEndpointContextMusicConfig": {
+																					"pageType": "MUSIC_PAGE_TYPE_PODCAST_SHOW_DETAIL_PAGE"
+																				}
+																			}
+																		}
+																	}
+																}
+															]
+														},
+														"subtitle": {
+															"runs": [
+																{
+																	"text": "415K views"
+																},
+																{
+																	"text": " • "
+																},
+																{
+																	"text": "Sep 27"
+																}
+															]
+														},
+														"description": {
+															"runs": [
+																{
+																	"text": "Subscribe to the main channel: @ChatHistory\n\nTime to get that thing done that yo"
+																}
+															]
+														},
+														"thumbnail": {
+															"musicThumbnailRenderer": {
+																"thumbnail": {
+																	"thumbnails": [
+																		{
+																			"url": "https://i.ytimg.com/vi/zyALWND3_bQ/hqdefault.jpg?sqp=-oaymwEWCJADEOEBIAQqCggAEOADGC0guwJIWg&rs=AMzJL3nvPg86JDmuEe_Ut11BfyOYAL3EBw",
+																			"width": 400,
+																			"height": 225
+																		}
+																	]
+																}
+															}
+														},
+														"onTap": {
+															"watchEndpoint": {
+																"videoId": "zyALWND3_bQ",
+																"watchEndpointMusicSupportedConfigs": {
+																	"watchEndpointMusicConfig": {
+																		"musicVideoType": "MUSIC_VIDEO_TYPE_PODCAST_EPISODE"
+																	}
+																}
+															}
+														},
+														"playbackProgress": {
+															"musicPlaybackProgressRenderer": {
+																"durationText": {
+																	"runs": [
+																		{
+																			"text": " • "
+																		},
+																		{
+																			"text": "2 hr 8 min"
+																		}
+																	]
+																}
+															}
+														}
+													}
+												}
+											]
+										}
+									}
+								],
+								"continuations": [
+									{
+										"nextContinuationData": {
+											"continuation": "fixture-continuation-token"
+										}
+									}
+								]
+							}
+						}
+					}
+				}
+			]
+		}
+	}
+}

@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 
+	"github.com/neoworks/otter-music/core/library"
 	"github.com/neoworks/otter-music/core/recommend"
 )
 
@@ -22,4 +23,30 @@ func (app *App) RecommendedFeed(limit, offset int, refresh bool) ([]recommend.It
 		return nil, errRecommendUnavailable
 	}
 	return app.engine.Feed(app.ctx, limit, offset, refresh)
+}
+
+// BlockRecommendation keeps a track ("track", video ID) or an artist ("artist",
+// browse ID) out of recommendations and autoplay.
+func (app *App) BlockRecommendation(kind, id, name string) error {
+	if app.engine == nil {
+		return errRecommendUnavailable
+	}
+	return app.engine.Block(app.ctx, library.BlockKind(kind), id, name)
+}
+
+// UnblockRecommendation lifts a "Don't recommend" choice.
+func (app *App) UnblockRecommendation(kind, id string) error {
+	if app.engine == nil {
+		return errRecommendUnavailable
+	}
+	return app.engine.Unblock(app.ctx, library.BlockKind(kind), id)
+}
+
+// RecommendationBlocks lists the "Don't recommend" choices, the newest first.
+func (app *App) RecommendationBlocks() ([]library.RecommendationBlock, error) {
+	lib, err := app.requireLibrary()
+	if err != nil {
+		return nil, err
+	}
+	return lib.RecommendationBlocks(app.ctx)
 }

@@ -5,6 +5,7 @@ import { itemHref } from '#lib/format.ts';
 import { library } from '#lib/library/library.svelte.ts';
 import type { MenuEntry } from '#lib/menu/menuEntry.ts';
 import { player } from '#lib/player/player.svelte.ts';
+import { recommendationFeedback } from '#lib/recommend/recommendationFeedback.svelte.ts';
 import ArrowCircleDownIcon from 'phosphor-svelte/lib/ArrowCircleDownIcon';
 import DiscIcon from 'phosphor-svelte/lib/DiscIcon';
 import HeartIcon from 'phosphor-svelte/lib/HeartIcon';
@@ -12,6 +13,8 @@ import ListPlusIcon from 'phosphor-svelte/lib/ListPlusIcon';
 import PlusIcon from 'phosphor-svelte/lib/PlusIcon';
 import PlaylistIcon from 'phosphor-svelte/lib/PlaylistIcon';
 import ProhibitIcon from 'phosphor-svelte/lib/ProhibitIcon';
+import ThumbsDownIcon from 'phosphor-svelte/lib/ThumbsDownIcon';
+import UserMinusIcon from 'phosphor-svelte/lib/UserMinusIcon';
 import QueueIcon from 'phosphor-svelte/lib/QueueIcon';
 import TrashIcon from 'phosphor-svelte/lib/TrashIcon';
 import UserIcon from 'phosphor-svelte/lib/UserIcon';
@@ -31,11 +34,7 @@ export function buildTrackMenuEntries(track: Track, options: TrackMenuOptions = 
 		...navigationEntries(track),
 		likeEntry(track, kind),
 		downloadEntry(track, kind),
-		{
-			label: 'Not interested',
-			icon: ProhibitIcon,
-			onselect: () => library.dislike(track, kind)
-		}
+		...feedbackEntries(track, kind)
 	];
 	if (options.onRemoveFromPlaylist) {
 		entries.push({
@@ -54,7 +53,50 @@ function menuKind(options: TrackMenuOptions): ItemKind {
 	return 'song';
 }
 
-function playlistEntries(track: Track): MenuEntry[] {
+function feedbackEntries(track: Track, kind: ItemKind): MenuEntry[] {
+	const entries: MenuEntry[] = [
+		{
+			label: dislikeLabel(track),
+			icon: ThumbsDownIcon,
+			separatorBefore: true,
+			onselect: () => recommendationFeedback.toggleDislike(track, kind)
+		},
+		{
+			label: 'Don’t recommend this song',
+			icon: ProhibitIcon,
+			onselect: () => recommendationFeedback.blockTrack(track)
+		}
+	];
+	const artists = track.artists.filter((artist) => artist.id !== '');
+	if (artists.length === 1) {
+		entries.push(blockArtistEntry(`Don’t recommend ${artists[0].name}`, artists[0]));
+	} else if (artists.length > 1) {
+		entries.push({
+			label: 'Don’t recommend artist',
+			icon: UserMinusIcon,
+			children: artists.map((artist) => blockArtistEntry(artist.name, artist))
+		});
+	}
+	return entries;
+}
+
+function dislikeLabel(track: Track): string {
+	if (library.isDisliked(track.videoId)) {
+		return 'Remove dislike';
+	}
+	return 'I don’t like this song';
+}
+
+function blockArtistEntry(label: string, artist: Artist): MenuEntry {
+	return {
+		label,
+		icon: UserMinusIcon,
+		onselect: () => recommendationFeedback.blockArtist(artist)
+	};
+}
+
+/** "New playlist" plus one entry per local playlist, each adding track to it. */
+export function playlistEntries(track: Track): MenuEntry[] {
 	const entries: MenuEntry[] = [
 		{ label: 'New playlist', icon: PlusIcon, onselect: () => addToNewPlaylist(track) }
 	];

@@ -89,6 +89,46 @@ func TestHomeContinuation(t *testing.T) {
 	}
 }
 
+func TestPodcastsHome(t *testing.T) {
+	server := newFakeServer(t)
+	server.respondWithFixture(t, "browse", "testdata/home_podcasts.json")
+
+	page, err := server.client().PodcastsHome(t.Context())
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	request := server.lastRequest(t, "browse")
+	if request.body["browseId"] != homeBrowseID || request.body["params"] != podcastsChipParams {
+		t.Errorf("unexpected request body: %v", request.body)
+	}
+	if page.Continuation != "fixture-continuation-token" {
+		t.Errorf("continuation = %q", page.Continuation)
+	}
+	if titles := shelfTitles(page); !reflect.DeepEqual(titles, []string{"History"}) {
+		t.Fatalf("shelves = %v", titles)
+	}
+
+	episode := withoutThumbnails(page.Shelves[0].Items[0])
+	show := music.Artist{Name: "Deep Dive History"}
+	wantEpisode := music.Item{
+		Kind:     music.ItemKindEpisode,
+		ID:       "BrIoPtoWims",
+		Title:    "5. THE EPIC OF GILGAMESH - The Entire Story",
+		Subtitle: "Deep Dive History",
+		Track: &music.Track{
+			VideoID:         "BrIoPtoWims",
+			Title:           "5. THE EPIC OF GILGAMESH - The Entire Story",
+			Artists:         []music.Artist{show},
+			Album:           &music.Album{ID: "MPSPPLc-YUx4BNhJZFkHcZT-TPTR_6X8GhTApW", Name: "Deep Dive History"},
+			DurationSeconds: 111 * 60,
+		},
+	}
+	if !reflect.DeepEqual(episode, wantEpisode) {
+		t.Errorf("episode = %+v %+v, want %+v %+v", episode, episode.Track, wantEpisode, wantEpisode.Track)
+	}
+}
+
 func TestParseCardWithWatchEndpointIsSong(t *testing.T) {
 	var card twoRowItem
 	cardJSON := `{

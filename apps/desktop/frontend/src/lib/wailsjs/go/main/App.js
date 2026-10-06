@@ -14,6 +14,10 @@ export function Artist(arg1) {
   return window['go']['main']['App']['Artist'](arg1);
 }
 
+export function BlockRecommendation(arg1, arg2, arg3) {
+  return window['go']['main']['App']['BlockRecommendation'](arg1, arg2, arg3);
+}
+
 export function CancelDownload(arg1) {
   return window['go']['main']['App']['CancelDownload'](arg1);
 }
@@ -142,6 +146,10 @@ export function PodcastContinuation(arg1) {
   return window['go']['main']['App']['PodcastContinuation'](arg1);
 }
 
+export function PodcastsHome() {
+  return window['go']['main']['App']['PodcastsHome']();
+}
+
 export function QueueAdd(arg1) {
   return window['go']['main']['App']['QueueAdd'](arg1);
 }
@@ -212,6 +220,10 @@ export function RecentSearches(arg1) {
 
 export function RecentTracks(arg1) {
   return window['go']['main']['App']['RecentTracks'](arg1);
+}
+
+export function RecommendationBlocks() {
+  return window['go']['main']['App']['RecommendationBlocks']();
 }
 
 export function RecommendedFeed(arg1, arg2, arg3) {
@@ -304,6 +316,10 @@ export function StorageUsage() {
 
 export function StreamURL(arg1) {
   return window['go']['main']['App']['StreamURL'](arg1);
+}
+
+export function UnblockRecommendation(arg1, arg2) {
+  return window['go']['main']['App']['UnblockRecommendation'](arg1, arg2);
 }
 
 export function Unsave(arg1, arg2) {

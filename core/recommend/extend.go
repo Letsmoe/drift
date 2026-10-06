@@ -7,8 +7,8 @@ import (
 )
 
 // Extend implements queue.Extender: autoplay continues with the radio of the
-// track that just played, minus disliked, queued and already played tracks,
-// ranked by taste and re-ranked for artist diversity.
+// track that just played, minus disliked, blocked, queued and already played
+// tracks, ranked by taste and re-ranked for artist diversity.
 func (e *Engine) Extend(ctx context.Context, upcoming, history []music.Track) ([]music.Track, error) {
 	if len(history) == 0 {
 		return nil, nil
@@ -30,12 +30,11 @@ func (e *Engine) Extend(ctx context.Context, upcoming, history []music.Track) ([
 }
 
 // scoreExtension scores radio candidates by taste and radio rank, skipping
-// disliked and excluded tracks.
+// disliked, blocked and excluded tracks.
 func scoreExtension(candidates []*candidate, profile *Profile, excluded map[string]bool) []Item {
 	items := make([]Item, 0, len(candidates))
 	for _, proposed := range candidates {
-		videoID := proposed.track.VideoID
-		if excluded[videoID] || profile.Disliked[videoID] {
+		if excluded[proposed.track.VideoID] || profile.excludes(proposed.track) {
 			continue
 		}
 		items = append(items, itemOf(proposed, baseScore(proposed, profile)))

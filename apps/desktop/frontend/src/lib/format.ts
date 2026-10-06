@@ -67,3 +67,22 @@ export function formatDate(timestamp: unknown): string {
 export function itemHref(kind: string, id: string): string {
 	return `/${kind}/${encodeURIComponent(id)}`;
 }
+
+// Podcast show browse IDs start with this; an episode's "album" is its show.
+const podcastShowPrefix = 'MPSP';
+
+/** The page a track opens: its album (an episode's show), else its first linked artist. */
+export function trackHref(track: Track): string | undefined {
+	const albumId = track.album?.id;
+	if (albumId && albumId.startsWith(podcastShowPrefix)) {
+		return itemHref('podcast', albumId);
+	}
+	if (albumId) {
+		return itemHref('album', albumId);
+	}
+	const artist = track.artists.find((linked) => linked.id !== '');
+	if (artist) {
+		return itemHref('artist', artist.id);
+	}
+	return undefined;
+}

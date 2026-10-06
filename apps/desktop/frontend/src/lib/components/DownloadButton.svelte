@@ -11,14 +11,15 @@
 	let {
 		track,
 		kind = 'song',
-		size = 18
-	}: { track: Track; kind?: ItemKind; size?: number } = $props();
+		size = 18,
+		revealOnHover = true
+	}: { track: Track; kind?: ItemKind; size?: number; revealOnHover?: boolean } = $props();
 
 	const status = $derived(downloads.statusOf(track.videoId));
 	const state = $derived(downloads.stateOf(track.videoId));
 	const label = $derived(describeAction(state));
-	// Idle and finished downloads only show on row hover; work in progress and failures always show.
-	const alwaysVisible = $derived(state !== '' && state !== 'done');
+	// In rows, idle and finished downloads only show on hover; work in progress and failures always show.
+	const alwaysVisible = $derived(!revealOnHover || (state !== '' && state !== 'done'));
 
 	function describeAction(current: string): string {
 		switch (current) {

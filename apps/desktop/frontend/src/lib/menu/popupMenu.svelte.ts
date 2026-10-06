@@ -15,6 +15,12 @@ export class PopupMenu {
 		this.position = { x, y };
 	}
 
+	/** Opens the menu at the pointer instead of the browser's context menu. */
+	openAtPointer(event: MouseEvent): void {
+		event.preventDefault();
+		this.openAt(event.clientX, event.clientY);
+	}
+
 	/** Opens the menu under an element, e.g. its "..." button. */
 	openBelow(element: HTMLElement): void {
 		const bounds = element.getBoundingClientRect();

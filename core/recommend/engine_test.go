@@ -7,6 +7,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/neoworks/otter-music/core/library"
 	"github.com/neoworks/otter-music/core/music"
 )
 
@@ -95,6 +96,65 @@ func TestFeedExcludesDislikedTracks(t *testing.T) {
 	}
 	if itemByVideoID(items, "radio2") == nil {
 		t.Error("other radio tracks must stay")
+	}
+}
+
+// TestFeedExcludesBlockedTracksAndArtists checks "Don't recommend" for a track and an artist.
+func TestFeedExcludesBlockedTracksAndArtists(t *testing.T) {
+	environment := newTestEnvironment(t)
+	seedListening(t, environment)
+	ctx := context.Background()
+	if err := environment.library.BlockRecommendation(ctx, library.BlockTrack, "radio1", "Title radio1"); err != nil {
+		t.Fatal(err)
+	}
+	if err := environment.library.BlockRecommendation(ctx, library.BlockArtist, "artist:r2", "Name artist:r2"); err != nil {
+		t.Fatal(err)
+	}
+
+	items := environment.feed(t)
+	if itemByVideoID(items, "radio1") != nil {
+		t.Error("a blocked track must be excluded")
+	}
+	if itemByVideoID(items, "radio2") != nil {
+		t.Error("a track by a blocked artist must be excluded")
+	}
+}
+
+// TestApplyExclusionsDropsFromTheMemoizedFeed checks that a block takes effect
+// without a re-rank and leaves the other items in order.
+func TestApplyExclusionsDropsFromTheMemoizedFeed(t *testing.T) {
+	environment := newTestEnvironment(t)
+	seedListening(t, environment)
+	ctx := context.Background()
+	before := environment.feed(t)
+	if itemByVideoID(before, "radio1") == nil {
+		t.Fatal("radio1 must be recommended before the block")
+	}
+	radioCalls := environment.catalog.callCount("radio")
+	homeCalls := environment.catalog.callCount("home")
+
+	if err := environment.library.BlockRecommendation(ctx, library.BlockTrack, "radio1", ""); err != nil {
+		t.Fatal(err)
+	}
+	if err := environment.engine.ApplyExclusions(ctx); err != nil {
+		t.Fatal(err)
+	}
+
+	after, err := environment.engine.Feed(ctx, 100, 0, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if itemByVideoID(after, "radio1") != nil {
+		t.Error("the blocked track is still in the memoized feed")
+	}
+	if len(after) != len(before)-1 {
+		t.Errorf("feed has %d items, want %d", len(after), len(before)-1)
+	}
+	if calls := environment.catalog.callCount("radio"); calls != radioCalls {
+		t.Errorf("radio called %d times, want no re-rank (%d)", calls, radioCalls)
+	}
+	if calls := environment.catalog.callCount("home"); calls != homeCalls {
+		t.Errorf("home called %d times, want no re-rank (%d)", calls, homeCalls)
 	}
 }
 

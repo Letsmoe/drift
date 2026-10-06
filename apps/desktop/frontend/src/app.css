@@ -12,6 +12,12 @@
 	initial-value: #3f3f46;
 }
 
+@property --art-accent {
+	syntax: '<color>';
+	inherits: true;
+	initial-value: #fafafa;
+}
+
 @property --art-1 {
 	syntax: '<color>';
 	inherits: true;
@@ -39,18 +45,22 @@
 .art-shell {
 	transition:
 		--art-vibrant 1200ms ease,
+		--art-accent 1200ms ease,
 		--art-1 1200ms ease,
 		--art-2 1200ms ease,
 		--art-3 1200ms ease,
 		--art-4 1200ms ease;
 }
 
-/* With a cover playing, the accent is its vibrant color lifted towards white so it reads on dark panels. */
+/* With a cover playing, the accent is its vibrant color, lifted by core/palette until it reads on
+   dark panels; accent fills (bg-action) always carry dark text. */
 .art-shell[data-art] {
-	--primary: color-mix(in oklab, var(--art-vibrant) 65%, white);
-	--primary-hover: color-mix(in oklab, var(--art-vibrant) 45%, white);
+	--primary: var(--art-accent);
+	--primary-hover: color-mix(in oklab, var(--art-accent) 75%, white);
+	--primary-fg: #0b0b0d;
 	--color-action: var(--primary);
 	--color-action-hover: var(--primary-hover);
+	--color-action-fg: var(--primary-fg);
 }
 
 /* Panels let the backdrop show through. */

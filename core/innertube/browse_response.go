@@ -33,10 +33,12 @@ type carouselShelf struct {
 	Contents []carouselItem
 }
 
-// carouselItem holds a card (album, playlist, artist, video) or a song row.
+// carouselItem holds a card (album, playlist, artist, video), a song row or, in the
+// podcasts home feed, an episode row.
 type carouselItem struct {
 	MusicTwoRowItemRenderer         *twoRowItem
 	MusicResponsiveListItemRenderer *listItem
+	MusicMultiRowListItemRenderer   *episodeRow
 }
 
 type twoRowItem struct {

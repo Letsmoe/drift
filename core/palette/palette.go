@@ -17,6 +17,8 @@ type Palette struct {
 	// Vibrant is the strongest saturated color that covers a visible part of the
 	// image; it falls back to Dominant for greyscale images.
 	Vibrant string `json:"vibrant"`
+	// Accent is Vibrant lifted towards white until it reads as text on dark panels.
+	Accent string `json:"accent"`
 	// Colors are up to maxColors clearly different colors, most common first,
 	// for backgrounds that blend several colors of the cover.
 	Colors []string `json:"colors"`
@@ -84,6 +86,7 @@ func Extract(img image.Image) Palette {
 	return Palette{
 		Dominant: hex(dominant),
 		Vibrant:  hex(vibrant),
+		Accent:   hex(accentFor(vibrant)),
 		Colors:   pickDistinct(bins, total, dominant),
 	}
 }

@@ -2,15 +2,19 @@
 	import { goto } from '$app/navigation';
 	import { Button, FloatingScrollbar } from '@neoworks-dev/ui';
 	import BooksIcon from 'phosphor-svelte/lib/BooksIcon';
+	import DownloadSimpleIcon from 'phosphor-svelte/lib/DownloadSimpleIcon';
+	import XIcon from 'phosphor-svelte/lib/XIcon';
 	import ArrowCircleDownIcon from 'phosphor-svelte/lib/ArrowCircleDownIcon';
 	import HeartIcon from 'phosphor-svelte/lib/HeartIcon';
 	import PlusIcon from 'phosphor-svelte/lib/PlusIcon';
 	import MusicImportDialog from '#lib/components/MusicImportDialog.svelte';
 	import Chip from '#lib/components/Chip.svelte';
 	import LibraryRow from '#lib/components/LibraryRow.svelte';
+	import { listenToImport } from '#lib/api/musicImport.ts';
 	import { downloads } from '#lib/downloads/downloads.svelte.ts';
 	import { formatSongCount } from '#lib/format.ts';
 	import { library } from '#lib/library/library.svelte.ts';
+	import { importPrompt } from '#lib/library/importPrompt.svelte.ts';
 	import { LibraryListing, libraryFilters } from '#lib/library/libraryListing.svelte.ts';
 
 	const listing = new LibraryListing();
@@ -22,6 +26,15 @@
 		!listing.hasKind('podcast') && (listing.filter === 'all' || listing.filter === 'podcast')
 	);
 	const showLikedSongs = $derived(listing.filter === 'all' || listing.filter === 'playlist');
+
+	// Someone who has imported once knows where importing lives.
+	$effect(() =>
+		listenToImport({
+			onProgress: () => {},
+			onDone: () => importPrompt.hide(),
+			onError: () => {}
+		})
+	);
 
 	function downloadsSubtitle(): string {
 		const active = downloads.summary.queued + downloads.summary.downloading;
@@ -45,7 +58,18 @@
 	<header class="flex h-12 items-center gap-3 px-2 text-dim">
 		<BooksIcon size={22} />
 		<h2 class="flex-1 text-base font-semibold">Your Library</h2>
-		<Button round size="sm" variant="ghost" icon={PlusIcon} onclick={createPlaylist} />
+		<span title="Import your music" class="flex">
+			<Button
+				round
+				size="sm"
+				variant="ghost"
+				icon={DownloadSimpleIcon}
+				onclick={() => (importDialogOpen = true)}
+			/>
+		</span>
+		<span title="Create playlist" class="flex">
+			<Button round size="sm" variant="ghost" icon={PlusIcon} onclick={createPlaylist} />
+		</span>
 	</header>
 
 	<div class="flex flex-wrap gap-2 px-2 pb-1">
@@ -123,17 +147,30 @@
 					</div>
 				</div>
 			{/if}
-			<div class="flex flex-col gap-3 rounded-lg bg-raised p-4">
-				<div>
-					<p class="text-base font-semibold">Import your music</p>
-					<p class="text-sm text-muted">
-						From YouTube Music or Spotify: liked songs, playlists, albums and more.
-					</p>
+			{#if !importPrompt.hidden}
+				<div class="relative flex flex-col gap-3 rounded-lg bg-raised p-4">
+					<button
+						type="button"
+						aria-label="Dismiss"
+						title="Dismiss"
+						onclick={() => importPrompt.hide()}
+						class="absolute top-2 right-2 rounded-full p-1.5 text-dim hover:bg-hover hover:text-default"
+					>
+						<XIcon size={14} />
+					</button>
+					<div class="pr-6">
+						<p class="text-base font-semibold">Import your music</p>
+						<p class="text-sm text-muted">
+							From YouTube Music or Spotify: liked songs, playlists, albums and more.
+						</p>
+					</div>
+					<div class="self-start">
+						<Button variant="primary" size="sm" onclick={() => (importDialogOpen = true)}>
+							Import your music
+						</Button>
+					</div>
 				</div>
-				<div class="self-start">
-					<Button size="sm" onclick={() => (importDialogOpen = true)}>Import your music</Button>
-				</div>
-			</div>
+			{/if}
 		</div>
 	</FloatingScrollbar>
 </aside>

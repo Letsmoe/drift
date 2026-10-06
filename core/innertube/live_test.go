@@ -34,6 +34,20 @@ func TestLiveHome(t *testing.T) {
 	}
 }
 
+func TestLivePodcastsHome(t *testing.T) {
+	page, err := NewClient().PodcastsHome(t.Context())
+	if err != nil {
+		t.Fatalf("podcasts home: %v", err)
+	}
+	if len(page.Shelves) == 0 || len(page.Shelves[0].Items) == 0 {
+		t.Fatal("podcasts home returned no shelves; the chip params or layout probably changed")
+	}
+	first := page.Shelves[0].Items[0]
+	if first.Kind != music.ItemKindEpisode || first.Track == nil || first.Track.Album == nil || first.Track.Album.ID == "" {
+		t.Errorf("first item = %+v, want an episode linked to its show", first)
+	}
+}
+
 const (
 	liveArtistID   = "UCRr1xG_2WIDs18a6cIiCxeA" // Daft Punk
 	liveAlbumID    = "MPREb_BQHrCwSBM37"        // TRON: Legacy

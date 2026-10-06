@@ -12,7 +12,7 @@ import (
 func scoreCandidates(candidates []*candidate, state *snapshot) []Item {
 	items := make([]Item, 0, len(candidates))
 	for _, proposed := range candidates {
-		if state.profile.Disliked[proposed.track.VideoID] {
+		if state.profile.excludes(proposed.track) {
 			continue
 		}
 		total := baseScore(proposed, state.profile) - penalties(proposed.track.VideoID, state)

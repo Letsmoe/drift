@@ -21,8 +21,26 @@ type Profile struct {
 	Seeds []Seed `json:"seeds"`
 	// Disliked holds the tracks rated thumbs-down.
 	Disliked map[string]bool `json:"disliked"`
+	// BlockedTracks and BlockedArtists are the "Don't recommend" choices: kept
+	// out of every recommendation without being a taste signal.
+	BlockedTracks  map[string]bool `json:"blockedTracks"`
+	BlockedArtists map[string]bool `json:"blockedArtists"`
 	// SignalCount is how many signals the profile was built from.
 	SignalCount int `json:"signalCount"`
+}
+
+// excludes reports whether track must never be recommended: disliked, blocked,
+// or by a blocked artist (featured ones included).
+func (profile *Profile) excludes(track music.Track) bool {
+	if profile.Disliked[track.VideoID] || profile.BlockedTracks[track.VideoID] {
+		return true
+	}
+	for _, artist := range track.Artists {
+		if artist.ID != "" && profile.BlockedArtists[artist.ID] {
+			return true
+		}
+	}
+	return false
 }
 
 // Seed is a track whose radio is worth recommending.
@@ -38,6 +56,7 @@ type profileInput struct {
 	tracks   map[string]music.Track
 	saved    savedTaste
 	disliked map[string]bool
+	blocked  blocks
 	now      time.Time
 }
 
@@ -57,11 +76,13 @@ func decayFactor(age, halfLife time.Duration) float64 {
 // buildProfile turns signals into per-entity affinities.
 func buildProfile(input profileInput) *Profile {
 	profile := &Profile{
-		Artists:     map[string]float64{},
-		ArtistNames: map[string]string{},
-		Albums:      map[string]float64{},
-		Disliked:    input.disliked,
-		SignalCount: len(input.signals),
+		Artists:        map[string]float64{},
+		ArtistNames:    map[string]string{},
+		Albums:         map[string]float64{},
+		Disliked:       input.disliked,
+		BlockedTracks:  input.blocked.tracks,
+		BlockedArtists: input.blocked.artists,
+		SignalCount:    len(input.signals),
 	}
 	trackWeights := decayedTrackWeights(input.signals, input.now)
 	for videoID, weight := range trackWeights {

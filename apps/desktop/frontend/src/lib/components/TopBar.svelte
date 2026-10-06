@@ -1,11 +1,20 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
+	import CaretLeftIcon from 'phosphor-svelte/lib/CaretLeftIcon';
+	import CaretRightIcon from 'phosphor-svelte/lib/CaretRightIcon';
 	import ClockCounterClockwiseIcon from 'phosphor-svelte/lib/ClockCounterClockwiseIcon';
 	import HouseIcon from 'phosphor-svelte/lib/HouseIcon';
 	import MagnifyingGlassIcon from 'phosphor-svelte/lib/MagnifyingGlassIcon';
 	import SearchField from '#lib/components/SearchField.svelte';
+	import { NavigationHistory } from '#lib/layout/navigationHistory.svelte.ts';
 	import { SearchSuggestions } from '#lib/search/suggestions.svelte.ts';
+
+	// MouseEvent.button numbers of the side buttons on most mice.
+	const mouseBackButton = 3;
+	const mouseForwardButton = 4;
+
+	const navigationHistory = new NavigationHistory();
 
 	const suggestions = new SearchSuggestions();
 	let query = $state(initialQuery());
@@ -72,9 +81,65 @@
 			suggestions.close();
 		}
 	}
+
+	function navigateWithMouseButtons(event: MouseEvent) {
+		if (event.button === mouseBackButton) {
+			event.preventDefault();
+			navigationHistory.back();
+		} else if (event.button === mouseForwardButton) {
+			event.preventDefault();
+			navigationHistory.forward();
+		}
+	}
+
+	function navigateWithKeys(event: KeyboardEvent) {
+		if (!event.altKey) {
+			return;
+		}
+		if (event.key === 'ArrowLeft') {
+			event.preventDefault();
+			navigationHistory.back();
+		} else if (event.key === 'ArrowRight') {
+			event.preventDefault();
+			navigationHistory.forward();
+		}
+	}
 </script>
 
-<header class="flex h-12 shrink-0 items-center justify-center gap-2 px-2">
+<svelte:window onmouseup={navigateWithMouseButtons} onkeydown={navigateWithKeys} />
+
+{#snippet historyButton(label: string, enabled: boolean, onclick: () => void, forward: boolean)}
+	<button
+		type="button"
+		aria-label={label}
+		title={label}
+		disabled={!enabled}
+		{onclick}
+		class="duration-fast glass flex size-9 items-center justify-center rounded-full text-default transition-colors hover:bg-hover disabled:cursor-default disabled:text-faint disabled:hover:bg-transparent"
+	>
+		{#if forward}
+			<CaretRightIcon size={18} weight="bold" />
+		{:else}
+			<CaretLeftIcon size={18} weight="bold" />
+		{/if}
+	</button>
+{/snippet}
+
+<header class="relative flex h-12 shrink-0 items-center justify-center gap-2 px-2">
+	<nav aria-label="History" class="absolute left-2 flex items-center gap-2">
+		{@render historyButton(
+			'Back',
+			navigationHistory.canGoBack,
+			() => navigationHistory.back(),
+			false
+		)}
+		{@render historyButton(
+			'Forward',
+			navigationHistory.canGoForward,
+			() => navigationHistory.forward(),
+			true
+		)}
+	</nav>
 	<a
 		href="/"
 		aria-label="Home"

@@ -7,6 +7,7 @@ import {
 	PlaylistContinuation,
 	Podcast,
 	PodcastContinuation,
+	PodcastsHome,
 	Radio,
 	Search,
 	SearchSongs,
@@ -78,6 +79,11 @@ export function podcastContinuation(token: string): Promise<PodcastEpisodes> {
 
 export function home(): Promise<HomePage> {
 	return Home();
+}
+
+/** The home feed's "Podcasts" chip: episode shelves by topic; continues via homeContinuation. */
+export function podcastsHome(): Promise<HomePage> {
+	return PodcastsHome();
 }
 
 export function homeContinuation(continuation: string): Promise<HomePage> {
