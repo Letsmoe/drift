@@ -4,8 +4,8 @@ import {
 	RecommendedFeed,
 	RecommendedRows,
 	UnblockRecommendation
-} from '#lib/wailsjs/go/main/App.js';
-import type { library, recommend } from '#lib/wailsjs/go/models.ts';
+} from '#lib/backend/generated/App.ts';
+import type { library, recommend } from '#lib/backend/generated/models.ts';
 
 export type RecommendedItem = recommend.Item;
 export type RecommendedRow = recommend.Row;

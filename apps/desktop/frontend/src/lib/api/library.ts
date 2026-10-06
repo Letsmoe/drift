@@ -21,8 +21,8 @@ import {
 	StartPlay,
 	Unsave,
 	UpdatePlay
-} from '#lib/wailsjs/go/main/App.js';
-import type { library } from '#lib/wailsjs/go/models.ts';
+} from '#lib/backend/generated/App.ts';
+import type { library } from '#lib/backend/generated/models.ts';
 import type { Item, ItemKind, Track } from '#lib/api/music.ts';
 
 export type Playlist = library.Playlist;

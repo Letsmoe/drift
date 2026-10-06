@@ -1,55 +1,141 @@
-// Command desktop is the Otter Music desktop app: the SvelteKit UI from frontend/
-// running in a Wails webview, bound to the Go core.
+// Command desktop is the Otter Music desktop backend: the Go core behind one
+// loopback HTTP server (the SvelteKit UI from frontend/, the stream proxy and the
+// RPC WebSocket). The Electron shell in electron/ starts it and opens a window on it.
 package main
 
 import (
+	"bufio"
+	"context"
+	"crypto/rand"
 	"embed"
-	"log"
+	"encoding/json"
+	"errors"
+	"flag"
+	"fmt"
+	"io"
+	"io/fs"
 	"log/slog"
+	"net"
+	"net/http"
 	"os"
-
-	"github.com/wailsapp/wails/v2"
-	"github.com/wailsapp/wails/v2/pkg/options"
-	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
-	"github.com/wailsapp/wails/v2/pkg/options/linux"
+	"os/signal"
+	"syscall"
+	"time"
 )
+
+const shutdownTimeout = 2 * time.Second
+
+// announcePrefix starts the stdout line that tells the shell where the backend listens.
+const announcePrefix = "otter-backend "
 
 // frontend/build is the SvelteKit static build (`bun run build` in frontend/).
 //
 //go:embed all:frontend/build
-var assets embed.FS
+var embeddedAssets embed.FS
 
-// build/appicon.png is the app icon; `wails build` also turns it into the macOS and Windows icons.
-//
-//go:embed build/appicon.png
-var appIcon []byte
+// announcement is the JSON after announcePrefix.
+type announcement struct {
+	URL   string `json:"url"`
+	Token string `json:"token"`
+}
 
 func main() {
-	logger := slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: logLevel()}))
-	app := NewApp(logger)
+	bindingsDirectory := flag.String("bindings", "", "write the TypeScript bindings into this directory and exit")
+	exitWithStdin := flag.Bool("exit-with-stdin", false, "quit when stdin closes (set by the Electron shell, so the backend dies with it)")
+	flag.Parse()
 
-	err := wails.Run(&options.App{
-		Title:            "Otter Music",
-		Width:            1200,
-		Height:           800,
-		MinWidth:         720,
-		MinHeight:        480,
-		AssetServer:      &assetserver.Options{Assets: assets},
-		BackgroundColour: &options.RGBA{R: 20, G: 20, B: 22, A: 255},
-		OnStartup:        app.startup,
-		OnShutdown:       app.shutdown,
-		Bind:             []any{app},
-		Linux: &linux.Options{
-			Icon:        appIcon,
-			ProgramName: "otter-music",
-			// Wails' default without Linux options. The zero value (on demand) turns on
-			// GPU rendering, which dies with Wayland protocol error 71 on Hyprland.
-			WebviewGpuPolicy: linux.WebviewGpuPolicyNever,
-		},
-	})
-	if err != nil {
-		log.Fatal(err)
+	logger := slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: logLevel()}))
+	var err error
+	if *bindingsDirectory != "" {
+		err = writeBindings(*bindingsDirectory)
+	} else {
+		err = run(logger, *exitWithStdin)
 	}
+	if err != nil {
+		logger.Error("desktop backend", "error", err)
+		os.Exit(1)
+	}
+}
+
+func run(logger *slog.Logger, exitWithStdin bool) error {
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
+	if exitWithStdin {
+		ctx = cancelWhenStdinCloses(ctx)
+	}
+
+	listener, err := new(net.ListenConfig).Listen(ctx, "tcp", "127.0.0.1:0")
+	if err != nil {
+		return fmt.Errorf("listen: %w", err)
+	}
+	assets, err := fs.Sub(embeddedAssets, "frontend/build")
+	if err != nil {
+		return fmt.Errorf("frontend assets: %w", err)
+	}
+
+	token := rand.Text()
+	baseURL := "http://" + listener.Addr().String()
+	rpc := newHub(token, logger)
+	app := NewApp(logger, baseURL, rpc.broadcast)
+	server := &http.Server{
+		Handler:           newServerHandler(app.proxyHandler(), rpc, assets),
+		ReadHeaderTimeout: 5 * time.Second,
+	}
+	serveErrors := make(chan error, 1)
+	go func() { serveErrors <- server.Serve(listener) }()
+
+	app.startup(ctx)
+	rpc.serve(app)
+	err = announce(os.Stdout, announcement{URL: baseURL, Token: token})
+	if err != nil {
+		return err
+	}
+
+	err = waitForStop(ctx, serveErrors)
+	shutdown(server, app, logger)
+	return err
+}
+
+func waitForStop(ctx context.Context, serveErrors <-chan error) error {
+	select {
+	case <-ctx.Done():
+		return nil
+	case err := <-serveErrors:
+		return fmt.Errorf("server stopped: %w", err)
+	}
+}
+
+func shutdown(server *http.Server, app *App, logger *slog.Logger) {
+	ctx, cancel := context.WithTimeout(context.Background(), shutdownTimeout)
+	defer cancel()
+	err := server.Shutdown(ctx)
+	if err != nil && !errors.Is(err, http.ErrServerClosed) {
+		logger.Warn("server shutdown", "error", err)
+	}
+	app.shutdown()
+}
+
+func announce(writer io.Writer, message announcement) error {
+	encoded, err := json.Marshal(message)
+	if err != nil {
+		return fmt.Errorf("encode announcement: %w", err)
+	}
+	_, err = fmt.Fprintf(writer, "%s%s\n", announcePrefix, encoded)
+	if err != nil {
+		return fmt.Errorf("announce: %w", err)
+	}
+	return nil
+}
+
+// cancelWhenStdinCloses ends ctx when the parent closes our stdin, which also
+// happens when the parent crashes.
+func cancelWhenStdinCloses(parent context.Context) context.Context {
+	ctx, cancel := context.WithCancel(parent)
+	go func() {
+		_, _ = io.Copy(io.Discard, bufio.NewReader(os.Stdin))
+		cancel()
+	}()
+	return ctx
 }
 
 // logLevel enables debug logs (e.g. every stream request) with OTTER_MUSIC_LOG=debug.

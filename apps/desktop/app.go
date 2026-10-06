@@ -2,14 +2,11 @@ package main
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"log/slog"
-	"net"
 	"net/http"
 	"os"
 	"path/filepath"
-	"time"
 
 	"github.com/neoworks/otter-music/core/account"
 	"github.com/neoworks/otter-music/core/download"
@@ -24,12 +21,15 @@ import (
 	"github.com/neoworks/otter-music/core/stream"
 )
 
-const shutdownTimeout = 2 * time.Second
+// eventEmitter pushes a named event with its payload to every connected frontend.
+type eventEmitter func(name string, data any)
 
-// App holds the methods bound to the frontend. Wails generates TypeScript for
-// every exported method into apps/desktop/frontend/src/lib/wailsjs.
+// App holds the methods the frontend calls over RPC (see rpc.go). `bun run bindings`
+// generates TypeScript for every exported method into
+// apps/desktop/frontend/src/lib/backend/generated.
 type App struct {
 	ctx       context.Context
+	emit      eventEmitter
 	logger    *slog.Logger
 	innertube *innertube.Client
 	podcasts  *podcasts.Directory
@@ -47,35 +47,35 @@ type App struct {
 	palette       *palette.Service
 	dataDirectory string
 
-	streamServer  *http.Server
+	// streamBaseURL is the backend server's origin; the proxy routes live under it.
 	streamBaseURL string
 }
 
-// NewApp creates the bound application.
-func NewApp(logger *slog.Logger) *App {
+// NewApp creates the application. streamBaseURL is the origin the backend
+// server listens on; emit receives every event for the frontend.
+func NewApp(logger *slog.Logger, streamBaseURL string, emit eventEmitter) *App {
 	innertubeClient := innertube.NewClient()
 	resolver := stream.NewResolver(innertubeClient)
 	app := &App{
-		logger:    logger,
-		innertube: innertubeClient,
-		podcasts:  podcasts.New(innertubeClient, logger),
-		lyrics:    lyrics.New(innertubeClient, lyrics.NewLRCLIB(nil, ""), logger),
-		resolver:  resolver,
-		proxy:     stream.NewProxy(resolver, logger),
-		palette:   newPaletteService(),
+		logger:        logger,
+		emit:          emit,
+		innertube:     innertubeClient,
+		podcasts:      podcasts.New(innertubeClient, logger),
+		lyrics:        lyrics.New(innertubeClient, lyrics.NewLRCLIB(nil, ""), logger),
+		resolver:      resolver,
+		proxy:         stream.NewProxy(resolver, logger),
+		palette:       newPaletteService(),
+		streamBaseURL: streamBaseURL,
 	}
 	app.queue = app.newQueue()
 	return app
 }
 
-// startup keeps the Wails context so bound calls are cancelled when the app quits,
-// and starts the stream proxy.
+// startup keeps ctx so long-running work stops when the backend quits, then opens
+// the library and resumes downloads.
 func (app *App) startup(ctx context.Context) {
 	app.ctx = ctx
 	app.openLibrary()
-	if err := app.startStreamServer(); err != nil {
-		app.logger.Error("stream server failed to start", "error", err)
-	}
 	app.startDownloads()
 }
 
@@ -112,19 +112,11 @@ func libraryPath() (string, error) {
 	return filepath.Join(directory, "library.db"), nil
 }
 
-func (app *App) shutdown(_ context.Context) {
+func (app *App) shutdown() {
 	if app.downloads != nil {
 		app.downloads.Close()
 	}
 	app.closeLibrary()
-	if app.streamServer == nil {
-		return
-	}
-	ctx, cancel := context.WithTimeout(context.Background(), shutdownTimeout)
-	defer cancel()
-	if err := app.streamServer.Shutdown(ctx); err != nil {
-		app.logger.Warn("stream server shutdown", "error", err)
-	}
 }
 
 func (app *App) closeLibrary() {
@@ -137,29 +129,9 @@ func (app *App) closeLibrary() {
 	}
 }
 
-// startStreamServer serves the proxy on a random loopback port. Audio goes over
-// plain HTTP rather than the Wails asset server, because WebKitGTK's media
-// pipeline does not reliably seek over custom URI schemes.
-func (app *App) startStreamServer() error {
-	var listenConfig net.ListenConfig
-	listener, err := listenConfig.Listen(app.ctx, "tcp", "127.0.0.1:0")
-	if err != nil {
-		return fmt.Errorf("listen: %w", err)
-	}
-
-	app.streamServer = &http.Server{
-		Handler:           app.proxy.Handler(),
-		ReadHeaderTimeout: 5 * time.Second,
-	}
-	app.streamBaseURL = "http://" + listener.Addr().String()
-
-	go func() {
-		err := app.streamServer.Serve(listener)
-		if err != nil && !errors.Is(err, http.ErrServerClosed) {
-			app.logger.Error("stream server stopped", "error", err)
-		}
-	}()
-	return nil
+// proxyHandler serves the stream proxy and downloaded covers.
+func (app *App) proxyHandler() http.Handler {
+	return app.proxy.Handler()
 }
 
 // StreamURL returns the URL an <audio> element plays videoID from.

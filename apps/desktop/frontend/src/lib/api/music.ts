@@ -1,5 +1,5 @@
-import { StreamURL } from '#lib/wailsjs/go/main/App.js';
-import { music } from '#lib/wailsjs/go/models.ts';
+import { StreamURL } from '#lib/backend/generated/App.ts';
+import type { music } from '#lib/backend/generated/models.ts';
 
 // Components import from here, never from the generated bindings directly.
 export type Track = music.Track;
@@ -36,7 +36,7 @@ export function createItem(
 	subtitle: string,
 	thumbnails: Thumbnail[]
 ): Item {
-	return music.Item.createFrom({ kind, id, title, subtitle, thumbnails });
+	return { kind, id, title, subtitle, thumbnails };
 }
 
 /** Copies a track with some fields replaced, e.g. an album track given the album's cover. */
@@ -44,5 +44,5 @@ export function createTrack(
 	track: Track,
 	changes: Partial<Pick<Track, 'thumbnails' | 'album'>>
 ): Track {
-	return music.Track.createFrom({ ...track, ...changes });
+	return { ...track, ...changes };
 }

@@ -18,7 +18,7 @@ export default defineConfig({
 	plugins: [
 		tailwindcss(),
 		sveltekit({
-			// Wails serves the static build; every route falls back to the SPA shell.
+			// The Go backend serves the static build; every route falls back to the SPA shell.
 			adapter: adapter({ fallback: 'index.html' }),
 			compilerOptions: {
 				runes: ({ filename }) => {

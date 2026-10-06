@@ -16,9 +16,9 @@ import {
 	RetryDownload,
 	SetKeepDownloaded,
 	StorageUsage
-} from '#lib/wailsjs/go/main/App.js';
-import { EventsOn } from '#lib/wailsjs/runtime/runtime.js';
-import type { download } from '#lib/wailsjs/go/models.ts';
+} from '#lib/backend/generated/App.ts';
+import { onEvent } from '#lib/backend/rpc.ts';
+import type { download } from '#lib/backend/generated/models.ts';
 import type { ItemKind, Track } from '#lib/api/music.ts';
 
 export type DownloadStatus = download.Status;
@@ -45,7 +45,7 @@ const downloadsEventName = 'downloads';
 
 /** Subscribes to download progress and state changes. Returns the unsubscribe function. */
 export function onDownloadUpdate(callback: (update: DownloadUpdate) => void): () => void {
-	return EventsOn(downloadsEventName, callback);
+	return onEvent(downloadsEventName, callback);
 }
 
 export function downloadTracks(tracks: Track[], kind: ItemKind): Promise<void> {

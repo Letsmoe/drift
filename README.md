@@ -1,6 +1,6 @@
 # Otter Music
 
-A YouTube Music player for desktop (Wails), Android (Kotlin) and iOS (Swift), sharing one Go core.
+A YouTube Music player for desktop (Electron shell, Go backend), Android (Kotlin) and iOS (Swift), sharing one Go core.
 
 ## Setup
 
@@ -15,6 +15,6 @@ bun run desktop:dev       # desktop app with hot reload
 bun run desktop:install   # build and install for the current user
 ```
 
-Requires Go 1.27, bun, the Wails v2 CLI, and on Linux WebKitGTK 4.1.
+Requires Go 1.27 and bun; Electron is installed by `bun install`.
 
 See [CLAUDE.md](CLAUDE.md) for layout, architecture and commands.

@@ -1,20 +1,22 @@
 import {
-	PickSpotifyExport,
-	PickSpotifyExportFolder,
 	SpotifyImport,
 	SpotifyPreviewExport,
 	SpotifyPreviewURL
-} from '#lib/wailsjs/go/main/App.js';
+} from '#lib/backend/generated/App.ts';
 import type { ImportOptions, ImportSummary } from '#lib/api/musicImport.ts';
+import { pickFile, pickFolder } from '#lib/backend/shell.ts';
 
 /** Opens a file picker; resolves to '' when the user cancels. */
 export function pickExportFile(): Promise<string> {
-	return PickSpotifyExport();
+	return pickFile({
+		title: 'Choose your Spotify data export',
+		filters: [{ name: 'Spotify export (*.zip, *.json)', extensions: ['zip', 'json'] }]
+	});
 }
 
 /** Opens a folder picker; resolves to '' when the user cancels. */
 export function pickExportFolder(): Promise<string> {
-	return PickSpotifyExportFolder();
+	return pickFolder({ title: 'Choose the extracted Spotify data folder' });
 }
 
 export function previewExport(path: string): Promise<ImportSummary> {
