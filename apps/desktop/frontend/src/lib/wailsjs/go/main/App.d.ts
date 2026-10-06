@@ -109,6 +109,8 @@ export function QueueRemove(arg1:number):Promise<queue.State>;
 
 export function QueueSetAutoplay(arg1:boolean):Promise<queue.State>;
 
+export function QueueSetMagicShuffle(arg1:boolean):Promise<queue.State>;
+
 export function QueueSetRepeat(arg1:string):Promise<queue.State>;
 
 export function QueueSetShuffle(arg1:boolean):Promise<queue.State>;

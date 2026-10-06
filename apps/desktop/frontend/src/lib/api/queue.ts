@@ -10,6 +10,7 @@ import {
 	QueuePrevious,
 	QueueRemove,
 	QueueSetAutoplay,
+	QueueSetMagicShuffle,
 	QueueSetRepeat,
 	QueueSetShuffle,
 	QueueState as fetchQueueState
@@ -29,6 +30,7 @@ export function emptyQueueState(): QueueState {
 		entries: [],
 		index: -1,
 		shuffle: false,
+		magicShuffle: false,
 		repeat: 'off',
 		autoplay: true,
 		context: ''
@@ -95,6 +97,11 @@ export function queuePrevious(): Promise<QueueState> {
 
 export function queueSetShuffle(enabled: boolean): Promise<QueueState> {
 	return QueueSetShuffle(enabled);
+}
+
+/** Magic shuffle: shuffle plus recommendations mixed in between the queued songs. */
+export function queueSetMagicShuffle(enabled: boolean): Promise<QueueState> {
+	return QueueSetMagicShuffle(enabled);
 }
 
 export function queueSetRepeat(mode: RepeatMode): Promise<QueueState> {

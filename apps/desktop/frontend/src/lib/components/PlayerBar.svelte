@@ -4,7 +4,6 @@
 	import QueueIcon from 'phosphor-svelte/lib/QueueIcon';
 	import RepeatIcon from 'phosphor-svelte/lib/RepeatIcon';
 	import RepeatOnceIcon from 'phosphor-svelte/lib/RepeatOnceIcon';
-	import ShuffleIcon from 'phosphor-svelte/lib/ShuffleIcon';
 	import SkipBackIcon from 'phosphor-svelte/lib/SkipBackIcon';
 	import SkipForwardIcon from 'phosphor-svelte/lib/SkipForwardIcon';
 	import SpeakerHighIcon from 'phosphor-svelte/lib/SpeakerHighIcon';
@@ -21,6 +20,7 @@
 	import { panels } from '#lib/layout/panels.svelte.ts';
 	import { library } from '#lib/library/library.svelte.ts';
 	import { player } from '#lib/player/player.svelte.ts';
+	import { shuffleIcon, shuffleLabel } from '#lib/player/shuffleMode.ts';
 	import type { ItemKind } from '#lib/api/music.ts';
 
 	const VolumeIcon = $derived(pickVolumeIcon());
@@ -28,6 +28,7 @@
 	const likeLabel = $derived(buildLikeLabel());
 	const likeWeight = $derived(buildLikeWeight());
 	const RepeatButtonIcon = $derived(pickRepeatIcon());
+	const ShuffleButtonIcon = $derived(shuffleIcon(player.queue));
 
 	function pickRepeatIcon() {
 		if (player.queue.repeat === 'one') {
@@ -44,13 +45,6 @@
 			return 'Repeat: off';
 		}
 		return 'Repeat: all';
-	}
-
-	function shuffleLabel(): string {
-		if (player.queue.shuffle) {
-			return 'Shuffle: on';
-		}
-		return 'Shuffle: off';
 	}
 
 	function currentKind(): ItemKind {
@@ -206,10 +200,10 @@
 			aria-disabled={!player.track}
 		>
 			<ToggleIconButton
-				icon={ShuffleIcon}
-				label={shuffleLabel()}
+				icon={ShuffleButtonIcon}
+				label={shuffleLabel(player.queue)}
 				active={player.queue.shuffle}
-				onclick={() => player.toggleShuffle()}
+				onclick={() => player.cycleShuffle()}
 			/>
 			<Button
 				round

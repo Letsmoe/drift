@@ -14,6 +14,7 @@ import {
 	queuePrevious,
 	queueRemove,
 	queueSetAutoplay,
+	queueSetMagicShuffle,
 	queueSetRepeat,
 	queueSetShuffle,
 	queueState,
@@ -122,6 +123,19 @@ export class Player {
 
 	async toggleShuffle(): Promise<void> {
 		await this.#run(queueSetShuffle(!this.queue.shuffle));
+	}
+
+	/** Cycles shuffle off, shuffle, magic shuffle (with recommendations mixed in), off. */
+	async cycleShuffle(): Promise<void> {
+		if (!this.queue.shuffle) {
+			await this.#run(queueSetShuffle(true));
+			return;
+		}
+		if (!this.queue.magicShuffle) {
+			await this.#run(queueSetMagicShuffle(true));
+			return;
+		}
+		await this.#run(queueSetShuffle(false));
 	}
 
 	/** Cycles repeat off, all, one, off. */

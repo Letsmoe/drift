@@ -20,7 +20,7 @@ type QueueStep struct {
 	Moved bool        `json:"moved"`
 }
 
-// engineExtender feeds autoplay from the recommendation engine once it exists.
+// engineExtender feeds autoplay and magic shuffle from the recommendation engine once it exists.
 type engineExtender struct {
 	app *App
 }
@@ -32,9 +32,17 @@ func (extender engineExtender) Extend(ctx context.Context, upcoming, history []m
 	return extender.app.engine.Extend(ctx, upcoming, history)
 }
 
+func (extender engineExtender) Mix(ctx context.Context, seeds, exclude []music.Track, count int) ([]music.Track, error) {
+	if extender.app.engine == nil {
+		return nil, nil
+	}
+	return extender.app.engine.Mix(ctx, seeds, exclude, count)
+}
+
 func (app *App) newQueue() *queue.Queue {
 	return queue.New(
 		queue.WithExtender(engineExtender{app: app}),
+		queue.WithRecommender(engineExtender{app: app}),
 		queue.WithOnChange(app.emitQueueState),
 		queue.WithLogger(app.logger),
 	)
@@ -107,6 +115,11 @@ func (app *App) QueuePrevious() queue.State {
 // QueueSetShuffle turns shuffle on or off.
 func (app *App) QueueSetShuffle(enabled bool) queue.State {
 	return app.queue.SetShuffle(enabled)
+}
+
+// QueueSetMagicShuffle turns magic shuffle (shuffle plus mixed-in recommendations) on or off.
+func (app *App) QueueSetMagicShuffle(enabled bool) queue.State {
+	return app.queue.SetMagicShuffle(enabled)
 }
 
 // QueueSetRepeat sets the repeat mode: "off", "all" or "one".

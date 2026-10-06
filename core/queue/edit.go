@@ -10,6 +10,7 @@ import (
 // they become the queue and the first one is current. They are queued as songs.
 func (queue *Queue) PlayNext(tracks []music.Track) State {
 	return queue.apply(func() bool {
+		queue.requestMixLocked()
 		return queue.insertLocked(queue.index+1, tracks, false, queue.frontOrderLocked(len(tracks)))
 	})
 }
@@ -19,6 +20,7 @@ func (queue *Queue) PlayNext(tracks []music.Track) State {
 // queue and the first one is current. They are queued as songs.
 func (queue *Queue) Add(tracks []music.Track) State {
 	return queue.apply(func() bool {
+		queue.requestMixLocked()
 		return queue.insertLocked(queue.autoplayTailLocked(), tracks, false, queue.endOrderLocked())
 	})
 }
@@ -88,7 +90,7 @@ func (queue *Queue) Remove(entryID int64) State {
 
 // Move puts an upcoming entry at newIndex (clamped to the upcoming range).
 // History and the current entry cannot be moved. A moved entry counts as
-// chosen by the user, so it is no longer an autoplay entry.
+// chosen by the user, so it is no longer an autoplay or magic entry.
 func (queue *Queue) Move(entryID int64, newIndex int) State {
 	return queue.apply(func() bool {
 		position := queue.positionOfLocked(entryID)
@@ -97,6 +99,7 @@ func (queue *Queue) Move(entryID int64, newIndex int) State {
 		}
 		moved := queue.items[position]
 		moved.entry.Autoplay = false
+		moved.entry.Magic = false
 		queue.items = slices.Delete(queue.items, position, position+1)
 		target := min(max(newIndex, queue.index+1), len(queue.items))
 		queue.items = slices.Insert(queue.items, target, moved)

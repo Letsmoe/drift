@@ -1,5 +1,6 @@
 <script lang="ts">
 	import PlayIcon from 'phosphor-svelte/lib/PlayIcon';
+	import SparkleIcon from 'phosphor-svelte/lib/SparkleIcon';
 	import XIcon from 'phosphor-svelte/lib/XIcon';
 	import type { ItemKind } from '#lib/api/music.ts';
 	import type { QueueEntry } from '#lib/api/queue.ts';
@@ -14,6 +15,7 @@
 	let {
 		entry,
 		current = false,
+		played = false,
 		draggable = false,
 		dropTarget = false,
 		size = 'compact',
@@ -24,6 +26,8 @@
 	}: {
 		entry: QueueEntry;
 		current?: boolean;
+		/** Already played: shown dimmed, above the current entry. */
+		played?: boolean;
 		draggable?: boolean;
 		dropTarget?: boolean;
 		/** Compact rows fit the side panel; comfortable ones the full-screen player. */
@@ -53,7 +57,8 @@
 		'group/queuerow duration-fast flex items-center rounded-md transition-colors hover:bg-hover',
 		size === 'compact' && 'gap-2.5 px-1.5 py-1',
 		size === 'comfortable' && 'gap-3 p-2',
-		dropTarget && 'border-t-2 border-action'
+		dropTarget && 'border-t-2 border-action',
+		played && 'opacity-60 hover:opacity-100'
 	]}
 >
 	{#if size === 'comfortable'}
@@ -73,6 +78,11 @@
 			>
 				{entry.track.title}
 			</p>
+			{#if entry.magic}
+				<span title="Recommended by magic shuffle" class="shrink-0 text-action">
+					<SparkleIcon size={12} weight="fill" />
+				</span>
+			{/if}
 			<DownloadedIndicator videoId={entry.track.videoId} size={12} />
 		</div>
 		<p
