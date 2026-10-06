@@ -2,7 +2,9 @@
 	import { FloatingScrollbar } from '@neoworks-dev/ui';
 	import BroomIcon from 'phosphor-svelte/lib/BroomIcon';
 	import SparkleIcon from 'phosphor-svelte/lib/SparkleIcon';
+	import ArtistAboutCard from '#lib/components/ArtistAboutCard.svelte';
 	import Cover from '#lib/components/Cover.svelte';
+	import LyricsPreview from '#lib/components/LyricsPreview.svelte';
 	import TrackCredits from '#lib/components/TrackCredits.svelte';
 	import UpcomingQueue from '#lib/components/UpcomingQueue.svelte';
 	import { panels } from '#lib/layout/panels.svelte.ts';
@@ -10,6 +12,10 @@
 	import { splitQueue } from '#lib/queue/queueSections.ts';
 
 	const sections = $derived(splitQueue(player.queue));
+	// Episodes' artist is their show, which has no artist page.
+	const leadArtist = $derived(
+		sections.nowPlaying?.track.artists.find((artist) => artist.id !== '')
+	);
 
 	function autoplayButtonLabel(): string {
 		if (player.queue.autoplay) {
@@ -52,27 +58,29 @@
 	<FloatingScrollbar class="min-h-0 flex-1">
 		<div class="flex flex-col gap-4 px-2 pb-4">
 			{#if sections.nowPlaying}
-				<section class="flex flex-col gap-3 px-2">
+				<section class="flex items-center gap-3 px-2">
 					<button
 						type="button"
 						aria-label="Open full-screen player"
 						onclick={() => panels.toggleFullPlayer()}
-						class="block w-full cursor-pointer rounded-xl"
+						class="shrink-0 cursor-pointer rounded-lg"
 					>
 						<Cover
 							thumbnails={sections.nowPlaying.track.thumbnails}
-							size={288}
-							class="w-full rounded-xl shadow-lg"
+							size={112}
+							class="size-28 rounded-lg shadow-lg"
 						/>
 					</button>
 					<div class="min-w-0 [&>p:first-child]:text-lg [&>p:first-child]:font-semibold">
 						<TrackCredits track={sections.nowPlaying.track} />
 					</div>
 				</section>
-			{:else}
-				<p class="px-2 py-8 text-center text-sm text-dim">
-					Nothing is queued. Play a song to start.
-				</p>
+				<div class="flex flex-col gap-2 px-2">
+					<LyricsPreview />
+					{#if leadArtist}
+						<ArtistAboutCard artist={leadArtist} />
+					{/if}
+				</div>
 			{/if}
 
 			<UpcomingQueue />

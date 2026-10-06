@@ -15,7 +15,8 @@ const kindLabels: Record<string, string> = {
 	playlist: 'Playlist',
 	library: 'Playlist',
 	artist: 'Artist',
-	podcast: 'Podcast'
+	podcast: 'Podcast',
+	song: 'Song radio'
 };
 
 const titles = loadTitles();

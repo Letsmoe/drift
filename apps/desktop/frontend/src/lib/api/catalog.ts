@@ -7,7 +7,8 @@ import {
 	PlaylistContinuation,
 	Podcast,
 	PodcastContinuation,
-	PodcastsHome,
+	PodcastShows,
+	PodcastShowsContinuation,
 	Radio,
 	Search,
 	SearchSongs,
@@ -81,9 +82,13 @@ export function home(): Promise<HomePage> {
 	return Home();
 }
 
-/** The home feed's "Podcasts" chip: episode shelves by topic; continues via homeContinuation. */
-export function podcastsHome(): Promise<HomePage> {
-	return PodcastsHome();
+/** Podcast shows by topic (the shows behind YouTube's trending episodes). */
+export function podcastShows(): Promise<HomePage> {
+	return PodcastShows();
+}
+
+export function podcastShowsContinuation(continuation: string): Promise<HomePage> {
+	return PodcastShowsContinuation(continuation);
 }
 
 export function homeContinuation(continuation: string): Promise<HomePage> {

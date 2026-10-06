@@ -57,7 +57,7 @@
 				{@render children()}
 			</main>
 		</FloatingScrollbar>
-		{#if panels.queueOpen}
+		{#if panels.queueOpen && player.queue.entries.length > 0}
 			<QueuePanel />
 		{/if}
 	</div>

@@ -1,4 +1,9 @@
-import { home, homeContinuation, podcastsHome } from '#lib/api/catalog.ts';
+import {
+	home,
+	homeContinuation,
+	podcastShows,
+	podcastShowsContinuation
+} from '#lib/api/catalog.ts';
 import type { HomePage, Item, Shelf } from '#lib/api/music.ts';
 import { describeError } from '#lib/format.ts';
 
@@ -22,9 +27,14 @@ class ShelfFeed {
 
 	#continuation = $state('');
 	#loadFirstPage: () => Promise<HomePage>;
+	#loadNextPage: (continuation: string) => Promise<HomePage>;
 
-	constructor(loadFirstPage: () => Promise<HomePage>) {
+	constructor(
+		loadFirstPage: () => Promise<HomePage>,
+		loadNextPage: (continuation: string) => Promise<HomePage>
+	) {
 		this.#loadFirstPage = loadFirstPage;
+		this.#loadNextPage = loadNextPage;
 	}
 
 	get hasMore(): boolean {
@@ -49,7 +59,7 @@ class ShelfFeed {
 
 		this.loadingMore = true;
 		try {
-			this.#append(await homeContinuation(this.#continuation));
+			this.#append(await this.#loadNextPage(this.#continuation));
 		} catch {
 			// The first page is already on screen; a failed extra page just ends the feed.
 			this.#continuation = '';
@@ -65,14 +75,14 @@ class ShelfFeed {
 }
 
 /**
- * The home feed's shelves for the selected filter. "Podcasts" is YouTube's own podcasts
- * feed: the regular home feed has (almost) no podcast-only shelves to filter down to.
+ * The home feed's shelves for the selected filter. "Podcasts" is the core's podcast
+ * directory: the regular home feed has (almost) no podcast-only shelves to filter down to.
  */
 export class HomeFeed {
 	filter = $state<HomeFilter>('all');
 
-	#homeFeed = new ShelfFeed(home);
-	#podcastsFeed = new ShelfFeed(podcastsHome);
+	#homeFeed = new ShelfFeed(home, homeContinuation);
+	#podcastsFeed = new ShelfFeed(podcastShows, podcastShowsContinuation);
 
 	#active = $derived(this.#feedFor(this.filter));
 	visibleShelves = $derived(this.#filterShelves(this.#active.shelves, this.filter));

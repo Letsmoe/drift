@@ -16,6 +16,7 @@
 		current = false,
 		draggable = false,
 		dropTarget = false,
+		size = 'compact',
 		ondragstart,
 		ondragover,
 		ondrop,
@@ -25,6 +26,8 @@
 		current?: boolean;
 		draggable?: boolean;
 		dropTarget?: boolean;
+		/** Compact rows fit the side panel; comfortable ones the full-screen player. */
+		size?: 'compact' | 'comfortable';
 		ondragstart?: (event: DragEvent) => void;
 		ondragover?: (event: DragEvent) => void;
 		ondrop?: (event: DragEvent) => void;
@@ -47,19 +50,40 @@
 	{ondragend}
 	oncontextmenu={(event) => contextMenu.openAtPointer(event)}
 	class={[
-		'group/queuerow duration-fast flex items-center gap-2.5 rounded-md px-1.5 py-1 transition-colors hover:bg-hover',
+		'group/queuerow duration-fast flex items-center rounded-md transition-colors hover:bg-hover',
+		size === 'compact' && 'gap-2.5 px-1.5 py-1',
+		size === 'comfortable' && 'gap-3 p-2',
 		dropTarget && 'border-t-2 border-action'
 	]}
 >
-	<Cover thumbnails={entry.track.thumbnails} size={32} class="size-8 shrink-0 rounded" />
+	{#if size === 'comfortable'}
+		<Cover thumbnails={entry.track.thumbnails} size={48} class="size-12 shrink-0 rounded-md" />
+	{:else}
+		<Cover thumbnails={entry.track.thumbnails} size={32} class="size-8 shrink-0 rounded" />
+	{/if}
 	<div class="min-w-0 flex-1">
 		<div class="flex min-w-0 items-center gap-1.5">
-			<p class={['truncate text-[13px] leading-tight font-medium', current && 'text-action']}>
+			<p
+				class={[
+					'truncate font-medium',
+					size === 'compact' && 'text-[13px] leading-tight',
+					size === 'comfortable' && 'text-base',
+					current && 'text-action'
+				]}
+			>
 				{entry.track.title}
 			</p>
 			<DownloadedIndicator videoId={entry.track.videoId} size={12} />
 		</div>
-		<p class="truncate text-xs leading-tight text-dim">{formatArtists(entry.track.artists)}</p>
+		<p
+			class={[
+				'truncate text-dim',
+				size === 'compact' && 'text-xs leading-tight',
+				size === 'comfortable' && 'text-sm'
+			]}
+		>
+			{formatArtists(entry.track.artists)}
+		</p>
 	</div>
 	{#if !current}
 		<div class="flex shrink-0 items-center opacity-0 group-hover/queuerow:opacity-100">

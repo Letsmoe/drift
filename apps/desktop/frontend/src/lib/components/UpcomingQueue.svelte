@@ -6,6 +6,8 @@
 
 	// The queued and autoplay sections with drag-to-reorder; shared by the Now playing
 	// column and the full-screen player.
+	let { size = 'compact' }: { size?: 'compact' | 'comfortable' } = $props();
+
 	const sections = $derived(splitQueue(player.queue));
 	const hasUpcoming = $derived(sections.queued.length > 0 || sections.autoplay.length > 0);
 	const queuedHeading = $derived(buildQueuedHeading(player.queue.context));
@@ -55,6 +57,7 @@
 		{#each entries as upcoming (upcoming.entry.id)}
 			<QueueRow
 				entry={upcoming.entry}
+				{size}
 				draggable
 				dropTarget={dropTargetEntryId === upcoming.entry.id}
 				ondragstart={(event) => startDrag(event, upcoming.entry.id)}

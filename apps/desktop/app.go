@@ -17,6 +17,7 @@ import (
 	"github.com/neoworks/otter-music/core/innertube"
 	"github.com/neoworks/otter-music/core/library"
 	"github.com/neoworks/otter-music/core/palette"
+	"github.com/neoworks/otter-music/core/podcasts"
 	"github.com/neoworks/otter-music/core/queue"
 	"github.com/neoworks/otter-music/core/recommend"
 	"github.com/neoworks/otter-music/core/stream"
@@ -30,6 +31,7 @@ type App struct {
 	ctx       context.Context
 	logger    *slog.Logger
 	innertube *innertube.Client
+	podcasts  *podcasts.Directory
 	resolver  *stream.Resolver
 	proxy     *stream.Proxy
 	// library and engine stay nil when the library database could not be opened.
@@ -54,6 +56,7 @@ func NewApp(logger *slog.Logger) *App {
 	app := &App{
 		logger:    logger,
 		innertube: innertubeClient,
+		podcasts:  podcasts.New(innertubeClient, logger),
 		resolver:  resolver,
 		proxy:     stream.NewProxy(resolver, logger),
 		palette:   newPaletteService(),

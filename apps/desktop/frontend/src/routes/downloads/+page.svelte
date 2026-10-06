@@ -15,7 +15,7 @@
 	import { downloads } from '#lib/downloads/downloads.svelte.ts';
 	import { formatBytes } from '#lib/downloads/downloadProgress.ts';
 	import { formatSongCount } from '#lib/format.ts';
-	import { playContext } from '#lib/player/contextPlayback.ts';
+	import { playContext, shufflePlayContext } from '#lib/player/contextPlayback.ts';
 
 	const context = 'downloads';
 	const tracks = $derived<Track[]>(downloads.downloadedItems.map((item) => item.track));
@@ -58,7 +58,12 @@
 		{/snippet}
 	</PageHeader>
 
-	<PlaylistActionRow {context} title="Downloads" onplay={() => playContext(tracks, context)}>
+	<PlaylistActionRow
+		{context}
+		title="Downloads"
+		onplay={() => playContext(tracks, context)}
+		onshuffle={() => shufflePlayContext(tracks, context)}
+	>
 		{#if paused}
 			<Button size="sm" icon={PlayIcon} onclick={() => downloads.resume()}>Resume downloads</Button>
 		{:else}
