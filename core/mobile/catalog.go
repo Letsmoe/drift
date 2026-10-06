@@ -1,5 +1,10 @@
 package mobile
 
+import (
+	"github.com/neoworks/otter-music/core/lyrics"
+	"github.com/neoworks/otter-music/core/music"
+)
+
 // Home returns the first page of the home feed as music.HomePage JSON.
 func (core *Core) Home() (string, error) {
 	page, err := core.innertube.Home(core.ctx)
@@ -81,13 +86,29 @@ func (core *Core) Radio(videoID string) (string, error) {
 	return encodeResult(tracks, err)
 }
 
-// Lyrics returns music.Lyrics JSON, or "null" when the track has no lyrics.
+// Lyrics returns YouTube's music.Lyrics JSON for videoID, or "null" when the
+// track has none. TrackLyrics also asks LRCLIB.
 func (core *Core) Lyrics(videoID string) (string, error) {
-	lyrics, found, err := core.innertube.Lyrics(core.ctx, videoID)
-	if err != nil || !found {
+	return core.lyricsJSON(music.Track{VideoID: videoID}, false)
+}
+
+// TrackLyrics returns music.Lyrics JSON for a music.Track JSON, or "null" when no
+// source has lyrics. allowLRCLIB lets the core ask lrclib.net when YouTube has no
+// synced lyrics (a user setting, off by default).
+func (core *Core) TrackLyrics(trackJSON string, allowLRCLIB bool) (string, error) {
+	var track music.Track
+	if err := decode(trackJSON, &track); err != nil {
+		return "", err
+	}
+	return core.lyricsJSON(track, allowLRCLIB)
+}
+
+func (core *Core) lyricsJSON(track music.Track, allowLRCLIB bool) (string, error) {
+	found, ok, err := core.lyrics.Lyrics(core.ctx, track, lyrics.Options{AllowLRCLIB: allowLRCLIB})
+	if err != nil || !ok {
 		return encodeResult(nil, err)
 	}
-	return encodeResult(lyrics, nil)
+	return encodeResult(found, nil)
 }
 
 // Podcast returns music.PodcastPage JSON.

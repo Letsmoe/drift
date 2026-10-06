@@ -11,7 +11,7 @@
 
 	$effect(() => {
 		if (player.track) {
-			lyricsView.load(player.track.videoId);
+			lyricsView.load(player.track);
 		}
 	});
 

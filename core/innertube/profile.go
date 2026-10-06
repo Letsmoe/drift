@@ -41,6 +41,16 @@ var VisionOS = Profile{
 	OSVersion:   "26.5.23O471",
 }
 
+// AndroidMusic is the YouTube Music Android app. Its lyrics pages carry per-line
+// timestamps (ytmusicapi's get_lyrics(timestamps=True) uses the same client).
+var AndroidMusic = Profile{
+	Name:      "ANDROID_MUSIC",
+	ID:        21,
+	Version:   "7.21.50",
+	UserAgent: "com.google.android.apps.youtube.music/7.21.50 (Linux; U; Android 11) gzip",
+	Host:      "music.youtube.com",
+}
+
 type requestContext struct {
 	Client clientInfo `json:"client"`
 }

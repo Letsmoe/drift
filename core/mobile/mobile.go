@@ -21,6 +21,7 @@ import (
 	"github.com/neoworks/otter-music/core/importer"
 	"github.com/neoworks/otter-music/core/innertube"
 	"github.com/neoworks/otter-music/core/library"
+	"github.com/neoworks/otter-music/core/lyrics"
 	"github.com/neoworks/otter-music/core/podcasts"
 	"github.com/neoworks/otter-music/core/queue"
 	"github.com/neoworks/otter-music/core/recommend"
@@ -52,6 +53,7 @@ type Core struct {
 	resolver         *stream.Resolver
 	innertube        *innertube.Client
 	podcasts         *podcasts.Directory
+	lyrics           *lyrics.Service
 	proxy            *stream.Proxy
 	// library and engine stay nil when the library database could not be opened.
 	library  *library.Library
@@ -82,6 +84,7 @@ func Open(dataDir string, listener Listener) (*Core, error) {
 		listener:  listener,
 		innertube: innertubeClient,
 		podcasts:  podcasts.New(innertubeClient, logger),
+		lyrics:    lyrics.New(innertubeClient, lyrics.NewLRCLIB(nil, ""), logger),
 		resolver:  resolver,
 		proxy:     stream.NewProxy(resolver, logger),
 	}

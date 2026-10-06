@@ -63,7 +63,7 @@ export function LibraryPlaylist(arg1:string):Promise<library.Playlist>;
 
 export function LikedTracks():Promise<Array<music.Track>>;
 
-export function Lyrics(arg1:string):Promise<music.Lyrics>;
+export function Lyrics(arg1:music.Track,arg2:boolean):Promise<music.Lyrics>;
 
 export function MovePlaylistEntry(arg1:string,arg2:number,arg3:number):Promise<void>;
 

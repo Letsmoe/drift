@@ -1,14 +1,16 @@
 package main
 
 import (
+	"github.com/neoworks/otter-music/core/lyrics"
 	"github.com/neoworks/otter-music/core/music"
 )
 
-// Lyrics returns YouTube Music's lyrics for a track, or nil when it has none.
-func (app *App) Lyrics(videoID string) (*music.Lyrics, error) {
-	lyrics, found, err := app.innertube.Lyrics(app.ctx, videoID)
-	if err != nil || !found {
+// Lyrics returns the lyrics of a track, or nil when no source has any. allowLRCLIB
+// lets the core ask lrclib.net when YouTube has no synced lyrics.
+func (app *App) Lyrics(track music.Track, allowLRCLIB bool) (*music.Lyrics, error) {
+	found, ok, err := app.lyrics.Lyrics(app.ctx, track, lyrics.Options{AllowLRCLIB: allowLRCLIB})
+	if err != nil || !ok {
 		return nil, err
 	}
-	return &lyrics, nil
+	return &found, nil
 }

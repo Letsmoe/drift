@@ -48,7 +48,12 @@ func (client *Client) homePage(ctx context.Context, request browseRequest) (musi
 
 // browse posts request to the browse endpoint and decodes the answer into response.
 func (client *Client) browse(ctx context.Context, request browseRequest, response any) error {
-	call, err := client.visitorCall(ctx, WebRemix, "browse", func(context requestContext) any {
+	return client.browseAs(ctx, WebRemix, request, response)
+}
+
+// browseAs is browse with another client profile.
+func (client *Client) browseAs(ctx context.Context, profile Profile, request browseRequest, response any) error {
+	call, err := client.visitorCall(ctx, profile, "browse", func(context requestContext) any {
 		request.Context = context
 		return request
 	})

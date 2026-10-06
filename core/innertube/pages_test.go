@@ -1,6 +1,7 @@
 package innertube
 
 import (
+	"encoding/json"
 	"reflect"
 	"testing"
 
@@ -316,5 +317,63 @@ func TestLyricsUnavailable(t *testing.T) {
 	_, found, err := server.client().Lyrics(t.Context(), "dQw4w9WgXcQ")
 	if err != nil || found {
 		t.Fatalf("found %v, err %v", found, err)
+	}
+}
+
+func TestTimedLyrics(t *testing.T) {
+	server := newFakeServer(t)
+	server.respondWithFixture(t, "next", "testdata/next_tabs.json")
+	server.respondWithFixture(t, "browse", "testdata/lyrics_timed.json")
+
+	lyrics, found, err := server.client().Lyrics(t.Context(), "dQw4w9WgXcQ")
+	if err != nil || !found {
+		t.Fatalf("found %v, err %v", found, err)
+	}
+	if server.requestCount("browse") != 1 {
+		t.Errorf("browse requests = %d, want only the timed page", server.requestCount("browse"))
+	}
+	if name := server.lastRequest(t, "browse").contextClient()["clientName"]; name != "ANDROID_MUSIC" {
+		t.Errorf("client = %v", name)
+	}
+	want := music.Lyrics{
+		Source: "Musixmatch",
+		Synced: true,
+		Lines: []music.LyricLine{
+			{Text: "♪", StartMs: 0},
+			{Text: "You were the shadow to my light, did you feel us?", StartMs: 11030},
+			{Text: "Another star, you fade away", StartMs: 17710},
+			{Text: "Afraid our aim is out of sight, wanna see us", StartMs: 21810},
+		},
+	}
+	if !reflect.DeepEqual(lyrics, want) {
+		t.Errorf("lyrics = %+v", lyrics)
+	}
+}
+
+func TestTimedLyricsFallBackToPlainPage(t *testing.T) {
+	server := newFakeServer(t)
+	server.respondWithFixture(t, "next", "testdata/next_tabs.json")
+	server.respondWithFixture(t, "browse", "testdata/lyrics.json")
+
+	lyrics, found, err := server.client().Lyrics(t.Context(), "dQw4w9WgXcQ")
+	if err != nil || !found || lyrics.Synced {
+		t.Fatalf("found %v, synced %v, err %v", found, lyrics.Synced, err)
+	}
+	if name := server.lastRequest(t, "browse").contextClient()["clientName"]; name != "WEB_REMIX" {
+		t.Errorf("fallback client = %v", name)
+	}
+}
+
+func TestParseTimedLyricsWithoutCuesIsPlain(t *testing.T) {
+	const body = `{"contents":{"elementRenderer":{"newElement":{"type":{"componentType":{"model":{"timedLyricsModel":{"lyricsData":{
+		"timedLyricsData":[{"lyricLine":"timed","cueRange":{"startTimeMilliseconds":"500"}},{"lyricLine":"untimed"}]}}}}}}}}}`
+	var response timedLyricsResponse
+	if err := json.Unmarshal([]byte(body), &response); err != nil {
+		t.Fatal(err)
+	}
+
+	lyrics, found := parseTimedLyrics(response)
+	if !found || lyrics.Synced || lyrics.Lines[0].StartMs != 0 {
+		t.Errorf("lyrics = %+v", lyrics)
 	}
 }
