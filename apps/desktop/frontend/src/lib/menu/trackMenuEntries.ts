@@ -10,6 +10,7 @@ import ArrowCircleDownIcon from 'phosphor-svelte/lib/ArrowCircleDownIcon';
 import DiscIcon from 'phosphor-svelte/lib/DiscIcon';
 import HeartIcon from 'phosphor-svelte/lib/HeartIcon';
 import ListPlusIcon from 'phosphor-svelte/lib/ListPlusIcon';
+import MicrophoneIcon from 'phosphor-svelte/lib/MicrophoneIcon';
 import PlusIcon from 'phosphor-svelte/lib/PlusIcon';
 import PlaylistIcon from 'phosphor-svelte/lib/PlaylistIcon';
 import ProhibitIcon from 'phosphor-svelte/lib/ProhibitIcon';
@@ -31,7 +32,7 @@ export function buildTrackMenuEntries(track: Track, options: TrackMenuOptions = 
 		{ label: 'Add to playlist', icon: PlaylistIcon, children: playlistEntries(track) },
 		{ label: 'Add to queue', icon: QueueIcon, onselect: () => player.addToQueue([track]) },
 		{ label: 'Play next', icon: ListPlusIcon, onselect: () => player.playNext([track]) },
-		...navigationEntries(track),
+		...navigationEntries(track, kind),
 		likeEntry(track, kind),
 		downloadEntry(track, kind),
 		...feedbackEntries(track, kind)
@@ -53,20 +54,32 @@ function menuKind(options: TrackMenuOptions): ItemKind {
 	return 'song';
 }
 
+/** "episode" or "song", for labels like "Don't recommend this episode". */
+function nounFor(kind: ItemKind): string {
+	if (kind === 'episode') {
+		return 'episode';
+	}
+	return 'song';
+}
+
 function feedbackEntries(track: Track, kind: ItemKind): MenuEntry[] {
 	const entries: MenuEntry[] = [
 		{
-			label: dislikeLabel(track),
+			label: dislikeLabel(track, kind),
 			icon: ThumbsDownIcon,
 			separatorBefore: true,
 			onselect: () => recommendationFeedback.toggleDislike(track, kind)
 		},
 		{
-			label: 'Don’t recommend this song',
+			label: `Don’t recommend this ${nounFor(kind)}`,
 			icon: ProhibitIcon,
 			onselect: () => recommendationFeedback.blockTrack(track)
 		}
 	];
+	if (kind === 'episode') {
+		entries.push(...blockShowEntries(track));
+		return entries;
+	}
 	const artists = track.artists.filter((artist) => artist.id !== '');
 	if (artists.length === 1) {
 		entries.push(blockArtistEntry(`Don’t recommend ${artists[0].name}`, artists[0]));
@@ -80,11 +93,26 @@ function feedbackEntries(track: Track, kind: ItemKind): MenuEntry[] {
 	return entries;
 }
 
-function dislikeLabel(track: Track): string {
+// An episode's "album" is its show.
+function blockShowEntries(track: Track): MenuEntry[] {
+	const show = track.album;
+	if (!show || show.id === '') {
+		return [];
+	}
+	return [
+		{
+			label: `Don’t recommend ${show.name}`,
+			icon: UserMinusIcon,
+			onselect: () => recommendationFeedback.blockPodcast(show.id, show.name)
+		}
+	];
+}
+
+function dislikeLabel(track: Track, kind: ItemKind): string {
 	if (library.isDisliked(track.videoId)) {
 		return 'Remove dislike';
 	}
-	return 'I don’t like this song';
+	return `I don’t like this ${nounFor(kind)}`;
 }
 
 function blockArtistEntry(label: string, artist: Artist): MenuEntry {
@@ -114,22 +142,34 @@ async function addToNewPlaylist(track: Track): Promise<void> {
 	await library.addToPlaylist(created.id, [track]);
 }
 
-function navigationEntries(track: Track): MenuEntry[] {
+function navigationEntries(track: Track, kind: ItemKind): MenuEntry[] {
 	const entries: MenuEntry[] = [];
 	const artists = track.artists.filter((artist) => artist.id !== '');
 	if (artists.length > 0) {
 		entries.push(artistEntry(artists));
 	}
 	if (track.album && track.album.id !== '') {
-		const albumHref = itemHref('album', track.album.id);
-		entries.push({
-			label: 'Go to album',
-			icon: DiscIcon,
-			onselect: () => goto(albumHref),
-			separatorBefore: artists.length === 0
-		});
+		entries.push(albumEntry(track.album.id, kind, artists.length === 0));
 	}
 	return entries;
+}
+
+// An episode's "album" is its podcast show.
+function albumEntry(albumId: string, kind: ItemKind, separatorBefore: boolean): MenuEntry {
+	if (kind === 'episode') {
+		return {
+			label: 'Go to podcast',
+			icon: MicrophoneIcon,
+			onselect: () => goto(itemHref('podcast', albumId)),
+			separatorBefore
+		};
+	}
+	return {
+		label: 'Go to album',
+		icon: DiscIcon,
+		onselect: () => goto(itemHref('album', albumId)),
+		separatorBefore
+	};
 }
 
 function artistEntry(artists: Artist[]): MenuEntry {

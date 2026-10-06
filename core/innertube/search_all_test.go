@@ -43,6 +43,7 @@ func TestSearchTopResultHoldsCardAndItsSongs(t *testing.T) {
 		Title:           "Voyager",
 		Artists:         []music.Artist{{ID: "UCRr1xG_2WIDs18a6cIiCxeA", Name: "Daft Punk"}},
 		DurationSeconds: 228,
+		PlayCount:       "51M plays",
 	}
 	if got := withoutTrackThumbnails(*items[1].Track); !reflect.DeepEqual(got, want) {
 		t.Errorf("listed song = %+v, want %+v", got, want)

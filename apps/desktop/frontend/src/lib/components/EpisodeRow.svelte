@@ -2,7 +2,7 @@
 	import type { Episode } from '#lib/api/music.ts';
 	import Cover from '#lib/components/Cover.svelte';
 	import PlayOverlayButton from '#lib/components/PlayOverlayButton.svelte';
-	import { formatDuration } from '#lib/format.ts';
+	import { formatDuration, playCountOf } from '#lib/format.ts';
 	import { player } from '#lib/player/player.svelte.ts';
 
 	let { episode, onplay }: { episode: Episode; onplay: () => void } = $props();
@@ -11,7 +11,7 @@
 	const current = $derived(player.isCurrent(track));
 	const playing = $derived(player.isPlaying(track));
 	const details = $derived(
-		[episode.published, formatDuration(track.durationSeconds)]
+		[episode.published, formatDuration(track.durationSeconds), playCountOf(track)]
 			.filter((part) => part !== '')
 			.join(' • ')
 	);

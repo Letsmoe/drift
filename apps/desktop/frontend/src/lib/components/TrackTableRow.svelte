@@ -119,7 +119,10 @@
 				<p class={['truncate text-base', current && 'text-action']}>{track.title}</p>
 				<DownloadedIndicator videoId={track.videoId} />
 			</div>
-			<p class="truncate text-sm text-dim"><ArtistLinks artists={track.artists} /></p>
+			<p class="truncate text-sm text-dim">
+				<ArtistLinks artists={track.artists} />{#if track.playCount}
+					<span> • {track.playCount}</span>{/if}
+			</p>
 		</div>
 	</div>
 

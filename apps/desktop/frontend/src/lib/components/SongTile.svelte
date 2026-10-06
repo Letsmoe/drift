@@ -4,7 +4,7 @@
 	import PlayOverlayButton from '#lib/components/PlayOverlayButton.svelte';
 	import TrackContextMenu from '#lib/components/TrackContextMenu.svelte';
 	import { PopupMenu } from '#lib/menu/popupMenu.svelte.ts';
-	import { formatArtists, trackHref } from '#lib/format.ts';
+	import { formatTrackByline, trackHref, trackKindOf } from '#lib/format.ts';
 	import { player } from '#lib/player/player.svelte.ts';
 	import { whenVisible } from '#lib/whenVisible.ts';
 
@@ -31,7 +31,7 @@
 
 	function play(): void {
 		onplay?.();
-		player.playOrToggle(track, tracks, index, context);
+		player.playOrToggle(track, tracks, index, context, trackKindOf(track));
 	}
 
 	function reportVisible(): void {
@@ -60,7 +60,7 @@
 				{track.title}
 			{/if}
 		</p>
-		<p class="truncate text-xs text-dim">{formatArtists(track.artists)}</p>
+		<p class="truncate text-xs text-dim">{formatTrackByline(track)}</p>
 	</div>
 	<PlayOverlayButton
 		{playing}

@@ -1,6 +1,7 @@
 package innertube
 
 import (
+	"regexp"
 	"slices"
 	"strconv"
 	"strings"
@@ -38,7 +39,22 @@ func parseSong(item listItem) (music.Track, bool) {
 		Album:           parseAlbum(slices.Concat(item.subtitleRuns(), item.column(2), item.column(3))),
 		DurationSeconds: parseRowDuration(item, segments),
 		Thumbnails:      parseThumbnails(item.thumbnails()),
+		PlayCount:       parsePlayCount(item.allColumnRuns()),
 	}, true
+}
+
+// playCountPattern matches YouTube's count segments: "6.2M plays", "922K views", "1 view".
+var playCountPattern = regexp.MustCompile(`^[\d.,]+[KMB]? (plays?|views?)$`)
+
+// parsePlayCount returns the first play or view count among runs, as shown.
+func parsePlayCount(runs []run) string {
+	for _, textRun := range runs {
+		text := strings.TrimSpace(textRun.Text)
+		if playCountPattern.MatchString(text) {
+			return text
+		}
+	}
+	return ""
 }
 
 // typeLabels are the leading "Song • " style segments unfiltered search puts before the details.

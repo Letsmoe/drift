@@ -99,6 +99,26 @@ func TestFeedExcludesDislikedTracks(t *testing.T) {
 	}
 }
 
+// TestProfileExcludesEpisodesOfBlockedShows checks "Don't recommend" for a podcast show.
+func TestProfileExcludesEpisodesOfBlockedShows(t *testing.T) {
+	environment := newTestEnvironment(t)
+	ctx := context.Background()
+	if err := environment.library.BlockRecommendation(ctx, library.BlockPodcast, "MPSPshow", "Show"); err != nil {
+		t.Fatal(err)
+	}
+
+	profile, err := environment.engine.Profile(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !profile.excludes(makeTrack("episode1", "", "MPSPshow")) {
+		t.Error("an episode of a blocked show must be excluded")
+	}
+	if profile.excludes(makeTrack("episode2", "", "MPSPother")) {
+		t.Error("episodes of other shows must stay")
+	}
+}
+
 // TestFeedExcludesBlockedTracksAndArtists checks "Don't recommend" for a track and an artist.
 func TestFeedExcludesBlockedTracksAndArtists(t *testing.T) {
 	environment := newTestEnvironment(t)

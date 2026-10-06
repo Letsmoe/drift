@@ -11,21 +11,22 @@ type BlockKind string
 
 // Block kinds. The values are what the recommendation_block table stores.
 const (
-	BlockTrack  BlockKind = "track"
-	BlockArtist BlockKind = "artist"
+	BlockTrack   BlockKind = "track"
+	BlockArtist  BlockKind = "artist"
+	BlockPodcast BlockKind = "podcast"
 )
 
-// RecommendationBlock is a track or artist the user asked never to be recommended.
+// RecommendationBlock is a track, artist or podcast the user asked never to be recommended.
 type RecommendationBlock struct {
 	Kind BlockKind `json:"kind"`
-	// ID is the video ID of a track or the browse ID of an artist.
+	// ID is the video ID of a track or the browse ID of an artist or podcast show.
 	ID string `json:"id"`
-	// Name is the track title or artist name, for listing the blocks.
+	// Name is the track title, artist name or show title, for listing the blocks.
 	Name      string    `json:"name"`
 	CreatedAt time.Time `json:"createdAt"`
 }
 
-// BlockRecommendation keeps a track or artist out of recommendations and autoplay;
+// BlockRecommendation keeps a track, artist or podcast out of recommendations and autoplay;
 // blocking it again only refreshes its name.
 func (library *Library) BlockRecommendation(ctx context.Context, kind BlockKind, id, name string) error {
 	if id == "" {

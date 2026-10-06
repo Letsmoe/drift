@@ -137,6 +137,7 @@ func parsePanelVideo(video panelVideo) (music.Track, bool) {
 		// The byline ends with the release year, so only lengthText holds the duration.
 		DurationSeconds: parseDuration([][]run{video.LengthText.Runs}),
 		Thumbnails:      parseThumbnails(video.Thumbnail.Thumbnails),
+		PlayCount:       parsePlayCount(byline),
 	}, true
 }
 
@@ -237,6 +238,7 @@ func parseShowEpisode(row episodeRow, show podcastShow) (music.Episode, bool) {
 			Album:           &music.Album{ID: show.ID, Name: show.Title},
 			DurationSeconds: parseSpokenDuration(joinText(duration)),
 			Thumbnails:      parseThumbnails(row.Thumbnail.thumbnails()),
+			PlayCount:       parsePlayCount(row.Subtitle.Runs),
 		},
 		Description: joinText(row.Description.Runs),
 		Published:   lastSegmentText(row.Subtitle.Runs),

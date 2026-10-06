@@ -94,6 +94,7 @@ func parseCard(card twoRowItem) (music.Item, bool) {
 			Title:      title,
 			Artists:    parseLinkedArtists(card.Subtitle.Runs),
 			Thumbnails: thumbnails,
+			PlayCount:  parsePlayCount(card.Subtitle.Runs),
 		}
 		return songItem(track, subtitle), true
 	}
@@ -149,6 +150,7 @@ func parseEpisodeTrack(videoID, title string, subtitle []run, thumbnails []thumb
 		Title:      title,
 		Artists:    []music.Artist{},
 		Thumbnails: parseThumbnails(thumbnails),
+		PlayCount:  parsePlayCount(subtitle),
 	}
 	for _, textRun := range subtitle {
 		if textRun.pageType() == pageTypePodcast {

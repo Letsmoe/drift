@@ -33,7 +33,10 @@
 
 	const visibleTracks = $derived(tracks.slice(0, visibleCount));
 	const showDateAdded = $derived(dateAddedLabels !== undefined);
-	const hasAlbumColumn = $derived(showAlbum && tracks.some((track) => track.album !== undefined));
+	// Rows only show linked albums; a column where none is linked would stay empty.
+	const hasAlbumColumn = $derived(
+		showAlbum && tracks.some((track) => track.album !== undefined && track.album.id !== '')
+	);
 	const gridClass = $derived(gridClassFor(hasAlbumColumn, showDateAdded));
 
 	$effect(() => {

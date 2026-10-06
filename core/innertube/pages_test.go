@@ -39,6 +39,7 @@ func TestAlbum(t *testing.T) {
 		Artists:         wantArtists,
 		Album:           &music.Album{ID: "MPREb_BQHrCwSBM37", Name: "TRON: Legacy"},
 		DurationSeconds: 149,
+		PlayCount:       "16M plays",
 		Thumbnails:      page.Thumbnails,
 	}
 	if !reflect.DeepEqual(page.Tracks[0], wantTrack) {
@@ -197,6 +198,7 @@ func TestPodcast(t *testing.T) {
 		Artists:         []music.Artist{wantAuthor},
 		Album:           &music.Album{ID: "MPSPPLOrNU6aQc_Z4", Name: "The Pop Culture Shuffle"},
 		DurationSeconds: 34 * 60,
+		PlayCount:       "1 view",
 	}
 	if got := withoutTrackThumbnails(episode.Track); !reflect.DeepEqual(got, wantTrack) {
 		t.Errorf("track = %+v, want %+v", got, wantTrack)

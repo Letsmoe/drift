@@ -52,7 +52,8 @@ func TestHome(t *testing.T) {
 				{ID: "UCU6cE7pdJPc6DU2jSrKEsdQ", Name: "Drake"},
 				{ID: "UCSzWQmDsKG37iKN2vw1G-2Q", Name: "Don Toliver"},
 			},
-			Album: &music.Album{ID: "MPREb_L2anhKI1Knd", Name: "HABIBTI (FOMO)"},
+			Album:     &music.Album{ID: "MPREb_L2anhKI1Knd", Name: "HABIBTI (FOMO)"},
+			PlayCount: "6.2M plays",
 		},
 	}
 	if !reflect.DeepEqual(song, wantSong) {
@@ -122,6 +123,7 @@ func TestPodcastsHome(t *testing.T) {
 			Artists:         []music.Artist{show},
 			Album:           &music.Album{ID: "MPSPPLc-YUx4BNhJZFkHcZT-TPTR_6X8GhTApW", Name: "Deep Dive History"},
 			DurationSeconds: 111 * 60,
+			PlayCount:       "922K views",
 		},
 	}
 	if !reflect.DeepEqual(episode, wantEpisode) {
