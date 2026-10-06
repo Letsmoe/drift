@@ -1156,6 +1156,7 @@ export namespace queue {
 	    kind: string;
 	    autoplay: boolean;
 	    magic: boolean;
+	    played: boolean;
 	
 	    static createFrom(source: any = {}) {
 	        return new Entry(source);
@@ -1168,6 +1169,7 @@ export namespace queue {
 	        this.kind = source["kind"];
 	        this.autoplay = source["autoplay"];
 	        this.magic = source["magic"];
+	        this.played = source["played"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

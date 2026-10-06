@@ -360,3 +360,21 @@ func waitUntilIdle(t *testing.T, queue *Queue) {
 	}
 	t.Fatalf("extension never finished")
 }
+
+func TestOnlyEntriesThatWereCurrentArePlayed(t *testing.T) {
+	queue := newTestQueue()
+	queue.Play(tracksNamed("a", "b", "c", "d", "e"), music.ItemKindSong, 3, "")
+	queue.Next()
+
+	queue.Previous()
+	state := queue.Previous()
+	played := []string{}
+	for _, entry := range state.Entries {
+		if entry.Played {
+			played = append(played, entry.Track.VideoID)
+		}
+	}
+	if !slices.Equal(played, []string{"c", "d", "e"}) {
+		t.Errorf("played = %v, want [c d e]", played)
+	}
+}

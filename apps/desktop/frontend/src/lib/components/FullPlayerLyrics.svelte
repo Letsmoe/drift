@@ -11,15 +11,23 @@
 
 	const activeIndex = $derived(lyricsView.activeLineIndex(player.currentTime));
 	const synced = $derived(lyricsView.lyrics?.synced === true);
-	let activeLine = $state<HTMLElement | null>(null);
+	let linesElement = $state<HTMLElement | null>(null);
 	let autoScrollResumesAt = 0;
 
 	// Synced lyrics follow the playback position; plain lyrics have no active line.
 	$effect(() => {
-		if (activeLine && Date.now() >= autoScrollResumesAt) {
-			scrollToActiveLine(activeLine);
+		const line = findLine(linesElement, activeIndex);
+		if (line && Date.now() >= autoScrollResumesAt) {
+			scrollToActiveLine(line);
 		}
 	});
+
+	function findLine(container: HTMLElement | null, index: number): HTMLElement | null {
+		if (!container || index < 0) {
+			return null;
+		}
+		return container.querySelector<HTMLElement>(`[data-line-index="${index}"]`);
+	}
 
 	function scrollToActiveLine(line: HTMLElement): void {
 		const scroller = findScrollParent(line);
@@ -55,6 +63,8 @@
 		if (!synced) {
 			return;
 		}
+		// A click is a pointerdown too; picking a line means following it again.
+		autoScrollResumesAt = 0;
 		player.seek(startMs / 1000);
 	}
 
@@ -81,14 +91,7 @@
 {#snippet lyricLine(text: string, startMs: number, index: number)}
 	<button
 		type="button"
-		bind:this={
-			() => (index === activeIndex ? activeLine : undefined),
-			(element) => {
-				if (index === activeIndex) {
-					activeLine = element;
-				}
-			}
-		}
+		data-line-index={index}
 		disabled={!synced}
 		onclick={() => seekToLine(startMs)}
 		class={[
@@ -127,7 +130,7 @@
 	{#if lyricsView.status === 'loading'}
 		<div class="flex h-full items-center justify-center"><LoadingSpinner size={28} /></div>
 	{:else if lyricsView.status === 'ready' && lyricsView.lyrics}
-		<div class="flex flex-col gap-3 py-[20vh] pr-6">
+		<div bind:this={linesElement} class="flex flex-col gap-3 py-[20vh] pr-6">
 			{#each lyricsView.lyrics.lines as line, index (index)}
 				{#if line.text === ''}
 					<div class="h-6"></div>
