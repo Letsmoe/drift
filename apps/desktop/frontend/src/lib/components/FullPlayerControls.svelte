@@ -3,7 +3,6 @@
 	import HeartIcon from 'phosphor-svelte/lib/HeartIcon';
 	import RepeatIcon from 'phosphor-svelte/lib/RepeatIcon';
 	import RepeatOnceIcon from 'phosphor-svelte/lib/RepeatOnceIcon';
-	import ShuffleIcon from 'phosphor-svelte/lib/ShuffleIcon';
 	import SkipBackIcon from 'phosphor-svelte/lib/SkipBackIcon';
 	import SkipForwardIcon from 'phosphor-svelte/lib/SkipForwardIcon';
 	import PlayOverlayButton from '#lib/components/PlayOverlayButton.svelte';
@@ -11,6 +10,7 @@
 	import { formatDuration } from '#lib/format.ts';
 	import { library } from '#lib/library/library.svelte.ts';
 	import { player } from '#lib/player/player.svelte.ts';
+	import { shuffleIcon, shuffleLabel } from '#lib/player/shuffleMode.ts';
 	import type { ItemKind } from '#lib/api/music.ts';
 
 	const liked = $derived(player.track !== null && library.isLiked(player.track.videoId));
@@ -74,8 +74,16 @@
 	{/if}
 
 	<div class="flex items-center justify-center gap-3">
-		<span class={[player.queue.shuffle && '[&>button]:text-action']}>
-			<Button round variant="ghost" icon={ShuffleIcon} onclick={() => player.toggleShuffle()} />
+		<span
+			title={shuffleLabel(player.queue)}
+			class={[player.queue.shuffle && '[&>button]:text-action']}
+		>
+			<Button
+				round
+				variant="ghost"
+				icon={shuffleIcon(player.queue)}
+				onclick={() => player.cycleShuffle()}
+			/>
 		</span>
 		<Button round variant="ghost" icon={SkipBackIcon} onclick={() => player.previous()} />
 		{#if player.buffering && player.track && !player.errorMessage}

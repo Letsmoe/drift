@@ -85,7 +85,7 @@ func TestEmptyListsEncodeAsArrays(t *testing.T) {
 
 func TestNestedNilSlicesEncodeAsArrays(t *testing.T) {
 	encoded := mustEncode(queue.State{})
-	if encoded != `{"entries":[],"index":0,"shuffle":false,"repeat":"","autoplay":false,"context":""}` {
+	if encoded != `{"entries":[],"index":0,"shuffle":false,"magicShuffle":false,"repeat":"","autoplay":false,"context":""}` {
 		t.Fatalf("state = %s", encoded)
 	}
 }

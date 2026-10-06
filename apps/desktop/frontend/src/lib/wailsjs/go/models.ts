@@ -1155,6 +1155,7 @@ export namespace queue {
 	    track: music.Track;
 	    kind: string;
 	    autoplay: boolean;
+	    magic: boolean;
 	
 	    static createFrom(source: any = {}) {
 	        return new Entry(source);
@@ -1166,6 +1167,7 @@ export namespace queue {
 	        this.track = this.convertValues(source["track"], music.Track);
 	        this.kind = source["kind"];
 	        this.autoplay = source["autoplay"];
+	        this.magic = source["magic"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -1190,6 +1192,7 @@ export namespace queue {
 	    entries: Entry[];
 	    index: number;
 	    shuffle: boolean;
+	    magicShuffle: boolean;
 	    repeat: string;
 	    autoplay: boolean;
 	    context: string;
@@ -1203,6 +1206,7 @@ export namespace queue {
 	        this.entries = this.convertValues(source["entries"], Entry);
 	        this.index = source["index"];
 	        this.shuffle = source["shuffle"];
+	        this.magicShuffle = source["magicShuffle"];
 	        this.repeat = source["repeat"];
 	        this.autoplay = source["autoplay"];
 	        this.context = source["context"];

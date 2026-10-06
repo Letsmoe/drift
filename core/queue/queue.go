@@ -37,6 +37,8 @@ type Entry struct {
 	Kind  music.ItemKind `json:"kind"`
 	// Autoplay marks entries added by the Extender rather than the user.
 	Autoplay bool `json:"autoplay"`
+	// Magic marks recommendations magic shuffle mixed in between the user's entries.
+	Magic bool `json:"magic"`
 }
 
 // State is a snapshot of the queue.
@@ -44,10 +46,12 @@ type State struct {
 	// Entries are in play order: played history, the current entry, upcoming.
 	Entries []Entry `json:"entries"`
 	// Index is the current entry, or -1 when the queue is empty.
-	Index    int        `json:"index"`
-	Shuffle  bool       `json:"shuffle"`
-	Repeat   RepeatMode `json:"repeat"`
-	Autoplay bool       `json:"autoplay"`
+	Index   int  `json:"index"`
+	Shuffle bool `json:"shuffle"`
+	// MagicShuffle is shuffle plus recommendations mixed into the upcoming entries.
+	MagicShuffle bool       `json:"magicShuffle"`
+	Repeat       RepeatMode `json:"repeat"`
+	Autoplay     bool       `json:"autoplay"`
 	// Context says where playback was started, e.g. "album:MPREb_x" or "radio".
 	Context string `json:"context"`
 }
@@ -65,6 +69,13 @@ type Option func(*Queue)
 func WithExtender(extender Extender) Option {
 	return func(queue *Queue) {
 		queue.extender = extender
+	}
+}
+
+// WithRecommender sets the source of magic shuffle's recommendations.
+func WithRecommender(recommender Recommender) Option {
+	return func(queue *Queue) {
+		queue.recommender = recommender
 	}
 }
 
@@ -113,10 +124,17 @@ type Queue struct {
 	generation int
 	extending  bool
 
-	extender Extender
-	onChange func(State)
-	logger   *slog.Logger
-	random   *rand.Rand
+	magic bool
+	// magicPending asks for a magic shuffle mix after the next change; mixing is
+	// true while one runs.
+	magicPending bool
+	mixing       bool
+
+	extender    Extender
+	recommender Recommender
+	onChange    func(State)
+	logger      *slog.Logger
+	random      *rand.Rand
 }
 
 // New returns an empty queue with autoplay on and repeat off.
@@ -147,12 +165,13 @@ func (queue *Queue) stateLocked() State {
 		entries[position] = queued.entry
 	}
 	return State{
-		Entries:  entries,
-		Index:    queue.index,
-		Shuffle:  queue.shuffle,
-		Repeat:   queue.repeat,
-		Autoplay: queue.autoplay,
-		Context:  queue.context,
+		Entries:      entries,
+		Index:        queue.index,
+		Shuffle:      queue.shuffle,
+		MagicShuffle: queue.magic,
+		Repeat:       queue.repeat,
+		Autoplay:     queue.autoplay,
+		Context:      queue.context,
 	}
 }
 
@@ -169,9 +188,11 @@ func (queue *Queue) apply(change func() bool) State {
 	queue.renumberLocked()
 	state := queue.stateLocked()
 	request := queue.extensionRequestLocked()
+	mix := queue.mixRequestLocked()
 	queue.mutex.Unlock()
 	queue.notify(state)
 	queue.startExtension(request)
+	queue.startMix(mix)
 	return state
 }
 

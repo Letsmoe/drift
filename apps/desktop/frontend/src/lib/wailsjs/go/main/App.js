@@ -198,6 +198,10 @@ export function QueueSetAutoplay(arg1) {
   return window['go']['main']['App']['QueueSetAutoplay'](arg1);
 }
 
+export function QueueSetMagicShuffle(arg1) {
+  return window['go']['main']['App']['QueueSetMagicShuffle'](arg1);
+}
+
 export function QueueSetRepeat(arg1) {
   return window['go']['main']['App']['QueueSetRepeat'](arg1);
 }

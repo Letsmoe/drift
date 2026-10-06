@@ -26,6 +26,7 @@ func (queue *Queue) Play(tracks []music.Track, kind music.ItemKind, startIndex i
 		if queue.shuffle {
 			queue.moveCurrentToFrontAndShuffleRestLocked()
 		}
+		queue.requestMixLocked()
 		return true
 	})
 }
@@ -106,7 +107,8 @@ func (queue *Queue) Jump(entryID int64) State {
 }
 
 // SetShuffle shuffles the upcoming entries (the current one stays) or, when
-// turned off, puts them back in insertion order.
+// turned off, puts them back in insertion order. Turning it off also ends
+// magic shuffle and removes its upcoming recommendations.
 func (queue *Queue) SetShuffle(enabled bool) State {
 	return queue.apply(func() bool {
 		if queue.shuffle == enabled {
@@ -115,9 +117,12 @@ func (queue *Queue) SetShuffle(enabled bool) State {
 		queue.shuffle = enabled
 		if enabled {
 			queue.shuffleUpcomingLocked()
-		} else {
-			queue.restoreUpcomingOrderLocked()
+			return true
 		}
+		if queue.magic {
+			queue.disableMagicLocked()
+		}
+		queue.restoreUpcomingOrderLocked()
 		return true
 	})
 }
