@@ -4,7 +4,7 @@ import type { QueueEntry, QueueState } from '#lib/api/queue.ts';
 export type UpcomingEntry = { entry: QueueEntry; index: number };
 
 export type QueueSections = {
-	/** Entries played before the current one, oldest first. */
+	/** Entries played before the current one, oldest first. Unplayed earlier entries are left out. */
 	played: UpcomingEntry[];
 	nowPlaying: QueueEntry | undefined;
 	/** The user's entries, with magic shuffle's recommendations mixed in. */
@@ -17,7 +17,10 @@ export function splitQueue(state: QueueState): QueueSections {
 	const queued: UpcomingEntry[] = [];
 	const autoplay: UpcomingEntry[] = [];
 	for (let index = 0; index < state.index; index += 1) {
-		played.push({ entry: state.entries[index], index });
+		const entry = state.entries[index];
+		if (entry.played) {
+			played.push({ entry, index });
+		}
 	}
 	for (let index = state.index + 1; index < state.entries.length; index += 1) {
 		const entry = state.entries[index];

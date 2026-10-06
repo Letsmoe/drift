@@ -39,6 +39,9 @@ type Entry struct {
 	Autoplay bool `json:"autoplay"`
 	// Magic marks recommendations magic shuffle mixed in between the user's entries.
 	Magic bool `json:"magic"`
+	// Played marks entries that have been current. Entries before the current one
+	// can be unplayed: Play keeps the tracks before its start track for Previous.
+	Played bool `json:"played"`
 }
 
 // State is a snapshot of the queue.
@@ -186,6 +189,7 @@ func (queue *Queue) apply(change func() bool) State {
 		return state
 	}
 	queue.renumberLocked()
+	queue.markCurrentPlayedLocked()
 	state := queue.stateLocked()
 	request := queue.extensionRequestLocked()
 	mix := queue.mixRequestLocked()
@@ -194,6 +198,12 @@ func (queue *Queue) apply(change func() bool) State {
 	queue.startExtension(request)
 	queue.startMix(mix)
 	return state
+}
+
+func (queue *Queue) markCurrentPlayedLocked() {
+	if queue.index >= 0 {
+		queue.items[queue.index].entry.Played = true
+	}
 }
 
 func (queue *Queue) notify(state State) {
