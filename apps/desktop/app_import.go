@@ -3,9 +3,6 @@ package main
 import (
 	"context"
 	"errors"
-	"fmt"
-
-	"github.com/wailsapp/wails/v2/pkg/runtime"
 
 	"github.com/neoworks/otter-music/core/importer"
 )
@@ -59,20 +56,20 @@ func (app *App) startImport(source importer.Source, options importer.Options) er
 		return err
 	}
 	return runner.Start(app.ctx, source, options,
-		func(progress importer.Progress) { runtime.EventsEmit(app.ctx, importProgressEvent, progress) },
+		func(progress importer.Progress) { app.emit(importProgressEvent, progress) },
 		app.reportImportEnd)
 }
 
 func (app *App) reportImportEnd(result importer.Result, err error) {
 	if errors.Is(err, context.Canceled) {
-		runtime.EventsEmit(app.ctx, importErrorEvent, importCancelledMessage)
+		app.emit(importErrorEvent, importCancelledMessage)
 		return
 	}
 	if err != nil {
-		runtime.EventsEmit(app.ctx, importErrorEvent, err.Error())
+		app.emit(importErrorEvent, err.Error())
 		return
 	}
-	runtime.EventsEmit(app.ctx, importDoneEvent, result)
+	app.emit(importDoneEvent, result)
 }
 
 // CancelImport stops the running import, whatever its source.
@@ -80,31 +77,4 @@ func (app *App) CancelImport() {
 	if app.importer != nil {
 		app.importer.Cancel()
 	}
-}
-
-// PickSpotifyExport opens a file picker for the data export zip or a JSON
-// file; it returns an empty path when the user cancels.
-func (app *App) PickSpotifyExport() (string, error) {
-	path, err := runtime.OpenFileDialog(app.ctx, runtime.OpenDialogOptions{
-		Title: "Choose your Spotify data export",
-		Filters: []runtime.FileFilter{
-			{DisplayName: "Spotify export (*.zip, *.json)", Pattern: "*.zip;*.json"},
-		},
-	})
-	if err != nil {
-		return "", fmt.Errorf("open file dialog: %w", err)
-	}
-	return path, nil
-}
-
-// PickSpotifyExportFolder opens a folder picker for an extracted data export;
-// it returns an empty path when the user cancels.
-func (app *App) PickSpotifyExportFolder() (string, error) {
-	path, err := runtime.OpenDirectoryDialog(app.ctx, runtime.OpenDialogOptions{
-		Title: "Choose the extracted Spotify data folder",
-	})
-	if err != nil {
-		return "", fmt.Errorf("open folder dialog: %w", err)
-	}
-	return path, nil
 }

@@ -6,8 +6,8 @@ import {
 	YouTubeSignInFromBrowser,
 	YouTubeSignInWithCookies,
 	YouTubeSignOut
-} from '#lib/wailsjs/go/main/App.js';
-import type { account, browsercookies } from '#lib/wailsjs/go/models.ts';
+} from '#lib/backend/generated/App.ts';
+import type { account, browsercookies } from '#lib/backend/generated/models.ts';
 import type { ImportOptions, ImportSummary } from '#lib/api/musicImport.ts';
 
 export type AccountStatus = account.Status;

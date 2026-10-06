@@ -5,14 +5,12 @@ import (
 	"errors"
 	"path/filepath"
 
-	"github.com/wailsapp/wails/v2/pkg/runtime"
-
 	"github.com/neoworks/otter-music/core/download"
 	"github.com/neoworks/otter-music/core/music"
 	"github.com/neoworks/otter-music/core/stream"
 )
 
-// downloadsEvent is the Wails event carrying every download.Update.
+// downloadsEvent is the event carrying every download.Update.
 const downloadsEvent = "downloads"
 
 var errDownloadsUnavailable = errors.New("downloads need the local library, which could not be opened")
@@ -43,7 +41,7 @@ func (app *App) startDownloads() {
 }
 
 func (app *App) emitDownloadUpdate(update download.Update) {
-	runtime.EventsEmit(app.ctx, downloadsEvent, update)
+	app.emit(downloadsEvent, update)
 }
 
 func (app *App) requireDownloads() (*download.Manager, error) {

@@ -9,6 +9,7 @@ storybook-static/
 
 # desktop
 apps/desktop/build/bin/
+apps/desktop/build/electron/
 apps/desktop/frontend/package.json.md5
 apps/desktop/frontend/build/*
 !apps/desktop/frontend/build/.gitkeep

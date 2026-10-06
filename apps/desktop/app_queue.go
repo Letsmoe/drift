@@ -3,13 +3,11 @@ package main
 import (
 	"context"
 
-	"github.com/wailsapp/wails/v2/pkg/runtime"
-
 	"github.com/neoworks/otter-music/core/music"
 	"github.com/neoworks/otter-music/core/queue"
 )
 
-// queueEvent is the Wails event carrying every new queue.State.
+// queueEvent is the event carrying every new queue.State.
 const queueEvent = "queue"
 
 // QueueStep is the result of QueueNext and QueueAdvance. Moved is false when
@@ -49,10 +47,7 @@ func (app *App) newQueue() *queue.Queue {
 }
 
 func (app *App) emitQueueState(state queue.State) {
-	if app.ctx == nil {
-		return
-	}
-	runtime.EventsEmit(app.ctx, queueEvent, state)
+	app.emit(queueEvent, state)
 }
 
 // QueueState returns the current queue.

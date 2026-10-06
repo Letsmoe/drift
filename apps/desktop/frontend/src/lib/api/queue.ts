@@ -14,9 +14,9 @@ import {
 	QueueSetRepeat,
 	QueueSetShuffle,
 	QueueState as fetchQueueState
-} from '#lib/wailsjs/go/main/App.js';
-import { EventsOn } from '#lib/wailsjs/runtime/runtime.js';
-import { queue, type main } from '#lib/wailsjs/go/models.ts';
+} from '#lib/backend/generated/App.ts';
+import { onEvent } from '#lib/backend/rpc.ts';
+import type { main, queue } from '#lib/backend/generated/models.ts';
 import type { ItemKind, Track } from '#lib/api/music.ts';
 
 export type QueueState = queue.State;
@@ -26,7 +26,7 @@ export type RepeatMode = 'off' | 'all' | 'one';
 
 /** The state of a queue with nothing in it. */
 export function emptyQueueState(): QueueState {
-	return queue.State.createFrom({
+	return {
 		entries: [],
 		index: -1,
 		shuffle: false,
@@ -34,7 +34,7 @@ export function emptyQueueState(): QueueState {
 		repeat: 'off',
 		autoplay: true,
 		context: ''
-	});
+	};
 }
 
 const queueEventName = 'queue';
@@ -45,7 +45,7 @@ export function queueState(): Promise<QueueState> {
 
 /** Subscribes to every queue change, including autoplay extensions. Returns the unsubscribe function. */
 export function onQueueChange(callback: (state: QueueState) => void): () => void {
-	return EventsOn(queueEventName, callback);
+	return onEvent(queueEventName, callback);
 }
 
 export function queuePlay(

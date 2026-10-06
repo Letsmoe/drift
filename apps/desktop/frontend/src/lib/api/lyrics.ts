@@ -1,4 +1,4 @@
-import { Lyrics } from '#lib/wailsjs/go/main/App.js';
+import { Lyrics } from '#lib/backend/generated/App.ts';
 import type { Lyrics as LyricsPage, Track } from '#lib/api/music.ts';
 
 export type { LyricLine, Lyrics } from '#lib/api/music.ts';

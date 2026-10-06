@@ -1,6 +1,6 @@
-import { CancelImport } from '#lib/wailsjs/go/main/App.js';
-import type { importer } from '#lib/wailsjs/go/models.ts';
-import { EventsOn } from '#lib/wailsjs/runtime/runtime.js';
+import { CancelImport } from '#lib/backend/generated/App.ts';
+import type { importer } from '#lib/backend/generated/models.ts';
+import { onEvent } from '#lib/backend/rpc.ts';
 
 export type ImportSummary = importer.Summary;
 export type ImportOptions = importer.Options;
@@ -63,9 +63,9 @@ export interface ImportListener {
 
 /** Listens to the events of a running import; returns the function that stops listening. */
 export function listenToImport(listener: ImportListener): () => void {
-	const stopProgress = EventsOn('import-progress', listener.onProgress);
-	const stopDone = EventsOn('import-done', listener.onDone);
-	const stopError = EventsOn('import-error', listener.onError);
+	const stopProgress = onEvent('import-progress', listener.onProgress);
+	const stopDone = onEvent('import-done', listener.onDone);
+	const stopError = onEvent('import-error', listener.onError);
 	return () => {
 		stopProgress();
 		stopDone();

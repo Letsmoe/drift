@@ -1,0 +1,65 @@
+{
+	"name": "otter-music",
+	"productName": "Otter Music",
+	"description": "YouTube Music player",
+	"version": "0.0.1",
+	"private": true,
+	"type": "module",
+	"main": "dist/main.js",
+	"desktopName": "otter-music.desktop",
+	"author": "Moritz Utcke <moritz.utcke@gmx.de>",
+	"scripts": {
+		"build": "bun build src/main.ts --target node --format esm --external electron --outfile dist/main.js && bun build src/preload.ts --target node --format cjs --external electron --outfile dist/preload.cjs",
+		"check": "tsc --noEmit"
+	},
+	"devDependencies": {
+		"@types/node": "^26.6.4",
+		"electron": "^44.6.0",
+		"electron-builder": "^26.15.3",
+		"typescript": "^7.0.2"
+	},
+	"build": {
+		"appId": "dev.neoworks.ottermusic",
+		"productName": "Otter Music",
+		"directories": {
+			"output": "../build/electron"
+		},
+		"files": [
+			"dist/**",
+			"package.json"
+		],
+		"npmRebuild": false,
+		"extraResources": [
+			{
+				"from": "../build/bin",
+				"to": "backend",
+				"filter": [
+					"otter-music-backend*"
+				]
+			},
+			{
+				"from": "../build/appicon.png",
+				"to": "icon.png"
+			}
+		],
+		"icon": "../build/appicon.png",
+		"linux": {
+			"executableName": "otter-music",
+			"category": "AudioVideo",
+			"target": [
+				"dir",
+				"AppImage"
+			]
+		},
+		"mac": {
+			"target": [
+				"dir"
+			]
+		},
+		"win": {
+			"target": [
+				"dir"
+			]
+		}
+	}
+}

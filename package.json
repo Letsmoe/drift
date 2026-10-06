@@ -3,18 +3,19 @@
 	"private": true,
 	"type": "module",
 	"workspaces": [
-		"apps/desktop/frontend"
+		"apps/desktop/frontend",
+		"apps/desktop/electron"
 	],
 	"scripts": {
-		"desktop:dev": "cd apps/desktop && wails dev -tags webkit2_41",
-		"desktop:build": "cd apps/desktop && wails build -tags webkit2_41",
-		"desktop:start": "./apps/desktop/build/bin/otter-music",
+		"desktop:dev": "bun scripts/desktop-dev.ts",
+		"desktop:build": "cd apps/desktop/frontend && bun run build && cd .. && go build -trimpath -ldflags='-s -w' -o build/bin/otter-music-backend . && cd electron && bun run build && bun x electron-builder --dir",
+		"desktop:start": "./apps/desktop/build/electron/linux-unpacked/otter-music",
 		"desktop:install": "bun run desktop:build && bun scripts/install-desktop.ts",
-		"bindings": "cd apps/desktop && wails generate module -tags webkit2_41",
-		"test": "cd core && go test ./...",
+		"bindings": "cd apps/desktop && go run . -bindings frontend/src/lib/backend/generated && prettier --write --log-level warn frontend/src/lib/backend/generated",
+		"test": "cd core && go test ./... && cd ../apps/desktop && go test ./...",
 		"lint": "bun run lint:go && bun run lint:frontend",
-		"lint:go": "cd core && golangci-lint run && cd ../apps/desktop && golangci-lint run --build-tags webkit2_41",
-		"lint:frontend": "prettier --check . && cd apps/desktop/frontend && bun run lint && bun run check",
+		"lint:go": "cd core && golangci-lint run && cd ../apps/desktop && golangci-lint run",
+		"lint:frontend": "prettier --check . && cd apps/desktop/frontend && bun run lint && bun run check && cd ../electron && bun run check",
 		"format": "bun run format:go && prettier --write .",
 		"format:go": "cd core && golangci-lint fmt && cd ../apps/desktop && golangci-lint fmt",
 		"tools": "go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest golang.org/x/mobile/cmd/gomobile@latest golang.org/x/mobile/cmd/gobind@latest",

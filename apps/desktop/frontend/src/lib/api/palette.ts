@@ -1,5 +1,5 @@
-import { CoverColors } from '#lib/wailsjs/go/main/App.js';
-import type { palette } from '#lib/wailsjs/go/models.ts';
+import { CoverColors } from '#lib/backend/generated/App.ts';
+import type { palette } from '#lib/backend/generated/models.ts';
 
 export type Palette = palette.Palette;
 

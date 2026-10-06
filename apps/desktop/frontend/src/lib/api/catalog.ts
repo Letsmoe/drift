@@ -13,7 +13,7 @@ import {
 	Search,
 	SearchSongs,
 	SearchSuggestions
-} from '#lib/wailsjs/go/main/App.js';
+} from '#lib/backend/generated/App.ts';
 import type {
 	AlbumPage,
 	ArtistPage,
