@@ -100,18 +100,11 @@ export function trackKindOf(track: Track): 'song' | 'episode' {
 	return 'song';
 }
 
-/** The page a track opens: its album (an episode's show), else its first linked artist. */
-export function trackHref(track: Track): string | undefined {
+/** The page a track opens: an episode's podcast show, else the song's own page. */
+export function trackHref(track: Track): string {
 	const albumId = track.album?.id;
 	if (albumId && isEpisodeTrack(track)) {
 		return itemHref('podcast', albumId);
 	}
-	if (albumId) {
-		return itemHref('album', albumId);
-	}
-	const artist = track.artists.find((linked) => linked.id !== '');
-	if (artist) {
-		return itemHref('artist', artist.id);
-	}
-	return undefined;
+	return itemHref('song', track.videoId);
 }

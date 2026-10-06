@@ -3,7 +3,9 @@
 	import { Button, LoadingSpinner } from '@neoworks-dev/ui';
 	import ArrowClockwiseIcon from 'phosphor-svelte/lib/ArrowClockwiseIcon';
 	import RecommendationSection from '#lib/components/RecommendationSection.svelte';
+	import FeaturedPodcast from '#lib/components/FeaturedPodcast.svelte';
 	import ShelfRow from '#lib/components/ShelfRow.svelte';
+	import type { Item } from '#lib/api/music.ts';
 	import { HomeFeed, type HomeFilter } from '#lib/home/homeFeed.svelte.ts';
 	import { Recommendations } from '#lib/recommend/recommendations.svelte.ts';
 
@@ -18,6 +20,19 @@
 		{ value: 'podcasts', label: 'Podcasts' }
 	];
 	const showRecommendations = $derived(feed.filter !== 'podcasts');
+	const featuredPodcast = $derived(pickFeaturedPodcast());
+
+	// The Podcasts tab opens with one show presented large: the first of the directory.
+	function pickFeaturedPodcast(): Item | undefined {
+		if (feed.filter !== 'podcasts') {
+			return undefined;
+		}
+		const firstShelf = feed.visibleShelves[0];
+		if (!firstShelf) {
+			return undefined;
+		}
+		return firstShelf.items.find((item) => item.kind === 'podcast');
+	}
 </script>
 
 {#snippet sectionStatus(status: string, message: string)}
@@ -86,6 +101,11 @@
 	{:else if feed.status === 'failed'}
 		<p class="py-24 text-center text-sm text-red">{feed.errorMessage}</p>
 	{:else}
+		{#if featuredPodcast}
+			<div class="px-3">
+				<FeaturedPodcast item={featuredPodcast} />
+			</div>
+		{/if}
 		{#each feed.visibleShelves as shelf, index (index)}
 			<ShelfRow {shelf} />
 		{/each}

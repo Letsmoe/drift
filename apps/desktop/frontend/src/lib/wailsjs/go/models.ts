@@ -718,6 +718,8 @@ export namespace music {
 	    subtitle: string;
 	    thumbnails: Thumbnail[];
 	    track?: Track;
+	    description?: string;
+	    published?: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new Item(source);
@@ -731,6 +733,8 @@ export namespace music {
 	        this.subtitle = source["subtitle"];
 	        this.thumbnails = this.convertValues(source["thumbnails"], Thumbnail);
 	        this.track = this.convertValues(source["track"], Track);
+	        this.description = source["description"];
+	        this.published = source["published"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

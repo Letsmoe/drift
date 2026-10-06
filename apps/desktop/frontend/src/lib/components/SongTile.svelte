@@ -43,16 +43,16 @@
 	role="group"
 	aria-label={track.title}
 	class={[
-		'group/tile duration-fast relative flex h-14 items-center gap-3 overflow-hidden rounded-md pr-2 transition-colors',
+		'group/tile duration-fast relative flex h-18 items-center gap-3 overflow-hidden rounded-md pr-2 transition-colors',
 		current && 'bg-hover ring-1 ring-action/40',
 		!current && 'bg-raised hover:bg-hover'
 	]}
 	{@attach whenVisible(reportVisible)}
 	oncontextmenu={(event) => contextMenu.openAtPointer(event)}
 >
-	<Cover thumbnails={track.thumbnails} size={56} class="h-full shrink-0" />
+	<Cover thumbnails={track.thumbnails} size={72} class="h-full shrink-0" />
 	<div class="min-w-0 flex-1">
-		<p class="truncate text-sm font-semibold" class:text-action={current}>
+		<p class="truncate text-base font-semibold" class:text-action={current}>
 			{#if pageHref}
 				<!-- Stretched over the tile: the whole tile opens the page, the play button sits above it. -->
 				<a href={pageHref} class="after:absolute after:inset-0">{track.title}</a>
@@ -60,7 +60,7 @@
 				{track.title}
 			{/if}
 		</p>
-		<p class="truncate text-xs text-dim">{formatTrackByline(track)}</p>
+		<p class="truncate text-sm text-dim">{formatTrackByline(track)}</p>
 	</div>
 	<PlayOverlayButton
 		{playing}

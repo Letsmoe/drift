@@ -14,7 +14,7 @@
 	import { formatSongCount } from '#lib/format.ts';
 	import { collectionMenuEntries } from '#lib/menu/collectionMenuEntries.ts';
 	import { RemoteResource } from '#lib/pages/remoteResource.svelte.ts';
-	import { playContext } from '#lib/player/contextPlayback.ts';
+	import { playContext, shufflePlayContext } from '#lib/player/contextPlayback.ts';
 
 	const context = 'liked';
 	const resource = new RemoteResource(() => likedTracks());
@@ -52,7 +52,12 @@
 				<span>{formatSongCount(tracks.length)}</span>
 			{/snippet}
 		</PageHeader>
-		<PlaylistActionRow {context} title="Liked Songs" onplay={() => playContext(tracks, context)}>
+		<PlaylistActionRow
+			{context}
+			title="Liked Songs"
+			onplay={() => playContext(tracks, context)}
+			onshuffle={() => shufflePlayContext(tracks, context)}
+		>
 			<CollectionDownloadButton kind="likes" id={likedCollectionId} title="Liked Songs" />
 			<MoreMenuButton buildEntries={() => collectionMenuEntries(tracks)} />
 		</PlaylistActionRow>

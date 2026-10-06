@@ -201,7 +201,10 @@
 	</div>
 
 	<div class="flex flex-col items-center gap-1">
-		<div class="flex items-center gap-2">
+		<div
+			class={['flex items-center gap-2', !player.track && 'pointer-events-none opacity-40']}
+			aria-disabled={!player.track}
+		>
 			<ToggleIconButton
 				icon={ShuffleIcon}
 				label={shuffleLabel()}
@@ -242,6 +245,8 @@
 
 		{#if player.errorMessage}
 			<p class="h-4 text-xs text-red">{player.errorMessage}</p>
+		{:else if !player.track}
+			<p class="h-4 text-xs text-dim">Pick something to play</p>
 		{:else}
 			<div class="flex w-full items-center gap-2">
 				<span class="w-10 text-right text-xs text-dim tabular-nums">

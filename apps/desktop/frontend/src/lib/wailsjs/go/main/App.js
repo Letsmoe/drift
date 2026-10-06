@@ -146,8 +146,12 @@ export function PodcastContinuation(arg1) {
   return window['go']['main']['App']['PodcastContinuation'](arg1);
 }
 
-export function PodcastsHome() {
-  return window['go']['main']['App']['PodcastsHome']();
+export function PodcastShows() {
+  return window['go']['main']['App']['PodcastShows']();
+}
+
+export function PodcastShowsContinuation(arg1) {
+  return window['go']['main']['App']['PodcastShowsContinuation'](arg1);
 }
 
 export function QueueAdd(arg1) {

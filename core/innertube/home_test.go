@@ -3,6 +3,7 @@ package innertube
 import (
 	"encoding/json"
 	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/neoworks/otter-music/core/music"
@@ -126,6 +127,11 @@ func TestPodcastsHome(t *testing.T) {
 			PlayCount:       "922K views",
 		},
 	}
+	if !strings.HasPrefix(episode.Description, "The Epic of Gilgamesh is the oldest") || episode.Published != "Jul 29" {
+		t.Errorf("description = %q, published = %q", episode.Description, episode.Published)
+	}
+	episode.Description = ""
+	episode.Published = ""
 	if !reflect.DeepEqual(episode, wantEpisode) {
 		t.Errorf("episode = %+v %+v, want %+v %+v", episode, episode.Track, wantEpisode, wantEpisode.Track)
 	}

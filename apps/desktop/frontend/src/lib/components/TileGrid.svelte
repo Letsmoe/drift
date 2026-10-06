@@ -4,13 +4,20 @@
 	let {
 		count,
 		tile,
-		collapsedRows = 2
-	}: { count: number; tile: Snippet<[number]>; collapsedRows?: number } = $props();
+		collapsedRows = 2,
+		columns: columnTemplate = 'repeat(auto-fill, minmax(20rem, 1fr))'
+	}: {
+		count: number;
+		tile: Snippet<[number]>;
+		collapsedRows?: number;
+		/** CSS grid-template-columns; the default fits as many 20rem columns as there is room for. */
+		columns?: string;
+	} = $props();
 
-	let columns = $state(1);
+	let columnCount = $state(1);
 	let expanded = $state(false);
 
-	const collapsedCount = $derived(columns * collapsedRows);
+	const collapsedCount = $derived(columnCount * collapsedRows);
 	const collapsible = $derived(count > collapsedCount);
 	const shownCount = $derived(visibleCount());
 	const toggleLabel = $derived(buildToggleLabel());
@@ -32,7 +39,7 @@
 	// The grid fills its width with as many columns as fit; read back how many that is.
 	function measureColumns(grid: HTMLDivElement) {
 		const observer = new ResizeObserver(() => {
-			columns = getComputedStyle(grid).gridTemplateColumns.split(' ').length;
+			columnCount = getComputedStyle(grid).gridTemplateColumns.split(' ').length;
 		});
 		observer.observe(grid);
 		return () => observer.disconnect();
@@ -40,7 +47,7 @@
 </script>
 
 <div class="flex flex-col gap-2 px-3">
-	<div class="grid grid-cols-[repeat(auto-fill,minmax(16rem,1fr))] gap-2" {@attach measureColumns}>
+	<div class="grid gap-2" style:grid-template-columns={columnTemplate} {@attach measureColumns}>
 		{#each { length: shownCount }, index (index)}
 			{@render tile(index)}
 		{/each}

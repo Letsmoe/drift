@@ -83,7 +83,9 @@ export function Podcast(arg1:string):Promise<music.PodcastPage>;
 
 export function PodcastContinuation(arg1:string):Promise<music.PodcastEpisodes>;
 
-export function PodcastsHome():Promise<music.HomePage>;
+export function PodcastShows():Promise<music.HomePage>;
+
+export function PodcastShowsContinuation(arg1:string):Promise<music.HomePage>;
 
 export function QueueAdd(arg1:Array<music.Track>):Promise<queue.State>;
 

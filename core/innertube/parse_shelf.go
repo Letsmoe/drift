@@ -69,7 +69,10 @@ func parseEpisodeRowItem(row episodeRow) (music.Item, bool) {
 	if !ok {
 		return music.Item{}, false
 	}
-	return episodeItem(episode.Track, show.Title), true
+	item := episodeItem(episode.Track, show.Title)
+	item.Description = episode.Description
+	item.Published = episode.Published
+	return item, true
 }
 
 func parseSongRow(row listItem) (music.Item, bool) {

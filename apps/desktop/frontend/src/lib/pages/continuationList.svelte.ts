@@ -28,6 +28,18 @@ export class ContinuationList<Entry> {
 		this.loadingMore = false;
 	}
 
+	/** Fetches every remaining page, e.g. before searching or sorting the whole list. */
+	async loadAll(): Promise<void> {
+		while (this.hasMore) {
+			const before = this.items.length;
+			await this.loadMore();
+			// A page in flight elsewhere or one that added nothing: stop instead of spinning.
+			if (this.items.length === before) {
+				return;
+			}
+		}
+	}
+
 	async loadMore(): Promise<void> {
 		if (!this.hasMore || this.loadingMore) {
 			return;

@@ -13,7 +13,7 @@
 	import TrackTable from '#lib/components/TrackTable.svelte';
 	import { formatSongCount, formatTotalDuration } from '#lib/format.ts';
 	import { collectionMenuEntries } from '#lib/menu/collectionMenuEntries.ts';
-	import { playContext } from '#lib/player/contextPlayback.ts';
+	import { playContext, shufflePlayContext } from '#lib/player/contextPlayback.ts';
 	import { routeParameter } from '#lib/pages/routeParameter.ts';
 	import { RemoteResource } from '#lib/pages/remoteResource.svelte.ts';
 
@@ -61,6 +61,7 @@
 			{context}
 			title={albumPage.title}
 			onplay={() => playContext(tracks, context)}
+			onshuffle={() => shufflePlayContext(tracks, context)}
 		>
 			<SaveButton
 				item={createItem(

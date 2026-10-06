@@ -10,19 +10,23 @@
 	import PageStatus from '#lib/components/PageStatus.svelte';
 	import PlaylistActionRow from '#lib/components/PlaylistActionRow.svelte';
 	import SaveButton from '#lib/components/SaveButton.svelte';
+	import TrackListControls from '#lib/components/TrackListControls.svelte';
 	import TrackTable from '#lib/components/TrackTable.svelte';
-	import { formatSongCount } from '#lib/format.ts';
+	import { formatSongCount, formatTotalDuration } from '#lib/format.ts';
 	import { collectionMenuEntries } from '#lib/menu/collectionMenuEntries.ts';
 	import { ContinuationList } from '#lib/pages/continuationList.svelte.ts';
+	import { TrackListFilter } from '#lib/pages/trackListFilter.svelte.ts';
 	import { routeParameter } from '#lib/pages/routeParameter.ts';
 	import { RemoteResource } from '#lib/pages/remoteResource.svelte.ts';
-	import { playContext } from '#lib/player/contextPlayback.ts';
+	import { playContext, shufflePlayContext } from '#lib/player/contextPlayback.ts';
 
 	const resource = new RemoteResource(playlist);
 	const trackList = new ContinuationList<Track>(fetchMoreTracks);
 	const playlistId = $derived(routeParameter(page.params.id));
 	const playlistPage = $derived(resource.data);
 	const context = $derived(`playlist:${playlistId}`);
+	const filter = new TrackListFilter();
+	const shownTracks = $derived(filter.apply(trackList.items));
 
 	$effect(() => {
 		resource.load(playlistId);
@@ -34,13 +38,25 @@
 		}
 	});
 
+	// Search and sort cover the whole playlist, not only the pages scrolled so far.
+	$effect(() => {
+		if (filter.active) {
+			trackList.loadAll();
+		}
+	});
+
 	async function fetchMoreTracks(token: string) {
 		const next = await playlistContinuation(token);
 		return { items: next.tracks, continuation: next.continuation };
 	}
 
 	function metaLabel(loaded: PlaylistPage): string {
-		return `${loaded.author} • ${formatSongCount(trackList.items.length)}`;
+		const songs = formatSongCount(trackList.items.length);
+		const length = formatTotalDuration(trackList.items);
+		if (trackList.hasMore) {
+			return `${loaded.author} • ${songs} so far`;
+		}
+		return `${loaded.author} • ${songs}, ${length}`;
 	}
 </script>
 
@@ -48,7 +64,12 @@
 
 {#if playlistPage}
 	<PageShell seed={playlistPage.title}>
-		<PageHeader label="Playlist" title={playlistPage.title} thumbnails={playlistPage.thumbnails}>
+		<PageHeader
+			label="Playlist"
+			title={playlistPage.title}
+			thumbnails={playlistPage.thumbnails}
+			description={playlistPage.description}
+		>
 			{#snippet meta()}
 				<span>{metaLabel(playlistPage)}</span>
 			{/snippet}
@@ -56,7 +77,8 @@
 		<PlaylistActionRow
 			{context}
 			title={playlistPage.title}
-			onplay={() => playContext(trackList.items, context)}
+			onplay={() => playContext(shownTracks, context)}
+			onshuffle={() => shufflePlayContext(shownTracks, context)}
 		>
 			<SaveButton
 				item={createItem(
@@ -70,8 +92,12 @@
 			<CollectionDownloadButton kind="playlist" id={playlistId} title={playlistPage.title} />
 			<MoreMenuButton buildEntries={() => collectionMenuEntries(trackList.items)} />
 		</PlaylistActionRow>
-		<TrackTable tracks={trackList.items} {context} />
-		{#if trackList.hasMore}
+		<TrackListControls {filter} />
+		<TrackTable tracks={shownTracks} {context} />
+		{#if filter.active && shownTracks.length === 0 && !trackList.loadingMore}
+			<p class="py-12 text-center text-sm text-dim">No songs match “{filter.query}”.</p>
+		{/if}
+		{#if trackList.hasMore && !filter.active}
 			<LoadMoreSentinel itemCount={trackList.items.length} onvisible={() => trackList.loadMore()} />
 		{/if}
 	</PageShell>

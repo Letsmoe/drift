@@ -20,7 +20,7 @@
 	import type { MenuEntry } from '#lib/menu/menuEntry.ts';
 	import { routeParameter } from '#lib/pages/routeParameter.ts';
 	import { RemoteResource } from '#lib/pages/remoteResource.svelte.ts';
-	import { playContext } from '#lib/player/contextPlayback.ts';
+	import { playContext, shufflePlayContext } from '#lib/player/contextPlayback.ts';
 
 	type OpenDialog = 'none' | 'edit' | 'delete';
 
@@ -109,7 +109,12 @@
 				<span>{metaLabel()}</span>
 			{/snippet}
 		</PageHeader>
-		<PlaylistActionRow {context} title={playlist.name} onplay={() => playContext(tracks, context)}>
+		<PlaylistActionRow
+			{context}
+			title={playlist.name}
+			onplay={() => playContext(tracks, context)}
+			onshuffle={() => shufflePlayContext(tracks, context)}
+		>
 			<CollectionDownloadButton kind="local" id={playlistId} title={playlist.name} />
 			<MoreMenuButton buildEntries={menuEntries} />
 		</PlaylistActionRow>

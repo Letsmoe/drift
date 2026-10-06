@@ -76,9 +76,14 @@ func (app *App) Home() (music.HomePage, error) {
 	return app.innertube.Home(app.ctx)
 }
 
-// PodcastsHome returns the first page of the home feed's podcasts chip.
-func (app *App) PodcastsHome() (music.HomePage, error) {
-	return app.innertube.PodcastsHome(app.ctx)
+// PodcastShows returns the first page of podcast shows by topic.
+func (app *App) PodcastShows() (music.HomePage, error) {
+	return app.podcasts.Shows(app.ctx)
+}
+
+// PodcastShowsContinuation returns the podcast show shelves continuation points to.
+func (app *App) PodcastShowsContinuation(continuation string) (music.HomePage, error) {
+	return app.podcasts.MoreShows(app.ctx, continuation)
 }
 
 // HomeContinuation returns the home feed page that continuation points to.

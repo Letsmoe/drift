@@ -23,6 +23,10 @@ type Item struct {
 	Thumbnails []Thumbnail `json:"thumbnails"`
 	// Track is set for songs and episodes, the playable kinds.
 	Track *Track `json:"track,omitempty"`
+	// Description and Published are set for episodes when the feed carries
+	// them (the podcasts home feed), e.g. "Jul 29".
+	Description string `json:"description,omitempty"`
+	Published   string `json:"published,omitempty"`
 }
 
 // Shelf is a titled row of items, e.g. "Quick picks" or "New releases".

@@ -6,9 +6,15 @@ func (core *Core) Home() (string, error) {
 	return encodeResult(page, err)
 }
 
-// PodcastsHome returns the first page of the home feed's podcasts chip as music.HomePage JSON.
-func (core *Core) PodcastsHome() (string, error) {
-	page, err := core.innertube.PodcastsHome(core.ctx)
+// PodcastShows returns the first page of podcast shows by topic as music.HomePage JSON.
+func (core *Core) PodcastShows() (string, error) {
+	page, err := core.podcasts.Shows(core.ctx)
+	return encodeResult(page, err)
+}
+
+// PodcastShowsContinuation returns the podcast show shelves token points to.
+func (core *Core) PodcastShowsContinuation(token string) (string, error) {
+	page, err := core.podcasts.MoreShows(core.ctx, token)
 	return encodeResult(page, err)
 }
 

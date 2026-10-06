@@ -120,7 +120,7 @@
 							<FullPlayerLyrics />
 						{:else}
 							<div class="flex flex-col gap-4 pr-4">
-								<UpcomingQueue />
+								<UpcomingQueue size="comfortable" />
 							</div>
 						{/if}
 					</FloatingScrollbar>

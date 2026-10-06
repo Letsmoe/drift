@@ -22,6 +22,21 @@ export function playContext(tracks: Track[], context: string, kind: ItemKind = '
 	player.playTracks(tracks, firstIndex(tracks.length), context, kind);
 }
 
+/** Turns shuffle on and starts the context from a random track, even when it is already playing. */
+export async function shufflePlayContext(
+	tracks: Track[],
+	context: string,
+	kind: ItemKind = 'song'
+): Promise<void> {
+	if (tracks.length === 0) {
+		return;
+	}
+	if (!player.queue.shuffle) {
+		await player.toggleShuffle();
+	}
+	player.playTracks(tracks, firstIndex(tracks.length), context, kind);
+}
+
 function firstIndex(trackCount: number): number {
 	if (!player.queue.shuffle) {
 		return 0;
