@@ -167,7 +167,7 @@ func (channel *nostrChannel) subscribeFrame() ([]byte, error) {
 		"#t":    channel.topics,
 		"since": time.Now().Add(-time.Minute).Unix(),
 	}
-	return marshalNostr([]any{"REQ", "otter-music-" + subscriptionID(channel.topics), filter})
+	return marshalNostr([]any{"REQ", "drift-" + subscriptionID(channel.topics), filter})
 }
 
 // relayConnection keeps one relay subscribed until the channel's context ends.

@@ -5,8 +5,8 @@ interface OpenDialogOptions {
 	filters?: { name: string; extensions: string[] }[];
 }
 
-contextBridge.exposeInMainWorld('otter', {
-	backend: () => ipcRenderer.sendSync('otter:backend'),
-	pickFile: (options: OpenDialogOptions) => ipcRenderer.invoke('otter:pick-file', options),
-	pickFolder: (options: OpenDialogOptions) => ipcRenderer.invoke('otter:pick-folder', options)
+contextBridge.exposeInMainWorld('drift', {
+	backend: () => ipcRenderer.sendSync('drift:backend'),
+	pickFile: (options: OpenDialogOptions) => ipcRenderer.invoke('drift:pick-file', options),
+	pickFolder: (options: OpenDialogOptions) => ipcRenderer.invoke('drift:pick-folder', options)
 });

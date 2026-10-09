@@ -8,7 +8,7 @@ import path from 'node:path';
 const desktopDirectory = path.resolve(import.meta.dirname, '../apps/desktop');
 const frontendDirectory = path.join(desktopDirectory, 'frontend');
 const electronDirectory = path.join(desktopDirectory, 'electron');
-const backendBinary = path.join(desktopDirectory, 'build/bin/otter-music-backend');
+const backendBinary = path.join(desktopDirectory, 'build/bin/drift-backend');
 const devServerPort = await findFreePort();
 const devServerUrl = `http://localhost:${devServerPort}`;
 const devServerTimeoutMs = 30_000;
@@ -63,7 +63,7 @@ await waitForDevServer();
 const electron = spawn('bun', ['x', 'electron', '.'], {
 	cwd: electronDirectory,
 	stdio: 'inherit',
-	env: { ...process.env, OTTER_DEV_URL: devServerUrl, OTTER_BACKEND_BINARY: backendBinary }
+	env: { ...process.env, DRIFT_DEV_URL: devServerUrl, DRIFT_BACKEND_BINARY: backendBinary }
 });
 
 electron.on('exit', (code) => {

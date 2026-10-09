@@ -8,12 +8,12 @@ import (
 )
 
 // TestLiveAccountLibrary reads the library of a real signed-in account. It
-// runs only when OTTER_MUSIC_TEST_COOKIES holds the Cookie header of a
+// runs only when DRIFT_TEST_COOKIES holds the Cookie header of a
 // music.youtube.com session; the cookies are never logged.
 func TestLiveAccountLibrary(t *testing.T) {
-	cookieHeader := os.Getenv("OTTER_MUSIC_TEST_COOKIES")
+	cookieHeader := os.Getenv("DRIFT_TEST_COOKIES")
 	if cookieHeader == "" {
-		t.Skip("OTTER_MUSIC_TEST_COOKIES is not set")
+		t.Skip("DRIFT_TEST_COOKIES is not set")
 	}
 	client := NewAccountClient(Session{CookieHeader: cookieHeader})
 

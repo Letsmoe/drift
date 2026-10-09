@@ -40,7 +40,7 @@
 </script>
 
 <svelte:head>
-	<title>Otter Music</title>
+	<title>Drift</title>
 </svelte:head>
 
 <div

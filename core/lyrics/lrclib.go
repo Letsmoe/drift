@@ -16,7 +16,7 @@ import (
 const (
 	lrclibBaseURL = "https://lrclib.net"
 	// LRCLIB asks clients to identify themselves.
-	lrclibUserAgent = "Otter Music (https://github.com/letsmoe/drift-music)"
+	lrclibUserAgent = "Drift (https://github.com/letsmoe/drift-music)"
 	lrclibTimeout   = 10 * time.Second
 	lrclibSource    = "LRCLIB"
 	// maxDurationDifference is how far (in seconds) a search result may be off the track.

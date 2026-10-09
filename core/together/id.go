@@ -26,9 +26,9 @@ const userIDGroupLength = 4
 // Key derivation salts; changing one makes old and new versions unable to meet.
 // They differ from otter's, so the two apps never answer each other.
 const (
-	roomSalt     = "otter-music-room-v1"
-	inboxSalt    = "otter-music-inbox-v1"
-	presenceSalt = "otter-music-presence-v1"
+	roomSalt     = "drift-room-v1"
+	inboxSalt    = "drift-inbox-v1"
+	presenceSalt = "drift-presence-v1"
 )
 
 // ErrInvalidUserID is returned for text that is not a user ID.

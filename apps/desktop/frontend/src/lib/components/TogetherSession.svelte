@@ -30,7 +30,7 @@
 			return `${hostName} ended the session.`;
 		}
 		if (status === 'failed') {
-			return `Could not reach ${hostName}. They need Otter Music open with a session started.`;
+			return `Could not reach ${hostName}. They need Drift open with a session started.`;
 		}
 		if (hosting) {
 			return 'Friends in your session hear what you hear';
