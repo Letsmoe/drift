@@ -7,11 +7,11 @@ plugins {
 }
 
 android {
-    namespace = "dev.neoworks.ottermusic"
+    namespace = "dev.letsmoe.drift"
     compileSdk = 37
 
     defaultConfig {
-        applicationId = "dev.neoworks.ottermusic"
+        applicationId = "dev.letsmoe.drift"
         minSdk = 26
         targetSdk = 36
         versionCode = 1
@@ -85,7 +85,7 @@ fun pathWithGoLocations(): String {
 // The script skips the build itself when the AAR is newer than the Go sources.
 val buildGoCore = tasks.register<Exec>("buildGoCore") {
     group = "build"
-    description = "Builds the Go core into app/libs/otter-core.aar with gomobile."
+    description = "Builds the Go core into app/libs/drift-core.aar with gomobile."
     workingDir = repositoryRoot
     commandLine(repositoryRoot.resolve("scripts/build-android-core.sh").absolutePath, androidSdkDirectory())
     environment("PATH", pathWithGoLocations())
@@ -96,7 +96,7 @@ tasks.named("preBuild") {
 }
 
 dependencies {
-    implementation(files("libs/otter-core.aar"))
+    implementation(files("libs/drift-core.aar"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.compose)
