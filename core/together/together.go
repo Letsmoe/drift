@@ -29,13 +29,13 @@ import (
 
 	"github.com/pion/webrtc/v4"
 
-	"github.com/neoworks/otter-music/core/library"
-	"github.com/neoworks/otter-music/core/queue"
+	"github.com/letsmoe/drift/core/library"
+	"github.com/letsmoe/drift/core/queue"
 )
 
 const (
 	maxNameLength = 40
-	defaultName   = "Otter listener"
+	defaultName   = "Drift listener"
 	// Invites nobody acted on disappear after this.
 	inviteLifetime = 30 * time.Minute
 )

@@ -6,8 +6,8 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/neoworks/otter-music/core/library"
-	"github.com/neoworks/otter-music/core/music"
+	"github.com/letsmoe/drift/core/library"
+	"github.com/letsmoe/drift/core/music"
 )
 
 // expiringCoverPath marks show covers served as signed URLs (".../pl_c/<id>/studio_square_thumbnail.jpg?sqp=…&rs=…");

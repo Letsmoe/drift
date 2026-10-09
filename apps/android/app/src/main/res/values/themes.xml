@@ -1,5 +1,5 @@
 <resources>
-    <style name="Theme.OtterMusic" parent="android:Theme.Material.NoActionBar">
+    <style name="Theme.Drift" parent="android:Theme.Material.NoActionBar">
         <item name="android:windowBackground">@color/background</item>
         <item name="android:colorBackground">@color/background</item>
         <item name="android:statusBarColor">@android:color/transparent</item>

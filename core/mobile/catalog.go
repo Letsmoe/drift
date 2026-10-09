@@ -1,8 +1,8 @@
 package mobile
 
 import (
-	"github.com/neoworks/otter-music/core/lyrics"
-	"github.com/neoworks/otter-music/core/music"
+	"github.com/letsmoe/drift/core/lyrics"
+	"github.com/letsmoe/drift/core/music"
 )
 
 // Home returns the first page of the home feed as music.HomePage JSON.

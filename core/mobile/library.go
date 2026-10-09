@@ -1,8 +1,8 @@
 package mobile
 
 import (
-	"github.com/neoworks/otter-music/core/library"
-	"github.com/neoworks/otter-music/core/music"
+	"github.com/letsmoe/drift/core/library"
+	"github.com/letsmoe/drift/core/music"
 )
 
 // resumePosition is where an unfinished episode should pick up.

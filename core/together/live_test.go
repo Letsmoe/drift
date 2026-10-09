@@ -7,8 +7,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/neoworks/otter-music/core/music"
-	"github.com/neoworks/otter-music/core/queue"
+	"github.com/letsmoe/drift/core/music"
+	"github.com/letsmoe/drift/core/queue"
 )
 
 // Uses the public relays and STUN servers.

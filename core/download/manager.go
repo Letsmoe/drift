@@ -15,9 +15,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/neoworks/otter-music/core/library"
-	"github.com/neoworks/otter-music/core/music"
-	"github.com/neoworks/otter-music/core/stream"
+	"github.com/letsmoe/drift/core/library"
+	"github.com/letsmoe/drift/core/music"
+	"github.com/letsmoe/drift/core/stream"
 )
 
 const (

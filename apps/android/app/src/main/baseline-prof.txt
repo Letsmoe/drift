@@ -10,7 +10,7 @@ HSPLandroidx/lifecycle/**->**(**)**
 HSPLandroidx/navigation/**->**(**)**
 HSPLandroidx/activity/**->**(**)**
 HSPLcoil3/**->**(**)**
-HSPLdev/neoworks/ottermusic/**->**(**)**
+HSPLdev/letsmoe/drift/**->**(**)**
 Landroidx/compose/runtime/**;
 Landroidx/compose/ui/**;
 Landroidx/compose/foundation/**;
@@ -18,4 +18,4 @@ Landroidx/compose/animation/**;
 Landroidx/compose/material3/**;
 Landroidx/navigation/**;
 Lcoil3/**;
-Ldev/neoworks/ottermusic/**;
+Ldev/letsmoe/drift/**;

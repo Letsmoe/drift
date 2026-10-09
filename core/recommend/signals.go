@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/neoworks/otter-music/core/library"
+	"github.com/letsmoe/drift/core/library"
 )
 
 // signal is one weighted user interaction with a track.

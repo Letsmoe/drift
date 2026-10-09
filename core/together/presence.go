@@ -7,8 +7,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/neoworks/otter-music/core/music"
-	"github.com/neoworks/otter-music/core/queue"
+	"github.com/letsmoe/drift/core/music"
+	"github.com/letsmoe/drift/core/queue"
 )
 
 const (

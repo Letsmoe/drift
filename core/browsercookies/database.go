@@ -20,7 +20,7 @@ var databaseSidecars = []string{"", "-wal", "-journal"}
 // the original while they run. The copy lives in a fresh temp directory that
 // the returned cleanup deletes.
 func openDatabaseCopy(tempParent, databasePath string) (*sql.DB, func(), error) {
-	directory, err := os.MkdirTemp(tempParent, "otter-cookies-")
+	directory, err := os.MkdirTemp(tempParent, "drift-cookies-")
 	if err != nil {
 		return nil, nil, fmt.Errorf("create temp directory: %w", err)
 	}

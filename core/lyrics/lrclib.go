@@ -10,13 +10,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/neoworks/otter-music/core/music"
+	"github.com/letsmoe/drift/core/music"
 )
 
 const (
 	lrclibBaseURL = "https://lrclib.net"
 	// LRCLIB asks clients to identify themselves.
-	lrclibUserAgent = "Otter Music (https://github.com/neoworks/otter-music)"
+	lrclibUserAgent = "Drift (https://github.com/letsmoe/drift)"
 	lrclibTimeout   = 10 * time.Second
 	lrclibSource    = "LRCLIB"
 	// maxDurationDifference is how far (in seconds) a search result may be off the track.

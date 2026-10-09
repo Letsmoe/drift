@@ -3,7 +3,7 @@ package innertube
 import (
 	"context"
 
-	"github.com/neoworks/otter-music/core/music"
+	"github.com/letsmoe/drift/core/music"
 )
 
 const homeBrowseID = "FEmusic_home"

@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/neoworks/otter-music/core/music"
+	"github.com/letsmoe/drift/core/music"
 )
 
 func TestAdoptTakesTheStateAsItIs(t *testing.T) {

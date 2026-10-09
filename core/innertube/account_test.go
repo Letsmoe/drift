@@ -11,7 +11,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/neoworks/otter-music/core/music"
+	"github.com/letsmoe/drift/core/music"
 )
 
 const testCookieHeader = "SID=sid-value; SAPISID=sapisid-value; __Secure-1PAPISID=first-party-value; __Secure-3PAPISID=third-party-value; HSID=hsid"

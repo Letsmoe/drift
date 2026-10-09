@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/neoworks/otter-music/core/palette"
+	"github.com/letsmoe/drift/core/palette"
 )
 
 const paletteFetchTimeout = 10 * time.Second

@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/neoworks/otter-music/core/lyrics"
-	"github.com/neoworks/otter-music/core/music"
+	"github.com/letsmoe/drift/core/lyrics"
+	"github.com/letsmoe/drift/core/music"
 )
 
 // Lyrics returns the lyrics of a track, or nil when no source has any. allowLRCLIB
