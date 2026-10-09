@@ -5,10 +5,6 @@ A YouTube Music player for desktop (Electron shell, Go backend), Android (Kotlin
 ## Setup
 
 ```sh
-# once: make the neoworks design system linkable
-(cd ../neoworks.dev/packages/ui && bun link)
-(cd ../neoworks.dev/packages/config && bun link)
-
 bun install
 bun run tools   # golangci-lint
 bun run desktop:dev       # desktop app with hot reload

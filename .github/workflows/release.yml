@@ -36,8 +36,6 @@ jobs:
         shell: bash
     env:
       TAG: ${{ github.event.release.tag_name || inputs.tag }}
-      # setup-frontend symlinks node_modules; without this Git Bash copies instead.
-      MSYS: winsymlinks:nativestrict
     steps:
       - uses: actions/checkout@v7
         with:
@@ -48,8 +46,6 @@ jobs:
           go-version-file: drift/go.work
           cache-dependency-path: 'drift/**/go.sum'
       - uses: ./drift/.github/actions/setup-frontend
-        with:
-          neoworks-dev-token: ${{ secrets.NEOWORKS_DEV_TOKEN }}
       - name: Check the tag matches the app version
         working-directory: drift/apps/desktop/electron
         run: |
