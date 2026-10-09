@@ -14,7 +14,7 @@ export interface Backend {
 	stop(): void;
 }
 
-const announcePrefix = 'otter-backend ';
+const announcePrefix = 'drift-backend ';
 const startTimeoutMs = 30_000;
 const stopTimeoutMs = 3_000;
 

@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/neoworks/otter-music/core/library"
-	"github.com/neoworks/otter-music/core/music"
+	"github.com/letsmoe/drift/core/library"
+	"github.com/letsmoe/drift/core/music"
 )
 
 // profileOf returns the engine's current profile.

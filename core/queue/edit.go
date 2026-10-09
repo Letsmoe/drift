@@ -3,7 +3,7 @@ package queue
 import (
 	"slices"
 
-	"github.com/neoworks/otter-music/core/music"
+	"github.com/letsmoe/drift/core/music"
 )
 
 // PlayNext inserts tracks right after the current entry. Into an empty queue

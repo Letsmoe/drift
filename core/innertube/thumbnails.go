@@ -5,7 +5,7 @@ import (
 	"regexp"
 	"slices"
 
-	"github.com/neoworks/otter-music/core/music"
+	"github.com/letsmoe/drift/core/music"
 )
 
 // largeVariantWidths are the widths added to resizable thumbnail lists, enough for the

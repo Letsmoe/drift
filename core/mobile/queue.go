@@ -3,8 +3,8 @@ package mobile
 import (
 	"context"
 
-	"github.com/neoworks/otter-music/core/music"
-	"github.com/neoworks/otter-music/core/queue"
+	"github.com/letsmoe/drift/core/music"
+	"github.com/letsmoe/drift/core/queue"
 )
 
 // queueStep is the result of QueueNext and QueueAdvance. Moved is false when

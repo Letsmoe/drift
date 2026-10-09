@@ -5,7 +5,7 @@ import (
 	"sort"
 	"time"
 
-	"github.com/neoworks/otter-music/core/music"
+	"github.com/letsmoe/drift/core/music"
 )
 
 // scoreCandidates scores every eligible candidate and returns them best first.

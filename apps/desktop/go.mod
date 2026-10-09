@@ -1,10 +1,10 @@
-module github.com/neoworks/otter-music/apps/desktop
+module github.com/letsmoe/drift/apps/desktop
 
 go 1.27.1
 
 require (
 	github.com/gorilla/websocket v1.5.3
-	github.com/neoworks/otter-music/core v0.0.0
+	github.com/letsmoe/drift/core v0.0.0
 )
 
 require (
@@ -46,4 +46,4 @@ require (
 	modernc.org/sqlite v1.60.1 // indirect
 )
 
-replace github.com/neoworks/otter-music/core => ../../core
+replace github.com/letsmoe/drift/core => ../../core

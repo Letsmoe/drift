@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# Builds the gomobile AAR of core/mobile into apps/android/app/libs/otter-core.aar.
+# Builds the gomobile AAR of core/mobile into apps/android/app/libs/drift-core.aar.
 # Usage: scripts/build-android-core.sh [android-sdk-dir]
 set -euo pipefail
 
 repoRoot="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-outputAar="$repoRoot/apps/android/app/libs/otter-core.aar"
+outputAar="$repoRoot/apps/android/app/libs/drift-core.aar"
 
 # Without an argument, take the first SDK with an NDK: a system SDK in
 # ANDROID_HOME often lacks one while Android Studio's ~/Android/Sdk has it.
@@ -47,7 +47,7 @@ if [[ -f "$outputAar" ]]; then
 	newerSource="$(find "$repoRoot/core" -type f \( -name '*.go' -o -name go.mod -o -name go.sum \) \
 		! -name '*_test.go' -newer "$outputAar" -print -quit)"
 	if [[ -z "$newerSource" ]]; then
-		echo "otter-core.aar is up to date"
+		echo "drift-core.aar is up to date"
 		exit 0
 	fi
 fi
@@ -57,7 +57,7 @@ cd "$repoRoot/core"
 gomobile bind \
 	-target=android/arm64,android/amd64 \
 	-androidapi 26 \
-	-javapkg dev.neoworks.ottermusic \
+	-javapkg dev.letsmoe.drift \
 	-ldflags='-s -w' \
 	-trimpath \
 	-o "$outputAar" \

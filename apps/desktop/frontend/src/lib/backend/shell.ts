@@ -14,7 +14,7 @@ export interface OpenDialogOptions {
 	filters?: FileFilter[];
 }
 
-/** What electron/src/preload.ts exposes as `window.otter`. */
+/** What electron/src/preload.ts exposes as `window.drift`. */
 interface ShellBridge {
 	backend(): BackendAddress;
 	/** Resolves to the chosen path, or '' when the user cancels. */
@@ -24,7 +24,7 @@ interface ShellBridge {
 
 declare global {
 	interface Window {
-		otter?: ShellBridge;
+		drift?: ShellBridge;
 	}
 }
 
@@ -33,18 +33,18 @@ declare global {
  * is served by the backend itself, so its origin and `?token=` are used instead.
  */
 export function backendAddress(): BackendAddress {
-	if (window.otter) {
-		return window.otter.backend();
+	if (window.drift) {
+		return window.drift.backend();
 	}
 	const token = new URLSearchParams(window.location.search).get('token');
 	return { url: window.location.origin, token: token || '' };
 }
 
 function requireShell(): ShellBridge {
-	if (!window.otter) {
+	if (!window.drift) {
 		throw new Error('File dialogs need the desktop app.');
 	}
-	return window.otter;
+	return window.drift;
 }
 
 export function pickFile(options: OpenDialogOptions): Promise<string> {

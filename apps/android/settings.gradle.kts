@@ -14,5 +14,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "otter-music"
+rootProject.name = "drift"
 include(":app")

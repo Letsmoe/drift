@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/neoworks/otter-music/core/library"
-	"github.com/neoworks/otter-music/core/music"
+	"github.com/letsmoe/drift/core/library"
+	"github.com/letsmoe/drift/core/music"
 )
 
 // ignoredShows counts the showings of one track that no click or play followed.

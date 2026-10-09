@@ -1,4 +1,4 @@
-// Command desktop is the Otter Music desktop backend: the Go core behind one
+// Command desktop is the Drift desktop backend: the Go core behind one
 // loopback HTTP server (the SvelteKit UI from frontend/, the stream proxy and the
 // RPC WebSocket). The Electron shell in electron/ starts it and opens a window on it.
 package main
@@ -26,7 +26,7 @@ import (
 const shutdownTimeout = 2 * time.Second
 
 // announcePrefix starts the stdout line that tells the shell where the backend listens.
-const announcePrefix = "otter-backend "
+const announcePrefix = "drift-backend "
 
 // frontend/build is the SvelteKit static build (`bun run build` in frontend/).
 //
@@ -138,9 +138,9 @@ func cancelWhenStdinCloses(parent context.Context) context.Context {
 	return ctx
 }
 
-// logLevel enables debug logs (e.g. every stream request) with OTTER_MUSIC_LOG=debug.
+// logLevel enables debug logs (e.g. every stream request) with DRIFT_LOG=debug.
 func logLevel() slog.Level {
-	if os.Getenv("OTTER_MUSIC_LOG") == "debug" {
+	if os.Getenv("DRIFT_LOG") == "debug" {
 		return slog.LevelDebug
 	}
 	return slog.LevelInfo

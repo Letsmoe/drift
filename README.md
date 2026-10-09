@@ -1,4 +1,4 @@
-# Otter Music
+# Drift
 
 A YouTube Music player for desktop (Electron shell, Go backend), Android (Kotlin) and iOS (Swift), sharing one Go core.
 

@@ -12,7 +12,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/neoworks/otter-music/core/music"
+	"github.com/letsmoe/drift/core/music"
 )
 
 func tracksNamed(videoIDs ...string) []music.Track {

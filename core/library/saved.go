@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/neoworks/otter-music/core/music"
+	"github.com/letsmoe/drift/core/music"
 )
 
 // SavedItem is an album, playlist, artist or podcast the user saved.

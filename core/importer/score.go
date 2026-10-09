@@ -4,8 +4,8 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/neoworks/otter-music/core/music"
-	"github.com/neoworks/otter-music/core/spotify"
+	"github.com/letsmoe/drift/core/music"
+	"github.com/letsmoe/drift/core/spotify"
 )
 
 // Score thresholds: a candidate below its threshold counts as unmatched.

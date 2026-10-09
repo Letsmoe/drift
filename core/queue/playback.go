@@ -3,7 +3,7 @@ package queue
 import (
 	"slices"
 
-	"github.com/neoworks/otter-music/core/music"
+	"github.com/letsmoe/drift/core/music"
 )
 
 // Play replaces the queue with tracks and starts at startIndex. With shuffle

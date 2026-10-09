@@ -23,10 +23,10 @@ runs:
         (cd neoworks.dev/packages/config && bun link)
     - name: Install dependencies
       shell: bash
-      working-directory: otter-music
+      working-directory: drift
       run: bun install --frozen-lockfile
     - name: Resolve ui's dependencies from the frontend
       shell: bash
       # Locally neoworks.dev has its own node_modules; installing that whole
       # monorepo in CI is not worth it, so ui borrows the frontend's svelte & co.
-      run: ln -s "$GITHUB_WORKSPACE/otter-music/apps/desktop/frontend/node_modules" neoworks.dev/packages/ui/node_modules
+      run: ln -s "$GITHUB_WORKSPACE/drift/apps/desktop/frontend/node_modules" neoworks.dev/packages/ui/node_modules

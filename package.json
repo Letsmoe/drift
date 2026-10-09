@@ -1,5 +1,5 @@
 {
-	"name": "otter-music",
+	"name": "drift",
 	"private": true,
 	"type": "module",
 	"workspaces": [
@@ -8,8 +8,8 @@
 	],
 	"scripts": {
 		"desktop:dev": "bun scripts/desktop-dev.ts",
-		"desktop:build": "cd apps/desktop/frontend && bun run build && cd .. && go build -trimpath -ldflags='-s -w' -o build/bin/otter-music-backend . && cd electron && bun run build && bun x electron-builder --dir",
-		"desktop:start": "./apps/desktop/build/electron/linux-unpacked/otter-music",
+		"desktop:build": "cd apps/desktop/frontend && bun run build && cd .. && go build -trimpath -ldflags='-s -w' -o build/bin/drift-backend . && cd electron && bun run build && bun x electron-builder --dir",
+		"desktop:start": "./apps/desktop/build/electron/linux-unpacked/drift",
 		"desktop:install": "bun run desktop:build && bun scripts/install-desktop.ts",
 		"bindings": "cd apps/desktop && go run . -bindings frontend/src/lib/backend/generated && prettier --write --log-level warn frontend/src/lib/backend/generated",
 		"test": "cd core && go test ./... && cd ../apps/desktop && go test ./...",
@@ -22,8 +22,8 @@
 		"android:core": "scripts/build-android-core.sh",
 		"android:build": "cd apps/android && ./gradlew assembleDebug",
 		"android:install": "cd apps/android && ./gradlew installDebug",
-		"android:start": "bun run android:install && adb shell am start -n dev.neoworks.ottermusic/.MainActivity",
-		"android:logs": "adb logcat --pid=$(adb shell pidof -s dev.neoworks.ottermusic)",
+		"android:start": "bun run android:install && adb shell am start -n dev.letsmoe.drift/.MainActivity",
+		"android:logs": "adb logcat --pid=$(adb shell pidof -s dev.letsmoe.drift)",
 		"android:lint": "cd apps/android && ./gradlew lint",
 		"test:live": "cd core && go test -tags live -run Live -v ./..."
 	},

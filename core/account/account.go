@@ -9,10 +9,10 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/neoworks/otter-music/core/importer"
-	"github.com/neoworks/otter-music/core/innertube"
-	"github.com/neoworks/otter-music/core/library"
-	"github.com/neoworks/otter-music/core/music"
+	"github.com/letsmoe/drift/core/importer"
+	"github.com/letsmoe/drift/core/innertube"
+	"github.com/letsmoe/drift/core/library"
+	"github.com/letsmoe/drift/core/music"
 )
 
 // ErrNotSignedIn means a call needs a YouTube Music session and none is stored.

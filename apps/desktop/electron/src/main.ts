@@ -12,17 +12,16 @@ import {
 } from 'electron';
 import { startBackend, type Backend } from './backend.ts';
 
-// The page lives on otter://app so its origin (and localStorage) stays the same
+// The page lives on drift://app so its origin (and localStorage) stays the same
 // although the backend picks a new port every run; requests are forwarded to it.
-const appScheme = 'otter';
+const appScheme = 'drift';
 const appOrigin = `${appScheme}://app`;
 
 // Set by scripts/desktop-dev.ts: the Vite dev server and a freshly built backend.
-const devServerUrl = process.env.OTTER_DEV_URL;
-const devBackendBinary = process.env.OTTER_BACKEND_BINARY;
+const devServerUrl = process.env.DRIFT_DEV_URL;
+const devBackendBinary = process.env.DRIFT_BACKEND_BINARY;
 
-const backendBinaryName =
-	process.platform === 'win32' ? 'otter-music-backend.exe' : 'otter-music-backend';
+const backendBinaryName = process.platform === 'win32' ? 'drift-backend.exe' : 'drift-backend';
 
 let backend: Backend | undefined;
 let mainWindow: BrowserWindow | undefined;
@@ -66,7 +65,7 @@ function requireBackend(): Backend {
 	return backend;
 }
 
-// Forwards otter://app/<path> to the backend, which serves the SPA build.
+// Forwards drift://app/<path> to the backend, which serves the SPA build.
 function serveAppScheme(): void {
 	protocol.handle(appScheme, (request) => {
 		const requested = new URL(request.url);
@@ -76,13 +75,13 @@ function serveAppScheme(): void {
 }
 
 function registerIpc(): void {
-	ipcMain.on('otter:backend', (event) => {
+	ipcMain.on('drift:backend', (event) => {
 		event.returnValue = requireBackend().address;
 	});
-	ipcMain.handle('otter:pick-file', (_event, options: OpenDialogOptions) =>
+	ipcMain.handle('drift:pick-file', (_event, options: OpenDialogOptions) =>
 		pickPath({ ...options, properties: ['openFile'] })
 	);
-	ipcMain.handle('otter:pick-folder', (_event, options: OpenDialogOptions) =>
+	ipcMain.handle('drift:pick-folder', (_event, options: OpenDialogOptions) =>
 		pickPath({ ...options, properties: ['openDirectory'] })
 	);
 }
@@ -128,7 +127,7 @@ function openExternally(url: string): void {
 
 function createWindow(): void {
 	const window = new BrowserWindow({
-		title: 'Otter Music',
+		title: 'Drift',
 		width: 1200,
 		height: 800,
 		minWidth: 720,
@@ -181,7 +180,7 @@ function quitWhenBackendDies(running: Backend): void {
 			app.quit();
 			return;
 		}
-		dialog.showErrorBox('Otter Music', `The backend stopped unexpectedly (code ${code}).`);
+		dialog.showErrorBox('Drift', `The backend stopped unexpectedly (code ${code}).`);
 		app.quit();
 	});
 }
@@ -190,7 +189,7 @@ async function start(): Promise<void> {
 	try {
 		backend = await startBackend(backendBinaryPath());
 	} catch (error) {
-		dialog.showErrorBox('Otter Music', String(error));
+		dialog.showErrorBox('Drift', String(error));
 		app.quit();
 		return;
 	}

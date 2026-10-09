@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/neoworks/otter-music/core/music"
+	"github.com/letsmoe/drift/core/music"
 )
 
 // SearchSongs returns YouTube Music songs matching query.

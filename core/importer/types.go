@@ -4,7 +4,7 @@
 // and saved items. Package spotify supplies the source data.
 package importer
 
-import "github.com/neoworks/otter-music/core/spotify"
+import "github.com/letsmoe/drift/core/spotify"
 
 // Source kinds.
 const (

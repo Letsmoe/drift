@@ -1,5 +1,5 @@
 const recommendContextPrefix = 'recommend:';
-const storageKey = 'otter-music:context-titles';
+const storageKey = 'drift:context-titles';
 // Enough for every list played recently; older names fall back to the generic label.
 const maxStoredTitles = 200;
 

@@ -79,7 +79,7 @@ func TestFirefoxSession(t *testing.T) {
 	if header != want {
 		t.Errorf("header = %q, want %q", header, want)
 	}
-	for _, leftover := range mustGlob(t, filepath.Join(env.tempDir, "otter-cookies-*")) {
+	for _, leftover := range mustGlob(t, filepath.Join(env.tempDir, "drift-cookies-*")) {
 		t.Errorf("temp copy %s was not deleted", leftover)
 	}
 }
