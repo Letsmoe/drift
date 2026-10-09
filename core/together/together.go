@@ -35,7 +35,7 @@ import (
 
 const (
 	maxNameLength = 40
-	defaultName   = "Otter listener"
+	defaultName   = "Drift listener"
 	// Invites nobody acted on disappear after this.
 	inviteLifetime = 30 * time.Minute
 )

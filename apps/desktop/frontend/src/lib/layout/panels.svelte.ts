@@ -1,4 +1,4 @@
-const queueWidthStorageKey = 'otter-music:queue-panel-width';
+const queueWidthStorageKey = 'drift:queue-panel-width';
 
 /** Bounds of the Now playing column's width in CSS pixels. */
 export const queueWidthLimits = { minimum: 300, maximum: 560, initial: 360 };

@@ -4,8 +4,8 @@ import { existsSync } from 'node:fs';
 import { homedir } from 'node:os';
 import path from 'node:path';
 
-const appName = 'otter-music';
-const bundleName = 'Otter Music.app';
+const appName = 'drift';
+const bundleName = 'Drift.app';
 // electron-builder's unpacked output (`--dir`), see apps/desktop/electron/package.json.
 const buildDirectory = path.resolve(import.meta.dirname, '../apps/desktop/build/electron');
 const appIcon = path.resolve(import.meta.dirname, '../apps/desktop/build/appicon.png');
@@ -22,12 +22,12 @@ function desktopEntry(binaryPath: string, iconPath: string): string {
 	return [
 		'[Desktop Entry]',
 		'Type=Application',
-		'Name=Otter Music',
+		'Name=Drift',
 		'Comment=YouTube Music player',
 		`Exec=${binaryPath}`,
 		`Icon=${iconPath}`,
 		// Matches desktopName in apps/desktop/electron/package.json, so the window groups under this entry.
-		'StartupWMClass=otter-music',
+		'StartupWMClass=drift',
 		'Categories=AudioVideo;Audio;Player;',
 		'Terminal=false',
 		''

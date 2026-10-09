@@ -87,7 +87,7 @@ func (app *App) startup(ctx context.Context) {
 // openLibrary opens the local database and builds the recommendation engine on
 // it. Failure is logged loudly; library methods then return errors.
 func (app *App) openLibrary() {
-	path, err := libraryPath()
+	path, err := libraryPath(app.logger)
 	if err != nil {
 		app.logger.Error("library path", "error", err)
 		return
@@ -104,17 +104,38 @@ func (app *App) openLibrary() {
 	app.importer = importer.New(lib, app.innertube, app.logger, importer.WithAccount(app.account.Reader))
 }
 
-func libraryPath() (string, error) {
+func libraryPath(logger *slog.Logger) (string, error) {
 	configDirectory, err := os.UserConfigDir()
 	if err != nil {
 		return "", fmt.Errorf("find config directory: %w", err)
 	}
-	directory := filepath.Join(configDirectory, "otter-music")
+	directory := filepath.Join(configDirectory, "drift")
+	migrateLegacyDirectory(logger, filepath.Join(configDirectory, "otter-music"), directory)
 	err = os.MkdirAll(directory, 0o700)
 	if err != nil {
 		return "", fmt.Errorf("create %s: %w", directory, err)
 	}
 	return filepath.Join(directory, "library.db"), nil
+}
+
+// migrateLegacyDirectory moves the data directory of the app's former name
+// when the new one does not exist yet. A failed move is logged and the app
+// starts with an empty library.
+func migrateLegacyDirectory(logger *slog.Logger, legacyDirectory, directory string) {
+	_, err := os.Stat(directory)
+	if err == nil {
+		return
+	}
+	_, err = os.Stat(legacyDirectory)
+	if err != nil {
+		return
+	}
+	err = os.Rename(legacyDirectory, directory)
+	if err != nil {
+		logger.Error("move legacy data directory", "from", legacyDirectory, "to", directory, "error", err)
+		return
+	}
+	logger.Info("moved legacy data directory", "from", legacyDirectory, "to", directory)
 }
 
 func (app *App) shutdown() {

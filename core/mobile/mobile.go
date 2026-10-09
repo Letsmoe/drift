@@ -42,7 +42,7 @@ type Listener interface {
 	OnQueueChanged(stateJSON string)
 }
 
-// Core is the whole otter-music core behind one gomobile-friendly object.
+// Core is the whole drift core behind one gomobile-friendly object.
 type Core struct {
 	ctx      context.Context
 	cancel   context.CancelFunc
@@ -99,9 +99,9 @@ func Open(dataDir string, listener Listener) (*Core, error) {
 	return core, nil
 }
 
-// logLevel enables debug logs with OTTER_MUSIC_LOG=debug.
+// logLevel enables debug logs with DRIFT_LOG=debug.
 func logLevel() slog.Level {
-	if os.Getenv("OTTER_MUSIC_LOG") == "debug" {
+	if os.Getenv("DRIFT_LOG") == "debug" {
 		return slog.LevelDebug
 	}
 	return slog.LevelInfo

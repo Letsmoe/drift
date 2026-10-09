@@ -1,4 +1,4 @@
-const storageKey = 'otter-music:lyrics-allow-lrclib';
+const storageKey = 'drift:lyrics-allow-lrclib';
 
 function loadAllowLRCLIB(): boolean {
 	try {

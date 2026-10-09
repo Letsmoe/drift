@@ -1,4 +1,4 @@
-const storageKey = 'otter-music:import-prompt-hidden';
+const storageKey = 'drift:import-prompt-hidden';
 
 function loadHidden(): boolean {
 	try {
