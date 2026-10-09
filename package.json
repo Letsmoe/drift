@@ -22,8 +22,8 @@
 		"android:core": "scripts/build-android-core.sh",
 		"android:build": "cd apps/android && ./gradlew assembleDebug",
 		"android:install": "cd apps/android && ./gradlew installDebug",
-		"android:start": "bun run android:install && adb shell am start -n dev.neoworks.ottermusic/.MainActivity",
-		"android:logs": "adb logcat --pid=$(adb shell pidof -s dev.neoworks.ottermusic)",
+		"android:start": "bun run android:install && adb shell am start -n dev.letsmoe.drift/.MainActivity",
+		"android:logs": "adb logcat --pid=$(adb shell pidof -s dev.letsmoe.drift)",
 		"android:lint": "cd apps/android && ./gradlew lint",
 		"test:live": "cd core && go test -tags live -run Live -v ./..."
 	},
