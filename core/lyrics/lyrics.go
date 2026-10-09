@@ -6,7 +6,7 @@ import (
 	"context"
 	"log/slog"
 
-	"github.com/neoworks/otter-music/core/music"
+	"github.com/letsmoe/drift-music/core/music"
 )
 
 // YouTube is the part of the innertube client the service needs.

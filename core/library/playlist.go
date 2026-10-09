@@ -11,7 +11,7 @@ import (
 	"slices"
 	"time"
 
-	"github.com/neoworks/otter-music/core/music"
+	"github.com/letsmoe/drift-music/core/music"
 )
 
 // PlaylistSummary is a playlist as listed, without its entries.

@@ -16,16 +16,16 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/neoworks/otter-music/core/account"
-	"github.com/neoworks/otter-music/core/download"
-	"github.com/neoworks/otter-music/core/importer"
-	"github.com/neoworks/otter-music/core/innertube"
-	"github.com/neoworks/otter-music/core/library"
-	"github.com/neoworks/otter-music/core/lyrics"
-	"github.com/neoworks/otter-music/core/podcasts"
-	"github.com/neoworks/otter-music/core/queue"
-	"github.com/neoworks/otter-music/core/recommend"
-	"github.com/neoworks/otter-music/core/stream"
+	"github.com/letsmoe/drift-music/core/account"
+	"github.com/letsmoe/drift-music/core/download"
+	"github.com/letsmoe/drift-music/core/importer"
+	"github.com/letsmoe/drift-music/core/innertube"
+	"github.com/letsmoe/drift-music/core/library"
+	"github.com/letsmoe/drift-music/core/lyrics"
+	"github.com/letsmoe/drift-music/core/podcasts"
+	"github.com/letsmoe/drift-music/core/queue"
+	"github.com/letsmoe/drift-music/core/recommend"
+	"github.com/letsmoe/drift-music/core/stream"
 )
 
 const shutdownTimeout = 2 * time.Second

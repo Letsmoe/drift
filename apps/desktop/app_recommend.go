@@ -3,8 +3,8 @@ package main
 import (
 	"errors"
 
-	"github.com/neoworks/otter-music/core/library"
-	"github.com/neoworks/otter-music/core/recommend"
+	"github.com/letsmoe/drift-music/core/library"
+	"github.com/letsmoe/drift-music/core/recommend"
 )
 
 var errRecommendUnavailable = errors.New("recommendations need the local library, which could not be opened")

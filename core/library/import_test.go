@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/neoworks/otter-music/core/music"
+	"github.com/letsmoe/drift-music/core/music"
 )
 
 func TestImportMatchRoundTrip(t *testing.T) {

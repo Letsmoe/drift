@@ -3,9 +3,9 @@ package main
 import (
 	"fmt"
 
-	"github.com/neoworks/otter-music/core/account"
-	"github.com/neoworks/otter-music/core/browsercookies"
-	"github.com/neoworks/otter-music/core/importer"
+	"github.com/letsmoe/drift-music/core/account"
+	"github.com/letsmoe/drift-music/core/browsercookies"
+	"github.com/letsmoe/drift-music/core/importer"
 )
 
 func (app *App) requireAccount() (*account.Service, error) {

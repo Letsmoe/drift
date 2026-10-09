@@ -3,7 +3,7 @@ package recommend
 import (
 	"context"
 
-	"github.com/neoworks/otter-music/core/music"
+	"github.com/letsmoe/drift-music/core/music"
 )
 
 // sourcePlan is what one ranking pass asks the catalog for and what came

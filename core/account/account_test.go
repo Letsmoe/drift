@@ -7,10 +7,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/neoworks/otter-music/core/importer"
-	"github.com/neoworks/otter-music/core/innertube"
-	"github.com/neoworks/otter-music/core/library"
-	"github.com/neoworks/otter-music/core/music"
+	"github.com/letsmoe/drift-music/core/importer"
+	"github.com/letsmoe/drift-music/core/innertube"
+	"github.com/letsmoe/drift-music/core/library"
+	"github.com/letsmoe/drift-music/core/music"
 )
 
 type libraryReader = importer.Account

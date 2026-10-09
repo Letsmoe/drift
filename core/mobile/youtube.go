@@ -1,8 +1,8 @@
 package mobile
 
 import (
-	"github.com/neoworks/otter-music/core/account"
-	"github.com/neoworks/otter-music/core/importer"
+	"github.com/letsmoe/drift-music/core/account"
+	"github.com/letsmoe/drift-music/core/importer"
 )
 
 func (core *Core) requireAccount() (*account.Service, error) {

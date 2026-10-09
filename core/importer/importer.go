@@ -9,9 +9,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/neoworks/otter-music/core/library"
-	"github.com/neoworks/otter-music/core/music"
-	"github.com/neoworks/otter-music/core/spotify"
+	"github.com/letsmoe/drift-music/core/library"
+	"github.com/letsmoe/drift-music/core/music"
+	"github.com/letsmoe/drift-music/core/spotify"
 )
 
 // ErrBusy is returned when an import is already running.

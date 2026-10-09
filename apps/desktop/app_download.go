@@ -5,9 +5,9 @@ import (
 	"errors"
 	"path/filepath"
 
-	"github.com/neoworks/otter-music/core/download"
-	"github.com/neoworks/otter-music/core/music"
-	"github.com/neoworks/otter-music/core/stream"
+	"github.com/letsmoe/drift-music/core/download"
+	"github.com/letsmoe/drift-music/core/music"
+	"github.com/letsmoe/drift-music/core/stream"
 )
 
 // downloadsEvent is the event carrying every download.Update.

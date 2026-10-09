@@ -10,7 +10,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/neoworks/otter-music/core/music"
+	"github.com/letsmoe/drift-music/core/music"
 )
 
 // autoplayThreshold is how few upcoming entries trigger an autoplay extension.

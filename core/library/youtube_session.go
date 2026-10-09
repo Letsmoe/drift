@@ -8,7 +8,7 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/neoworks/otter-music/core/music"
+	"github.com/letsmoe/drift-music/core/music"
 )
 
 // YouTubeSession is the stored YouTube Music sign-in. The cookie header is a

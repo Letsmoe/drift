@@ -5,7 +5,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/neoworks/otter-music/core/queue"
+	"github.com/letsmoe/drift-music/core/queue"
 )
 
 const (
