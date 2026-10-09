@@ -27,6 +27,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+        preferHighestRefreshRate()
         val container = (application as OtterApplication).container
         setContent {
             CompositionLocalProvider(LocalAppContainer provides container) {
@@ -36,6 +37,22 @@ class MainActivity : ComponentActivity() {
             }
         }
         askForNotificationsOnFirstPlay(container)
+    }
+
+    // Ask for the display mode with the highest refresh rate at the current resolution (e.g. 120 Hz).
+    private fun preferHighestRefreshRate() {
+        val currentDisplay = ContextCompat.getDisplayOrDefault(this)
+        val currentMode = currentDisplay.mode
+        val fastestMode = currentDisplay.supportedModes
+            .filter { mode ->
+                mode.physicalWidth == currentMode.physicalWidth &&
+                    mode.physicalHeight == currentMode.physicalHeight
+            }
+            .maxByOrNull { mode -> mode.refreshRate }
+            ?: return
+        val attributes = window.attributes
+        attributes.preferredDisplayModeId = fastestMode.modeId
+        window.attributes = attributes
     }
 
     // The media notification needs the permission on Android 13+; ask when playback first starts.

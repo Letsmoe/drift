@@ -7,6 +7,7 @@
 	import HouseIcon from 'phosphor-svelte/lib/HouseIcon';
 	import MagnifyingGlassIcon from 'phosphor-svelte/lib/MagnifyingGlassIcon';
 	import SearchField from '#lib/components/SearchField.svelte';
+	import TogetherMenu from '#lib/components/TogetherMenu.svelte';
 	import { NavigationHistory } from '#lib/layout/navigationHistory.svelte.ts';
 	import { SearchSuggestions } from '#lib/search/suggestions.svelte.ts';
 
@@ -187,5 +188,8 @@
 				{/each}
 			</ul>
 		{/if}
+	</div>
+	<div class="absolute right-2 flex items-center gap-2">
+		<TogetherMenu />
 	</div>
 </header>

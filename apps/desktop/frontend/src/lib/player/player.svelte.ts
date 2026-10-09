@@ -23,11 +23,18 @@ import {
 	type RepeatMode
 } from '#lib/api/queue.ts';
 import { streamUrl } from '#lib/api/music.ts';
+import type { RemotePlayback } from '#lib/api/together.ts';
 import { describeError } from '#lib/format.ts';
 
 /** Seconds into a track after which Previous restarts it instead of going back. */
 const restartThresholdSeconds = 3;
 const progressReportIntervalMs = 15_000;
+
+/** Where someone else's player was when it arrived, for an entry that is still loading here. */
+interface PendingRemoteStart {
+	playback: RemotePlayback;
+	receivedAtMs: number;
+}
 
 /**
  * Playback state shared by the track lists, the queue UI and the player bar. The queue lives
@@ -50,7 +57,11 @@ export class Player {
 	// A slow URL lookup must not override a track the user picked afterwards.
 	#latestRequestId = 0;
 	#loadedEntryId: number | undefined = undefined;
+	// The entry `source` belongs to; it lags #loadedEntryId while a URL loads.
+	#sourceEntryId: number | undefined = undefined;
 	#playIdPromise: Promise<number | null> | null = null;
+	#userActionListeners: Array<() => void> = [];
+	#pendingRemoteStart: PendingRemoteStart | null = null;
 
 	constructor() {
 		onQueueChange((state) => this.#applyState(state));
@@ -194,10 +205,37 @@ export class Player {
 			this.#reportPlay(false);
 		}
 		this.paused = !this.paused;
+		this.#notifyUserAction();
 	}
 
 	seek(seconds: number): void {
 		this.currentTime = seconds;
+		this.#notifyUserAction();
+	}
+
+	/** Listens to plays, pauses and seeks by the user. Returns the unsubscribe function. */
+	onUserAction(listener: () => void): () => void {
+		this.#userActionListeners.push(listener);
+		return () => {
+			this.#userActionListeners = this.#userActionListeners.filter((other) => other !== listener);
+		};
+	}
+
+	/** Follows someone else's player (Listen Together) without announcing it as a user action. */
+	followRemote(playback: RemotePlayback): void {
+		if (this.entry?.id !== playback.entryId || this.errorMessage) {
+			return;
+		}
+		if (this.#sourceEntryId !== playback.entryId) {
+			this.#pendingRemoteStart = { playback, receivedAtMs: performance.now() };
+			return;
+		}
+		if (this.paused !== playback.paused) {
+			this.paused = playback.paused;
+		}
+		if (Math.abs(this.currentTime - playback.positionSeconds) > playback.toleranceSeconds) {
+			this.currentTime = playback.positionSeconds;
+		}
 	}
 
 	setVolume(volume: number): void {
@@ -298,8 +336,38 @@ export class Player {
 
 	#startPlayback(source: string, resumeSeconds: number): void {
 		this.source = source;
+		this.#sourceEntryId = this.#loadedEntryId;
+		const remoteStart = this.#takePendingRemoteStart();
+		if (remoteStart) {
+			this.currentTime = remoteStart.positionSeconds;
+			this.paused = remoteStart.paused;
+			return;
+		}
 		this.currentTime = resumeSeconds;
 		this.paused = false;
+	}
+
+	// A remote position that arrived while loading, moved on by the time the load took.
+	#takePendingRemoteStart(): RemotePlayback | null {
+		const pending = this.#pendingRemoteStart;
+		this.#pendingRemoteStart = null;
+		if (!pending || pending.playback.entryId !== this.#loadedEntryId) {
+			return null;
+		}
+		if (pending.playback.paused) {
+			return pending.playback;
+		}
+		const elapsedSeconds = (performance.now() - pending.receivedAtMs) / 1000;
+		return {
+			...pending.playback,
+			positionSeconds: pending.playback.positionSeconds + elapsedSeconds
+		};
+	}
+
+	#notifyUserAction(): void {
+		for (const listener of this.#userActionListeners) {
+			listener();
+		}
 	}
 
 	async #lookUpResumeSeconds(entry: QueueEntry): Promise<number> {
@@ -321,6 +389,7 @@ export class Player {
 		this.#reportPlay(false);
 		this.#latestRequestId += 1;
 		this.#loadedEntryId = undefined;
+		this.#sourceEntryId = undefined;
 		this.source = undefined;
 		this.paused = true;
 		this.currentTime = 0;

@@ -64,7 +64,7 @@ fun FloatingSheet(
             modifier = Modifier
                 .navigationBarsPadding()
                 .padding(start = 8.dp, end = 8.dp, bottom = 8.dp)
-                .glassSurface(shape = RoundedCornerShape(28.dp), alpha = 0.94f)
+                .glassSurface(shape = RoundedCornerShape(28.dp), alpha = 0.97f)
                 .fillMaxWidth(),
         ) {
             Grabber()

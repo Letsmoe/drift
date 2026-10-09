@@ -199,7 +199,7 @@ func TestPodcast(t *testing.T) {
 		Artists:         []music.Artist{wantAuthor},
 		Album:           &music.Album{ID: "MPSPPLOrNU6aQc_Z4", Name: "The Pop Culture Shuffle"},
 		DurationSeconds: 34 * 60,
-		PlayCount:       "1 view",
+		PlayCount:       "1 play",
 	}
 	if got := withoutTrackThumbnails(episode.Track); !reflect.DeepEqual(got, wantTrack) {
 		t.Errorf("track = %+v, want %+v", got, wantTrack)

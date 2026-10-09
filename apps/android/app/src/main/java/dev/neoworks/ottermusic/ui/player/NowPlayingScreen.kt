@@ -1,12 +1,21 @@
 package dev.neoworks.ottermusic.ui.player
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.activity.compose.PredictiveBackHandler
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalWindowInfo
+import androidx.compose.ui.platform.LocalHapticFeedback
+import kotlin.coroutines.cancellation.CancellationException
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
@@ -22,7 +31,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -44,7 +52,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -60,29 +67,60 @@ import dev.neoworks.ottermusic.ui.navigation.openAlbum
 import dev.neoworks.ottermusic.ui.navigation.openArtist
 import dev.neoworks.ottermusic.ui.theme.Canvas
 import dev.neoworks.ottermusic.ui.theme.OtterTheme
-import kotlin.math.roundToInt
 import kotlinx.coroutines.launch
 
-private const val DISMISS_DRAG_PIXELS = 360f
+private const val DISMISS_DISTANCE_FRACTION = 0.25f
+private const val DISMISS_VELOCITY = 1800f
+private const val BACK_SCALE_REDUCTION = 0.1f
+private val PlayerCornerRadius = 28.dp
 
-/** Slides the Now Playing screen up from the bottom while [isOpen]. */
+/**
+ * Slides the Now Playing screen up from the bottom while [isOpen]; its cover is shared with the
+ * mini player. System back (including the predictive gesture) shrinks it away.
+ */
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun NowPlayingOverlay(isOpen: Boolean, onClose: () -> Unit) {
+fun NowPlayingOverlay(isOpen: Boolean, sharedTransitionScope: SharedTransitionScope, onClose: () -> Unit) {
+    val backProgress = remember { Animatable(0f) }
+    LaunchedEffect(isOpen) {
+        if (isOpen) {
+            backProgress.snapTo(0f)
+        }
+    }
+    PredictiveBackHandler(enabled = isOpen) { progressEvents ->
+        try {
+            progressEvents.collect { event -> backProgress.snapTo(event.progress) }
+            onClose()
+        } catch (cancellation: CancellationException) {
+            backProgress.animateTo(0f)
+            throw cancellation
+        }
+    }
     AnimatedVisibility(
         visible = isOpen,
         enter = slideInVertically { fullHeight -> fullHeight },
         exit = slideOutVertically { fullHeight -> fullHeight },
     ) {
-        NowPlayingScreen(onClose = onClose)
+        val sharedCover = rememberSharedCoverModifier(sharedTransitionScope, this)
+        NowPlayingScreen(
+            onClose = onClose,
+            sharedCover = sharedCover,
+            modifier = Modifier.graphicsLayer {
+                val scale = 1f - BACK_SCALE_REDUCTION * backProgress.value
+                scaleX = scale
+                scaleY = scale
+            },
+        )
     }
 }
 
 /**
  * Full-screen player: gradient from the cover color, big cover, title, seek bar, transport
- * controls, autoplay and queue. Dragging down dismisses it.
+ * controls, autoplay and queue. Dragging down follows the finger and dismisses on distance or fling.
  */
+@Suppress("ModifierParameter")
 @Composable
-fun NowPlayingScreen(onClose: () -> Unit) {
+fun NowPlayingScreen(onClose: () -> Unit, sharedCover: Modifier, modifier: Modifier = Modifier) {
     val player = LocalAppContainer.current.playerController
     val queue by player.queue.collectAsStateWithLifecycle()
     val entry = queue.currentEntry
@@ -91,23 +129,30 @@ fun NowPlayingScreen(onClose: () -> Unit) {
     }
     val dismissOffset = remember { Animatable(0f) }
     val scope = rememberCoroutineScope()
+    val screenHeightPixels = LocalWindowInfo.current.containerSize.height.toFloat()
     val coverColor by rememberCoverColor(entry.track.thumbnails.bestFor(128)?.url)
     var showQueue by remember { mutableStateOf(false) }
     var showMore by remember { mutableStateOf(false) }
 
     Box(
-        modifier = Modifier
-            .offset { IntOffset(0, dismissOffset.value.roundToInt()) }
+        modifier = modifier
+            .graphicsLayer {
+                translationY = dismissOffset.value
+                shape = RoundedCornerShape(topStart = PlayerCornerRadius, topEnd = PlayerCornerRadius)
+                clip = true
+            }
             .fillMaxSize()
-            .background(Brush.verticalGradient(listOf(coverColor, Canvas), endY = 1800f))
-            .background(Canvas.copy(alpha = 0.35f))
+            .drawBehind {
+                drawRect(Brush.verticalGradient(listOf(coverColor, Canvas), endY = size.height * 0.75f))
+                drawRect(Canvas.copy(alpha = 0.35f))
+            }
             .draggable(
                 orientation = Orientation.Vertical,
                 state = rememberDraggableState { delta ->
                     scope.launch { dismissOffset.snapTo((dismissOffset.value + delta).coerceAtLeast(0f)) }
                 },
-                onDragStopped = {
-                    scope.launch { settleDismissDrag(dismissOffset, onClose) }
+                onDragStopped = { velocity ->
+                    scope.launch { settleDismissDrag(dismissOffset, velocity, screenHeightPixels, onClose) }
                 },
             ),
     ) {
@@ -124,7 +169,7 @@ fun NowPlayingScreen(onClose: () -> Unit) {
                 onMore = { showMore = true },
             )
             Spacer(Modifier.weight(1f))
-            NowPlayingCover(entry = entry)
+            NowPlayingCover(entry = entry, sharedCover = sharedCover)
             Spacer(Modifier.weight(1f))
             TrackInfoRow(entry = entry, onClose = onClose)
             Spacer(Modifier.height(8.dp))
@@ -145,13 +190,19 @@ fun NowPlayingScreen(onClose: () -> Unit) {
     }
 }
 
-private suspend fun settleDismissDrag(dismissOffset: Animatable<Float, *>, onClose: () -> Unit) {
-    if (dismissOffset.value > DISMISS_DRAG_PIXELS) {
+// Closing keeps the dragged offset so the exit slide continues from where the finger left off.
+private suspend fun settleDismissDrag(
+    dismissOffset: Animatable<Float, *>,
+    velocity: Float,
+    screenHeightPixels: Float,
+    onClose: () -> Unit,
+) {
+    val isFarEnough = dismissOffset.value > screenHeightPixels * DISMISS_DISTANCE_FRACTION
+    if (isFarEnough || velocity > DISMISS_VELOCITY) {
         onClose()
-        dismissOffset.snapTo(0f)
         return
     }
-    dismissOffset.animateTo(0f)
+    dismissOffset.animateTo(0f, spring(dampingRatio = Spring.DampingRatioLowBouncy, stiffness = Spring.StiffnessMedium), velocity)
 }
 
 @Composable
@@ -203,17 +254,22 @@ private fun NowPlayingTopBar(playContext: String, onClose: () -> Unit, onMore: (
     }
 }
 
+@Suppress("ModifierParameter")
 @Composable
-private fun NowPlayingCover(entry: QueueEntry) {
+private fun NowPlayingCover(entry: QueueEntry, sharedCover: Modifier) {
     val player = LocalAppContainer.current.playerController
     val isPlaying by player.isPlaying.collectAsStateWithLifecycle()
     // Apple Music feel: the cover shrinks while paused.
-    val coverScale by animateFloatAsState(if (isPlaying) 1f else 0.86f, label = "coverScale")
+    val coverScale by animateFloatAsState(
+        targetValue = if (isPlaying) 1f else 0.86f,
+        animationSpec = spring(dampingRatio = 0.7f, stiffness = Spring.StiffnessLow),
+        label = "coverScale",
+    )
     CoverFill(
         thumbnails = entry.track.thumbnails,
         requestSize = 400.dp,
         shape = RoundedCornerShape(14.dp),
-        modifier = Modifier
+        modifier = sharedCover
             .fillMaxWidth()
             .aspectRatio(1f)
             .graphicsLayer {
@@ -232,6 +288,7 @@ private fun TrackInfoRow(entry: QueueEntry, onClose: () -> Unit) {
     val likedVideoIds by container.libraryState.likedVideoIds.collectAsStateWithLifecycle()
     LaunchedEffect(entry.track.videoId) { container.libraryState.ensureRatings(listOf(entry.track.videoId)) }
     val isLiked = entry.track.videoId in likedVideoIds
+    val haptics = LocalHapticFeedback.current
 
     Row(verticalAlignment = Alignment.CenterVertically) {
         Column(modifier = Modifier.weight(1f)) {
@@ -249,13 +306,13 @@ private fun TrackInfoRow(entry: QueueEntry, onClose: () -> Unit) {
                 },
             )
         }
-        IconButton(onClick = { container.libraryState.toggleLike(entry.track, entry.kind) }) {
-            Icon(
-                imageVector = OtterIcons.Heart.select(isLiked),
-                contentDescription = "Like",
-                tint = if (isLiked) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
-            )
-        }
+        LikeButton(
+            isLiked = isLiked,
+            onToggle = {
+                haptics.performHapticFeedback(if (isLiked) HapticFeedbackType.ToggleOff else HapticFeedbackType.ToggleOn)
+                container.libraryState.toggleLike(entry.track, entry.kind)
+            },
+        )
     }
 }
 
@@ -274,5 +331,28 @@ private fun ArtistLinks(artists: List<Artist>, onOpenArtist: (Artist) -> Unit) {
                 modifier = Modifier.clickable(enabled = canOpen) { onOpenArtist(artist) },
             )
         }
+    }
+}
+
+/** Heart that pops with a springy overshoot when it turns on. */
+@Composable
+private fun LikeButton(isLiked: Boolean, onToggle: () -> Unit) {
+    val popScale = remember { Animatable(1f) }
+    LaunchedEffect(isLiked) {
+        if (isLiked) {
+            popScale.snapTo(0.7f)
+            popScale.animateTo(1f, spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessMedium))
+        }
+    }
+    IconButton(onClick = onToggle) {
+        Icon(
+            imageVector = OtterIcons.Heart.select(isLiked),
+            contentDescription = if (isLiked) "Unlike" else "Like",
+            tint = if (isLiked) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.graphicsLayer {
+                scaleX = popScale.value
+                scaleY = popScale.value
+            },
+        )
     }
 }

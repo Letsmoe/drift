@@ -111,7 +111,7 @@ func parseCard(card twoRowItem) (music.Item, bool) {
 		Kind:       kind,
 		ID:         endpoint.BrowseID,
 		Title:      title,
-		Subtitle:   subtitle,
+		Subtitle:   viewsAsPlays(subtitle),
 		Thumbnails: thumbnails,
 	}, true
 }
@@ -133,7 +133,7 @@ func songItem(track music.Track, subtitle string) music.Item {
 		Kind:       music.ItemKindSong,
 		ID:         track.VideoID,
 		Title:      track.Title,
-		Subtitle:   subtitle,
+		Subtitle:   viewsAsPlays(subtitle),
 		Thumbnails: track.Thumbnails,
 		Track:      &track,
 	}

@@ -53,7 +53,8 @@
 }
 
 /* With a cover playing, the accent is its vibrant color, lifted by core/palette until it reads on
-   dark panels; accent fills (bg-action) always carry dark text. */
+   dark panels; accent fills (bg-action) always carry dark text. Secondary text is translucent white
+   instead of the theme's greys, which disappear on mid-tone tints. */
 .art-shell[data-art] {
 	--primary: var(--art-accent);
 	--primary-hover: color-mix(in oklab, var(--art-accent) 75%, white);
@@ -61,6 +62,12 @@
 	--color-action: var(--primary);
 	--color-action-hover: var(--primary-hover);
 	--color-action-fg: var(--primary-fg);
+	--text-muted: rgb(255 255 255 / 0.78);
+	--text-dim: rgb(255 255 255 / 0.62);
+	--text-faint: rgb(255 255 255 / 0.45);
+	--color-muted: var(--text-muted);
+	--color-dim: var(--text-dim);
+	--color-faint: var(--text-faint);
 }
 
 /* Panels let the backdrop show through. */

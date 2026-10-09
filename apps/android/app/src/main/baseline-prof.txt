@@ -1,0 +1,21 @@
+# Hand-written baseline profile: precompile the Compose runtime, UI, foundation and Material 3
+# paths every screen uses, plus the app's own UI and playback code. Wildcards are expanded by
+# AGP when it merges the profile into the release build.
+HSPLandroidx/compose/runtime/**->**(**)**
+HSPLandroidx/compose/ui/**->**(**)**
+HSPLandroidx/compose/foundation/**->**(**)**
+HSPLandroidx/compose/animation/**->**(**)**
+HSPLandroidx/compose/material3/**->**(**)**
+HSPLandroidx/lifecycle/**->**(**)**
+HSPLandroidx/navigation/**->**(**)**
+HSPLandroidx/activity/**->**(**)**
+HSPLcoil3/**->**(**)**
+HSPLdev/neoworks/ottermusic/**->**(**)**
+Landroidx/compose/runtime/**;
+Landroidx/compose/ui/**;
+Landroidx/compose/foundation/**;
+Landroidx/compose/animation/**;
+Landroidx/compose/material3/**;
+Landroidx/navigation/**;
+Lcoil3/**;
+Ldev/neoworks/ottermusic/**;

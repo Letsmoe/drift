@@ -20,7 +20,11 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            // Signed with the debug key so a release build installs over the debug one and keeps the library.
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
 
@@ -116,6 +120,8 @@ dependencies {
     implementation(libs.coil.network.okhttp)
     implementation(libs.androidx.palette)
     implementation(libs.reorderable)
+
+    implementation(libs.androidx.profileinstaller)
 
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.kotlinx.coroutines.android)

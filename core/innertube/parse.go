@@ -46,15 +46,30 @@ func parseSong(item listItem) (music.Track, bool) {
 // playCountPattern matches YouTube's count segments: "6.2M plays", "922K views", "1 view".
 var playCountPattern = regexp.MustCompile(`^[\d.,]+[KMB]? (plays?|views?)$`)
 
-// parsePlayCount returns the first play or view count among runs, as shown.
+// viewCountPattern finds video view counts inside longer text, e.g. "Artist • 922K views".
+var viewCountPattern = regexp.MustCompile(`\b([\d.,]+[KMB]?) views?\b`)
+
+// parsePlayCount returns the first play or view count among runs, views written as plays.
 func parsePlayCount(runs []run) string {
 	for _, textRun := range runs {
 		text := strings.TrimSpace(textRun.Text)
 		if playCountPattern.MatchString(text) {
-			return text
+			return viewsAsPlays(text)
 		}
 	}
 	return ""
+}
+
+// viewsAsPlays rewrites video view counts as plays ("922K views" -> "922K plays"), so songs
+// and videos read the same.
+func viewsAsPlays(text string) string {
+	return viewCountPattern.ReplaceAllStringFunc(text, func(count string) string {
+		number := viewCountPattern.FindStringSubmatch(count)[1]
+		if number == "1" {
+			return "1 play"
+		}
+		return number + " plays"
+	})
 }
 
 // typeLabels are the leading "Song • " style segments unfiltered search puts before the details.
@@ -159,7 +174,7 @@ func parseThumbnails(thumbnails []thumbnail) []music.Thumbnail {
 			Height: thumbnail.Height,
 		})
 	}
-	return parsed
+	return withLargeVariants(parsed)
 }
 
 func joinText(runs []run) string {

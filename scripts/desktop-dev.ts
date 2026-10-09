@@ -2,14 +2,28 @@
 // UI), a fresh build of the Go backend and Electron pointed at both. Go changes
 // need a restart of this script.
 import { spawn, spawnSync, type ChildProcess } from 'node:child_process';
+import net from 'node:net';
 import path from 'node:path';
 
 const desktopDirectory = path.resolve(import.meta.dirname, '../apps/desktop');
 const frontendDirectory = path.join(desktopDirectory, 'frontend');
 const electronDirectory = path.join(desktopDirectory, 'electron');
 const backendBinary = path.join(desktopDirectory, 'build/bin/otter-music-backend');
-const devServerUrl = 'http://localhost:5173';
+const devServerPort = await findFreePort();
+const devServerUrl = `http://localhost:${devServerPort}`;
 const devServerTimeoutMs = 30_000;
+
+// Asks the OS for an unused port; --strictPort makes Vite fail loudly if it is taken in between.
+function findFreePort(): Promise<number> {
+	return new Promise((resolve, reject) => {
+		const server = net.createServer();
+		server.on('error', reject);
+		server.listen(0, 'localhost', () => {
+			const address = server.address() as net.AddressInfo;
+			server.close(() => resolve(address.port));
+		});
+	});
+}
 
 function runOrExit(command: string, args: string[], directory: string): void {
 	const result = spawnSync(command, args, { cwd: directory, stdio: 'inherit' });
@@ -40,7 +54,7 @@ function stopAll(children: ChildProcess[]): void {
 runOrExit('go', ['build', '-o', backendBinary, '.'], desktopDirectory);
 runOrExit('bun', ['run', 'build'], electronDirectory);
 
-const vite = spawn('bun', ['run', 'dev', '--strictPort'], {
+const vite = spawn('bun', ['run', 'dev', '--port', String(devServerPort), '--strictPort'], {
 	cwd: frontendDirectory,
 	stdio: 'inherit'
 });

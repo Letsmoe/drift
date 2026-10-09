@@ -10,7 +10,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,6 +27,7 @@ import dev.neoworks.ottermusic.ui.components.SheetDivider
 import dev.neoworks.ottermusic.ui.icons.OtterIcons
 import dev.neoworks.ottermusic.ui.showToastOnFailure
 import dev.neoworks.ottermusic.ui.theme.OtterTheme
+import dev.neoworks.ottermusic.ui.LocalAppContainer
 import kotlinx.coroutines.launch
 
 private enum class EntryDialog { None, Edit, Delete }
@@ -37,7 +37,8 @@ private enum class EntryDialog { None, Edit, Delete }
 fun LibraryEntrySheet(entry: LibraryEntry, libraryState: LibraryState, onDismiss: () -> Unit) {
     var openDialog by remember { mutableStateOf(EntryDialog.None) }
     val context = LocalContext.current
-    val scope = rememberCoroutineScope()
+    // Outlives the sheet or dialog, which closes right after starting the work.
+    val scope = LocalAppContainer.current.applicationScope
 
     if (openDialog == EntryDialog.None) {
         FloatingSheet(onDismiss = onDismiss) { dismiss ->

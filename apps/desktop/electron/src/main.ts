@@ -148,8 +148,31 @@ function createWindow(): void {
 		mainWindow = undefined;
 	});
 	keepNavigationInApp(window);
+	toggleDevToolsOnShortcut(window);
 	void window.loadURL(devServerUrl || `${appOrigin}/`);
 	mainWindow = window;
+}
+
+// The removed application menu used to provide these shortcuts.
+function toggleDevToolsOnShortcut(window: BrowserWindow): void {
+	window.webContents.on('before-input-event', (event, input) => {
+		if (input.type !== 'keyDown' || !isDevToolsShortcut(input)) {
+			return;
+		}
+		event.preventDefault();
+		window.webContents.toggleDevTools();
+	});
+}
+
+function isDevToolsShortcut(input: Electron.Input): boolean {
+	if (input.key === 'F12') {
+		return true;
+	}
+	const isKeyI = input.key.toLowerCase() === 'i';
+	if (process.platform === 'darwin') {
+		return isKeyI && input.meta && input.alt;
+	}
+	return isKeyI && input.control && input.shift;
 }
 
 function quitWhenBackendDies(running: Backend): void {

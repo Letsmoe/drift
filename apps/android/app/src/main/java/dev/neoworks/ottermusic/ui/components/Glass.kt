@@ -18,7 +18,7 @@ val FloatingBarShape = RoundedCornerShape(28.dp)
  * a hairline border and a soft shadow. Compose cannot blur what is behind a view cheaply, so the
  * translucency stands in for the frosted blur.
  */
-fun Modifier.glassSurface(shape: Shape = FloatingBarShape, alpha: Float = 0.78f): Modifier =
+fun Modifier.glassSurface(shape: Shape = FloatingBarShape, alpha: Float = 0.96f): Modifier =
     this
         .shadow(elevation = 16.dp, shape = shape, ambientColor = Color.Black, spotColor = Color.Black)
         .clip(shape)

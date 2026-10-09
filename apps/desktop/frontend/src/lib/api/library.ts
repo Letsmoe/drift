@@ -22,6 +22,7 @@ import {
 	Unsave,
 	UpdatePlay
 } from '#lib/backend/generated/App.ts';
+import { onEvent } from '#lib/backend/rpc.ts';
 import type { library } from '#lib/backend/generated/models.ts';
 import type { Item, ItemKind, Track } from '#lib/api/music.ts';
 
@@ -103,6 +104,13 @@ export function isSaved(kind: ItemKind, id: string): Promise<boolean> {
 
 export function savedItems(): Promise<SavedItem[]> {
 	return SavedItems();
+}
+
+const savedItemsEventName = 'saved-items';
+
+/** Subscribes to saved items changing in the backend, e.g. refreshed podcast covers. */
+export function onSavedItemsChange(callback: () => void): () => void {
+	return onEvent(savedItemsEventName, callback);
 }
 
 /** Records the start of a playback; the returned play ID goes to updatePlay. */

@@ -16,7 +16,7 @@
 </script>
 
 {#if artistPage}
-	<section class="flex flex-col gap-3 rounded-xl bg-raised/60 p-3">
+	<section class="flex flex-col gap-3">
 		<h3 class="text-sm font-semibold text-muted">About the artist</h3>
 		<div class="flex items-center gap-3">
 			<Cover thumbnails={artistPage.thumbnails} size={56} class="size-14 shrink-0 rounded-full" />
@@ -30,7 +30,7 @@
 			</div>
 		</div>
 		{#if artistPage.description}
-			<p class="line-clamp-4 text-xs text-muted">{artistPage.description}</p>
+			<p class="line-clamp-4 text-base text-muted">{artistPage.description}</p>
 		{/if}
 	</section>
 {/if}

@@ -26,6 +26,8 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -95,6 +97,7 @@ private fun QueueHeader(onClear: () -> Unit) {
 @Composable
 private fun QueueList(queue: QueueState, player: PlayerController, modifier: Modifier = Modifier) {
     val lazyListState = rememberLazyListState()
+    val haptics = LocalHapticFeedback.current
     val upcoming = remember { mutableStateListOf<QueueEntry>() }
     // Follow the core's queue unless a drag has reordered the local copy.
     LaunchedEffect(queue.entries, queue.index) {
@@ -123,7 +126,11 @@ private fun QueueList(queue: QueueState, player: PlayerController, modifier: Mod
                     isDragging = isDragging,
                     player = player,
                     dragHandle = Modifier.draggableHandle(
-                        onDragStopped = { commitMove(entry.id, upcoming, queue.index, player) },
+                        onDragStarted = { haptics.performHapticFeedback(HapticFeedbackType.GestureThresholdActivate) },
+                        onDragStopped = {
+                            haptics.performHapticFeedback(HapticFeedbackType.GestureEnd)
+                            commitMove(entry.id, upcoming, queue.index, player)
+                        },
                     ),
                 )
             }
@@ -138,7 +145,11 @@ private fun QueueList(queue: QueueState, player: PlayerController, modifier: Mod
                     isDragging = isDragging,
                     player = player,
                     dragHandle = Modifier.draggableHandle(
-                        onDragStopped = { commitMove(entry.id, upcoming, queue.index, player) },
+                        onDragStarted = { haptics.performHapticFeedback(HapticFeedbackType.GestureThresholdActivate) },
+                        onDragStopped = {
+                            haptics.performHapticFeedback(HapticFeedbackType.GestureEnd)
+                            commitMove(entry.id, upcoming, queue.index, player)
+                        },
                     ),
                 )
             }
@@ -209,8 +220,10 @@ private fun NowPlayingRow(entry: QueueEntry, player: PlayerController) {
 @Composable
 private fun UpcomingRow(entry: QueueEntry, isDragging: Boolean, player: PlayerController, dragHandle: Modifier) {
     val dismissState = rememberSwipeToDismissBoxState()
+    val haptics = LocalHapticFeedback.current
     LaunchedEffect(dismissState.currentValue) {
         if (dismissState.currentValue == SwipeToDismissBoxValue.EndToStart) {
+            haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
             player.remove(entry.id)
         }
     }

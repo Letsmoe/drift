@@ -86,7 +86,7 @@ func TestHomeContinuation(t *testing.T) {
 	if album.Kind != music.ItemKindAlbum || album.ID != "MPREb_zJXCvnQsnxE" || album.Subtitle != "Single • Bruno Mars" {
 		t.Errorf("album = %+v", album)
 	}
-	if len(album.Thumbnails) != 2 || album.Thumbnails[1].Width != 544 {
+	if len(album.Thumbnails) != 3 || album.Thumbnails[1].Width != 544 || album.Thumbnails[2].Width != 1080 {
 		t.Errorf("album thumbnails = %+v", album.Thumbnails)
 	}
 }
@@ -124,7 +124,7 @@ func TestPodcastsHome(t *testing.T) {
 			Artists:         []music.Artist{show},
 			Album:           &music.Album{ID: "MPSPPLc-YUx4BNhJZFkHcZT-TPTR_6X8GhTApW", Name: "Deep Dive History"},
 			DurationSeconds: 111 * 60,
-			PlayCount:       "922K views",
+			PlayCount:       "922K plays",
 		},
 	}
 	if !strings.HasPrefix(episode.Description, "The Epic of Gilgamesh is the oldest") || episode.Published != "Jul 29" {

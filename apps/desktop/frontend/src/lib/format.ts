@@ -18,7 +18,7 @@ export function formatArtists(artists: Artist[]): string {
 	return artists.map((artist) => artist.name).join(', ');
 }
 
-/** YouTube's "6.2M plays" / "922K views" text, or '' when the track has none. */
+/** YouTube's "6.2M plays" text (video views are reported as plays too), or '' when the track has none. */
 export function playCountOf(track: Track): string {
 	if (track.playCount) {
 		return track.playCount;

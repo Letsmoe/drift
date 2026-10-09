@@ -24,7 +24,8 @@ type engineExtender struct {
 }
 
 func (extender engineExtender) Extend(ctx context.Context, upcoming, history []music.Track) ([]music.Track, error) {
-	if extender.app.engine == nil {
+	// In someone else's Listen Together room the host's autoplay extends the shared queue.
+	if extender.app.engine == nil || extender.app.following() {
 		return nil, nil
 	}
 	return extender.app.engine.Extend(ctx, upcoming, history)
@@ -48,6 +49,9 @@ func (app *App) newQueue() *queue.Queue {
 
 func (app *App) emitQueueState(state queue.State) {
 	app.emit(queueEvent, state)
+	if app.together != nil {
+		app.together.QueueChanged(state)
+	}
 }
 
 // QueueState returns the current queue.

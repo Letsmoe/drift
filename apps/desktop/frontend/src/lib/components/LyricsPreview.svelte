@@ -40,26 +40,26 @@
 </script>
 
 {#if lines.length > 0}
-	<section class="flex flex-col gap-2 rounded-xl bg-raised/60 p-3">
+	<section class="flex flex-col gap-2">
 		<div class="flex items-center justify-between">
 			<h3 class="text-sm font-semibold text-muted">Lyrics</h3>
 			<button
 				type="button"
 				onclick={() => panels.toggleFullPlayer()}
-				class="rounded-full px-2 py-0.5 text-xs font-semibold text-dim hover:bg-hover hover:text-default"
+				class="-mr-2 rounded-full px-2 py-0.5 text-xs font-semibold text-dim hover:bg-hover hover:text-default"
 			>
 				Show all
 			</button>
 		</div>
 		<div
 			bind:this={windowElement}
-			class="lyrics-window relative flex h-24 flex-col gap-0.5 overflow-hidden text-sm font-semibold"
+			class="lyrics-window relative flex h-36 flex-col gap-1 overflow-hidden text-lg font-semibold"
 		>
 			{#each lines as line, index (index)}
 				<p
 					data-line-index={index}
 					class={[
-						'lyric-line min-h-5 truncate',
+						'lyric-line min-h-7 truncate',
 						index === activeIndex && 'text-default',
 						index !== activeIndex && 'text-dim'
 					]}
