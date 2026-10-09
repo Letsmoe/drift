@@ -1,0 +1,87 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing release tag to build and attach packages to, e.g. v0.0.1
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  desktop:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            platform: linux
+            targets: AppImage tar.gz
+            backend: otter-music-backend
+          - os: macos-latest
+            platform: mac
+            targets: dmg zip
+            backend: otter-music-backend
+          - os: windows-latest
+            platform: win
+            targets: nsis zip
+            backend: otter-music-backend.exe
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+    env:
+      TAG: ${{ github.event.release.tag_name || inputs.tag }}
+      # setup-frontend symlinks node_modules; without this Git Bash copies instead.
+      MSYS: winsymlinks:nativestrict
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          path: otter-music
+          ref: ${{ env.TAG }}
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: otter-music/go.work
+          cache-dependency-path: 'otter-music/**/go.sum'
+      - uses: ./otter-music/.github/actions/setup-frontend
+        with:
+          neoworks-dev-token: ${{ secrets.NEOWORKS_DEV_TOKEN }}
+      - name: Check the tag matches the app version
+        working-directory: otter-music/apps/desktop/electron
+        run: |
+          version=$(bun -e 'console.log(require("./package.json").version)')
+          if [ "$TAG" != "v$version" ]; then
+            echo "Tag $TAG does not match version $version in apps/desktop/electron/package.json." >&2
+            exit 1
+          fi
+      - name: Build frontend
+        working-directory: otter-music/apps/desktop/frontend
+        run: bun run build
+      - name: Build backend
+        working-directory: otter-music/apps/desktop
+        run: go build -trimpath -ldflags='-s -w' -o build/bin/${{ matrix.backend }} .
+      - name: Package
+        working-directory: otter-music/apps/desktop/electron
+        env:
+          # Unsigned for now; don't pick up whatever identity the runner has.
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+        run: |
+          bun run build
+          bun x electron-builder --${{ matrix.platform }} ${{ matrix.targets }} --publish never \
+            '-c.artifactName=otter-music-${version}-${os}-${arch}.${ext}'
+      - name: Attach to the release
+        working-directory: otter-music/apps/desktop/build/electron
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          shopt -s nullglob
+          packages=(otter-music-*.AppImage otter-music-*.tar.gz otter-music-*.dmg otter-music-*.zip otter-music-*.exe)
+          if [ ${#packages[@]} -eq 0 ]; then
+            echo "electron-builder produced no packages." >&2
+            exit 1
+          fi
+          gh release upload "$TAG" "${packages[@]}" --clobber --repo "$GITHUB_REPOSITORY"

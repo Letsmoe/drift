@@ -4,7 +4,86 @@ A YouTube Music player. No server: every app talks to YouTube Music directly thr
 
 ## Git
 
-You're allowed to use git. Every time you make a big change, commit the current worktree if it's dirty before changing anything, then write your changes, choose a short to-the-point commit message, and push to the remote repository. If you are unsure about what to write in the commit message, ask for help. Write an explanation of the change in the body of the commit message if it is not obvious from the title. Always mention that a commit was made by you and not an actual human.
+Commit the worktree first if it's dirty, then write your changes. Short, to-the-point commit title; a body explaining the change when the title doesn't carry it; ask if you're unsure what to write. On a feature branch, only commit what that branch is for.
+
+No trailers, ever: no `Co-Authored-By` on a commit, no "Generated with Claude Code" on a PR.
+
+## Writing
+
+Commits and issues carry only what matters. Say the thing, explain what a reader won't see for themselves, stop. No restating the diff, no summarising what you just said, no section that exists because the format seemed to want one.
+
+Write issues and their comments the way you'd explain it to a colleague, in complete sentences.
+
+- Start with a 2–3 sentence summary: what happened, why, and the fix.
+- Use short headings, with short paragraphs of normal prose under them.
+- Never join ideas with arrows, slashes, colons or dashes. Write "first X, then Y" instead of "X → Y", and "A and B" instead of "A / B".
+- Use at most two code identifiers per sentence. Say what each one does the first time it appears.
+- Use bullets only for genuinely separate items, and make each bullet a full sentence.
+- Use tables only for numbers or timelines.
+- Use one date format everywhere: 2026-10-07 18:28.
+- Put error messages, paths and commands in code formatting, and long logs in a collapsed `<details>` block.
+- Put side findings in a short "Out of scope" section at the end.
+
+## How we work
+
+One agent at a time, with me giving feedback as it goes. Keep each step small enough for me to read in one sitting, and stop to show me rather than piling up work I then have to catch up on.
+
+`main` is what I've reviewed. It stays checked out in the repo root: never switch branches there.
+
+Straight to `main` in the root, no branch: typos, one-liners, and anything that only touches how we work rather than the app — this file, `.claude/skills/`, CI workflows, editor config.
+
+Everything else happens on a branch off `main`, in a worktree under `.worktrees/<branch>` (`git worktree add .worktrees/<branch> -b <branch> main`). Name it `<issue-number>-<slug>` when there is an issue (`12-lyrics-offset`), `<slug>` when there isn't. One branch is one thing; anything found along the way gets written down as an issue and stays off the branch, unless the branch can't finish without it.
+
+Before starting on anything, check whether it is already half-built: `git branch` and `git worktree list` for the feature, and read what is on the branch. Sessions end mid-feature, and a branch is where that work is — starting again writes it a second time and loses whatever the first attempt learned. If a branch for it exists, continue on it.
+
+No pull requests unless I ask for one. Review happens here, on the diff, before the merge.
+
+## Issues
+
+Issues on `letsmoe/otter-music` carry goals across sessions. A session ends and its context goes with it; an issue is the only thing that carries a goal to the next one. So:
+
+- Work that finishes in this session, with me here, needs no issue.
+- Work that won't finish in one session gets one, however loosely defined it still is.
+- Something concrete found along the way, that isn't what we're doing now, gets one instead of being done.
+
+Write them as soon as the list exists, not once the work starts.
+
+This repo is on my personal account, not neoworks: write to GitHub with plain `gh`, never `gh bot`.
+
+Every issue gets four labels: a type, a priority, an effort and an area. A personal repo has no issue types or issue fields, so all four are labels (`gh issue create --label type:bug --label priority:high --label effort:low --label area:core …`).
+
+- **Type** — `type:bug` something is broken, `type:feature` something new, `type:task` everything else.
+- **Priority** — `priority:urgent` drop everything, `priority:high` next up, `priority:medium` normal, `priority:low` nice to have.
+- **Effort** — `effort:low` an hour or two, `effort:medium` about a day, `effort:high` several days or needs splitting.
+- **Area**, exactly one of:
+  - `area:extraction` — `innertube`, `stream`, `lyrics`: talking to YouTube
+  - `area:core` — the rest of `core`: library, queue, recommendations, import, downloads, Listen Together
+  - `area:desktop` — the Go backend, Electron shell and Svelte frontend
+  - `area:android` — the Android app and `core/mobile`
+  - `area:release` — CI, packaging, releases
+
+Two areas is fine when an issue genuinely spans them; three means split it.
+
+## Done means verified
+
+Work is done when it has been shown to work, not when the code is written. Shown means one of:
+
+- a test that fails without the fix and passes with it;
+- shown in a running instance of the app (the `run` skill), with a screenshot, and one from before if you reproduced it.
+
+`bun run lint` and `bun run test` pass on the branch either way, and `bun run test:live` when `innertube` or `stream` changed.
+
+Then hand it over and stop: what changed in a sentence or two, the evidence, and the branch. When it has an issue, the evidence also goes on the issue as a comment — that comment is what I read, so it's written for someone who wasn't in the session.
+
+Never launch or restart my installed app; run your own instance. When I tell you what's happening, that's the reproduction: take it as given and go find the cause.
+
+## Merging
+
+I review the branch's diff, and it merges into `main` when I say so — never before, and never without evidence. Merge in the root with `git merge --no-ff <branch>`, so the branch stays one unit in the history; if it conflicts, resolve it in the merge commit. Push `main`. Then remove the worktree and delete the branch, and close its issue with `gh issue close <n>`.
+
+## Releases
+
+Publishing a GitHub release (`v<version>`, matching `version` in `apps/desktop/electron/package.json`) runs `.github/workflows/release.yml`, which builds the desktop app for Linux, macOS and Windows and attaches the packages to the release. Release only from reviewed `main`.
 
 ## Layout
 
@@ -21,6 +100,7 @@ core/               Go module github.com/neoworks/otter-music/core: the shared, 
   browsercookies/   desktop-only, UI-free: reads a signed-in browser session (Firefox family, Chromium family) or parses pasted cookies; runs only on the user's click
   recommend/        recommendation engine over the library + a Catalog (the innertube client): candidates → weighted ranking → diversity re-ranking; also the queue's autoplay Extender
   download/         offline downloads: persistent resumable queue, collections kept in sync, local files served by the stream proxy
+  together/         Listen Together: signed identity + friends, Nostr signaling, WebRTC rooms with join approval, queue/playback sync, friends' presence
   mobile/           gomobile adapter: the whole core behind one `Core` object, complex values as JSON strings (Android AAR)
 apps/desktop/       desktop backend (Go module …/apps/desktop): core behind a loopback server (SPA, stream proxy, RPC WebSocket)
   electron/         Electron shell: starts the backend, owns the window and native dialogs, packaging
@@ -40,7 +120,7 @@ apps/ios/           planned: Swift + SwiftUI + AVPlayer, core via gomobile xcfra
 
 ### YouTube extraction (three layers)
 
-1. **Metadata**: InnerTube JSON (search, browse, next) via the `WEB_REMIX` profile. The home feed is `browse` `FEmusic_home` plus continuations; continuation responses also carry an empty tab skeleton, so parse `continuationContents` first. Response structs model only the fields the parsers read; encoding/json matches InnerTube's camelCase keys case-insensitively, so they need no tags. Surprises: unfiltered `search` returns one flat list (a `musicCardShelfRenderer` plus one `itemSectionRenderer` per row, rows prefixed "Song • ", no shelf titles), so the parser groups rows by kind into shelves; album/playlist/podcast pages are `twoColumnBrowseResultsRenderer` with the rows in `secondaryContents`, durations in `fixedColumns`, and album rows leave out album, cover and (when equal to the album artist) artists; playlist continuation uses the `continuationItemRenderer` token and answers with `onResponseReceivedActions` (the `continuations` token is a different, wrong shape); podcast episodes are `musicMultiRowListItemRenderer` with spoken durations ("1 hr 5 min") and their continuation response does not name the show, so the `PodcastPage` continuation token wraps the show next to YouTube's token.
+1. **Metadata**: InnerTube JSON (search, browse, next) via the `WEB_REMIX` profile. The home feed is `browse` `FEmusic_home` plus continuations; continuation responses also carry an empty tab skeleton, so parse `continuationContents` first. Response structs model only the fields the parsers read; encoding/json matches InnerTube's camelCase keys case-insensitively, so they need no tags. Surprises: unfiltered `search` returns one flat list (a `musicCardShelfRenderer` plus one `itemSectionRenderer` per row, rows prefixed "Song • ", no shelf titles), so the parser groups rows by kind into shelves; album/playlist/podcast pages are `twoColumnBrowseResultsRenderer` with the rows in `secondaryContents`, durations in `fixedColumns`, and album rows leave out album, cover and (when equal to the album artist) artists; playlist continuation uses the `continuationItemRenderer` token and answers with `onResponseReceivedActions` (the `continuations` token is a different, wrong shape); podcast episodes are `musicMultiRowListItemRenderer` with spoken durations ("1 hr 5 min") and their continuation response does not name the show, so the `PodcastPage` continuation token wraps the show next to YouTube's token. Video view counts ("922K views") are rewritten as plays (`viewsAsPlays`) in `PlayCount` and card subtitles. Podcast show covers (`i.ytimg.com/pl_c/…/studio_square_thumbnail.jpg?sqp=…`) are signed and answer 404 a few days after they were issued, so `podcasts.Directory.RefreshSavedCovers` renews saved podcasts' covers (desktop: at startup and every 12 h, then the `saved-items` event).
 2. **Stream URLs**: `player` requests via the `VISIONOS` profile, which returns plain, unciphered URLs that download fully without a PoToken (yt-dlp's default client without a JS runtime). Every request needs a visitor ID (`visitor_id` endpoint, fetched once per client); without it YouTube answers "Sign in to confirm you're not a bot". Stream URLs are bound to the requesting IP and expire after ~6 h.
 3. **PoToken + cipher** (not built, not needed today): `WEB` is SABR-only, `tv` needs a TV session and `web_embedded` rejects music tracks, so there is no ciphered fallback client worth supporting right now. If `VISIONOS` dies, the fallback is yt-dlp's solver ([yt-dlp/ejs](https://github.com/yt-dlp/ejs), Unlicense) plus BotGuard, both run **in the platform webview** (Electron's Chromium, Android WebView, WKWebView) behind an interface in core. Not goja: it could not finish solving one player.js (~3 MB) in 5 minutes.
 
@@ -93,6 +173,17 @@ Optional sign-in whose only job is reading the user's own library for import and
 - **Offline**: Liked Songs, local playlists, downloaded lists and the queue work for downloaded tracks; `Downloaded()` lists carry the local cover as thumbnail. Catalog pages fail as before; autoplay and recommendation sources log network failures at debug level only.
 - **Network policy**: `SetAllowDownloads(false)` (mobile "Download only on Wi-Fi") interrupts like pause; the setting itself lives in the app.
 - Tests use an `httptest` fake CDN (Range, 403, cut transfers); `TestLiveDownloadsASearchedTrack` runs with `bun run test:live`.
+
+## Listen Together
+
+`core/together`, ported from otter's Watch Together (`apps/backend/internal/together`, same owner). No server: peers meet on public Nostr relays (`DefaultRelays`, ephemeral kind 25051), then talk peer-to-peer over a WebRTC data channel (pion, STUN only; symmetric NAT on both ends fails, like in otter).
+
+- **Identity**: an Ed25519 key per user (migration 007, `together_identity`; the seed is a credential and redacts itself). The fixed user ID friends add is the first 60 bits of `sha256(publicKey)` as 12 symbols (`K7QD-9MZA-X2PT`). Every relay message is an envelope signed over `topic + body`, and receivers drop anything not signed by the ID it claims (`openSigned`), so nobody can pose as a trusted friend.
+- **Topics**: each sealed with AES-GCM under an scrypt key derived from a user ID plus a salt; the topic is a hash of that key. Room = host's ID (`otter-music-room-v1`), invite inbox = recipient's ID, presence = sender's ID. Anyone who knows an ID can reach these topics; the signatures decide what is believed.
+- **Rooms**: star around the host, who forwards between guests. A guest repeats `join` every 2 s; the host offers at once to trusted friends (`together_friend.trusted`) and keeps everyone else in `Requests` (answering `waiting`, guest status `awaiting`, 3 min patience) until the user accepts (optionally trusting them from then on) or declines (`declined`). Every new connection asks again.
+- **Sync** (`sync.go`): queue states go around whole with a Lamport version + origin peer ID (ties break by origin, so everyone converges); receivers `queue.Adopt` them, keeping entry IDs so the current track doesn't restart. A guest shares nothing until it adopted the host's queue; only the host's autoplay extends (desktop's extender returns nothing while `Following()`). Play/pause/seek go out as playback messages (tolerance 0.75 s); the host also sends its position every 5 s (tolerance 2 s). New guests get the host's queue and extrapolated position.
+- **Presence** (`presence.go`, lobby in `lobby.go`): while online and sharing (`share_presence`, on by default), the current track (smallest cover only), position, paused and whether a session is open go to the presence topic on changes (1 s debounce, seeks > 3 s) and every 20 s; friends are offline after 65 s of silence or an explicit offline message (sent on quit and when sharing is turned off). The lobby runs once the user has friends or used Listen Together; one relay subscription covers the inbox and all friends' presence topics.
+- Desktop: `app_together.go`, events `together` (State) and `together-playback`; the player reports to `TogetherReportPlayback` every 5 s and on user actions. Tests run two instances over in-process signaling and loopback WebRTC; `TestLiveListenTogetherOverPublicRelays` uses the real relays (`bun run test:live`).
 
 ## Desktop
 
