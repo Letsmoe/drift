@@ -11,8 +11,8 @@
 	<section class="flex flex-col gap-2">
 		<h3 class="text-base font-semibold">Use a browser where you are signed in</h3>
 		<p class="text-sm text-muted">
-			If you are already signed in to music.youtube.com in a browser on this computer, Drift
-			can pick up that session. This reads the browser's cookie store, and only when you press the
+			If you are already signed in to music.youtube.com in a browser on this computer, Drift can
+			pick up that session. This reads the browser's cookie store, and only when you press the
 			button.
 		</p>
 		<div class="self-start">
