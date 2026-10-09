@@ -4,7 +4,7 @@ import (
 	"context"
 	"slices"
 
-	"github.com/neoworks/otter-music/core/music"
+	"github.com/letsmoe/drift-music/core/music"
 )
 
 const (

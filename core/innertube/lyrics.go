@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/neoworks/otter-music/core/music"
+	"github.com/letsmoe/drift-music/core/music"
 )
 
 // lyricsBrowsePrefix starts the browse ID of a track's lyrics page.

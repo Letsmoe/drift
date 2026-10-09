@@ -5,7 +5,7 @@ import (
 	"os/user"
 	"strings"
 
-	"github.com/neoworks/otter-music/core/together"
+	"github.com/letsmoe/drift-music/core/together"
 )
 
 const (

@@ -6,8 +6,8 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/neoworks/otter-music/core/library"
-	"github.com/neoworks/otter-music/core/queue"
+	"github.com/letsmoe/drift-music/core/library"
+	"github.com/letsmoe/drift-music/core/queue"
 )
 
 type recordingListener struct {

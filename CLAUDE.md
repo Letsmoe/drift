@@ -40,7 +40,7 @@ No pull requests unless I ask for one. Review happens here, on the diff, before 
 
 ## Issues
 
-Issues on `letsmoe/otter-music` carry goals across sessions. A session ends and its context goes with it; an issue is the only thing that carries a goal to the next one. So:
+Issues on `letsmoe/drift-music` carry goals across sessions. A session ends and its context goes with it; an issue is the only thing that carries a goal to the next one. So:
 
 - Work that finishes in this session, with me here, needs no issue.
 - Work that won't finish in one session gets one, however loosely defined it still is.
@@ -88,7 +88,7 @@ Publishing a GitHub release (`v<version>`, matching `version` in `apps/desktop/e
 ## Layout
 
 ```
-core/               Go module github.com/neoworks/otter-music/core: the shared, UI-free core
+core/               Go module github.com/letsmoe/drift-music/core: the shared, UI-free core
   music/            domain types (Track, Artist, Album, Thumbnail): the one data shape every app sees
   innertube/        InnerTube client: client profiles, visitor ID, search, home feed, album/playlist/artist/podcast pages, radio, player; `AccountClient` (session-authenticated library reads, the only client that sends cookies); testdata/ holds trimmed real responses (the account/library fixtures are synthesized)
   stream/           resolver (profile chain → best audio URL, cached until expiry) + local HTTP proxy

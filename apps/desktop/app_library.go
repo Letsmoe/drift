@@ -3,8 +3,8 @@ package main
 import (
 	"errors"
 
-	"github.com/neoworks/otter-music/core/library"
-	"github.com/neoworks/otter-music/core/music"
+	"github.com/letsmoe/drift-music/core/library"
+	"github.com/letsmoe/drift-music/core/music"
 )
 
 var errLibraryUnavailable = errors.New("the local library could not be opened")

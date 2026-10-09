@@ -4,7 +4,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/neoworks/otter-music/core/importer"
+	"github.com/letsmoe/drift-music/core/importer"
 )
 
 type recordingImportListener struct {

@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/neoworks/otter-music/core/music"
+	"github.com/letsmoe/drift-music/core/music"
 )
 
 func TestHome(t *testing.T) {

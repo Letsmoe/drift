@@ -3,7 +3,7 @@ package innertube
 import (
 	"testing"
 
-	"github.com/neoworks/otter-music/core/music"
+	"github.com/letsmoe/drift-music/core/music"
 )
 
 func TestWithLargeVariantsResizesGoogleImages(t *testing.T) {

@@ -3,8 +3,8 @@ package main
 import (
 	"context"
 
-	"github.com/neoworks/otter-music/core/music"
-	"github.com/neoworks/otter-music/core/queue"
+	"github.com/letsmoe/drift-music/core/music"
+	"github.com/letsmoe/drift-music/core/queue"
 )
 
 // queueEvent is the event carrying every new queue.State.

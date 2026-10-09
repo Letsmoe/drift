@@ -12,9 +12,9 @@ import (
 
 	"github.com/pion/webrtc/v4"
 
-	"github.com/neoworks/otter-music/core/library"
-	"github.com/neoworks/otter-music/core/music"
-	"github.com/neoworks/otter-music/core/queue"
+	"github.com/letsmoe/drift-music/core/library"
+	"github.com/letsmoe/drift-music/core/music"
+	"github.com/letsmoe/drift-music/core/queue"
 )
 
 // memorySignaling is an in-process relay: every send reaches every

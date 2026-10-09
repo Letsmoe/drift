@@ -5,7 +5,7 @@ import (
 	"sort"
 	"time"
 
-	"github.com/neoworks/otter-music/core/music"
+	"github.com/letsmoe/drift-music/core/music"
 )
 
 // Profile is the user's time-decayed taste: an affinity in [-1, 1] per artist

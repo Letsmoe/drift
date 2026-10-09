@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/neoworks/otter-music/core/music"
+	"github.com/letsmoe/drift-music/core/music"
 )
 
 // ImportMatch is the remembered result of matching one external item to

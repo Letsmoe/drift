@@ -1,6 +1,6 @@
 package mobile
 
-import "github.com/neoworks/otter-music/core/library"
+import "github.com/letsmoe/drift-music/core/library"
 
 // BlockRecommendation keeps a track ("track", video ID) or an artist ("artist",
 // browse ID) out of recommendations and autoplay.

@@ -4,7 +4,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/neoworks/otter-music/core/download"
+	"github.com/letsmoe/drift-music/core/download"
 )
 
 type recordingDownloadListener struct {

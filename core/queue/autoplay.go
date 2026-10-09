@@ -5,7 +5,7 @@ import (
 	"errors"
 	"net"
 
-	"github.com/neoworks/otter-music/core/music"
+	"github.com/letsmoe/drift-music/core/music"
 )
 
 // extensionRequest is what one Extender call is given, plus the queue

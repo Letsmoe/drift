@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/neoworks/otter-music/core/music"
+	"github.com/letsmoe/drift-music/core/music"
 )
 
 // playlistBrowsePrefix turns a playlist ID into the browse ID that opens it.

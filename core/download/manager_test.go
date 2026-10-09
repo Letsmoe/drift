@@ -5,7 +5,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/neoworks/otter-music/core/music"
+	"github.com/letsmoe/drift-music/core/music"
 )
 
 func TestDownloadsTrackAndExposesLocalFiles(t *testing.T) {
