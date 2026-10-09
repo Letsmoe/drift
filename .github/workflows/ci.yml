@@ -37,8 +37,6 @@ jobs:
           go-version-file: drift/go.work
           cache-dependency-path: 'drift/**/go.sum'
       - uses: ./drift/.github/actions/setup-frontend
-        with:
-          neoworks-dev-token: ${{ secrets.NEOWORKS_DEV_TOKEN }}
       - name: Lint frontend
         working-directory: drift
         run: bun run lint:frontend

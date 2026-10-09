@@ -223,7 +223,7 @@ After writing changes, run `bun run lint` and `bun run test` and fix everything 
 
 ## CI
 
-- `.github/workflows/ci.yml`: core (golangci-lint, `go test -race`) and desktop (frontend lint/check, golangci-lint, `go test -race`, `desktop:build`) on push to main and PRs. The desktop job checks out the private `neoworks-dev/neoworks.dev` next to this repo to bun-link the ui package; it needs the `NEOWORKS_DEV_TOKEN` secret (read access to that repo's contents).
+- `.github/workflows/ci.yml`: core (golangci-lint, `go test -race`) and desktop (frontend lint/check, golangci-lint, `go test -race`, `desktop:build`) on push to main and PRs.
 - `.github/workflows/canary.yml`: daily live tests against YouTube; on failure it opens an issue labelled `canary`, or comments on the open one. GitHub runner IPs may get bot-checked by YouTube more often than home connections, so a canary failure that doesn't reproduce locally may just be the runner.
 
 ## Frontend (apps/desktop/frontend)
@@ -235,7 +235,7 @@ After writing changes, run `bun run lint` and `bun run test` and fix everything 
 
 ### Design system
 
-`@neoworks-dev/ui` and `@neoworks-dev/config` are **bun-linked** from `../neoworks.dev/packages/` (run `bun link` there once). Use its tokens (`bg-canvas`, `bg-raised`, `text-dim`, `border-line`, …) and components (`ListRow`, `Button`, `SectionHeader`, `LoadingSpinner`, …) before writing new ones; see `node_modules/@neoworks-dev/ui/COMPONENTS.md`. Generic primitives belong in the ui package (with a Storybook story there); music-specific components go in `frontend/src/lib/components`.
+`@neoworks-dev/ui` and `@neoworks-dev/config` come from npm. To work on them alongside Drift, `bun link` them from `../neoworks.dev/packages/` and `bun link @neoworks-dev/ui` in the frontend; don't commit the link. Use its tokens (`bg-canvas`, `bg-raised`, `text-dim`, `border-line`, …) and components (`ListRow`, `Button`, `SectionHeader`, `LoadingSpinner`, …) before writing new ones; see `node_modules/@neoworks-dev/ui/COMPONENTS.md`. Generic primitives belong in the ui package (with a Storybook story there); music-specific components go in `frontend/src/lib/components`.
 
 ## Code Style
 
