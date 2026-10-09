@@ -31,7 +31,7 @@ linters:
         - name: unused-parameter
     wrapcheck:
       ignore-package-globs:
-        - github.com/letsmoe/drift-music/*
+        - github.com/letsmoe/drift/*
 
 formatters:
   enable:
@@ -40,4 +40,4 @@ formatters:
   settings:
     goimports:
       local-prefixes:
-        - github.com/letsmoe/drift-music
+        - github.com/letsmoe/drift

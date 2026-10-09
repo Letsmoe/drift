@@ -9,9 +9,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/letsmoe/drift-music/core/library"
-	"github.com/letsmoe/drift-music/core/music"
-	"github.com/letsmoe/drift-music/core/spotify"
+	"github.com/letsmoe/drift/core/library"
+	"github.com/letsmoe/drift/core/music"
+	"github.com/letsmoe/drift/core/spotify"
 )
 
 // ErrBusy is returned when an import is already running.

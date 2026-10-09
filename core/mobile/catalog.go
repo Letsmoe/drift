@@ -1,8 +1,8 @@
 package mobile
 
 import (
-	"github.com/letsmoe/drift-music/core/lyrics"
-	"github.com/letsmoe/drift-music/core/music"
+	"github.com/letsmoe/drift/core/lyrics"
+	"github.com/letsmoe/drift/core/music"
 )
 
 // Home returns the first page of the home feed as music.HomePage JSON.

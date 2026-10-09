@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/letsmoe/drift-music/core/music"
+	"github.com/letsmoe/drift/core/music"
 )
 
 func TestSearch(t *testing.T) {

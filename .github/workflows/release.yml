@@ -41,17 +41,17 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
-          path: drift-music
+          path: drift
           ref: ${{ env.TAG }}
       - uses: actions/setup-go@v7
         with:
-          go-version-file: drift-music/go.work
-          cache-dependency-path: 'drift-music/**/go.sum'
-      - uses: ./drift-music/.github/actions/setup-frontend
+          go-version-file: drift/go.work
+          cache-dependency-path: 'drift/**/go.sum'
+      - uses: ./drift/.github/actions/setup-frontend
         with:
           neoworks-dev-token: ${{ secrets.NEOWORKS_DEV_TOKEN }}
       - name: Check the tag matches the app version
-        working-directory: drift-music/apps/desktop/electron
+        working-directory: drift/apps/desktop/electron
         run: |
           version=$(bun -e 'console.log(require("./package.json").version)')
           if [ "$TAG" != "v$version" ]; then
@@ -59,13 +59,13 @@ jobs:
             exit 1
           fi
       - name: Build frontend
-        working-directory: drift-music/apps/desktop/frontend
+        working-directory: drift/apps/desktop/frontend
         run: bun run build
       - name: Build backend
-        working-directory: drift-music/apps/desktop
+        working-directory: drift/apps/desktop
         run: go build -trimpath -ldflags='-s -w' -o build/bin/${{ matrix.backend }} .
       - name: Package
-        working-directory: drift-music/apps/desktop/electron
+        working-directory: drift/apps/desktop/electron
         env:
           # Unsigned for now; don't pick up whatever identity the runner has.
           CSC_IDENTITY_AUTO_DISCOVERY: 'false'
@@ -74,7 +74,7 @@ jobs:
           bun x electron-builder --${{ matrix.platform }} ${{ matrix.targets }} --publish never \
             '-c.artifactName=drift-${version}-${os}-${arch}.${ext}'
       - name: Attach to the release
-        working-directory: drift-music/apps/desktop/build/electron
+        working-directory: drift/apps/desktop/build/electron
         env:
           GH_TOKEN: ${{ github.token }}
         run: |

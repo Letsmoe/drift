@@ -31,24 +31,24 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
-          path: drift-music
+          path: drift
       - uses: actions/setup-go@v7
         with:
-          go-version-file: drift-music/go.work
-          cache-dependency-path: 'drift-music/**/go.sum'
-      - uses: ./drift-music/.github/actions/setup-frontend
+          go-version-file: drift/go.work
+          cache-dependency-path: 'drift/**/go.sum'
+      - uses: ./drift/.github/actions/setup-frontend
         with:
           neoworks-dev-token: ${{ secrets.NEOWORKS_DEV_TOKEN }}
       - name: Lint frontend
-        working-directory: drift-music
+        working-directory: drift
         run: bun run lint:frontend
       - uses: golangci/golangci-lint-action@v9
         with:
           version: v2.14.0
-          working-directory: drift-music/apps/desktop
+          working-directory: drift/apps/desktop
       - name: Test backend
-        working-directory: drift-music/apps/desktop
+        working-directory: drift/apps/desktop
         run: go test -race ./...
       - name: Build
-        working-directory: drift-music
+        working-directory: drift
         run: bun run desktop:build

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/letsmoe/drift-music/core/music"
+	"github.com/letsmoe/drift/core/music"
 )
 
 // Mix implements queue.Recommender for magic shuffle: the radios of the seed

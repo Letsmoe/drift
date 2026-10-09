@@ -11,7 +11,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/letsmoe/drift-music/core/innertube"
+	"github.com/letsmoe/drift/core/innertube"
 )
 
 const audioBytes = "0123456789"

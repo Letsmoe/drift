@@ -1,4 +1,4 @@
-module github.com/letsmoe/drift-music/core
+module github.com/letsmoe/drift/core
 
 go 1.27.1
 

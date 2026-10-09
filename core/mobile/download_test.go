@@ -4,7 +4,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/letsmoe/drift-music/core/download"
+	"github.com/letsmoe/drift/core/download"
 )
 
 type recordingDownloadListener struct {

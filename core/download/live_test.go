@@ -6,10 +6,10 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/letsmoe/drift-music/core/innertube"
-	"github.com/letsmoe/drift-music/core/library"
-	"github.com/letsmoe/drift-music/core/music"
-	"github.com/letsmoe/drift-music/core/stream"
+	"github.com/letsmoe/drift/core/innertube"
+	"github.com/letsmoe/drift/core/library"
+	"github.com/letsmoe/drift/core/music"
+	"github.com/letsmoe/drift/core/stream"
 )
 
 func TestLiveDownloadsASearchedTrack(t *testing.T) {

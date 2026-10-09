@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/letsmoe/drift-music/core/music"
+	"github.com/letsmoe/drift/core/music"
 )
 
 // maxPlaylistPages bounds continuation fetching of a runaway playlist.

@@ -5,7 +5,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/letsmoe/drift-music/core/music"
+	"github.com/letsmoe/drift/core/music"
 )
 
 func TestDownloadsTrackAndExposesLocalFiles(t *testing.T) {

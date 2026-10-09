@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/letsmoe/drift-music/core/music"
+	"github.com/letsmoe/drift/core/music"
 )
 
 // Browse IDs of the library pages (ytmusicapi mixins/library.py).

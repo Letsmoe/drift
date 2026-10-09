@@ -3,9 +3,9 @@ package main
 import (
 	"fmt"
 
-	"github.com/letsmoe/drift-music/core/account"
-	"github.com/letsmoe/drift-music/core/browsercookies"
-	"github.com/letsmoe/drift-music/core/importer"
+	"github.com/letsmoe/drift/core/account"
+	"github.com/letsmoe/drift/core/browsercookies"
+	"github.com/letsmoe/drift/core/importer"
 )
 
 func (app *App) requireAccount() (*account.Service, error) {

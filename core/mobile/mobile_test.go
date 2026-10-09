@@ -6,8 +6,8 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/letsmoe/drift-music/core/library"
-	"github.com/letsmoe/drift-music/core/queue"
+	"github.com/letsmoe/drift/core/library"
+	"github.com/letsmoe/drift/core/queue"
 )
 
 type recordingListener struct {

@@ -3,7 +3,7 @@ package recommend
 import (
 	"context"
 
-	"github.com/letsmoe/drift-music/core/music"
+	"github.com/letsmoe/drift/core/music"
 )
 
 // Extend implements queue.Extender: autoplay continues with the radio of the

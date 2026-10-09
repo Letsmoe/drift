@@ -3,8 +3,8 @@ package importer
 import (
 	"context"
 
-	"github.com/letsmoe/drift-music/core/music"
-	"github.com/letsmoe/drift-music/core/spotify"
+	"github.com/letsmoe/drift/core/music"
+	"github.com/letsmoe/drift/core/spotify"
 )
 
 func trackLookup(catalog Catalog, track spotify.Track) lookup {

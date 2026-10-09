@@ -3,7 +3,7 @@ package innertube
 import (
 	"strings"
 
-	"github.com/letsmoe/drift-music/core/music"
+	"github.com/letsmoe/drift/core/music"
 )
 
 // itemKinds maps the page a card opens to its kind; cards opening anything else

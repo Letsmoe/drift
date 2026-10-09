@@ -5,7 +5,7 @@ import (
 	"sort"
 	"time"
 
-	"github.com/letsmoe/drift-music/core/music"
+	"github.com/letsmoe/drift/core/music"
 )
 
 // Profile is the user's time-decayed taste: an affinity in [-1, 1] per artist

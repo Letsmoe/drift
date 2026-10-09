@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 
-	"github.com/letsmoe/drift-music/core/importer"
+	"github.com/letsmoe/drift/core/importer"
 )
 
 // Events the frontend listens to while an import (Spotify or YouTube Music) runs.

@@ -7,8 +7,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/letsmoe/drift-music/core/library"
-	"github.com/letsmoe/drift-music/core/music"
+	"github.com/letsmoe/drift/core/library"
+	"github.com/letsmoe/drift/core/music"
 )
 
 // seedListening gives the user one completed play of a track by artist:seed

@@ -5,9 +5,9 @@ import (
 	"errors"
 	"path/filepath"
 
-	"github.com/letsmoe/drift-music/core/download"
-	"github.com/letsmoe/drift-music/core/music"
-	"github.com/letsmoe/drift-music/core/stream"
+	"github.com/letsmoe/drift/core/download"
+	"github.com/letsmoe/drift/core/music"
+	"github.com/letsmoe/drift/core/stream"
 )
 
 var errDownloadsUnavailable = errors.New("downloads need the local library, which could not be opened")

@@ -6,8 +6,8 @@ import (
 	"log/slog"
 	"testing"
 
-	"github.com/letsmoe/drift-music/core/innertube"
-	"github.com/letsmoe/drift-music/core/music"
+	"github.com/letsmoe/drift/core/innertube"
+	"github.com/letsmoe/drift/core/music"
 )
 
 func TestLiveShows(t *testing.T) {

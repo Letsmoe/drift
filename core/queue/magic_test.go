@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/letsmoe/drift-music/core/music"
+	"github.com/letsmoe/drift/core/music"
 )
 
 type mixCall struct {

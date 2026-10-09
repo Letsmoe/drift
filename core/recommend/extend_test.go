@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/letsmoe/drift-music/core/music"
+	"github.com/letsmoe/drift/core/music"
 )
 
 // TestExtendFollowsTheLastTracksRadio checks filtering, ranking and the limit.

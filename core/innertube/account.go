@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/letsmoe/drift-music/core/music"
+	"github.com/letsmoe/drift/core/music"
 )
 
 // AccountClient reads the signed-in user's YouTube Music library. It is the

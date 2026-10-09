@@ -6,7 +6,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/letsmoe/drift-music/core/music"
+	"github.com/letsmoe/drift/core/music"
 )
 
 // minimumResumeSeconds is how far into an episode a play must have got to be worth resuming.

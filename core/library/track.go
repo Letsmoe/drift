@@ -8,7 +8,7 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/letsmoe/drift-music/core/music"
+	"github.com/letsmoe/drift/core/music"
 )
 
 // executor is what *sql.DB and *sql.Tx share.

@@ -7,7 +7,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/letsmoe/drift-music/core/music"
+	"github.com/letsmoe/drift/core/music"
 )
 
 type fakeCatalog struct {
