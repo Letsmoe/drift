@@ -10,7 +10,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.platform.LocalContext
 import androidx.palette.graphics.Palette
 import coil3.SingletonImageLoader
@@ -22,7 +21,10 @@ import dev.neoworks.ottermusic.ui.theme.Canvas
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-private const val DARKEN_AMOUNT = 0.55f
+private const val MIN_SATURATION = 0.3f
+private const val MAX_SATURATION = 0.7f
+private const val MIN_LIGHTNESS = 0.18f
+private const val MAX_LIGHTNESS = 0.3f
 
 /**
  * A darkened version of the cover's vibrant (or dominant) color for the Now Playing gradient,
@@ -57,11 +59,26 @@ private suspend fun extractCoverColor(context: android.content.Context, coverUrl
     }
     return withContext(Dispatchers.Default) {
         val palette = Palette.from(result.image.toBitmap()).generate()
-        val swatch = palette.vibrantSwatch ?: palette.dominantSwatch
+        val swatch = pickSwatch(palette)
         if (swatch == null) {
             return@withContext null
         }
-        lerp(Color(swatch.rgb), Color.Black, DARKEN_AMOUNT)
+        toGradientColor(swatch)
     }
+}
+
+private fun pickSwatch(palette: Palette): Palette.Swatch? =
+    palette.vibrantSwatch
+        ?: palette.lightVibrantSwatch
+        ?: palette.mutedSwatch
+        ?: palette.lightMutedSwatch
+        ?: palette.dominantSwatch
+
+// Dark but never muddy: lightness is pinned to a narrow band and weak colors get some saturation.
+private fun toGradientColor(swatch: Palette.Swatch): Color {
+    val hsl = swatch.hsl
+    val saturation = hsl[1].coerceIn(MIN_SATURATION, MAX_SATURATION)
+    val lightness = hsl[2].coerceIn(MIN_LIGHTNESS, MAX_LIGHTNESS)
+    return Color.hsl(hsl[0], saturation, lightness)
 }
 

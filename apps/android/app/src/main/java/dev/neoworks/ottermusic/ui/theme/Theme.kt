@@ -1,6 +1,7 @@
 package dev.neoworks.ottermusic.ui.theme
 
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Shapes
 import androidx.compose.material3.darkColorScheme
@@ -76,7 +77,9 @@ fun OtterMusicTheme(content: @Composable () -> Unit) {
             colorScheme = OtterColorScheme,
             typography = OtterTypography,
             shapes = OtterShapes,
-            content = content,
-        )
+        ) {
+            // Without a Surface ancestor, text defaults to black on the dark canvas.
+            CompositionLocalProvider(LocalContentColor provides OtterColorScheme.onSurface, content = content)
+        }
     }
 }

@@ -6,6 +6,7 @@ import {
 	playlists,
 	removeFromPlaylist,
 	renamePlaylist,
+	onSavedItemsChange,
 	ratings,
 	save,
 	savedItems,
@@ -28,8 +29,9 @@ export class LibraryState {
 
 	#requestedRatingIds = new SvelteSet<string>();
 
-	/** Loads playlists and saved items; call once at startup. */
+	/** Loads playlists and saved items and follows backend changes to them; call once at startup. */
 	async load(): Promise<void> {
+		onSavedItemsChange(() => this.refreshSavedItems());
 		await Promise.all([this.refreshPlaylists(), this.refreshSavedItems()]);
 	}
 

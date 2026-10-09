@@ -326,3 +326,66 @@ export namespace recommend {
 		items: recommend.Item[];
 	}
 }
+
+export namespace together {
+	export interface Friend {
+		userId: string;
+		name: string;
+		trusted: boolean;
+		addedAt: string;
+		presence: together.Presence | null;
+	}
+
+	export interface Identity {
+		userId: string;
+		name: string;
+	}
+
+	export interface Invite {
+		from: together.Identity;
+		receivedAt: string;
+	}
+
+	export interface NowPlaying {
+		track: music.Track;
+		positionSeconds: number;
+		paused: boolean;
+		updatedAt: string;
+	}
+
+	export interface Peer {
+		id: string;
+		userId: string;
+		name: string;
+	}
+
+	export interface PlaybackReport {
+		entryId: number;
+		paused: boolean;
+		positionSeconds: number;
+		userAction: boolean;
+	}
+
+	export interface Presence {
+		nowPlaying: together.NowPlaying | null;
+		sessionOpen: boolean;
+		seenAt: string;
+	}
+
+	export interface Room {
+		hostUserId: string;
+		hosting: boolean;
+		status: string;
+		selfPeerId: string;
+		peers: together.Peer[];
+		requests: together.Peer[];
+	}
+
+	export interface State {
+		self: together.Identity;
+		sharePresence: boolean;
+		room: together.Room | null;
+		friends: together.Friend[];
+		invites: together.Invite[];
+	}
+}

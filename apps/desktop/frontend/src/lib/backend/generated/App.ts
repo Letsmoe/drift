@@ -11,7 +11,8 @@ import type {
 	music,
 	palette,
 	queue,
-	recommend
+	recommend,
+	together
 } from '#lib/backend/generated/models.ts';
 
 export function AddToPlaylist(id: string, tracks: music.Track[]): Promise<void> {
@@ -341,6 +342,62 @@ export function StorageUsage(): Promise<download.Usage> {
 
 export function StreamURL(videoID: string): Promise<string> {
 	return call('StreamURL', [videoID]);
+}
+
+export function TogetherAcceptJoin(peerID: string, trust: boolean): Promise<void> {
+	return call('TogetherAcceptJoin', [peerID, trust]);
+}
+
+export function TogetherAddFriend(userID: string, name: string): Promise<void> {
+	return call('TogetherAddFriend', [userID, name]);
+}
+
+export function TogetherDeclineJoin(peerID: string): Promise<void> {
+	return call('TogetherDeclineJoin', [peerID]);
+}
+
+export function TogetherDismissInvite(userID: string): Promise<void> {
+	return call('TogetherDismissInvite', [userID]);
+}
+
+export function TogetherHost(): Promise<void> {
+	return call('TogetherHost', []);
+}
+
+export function TogetherInvite(userID: string): Promise<void> {
+	return call('TogetherInvite', [userID]);
+}
+
+export function TogetherJoin(userID: string): Promise<void> {
+	return call('TogetherJoin', [userID]);
+}
+
+export function TogetherLeave(): Promise<void> {
+	return call('TogetherLeave', []);
+}
+
+export function TogetherRemoveFriend(userID: string): Promise<void> {
+	return call('TogetherRemoveFriend', [userID]);
+}
+
+export function TogetherReportPlayback(report: together.PlaybackReport): Promise<void> {
+	return call('TogetherReportPlayback', [report]);
+}
+
+export function TogetherSetFriendTrusted(userID: string, trusted: boolean): Promise<void> {
+	return call('TogetherSetFriendTrusted', [userID, trusted]);
+}
+
+export function TogetherSetName(name: string): Promise<void> {
+	return call('TogetherSetName', [name]);
+}
+
+export function TogetherSetSharePresence(share: boolean): Promise<void> {
+	return call('TogetherSetSharePresence', [share]);
+}
+
+export function TogetherState(): Promise<together.State> {
+	return call('TogetherState', []);
 }
 
 export function UnblockRecommendation(kind: string, id: string): Promise<void> {

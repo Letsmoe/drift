@@ -5,6 +5,7 @@
 	import ArtistAboutCard from '#lib/components/ArtistAboutCard.svelte';
 	import Cover from '#lib/components/Cover.svelte';
 	import LyricsPreview from '#lib/components/LyricsPreview.svelte';
+	import QueueResizeHandle from '#lib/components/QueueResizeHandle.svelte';
 	import TrackCredits from '#lib/components/TrackCredits.svelte';
 	import UpcomingQueue from '#lib/components/UpcomingQueue.svelte';
 	import { panels } from '#lib/layout/panels.svelte.ts';
@@ -25,7 +26,11 @@
 	}
 </script>
 
-<aside class="art-wash-strong flex w-80 shrink-0 flex-col rounded-2xl">
+<aside
+	class="art-wash-strong relative flex shrink-0 flex-col rounded-2xl"
+	style:width="{panels.queueWidth}px"
+>
+	<QueueResizeHandle />
 	<header class="flex h-12 shrink-0 items-center justify-between gap-2 px-4">
 		<h2 class="text-base font-semibold">Now playing</h2>
 		<div class="flex items-center gap-1">
@@ -56,34 +61,37 @@
 	</header>
 
 	<FloatingScrollbar class="min-h-0 flex-1">
-		<div class="flex flex-col gap-4 px-2 pb-4">
+		<div class="flex flex-col gap-6 px-4 pb-4">
 			{#if sections.nowPlaying}
-				<section class="flex items-center gap-3 px-2">
+				<section class="relative h-56 w-full shrink-0 overflow-hidden rounded-xl shadow-lg">
 					<button
 						type="button"
 						aria-label="Open full-screen player"
 						onclick={() => panels.toggleFullPlayer()}
-						class="shrink-0 cursor-pointer rounded-lg"
+						class="absolute inset-0 cursor-pointer"
 					>
 						<Cover
 							thumbnails={sections.nowPlaying.track.thumbnails}
-							size={112}
-							class="size-28 rounded-lg shadow-lg"
+							size={panels.queueWidth}
+							fill
 						/>
 					</button>
-					<div class="min-w-0 [&>p:first-child]:text-lg [&>p:first-child]:font-semibold">
+					<!-- Clicks pass through to the cover button except on the title and artist links. -->
+					<div
+						class="pointer-events-none absolute inset-x-0 bottom-0 bg-linear-to-t from-black/85 via-black/50 to-transparent px-4 pt-16 pb-4 [&_a]:pointer-events-auto [&>p:first-child]:text-2xl [&>p:first-child]:font-bold"
+					>
 						<TrackCredits track={sections.nowPlaying.track} />
 					</div>
 				</section>
-				<div class="flex flex-col gap-2 px-2">
-					<LyricsPreview />
-					{#if leadArtist}
-						<ArtistAboutCard artist={leadArtist} />
-					{/if}
-				</div>
+				{#if leadArtist}
+					<ArtistAboutCard artist={leadArtist} />
+				{/if}
+				<LyricsPreview />
 			{/if}
 
-			<UpcomingQueue />
+			<div class="-mx-1.5 flex flex-col gap-4">
+				<UpcomingQueue />
+			</div>
 		</div>
 	</FloatingScrollbar>
 </aside>

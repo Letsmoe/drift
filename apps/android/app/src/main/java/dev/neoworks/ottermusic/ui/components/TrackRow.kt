@@ -1,7 +1,8 @@
 package dev.neoworks.ottermusic.ui.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,6 +26,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -47,6 +50,7 @@ import dev.neoworks.ottermusic.ui.theme.OtterTheme
  * @param trailing extra content before the "more" button, e.g. a drag handle.
  * @param onRemoveFromPlaylist adds "Remove from playlist" to the action sheet.
  */
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun TrackRow(
     track: Track,
@@ -65,6 +69,7 @@ fun TrackRow(
     val isPlaying by container.playerController.isPlaying.collectAsStateWithLifecycle()
     val likedVideoIds by container.libraryState.likedVideoIds.collectAsStateWithLifecycle()
     var showActions by remember { mutableStateOf(false) }
+    val haptics = LocalHapticFeedback.current
 
     val isCurrent = currentTrack?.videoId == track.videoId
     val titleColor = if (isCurrent) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
@@ -73,7 +78,13 @@ fun TrackRow(
         modifier = modifier
             .fillMaxWidth()
             .heightIn(min = 64.dp)
-            .clickable(onClick = onClick)
+            .combinedClickable(
+                onClick = onClick,
+                onLongClick = {
+                    haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                    showActions = true
+                },
+            )
             .padding(start = 16.dp, end = 4.dp, top = 8.dp, bottom = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),

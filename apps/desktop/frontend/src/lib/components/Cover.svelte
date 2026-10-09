@@ -8,6 +8,7 @@
 		thumbnails,
 		size,
 		aspect = 'square',
+		fill = false,
 		class: className = ''
 	}: {
 		thumbnails: Thumbnail[];
@@ -15,6 +16,8 @@
 		size: number;
 		/** 'video' (16:9) suits episode thumbnails, which YouTube serves wide. */
 		aspect?: 'square' | 'video';
+		/** Fills the parent and crops instead of letterboxing, e.g. as a backdrop; aspect is ignored. */
+		fill?: boolean;
 		class?: ClassValue;
 	} = $props();
 
@@ -22,13 +25,24 @@
 	// Remembers the URL that failed, so a new thumbnail gets its own chance to load.
 	let failedUrl = $state<string | undefined>(undefined);
 	const showImage = $derived(url !== undefined && url !== failedUrl);
-	const aspectClass = $derived(aspectClassFor(aspect));
+	const shapeClass = $derived(shapeClassFor(aspect));
+	const fitClass = $derived(fitClassFor());
 
-	function aspectClassFor(shape: 'square' | 'video'): string {
+	function shapeClassFor(shape: 'square' | 'video'): string {
+		if (fill) {
+			return 'size-full';
+		}
 		if (shape === 'video') {
 			return 'aspect-video';
 		}
 		return 'aspect-square';
+	}
+
+	function fitClassFor(): string {
+		if (fill) {
+			return 'object-cover';
+		}
+		return 'bg-black/40 object-contain';
 	}
 </script>
 
@@ -38,10 +52,10 @@
 		alt=""
 		loading="lazy"
 		onerror={() => (failedUrl = url)}
-		class={[aspectClass, 'object-cover', className]}
+		class={[shapeClass, fitClass, className]}
 	/>
 {:else}
-	<div class={['flex items-center justify-center bg-hover text-dim', aspectClass, className]}>
+	<div class={['flex items-center justify-center bg-hover text-dim', shapeClass, className]}>
 		<MusicNoteIcon size={Math.round(size / 3)} />
 	</div>
 {/if}

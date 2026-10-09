@@ -1,6 +1,9 @@
 package dev.neoworks.ottermusic.ui.navigation
 
-import androidx.activity.compose.BackHandler
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,6 +21,8 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.NavHost
@@ -45,8 +50,10 @@ import dev.neoworks.ottermusic.ui.theme.Canvas
  * The app frame: the NavHost under a floating stack of mini player + tab bar, with the Now
  * Playing screen as an overlay above everything. Screens draw edge to edge; they handle the
  * status bar themselves (top bars use statusBarsPadding) and pad their scrolling content with
- * [LocalBottomOverlayPadding].
+ * [LocalBottomOverlayPadding]. The mini player cover and the Now Playing cover are one shared
+ * element, so opening the player makes the cover fly up.
  */
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun AppShell() {
     val navController = rememberNavController()
@@ -55,31 +62,38 @@ fun AppShell() {
     var isNowPlayingOpen by rememberSaveable { mutableStateOf(false) }
     var overlayHeight by remember { mutableStateOf(0.dp) }
     val density = LocalDensity.current
+    val isPlayerShown = isNowPlayingOpen && currentTrack != null
 
     CompositionLocalProvider(
         LocalNavController provides navController,
         LocalBottomOverlayPadding provides overlayHeight,
     ) {
-        Box(modifier = Modifier.fillMaxSize().background(Canvas)) {
-            AppNavHost(navController)
-            Column(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .onSizeChanged { size -> overlayHeight = with(density) { size.height.toDp() } },
-            ) {
-                MiniPlayer(onOpen = { isNowPlayingOpen = true })
-                FloatingNavBar(
-                    selectedTab = selectedTabOf(navController),
-                    onSelect = { tab -> navController.switchToTab(tab.route) },
+        SharedTransitionLayout {
+            Box(modifier = Modifier.fillMaxSize().background(Canvas)) {
+                AppNavHost(navController)
+                Column(
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .onSizeChanged { size -> overlayHeight = with(density) { size.height.toDp() } },
+                ) {
+                    MiniPlayer(
+                        isVisible = !isPlayerShown,
+                        sharedTransitionScope = this@SharedTransitionLayout,
+                        onOpen = { isNowPlayingOpen = true },
+                    )
+                    FloatingNavBar(
+                        selectedTab = selectedTabOf(navController),
+                        onSelect = { tab -> navController.switchToTab(tab.route) },
+                    )
+                }
+                NowPlayingOverlay(
+                    isOpen = isPlayerShown,
+                    sharedTransitionScope = this@SharedTransitionLayout,
+                    onClose = { isNowPlayingOpen = false },
                 )
             }
-            NowPlayingOverlay(
-                isOpen = isNowPlayingOpen && currentTrack != null,
-                onClose = { isNowPlayingOpen = false },
-            )
         }
     }
-    BackHandler(enabled = isNowPlayingOpen) { isNowPlayingOpen = false }
 }
 
 // The tab that owns the current destination; detail pages keep the tab they were opened from.
@@ -114,17 +128,33 @@ private fun tabOwning(destination: androidx.navigation.NavDestination): Tab? {
 
 @Composable
 private fun AppNavHost(navController: androidx.navigation.NavHostController) {
-    NavHost(navController = navController, startDestination = Routes.Home) {
-        composable<Routes.Home> { HomeScreen() }
-        composable<Routes.Search> { SearchScreen() }
-        composable<Routes.Library> { LibraryScreen() }
-        composable<Routes.Album> { entry -> AlbumScreen(albumId = entry.toRoute<Routes.Album>().id) }
-        composable<Routes.Playlist> { entry -> PlaylistScreen(playlistId = entry.toRoute<Routes.Playlist>().id) }
-        composable<Routes.Artist> { entry -> ArtistScreen(artistId = entry.toRoute<Routes.Artist>().id) }
-        composable<Routes.Podcast> { entry -> PodcastScreen(podcastId = entry.toRoute<Routes.Podcast>().id) }
-        composable<Routes.LikedSongs> { LikedSongsScreen() }
-        composable<Routes.LocalPlaylist> { entry ->
+    NavHost(
+        navController = navController,
+        startDestination = Routes.Home,
+        enterTransition = { enterTransitionFor(initialState.destination, targetState.destination) },
+        exitTransition = { ExitTransition.None },
+        popEnterTransition = { EnterTransition.None },
+        popExitTransition = { popExitTransitionFor(initialState.destination, targetState.destination) },
+    ) {
+        screen<Routes.Home> { HomeScreen() }
+        screen<Routes.Search> { SearchScreen() }
+        screen<Routes.Library> { LibraryScreen() }
+        screen<Routes.Album> { entry -> AlbumScreen(albumId = entry.toRoute<Routes.Album>().id) }
+        screen<Routes.Playlist> { entry -> PlaylistScreen(playlistId = entry.toRoute<Routes.Playlist>().id) }
+        screen<Routes.Artist> { entry -> ArtistScreen(artistId = entry.toRoute<Routes.Artist>().id) }
+        screen<Routes.Podcast> { entry -> PodcastScreen(podcastId = entry.toRoute<Routes.Podcast>().id) }
+        screen<Routes.LikedSongs> { LikedSongsScreen() }
+        screen<Routes.LocalPlaylist> { entry ->
             LocalPlaylistScreen(playlistId = entry.toRoute<Routes.LocalPlaylist>().id)
         }
+    }
+}
+
+// Every destination paints an opaque canvas so overlapping transitions never show through.
+private inline fun <reified Route : Any> NavGraphBuilder.screen(
+    crossinline content: @Composable (NavBackStackEntry) -> Unit,
+) {
+    composable<Route> { entry ->
+        Box(modifier = Modifier.fillMaxSize().background(Canvas)) { content(entry) }
     }
 }

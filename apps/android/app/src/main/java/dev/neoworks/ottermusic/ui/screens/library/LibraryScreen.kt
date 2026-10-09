@@ -20,7 +20,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,6 +45,7 @@ import dev.neoworks.ottermusic.ui.showToastOnFailure
 import dev.neoworks.ottermusic.ui.theme.OtterTheme
 import androidx.navigation.NavController
 import dev.neoworks.ottermusic.core.model.ItemKind
+import dev.neoworks.ottermusic.ui.LocalAppContainer
 import kotlinx.coroutines.launch
 
 @Composable
@@ -53,7 +53,7 @@ fun LibraryScreen(modifier: Modifier = Modifier) {
     val viewModel = appViewModel { container -> LibraryViewModel(container.core, container.libraryState) }
     val navController = LocalNavController.current
     val context = LocalContext.current
-    val scope = rememberCoroutineScope()
+    val scope = LocalAppContainer.current.applicationScope
     val entries by viewModel.entries.collectAsStateWithLifecycle()
     val filter by viewModel.filter.collectAsStateWithLifecycle()
     val sort by viewModel.sort.collectAsStateWithLifecycle()

@@ -21,11 +21,12 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -66,57 +67,26 @@ fun TrackActionSheet(
     onOpenAlbum: ((Album) -> Unit)? = null,
     onOpenArtist: ((Artist) -> Unit)? = null,
 ) {
-    val container = LocalAppContainer.current
     val navController = LocalNavController.current
-    val context = LocalContext.current
-    val scope = rememberCoroutineScope()
     var showPlaylistPicker by remember { mutableStateOf(false) }
     var showArtistPicker by remember { mutableStateOf(false) }
 
     val openAlbum = onOpenAlbum ?: { album: Album -> navController.openAlbum(album.id) }
     val openArtist = onOpenArtist ?: { artist: Artist -> navController.openArtist(artist.id) }
     val linkedArtists = track.artists.filter { artist -> artist.id.isNotEmpty() }
-    val linkedAlbum = track.album?.takeIf { album -> album.id.isNotEmpty() }
 
-    FloatingSheet(onDismiss = onDismiss) { dismiss ->
-        TrackSheetHeader(track = track, kind = kind)
-        SheetDivider()
-        ActionRow(OtterIcons.SkipForward, "Play next", {
-            container.playerController.playNext(listOf(track))
-            Toast.makeText(context, "Playing next", Toast.LENGTH_SHORT).show()
-            dismiss()
-        })
-        ActionRow(OtterIcons.Queue, "Add to queue", {
-            container.playerController.addToQueue(listOf(track))
-            Toast.makeText(context, "Added to queue", Toast.LENGTH_SHORT).show()
-            dismiss()
-        })
-        ActionRow(OtterIcons.AddToPlaylist, "Save to playlist", { showPlaylistPicker = true })
-        ActionRow(OtterIcons.Radio, "Start radio", {
-            scope.launch { startRadio(container.core, container.playerController, track, context) }
-            dismiss()
-        })
-        if (linkedAlbum != null) {
-            ActionRow(OtterIcons.Album, "Go to album", {
-                dismiss()
-                openAlbum(linkedAlbum)
-            })
-        }
-        if (linkedArtists.size == 1) {
-            ActionRow(OtterIcons.Artist, "Go to artist", {
-                dismiss()
-                openArtist(linkedArtists.first())
-            })
-        }
-        if (linkedArtists.size > 1) {
-            ActionRow(OtterIcons.Artist, "Go to artist", { showArtistPicker = true })
-        }
-        if (onRemoveFromPlaylist != null) {
-            ActionRow(OtterIcons.Remove, "Remove from playlist", {
-                onRemoveFromPlaylist()
-                dismiss()
-            })
-        }
+    // The picker replaces the action sheet instead of stacking on it, so nothing shows through.
+    if (!showPlaylistPicker) {
+        TrackActionRows(
+            track = track,
+            kind = kind,
+            onDismiss = onDismiss,
+            onRemoveFromPlaylist = onRemoveFromPlaylist,
+            onOpenAlbum = openAlbum,
+            onOpenArtist = openArtist,
+            onSaveToPlaylist = { showPlaylistPicker = true },
+            onPickArtist = { showArtistPicker = true },
+        )
     }
 
     if (showPlaylistPicker) {
@@ -138,6 +108,66 @@ fun TrackActionSheet(
             },
             onDismiss = { showArtistPicker = false },
         )
+    }
+}
+
+@Composable
+private fun TrackActionRows(
+    track: Track,
+    kind: ItemKind,
+    onDismiss: () -> Unit,
+    onRemoveFromPlaylist: (() -> Unit)?,
+    onOpenAlbum: (Album) -> Unit,
+    onOpenArtist: (Artist) -> Unit,
+    onSaveToPlaylist: () -> Unit,
+    onPickArtist: () -> Unit,
+) {
+    val container = LocalAppContainer.current
+    val context = LocalContext.current
+    // Outlives the sheet, which closes right after starting the radio.
+    val scope = container.applicationScope
+    val linkedArtists = track.artists.filter { artist -> artist.id.isNotEmpty() }
+    val linkedAlbum = track.album?.takeIf { album -> album.id.isNotEmpty() }
+
+    FloatingSheet(onDismiss = onDismiss) { dismiss ->
+        TrackSheetHeader(track = track, kind = kind)
+        SheetDivider()
+        ActionRow(OtterIcons.SkipForward, "Play next", {
+            container.playerController.playNext(listOf(track))
+            Toast.makeText(context, "Playing next", Toast.LENGTH_SHORT).show()
+            dismiss()
+        })
+        ActionRow(OtterIcons.Queue, "Add to queue", {
+            container.playerController.addToQueue(listOf(track))
+            Toast.makeText(context, "Added to queue", Toast.LENGTH_SHORT).show()
+            dismiss()
+        })
+        ActionRow(OtterIcons.AddToPlaylist, "Save to playlist", { onSaveToPlaylist() })
+        ActionRow(OtterIcons.Radio, "Start radio", {
+            scope.launch { startRadio(container.core, container.playerController, track, context) }
+            dismiss()
+        })
+        if (linkedAlbum != null) {
+            ActionRow(OtterIcons.Album, "Go to album", {
+                dismiss()
+                onOpenAlbum(linkedAlbum)
+            })
+        }
+        if (linkedArtists.size == 1) {
+            ActionRow(OtterIcons.Artist, "Go to artist", {
+                dismiss()
+                onOpenArtist(linkedArtists.first())
+            })
+        }
+        if (linkedArtists.size > 1) {
+            ActionRow(OtterIcons.Artist, "Go to artist", { onPickArtist() })
+        }
+        if (onRemoveFromPlaylist != null) {
+            ActionRow(OtterIcons.Remove, "Remove from playlist", {
+                onRemoveFromPlaylist()
+                dismiss()
+            })
+        }
     }
 }
 
@@ -232,7 +262,8 @@ fun PlaylistPickerSheet(tracks: List<Track>, onDismiss: () -> Unit) {
     val library = LocalAppContainer.current.libraryState
     val playlists by library.playlists.collectAsStateWithLifecycle()
     val context = LocalContext.current
-    val scope = rememberCoroutineScope()
+    // Outlives the sheet or dialog, which closes right after starting the work.
+    val scope = LocalAppContainer.current.applicationScope
     var showNewPlaylistDialog by remember { mutableStateOf(false) }
 
     fun addTo(playlist: PlaylistSummary, dismiss: () -> Unit) {
@@ -310,6 +341,8 @@ private fun PlaylistPickerRow(playlist: PlaylistSummary, onClick: () -> Unit) {
 @Composable
 fun NewPlaylistDialog(onDismiss: () -> Unit, onCreate: (String) -> Unit) {
     var name by remember { mutableStateOf("") }
+    val focusRequester = remember { FocusRequester() }
+    LaunchedEffect(Unit) { focusRequester.requestFocus() }
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text("New playlist") },
@@ -319,6 +352,7 @@ fun NewPlaylistDialog(onDismiss: () -> Unit, onCreate: (String) -> Unit) {
                 onValueChange = { name = it },
                 singleLine = true,
                 label = { Text("Name") },
+                modifier = Modifier.focusRequester(focusRequester),
             )
         },
         confirmButton = {

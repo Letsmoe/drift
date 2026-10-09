@@ -135,7 +135,7 @@ func parseBrowseRow(row listItem, kind music.ItemKind) music.Item {
 		Kind:       kind,
 		ID:         row.browseEndpoint().BrowseID,
 		Title:      joinText(row.column(0)),
-		Subtitle:   joinText(row.column(1)),
+		Subtitle:   viewsAsPlays(joinText(row.column(1))),
 		Thumbnails: parseThumbnails(row.thumbnails()),
 	}
 }
@@ -197,7 +197,7 @@ func parseCardItem(card cardShelf) (music.Item, bool) {
 		Kind:       kind,
 		ID:         navigation.BrowseEndpoint.BrowseID,
 		Title:      title,
-		Subtitle:   joinText(card.Subtitle.Runs),
+		Subtitle:   viewsAsPlays(joinText(card.Subtitle.Runs)),
 		Thumbnails: parseThumbnails(thumbnails),
 	}, true
 }

@@ -5,11 +5,15 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -34,6 +38,10 @@ import dev.neoworks.ottermusic.ui.icons.OtterIcons
 import dev.neoworks.ottermusic.ui.theme.OtterTheme
 import java.util.Locale
 
+private val SEEK_THUMB_SIZE = 14.dp
+private val SEEK_TRACK_HEIGHT = 4.dp
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun SeekBar() {
     val player = LocalAppContainer.current.playerController
@@ -49,6 +57,12 @@ internal fun SeekBar() {
     }
     shownMs = shownMs.coerceIn(0f, safeDuration)
 
+    val sliderColors = SliderDefaults.colors(
+        thumbColor = Color.White,
+        activeTrackColor = Color.White,
+        inactiveTrackColor = Color.White.copy(alpha = 0.25f),
+    )
+    val interactionSource = remember { MutableInteractionSource() }
     Slider(
         value = shownMs,
         onValueChange = { value ->
@@ -60,11 +74,25 @@ internal fun SeekBar() {
             isDragging = false
         },
         valueRange = 0f..safeDuration,
-        colors = SliderDefaults.colors(
-            thumbColor = Color.White,
-            activeTrackColor = Color.White,
-            inactiveTrackColor = Color.White.copy(alpha = 0.25f),
-        ),
+        interactionSource = interactionSource,
+        colors = sliderColors,
+        thumb = {
+            SliderDefaults.Thumb(
+                interactionSource = interactionSource,
+                colors = sliderColors,
+                thumbSize = DpSize(SEEK_THUMB_SIZE, SEEK_THUMB_SIZE),
+            )
+        },
+        track = { sliderState ->
+            SliderDefaults.Track(
+                sliderState = sliderState,
+                colors = sliderColors,
+                thumbTrackGapSize = 0.dp,
+                trackInsideCornerSize = 0.dp,
+                drawStopIndicator = null,
+                modifier = Modifier.height(SEEK_TRACK_HEIGHT),
+            )
+        },
     )
     Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp), horizontalArrangement = Arrangement.SpaceBetween) {
         Text(formatTime(shownMs.toLong()), style = MaterialTheme.typography.labelMedium, color = OtterTheme.colors.textMuted)

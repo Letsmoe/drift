@@ -9,7 +9,7 @@ type Track struct {
 	Album           *Album      `json:"album,omitempty"`
 	DurationSeconds int         `json:"durationSeconds"`
 	Thumbnails      []Thumbnail `json:"thumbnails"`
-	// PlayCount is YouTube's count as shown, e.g. "6.2M plays" or "922K views";
+	// PlayCount is YouTube's count as shown, e.g. "6.2M plays"; video views are written as plays too;
 	// empty when the response carried none (radio, playlists, stored tracks).
 	PlayCount string `json:"playCount,omitempty"`
 }

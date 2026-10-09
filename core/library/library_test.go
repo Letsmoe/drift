@@ -91,8 +91,8 @@ func TestOpenIsIdempotent(t *testing.T) {
 	if err = second.DB().QueryRowContext(ctx, `SELECT COUNT(*) FROM _migration`).Scan(&applied); err != nil {
 		t.Fatal(err)
 	}
-	if applied != 6 {
-		t.Fatalf("applied migrations = %d, want 6", applied)
+	if applied != 7 {
+		t.Fatalf("applied migrations = %d, want 7", applied)
 	}
 	tracks, err := second.Tracks(ctx, []string{"a"})
 	if err != nil || len(tracks) != 1 {

@@ -19,6 +19,7 @@ import (
 	"github.com/neoworks/otter-music/core/queue"
 	"github.com/neoworks/otter-music/core/recommend"
 	"github.com/neoworks/otter-music/core/stream"
+	"github.com/neoworks/otter-music/core/together"
 )
 
 // eventEmitter pushes a named event with its payload to every connected frontend.
@@ -43,8 +44,10 @@ type App struct {
 	account  *account.Service
 	queue    *queue.Queue
 	// downloads stays nil when the library could not be opened.
-	downloads     *download.Manager
-	palette       *palette.Service
+	downloads *download.Manager
+	palette   *palette.Service
+	// together stays nil when the library could not be opened.
+	together      *together.Together
 	dataDirectory string
 
 	// streamBaseURL is the backend server's origin; the proxy routes live under it.
@@ -72,11 +75,13 @@ func NewApp(logger *slog.Logger, streamBaseURL string, emit eventEmitter) *App {
 }
 
 // startup keeps ctx so long-running work stops when the backend quits, then opens
-// the library and resumes downloads.
+// the library, resumes downloads and keeps saved podcast covers fresh.
 func (app *App) startup(ctx context.Context) {
 	app.ctx = ctx
 	app.openLibrary()
+	app.openTogether()
 	app.startDownloads()
+	go app.refreshPodcastCovers()
 }
 
 // openLibrary opens the local database and builds the recommendation engine on
@@ -113,6 +118,7 @@ func libraryPath() (string, error) {
 }
 
 func (app *App) shutdown() {
+	app.closeTogether()
 	if app.downloads != nil {
 		app.downloads.Close()
 	}

@@ -22,6 +22,8 @@ import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -175,6 +177,7 @@ private fun PlaylistList(
     onRemove: (PlaylistEntry) -> Unit,
 ) {
     val playerController = LocalAppContainer.current.playerController
+    val haptics = LocalHapticFeedback.current
     val context = "library:${playlist.id}"
     val tracks = entries.map { entry -> entry.track }
     val reorderableState = rememberReorderableLazyListState(listState) { from, to ->
@@ -219,7 +222,13 @@ private fun PlaylistList(
                         trailing = {
                             IconButton(
                                 onClick = {},
-                                modifier = Modifier.draggableHandle(onDragStopped = { viewModel.commitMove(entry.id) }),
+                                modifier = Modifier.draggableHandle(
+                                    onDragStarted = { haptics.performHapticFeedback(HapticFeedbackType.GestureThresholdActivate) },
+                                    onDragStopped = {
+                                        haptics.performHapticFeedback(HapticFeedbackType.GestureEnd)
+                                        viewModel.commitMove(entry.id)
+                                    },
+                                ),
                             ) {
                                 Icon(OtterIcons.DragHandle.outline, contentDescription = "Reorder", tint = OtterTheme.colors.textDim)
                             }
@@ -309,8 +318,10 @@ private fun EmptyPlaylist(onFindSongs: () -> Unit) {
 @Composable
 private fun SwipeToRemoveRow(onRemove: () -> Unit, content: @Composable () -> Unit) {
     val dismissState = rememberSwipeToDismissBoxState()
+    val haptics = LocalHapticFeedback.current
     LaunchedEffect(dismissState.currentValue) {
         if (dismissState.currentValue == SwipeToDismissBoxValue.EndToStart) {
+            haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
             onRemove()
         }
     }

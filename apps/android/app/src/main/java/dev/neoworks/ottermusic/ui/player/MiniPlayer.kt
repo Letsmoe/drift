@@ -1,11 +1,27 @@
 package dev.neoworks.ottermusic.ui.player
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.hapticfeedback.HapticFeedback
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
+import kotlin.math.abs
+import kotlinx.coroutines.launch
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
@@ -16,7 +32,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CircularProgressIndicator
@@ -26,12 +41,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -42,28 +54,37 @@ import dev.neoworks.ottermusic.ui.components.Cover
 import dev.neoworks.ottermusic.ui.components.glassSurface
 import dev.neoworks.ottermusic.ui.icons.OtterIcons
 import dev.neoworks.ottermusic.ui.theme.OtterTheme
-import kotlin.math.roundToInt
 
 private const val SWIPE_THRESHOLD_PIXELS = 120f
+private const val SWIPE_VELOCITY_THRESHOLD = 900f
+private const val DRAG_RESISTANCE = 3f
 
 /**
  * Floating card above the tab bar: cover, title and artist, play/pause, next and a 2dp progress
- * line. Swipe sideways for next/previous, tap to open Now Playing. Hidden when the queue is empty.
+ * line. Swipe sideways for next/previous, tap to open Now Playing. Hidden when the queue is empty
+ * or while [isVisible] is false (Now Playing is open and owns the shared cover).
  */
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun MiniPlayer(onOpen: () -> Unit, modifier: Modifier = Modifier) {
+fun MiniPlayer(
+    isVisible: Boolean,
+    sharedTransitionScope: SharedTransitionScope,
+    onOpen: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     val player = LocalAppContainer.current.playerController
     val track by player.currentTrack.collectAsStateWithLifecycle()
     val shownTrack = rememberLastNonNull(track)
 
     AnimatedVisibility(
-        visible = track != null,
+        visible = track != null && isVisible,
         modifier = modifier,
         enter = slideInVertically { fullHeight -> fullHeight } + fadeIn(),
-        exit = slideOutVertically { fullHeight -> fullHeight } + fadeOut(),
+        exit = fadeOut(tween(durationMillis = 150)),
     ) {
         if (shownTrack != null) {
-            MiniPlayerCard(track = shownTrack, player = player, onOpen = onOpen)
+            val sharedCover = rememberSharedCoverModifier(sharedTransitionScope, this)
+            MiniPlayerCard(track = shownTrack, player = player, sharedCover = sharedCover, onOpen = onOpen)
         }
     }
 }
@@ -78,25 +99,29 @@ private fun <T : Any> rememberLastNonNull(value: T?): T? {
     return holder[0] as T?
 }
 
+@Suppress("ModifierParameter")
 @Composable
-private fun MiniPlayerCard(track: Track, player: PlayerController, onOpen: () -> Unit) {
+private fun MiniPlayerCard(track: Track, player: PlayerController, sharedCover: Modifier, onOpen: () -> Unit) {
     val isPlaying by player.isPlaying.collectAsStateWithLifecycle()
     val isBuffering by player.isBuffering.collectAsStateWithLifecycle()
-    var dragOffset by remember { mutableFloatStateOf(0f) }
-    val dragState = rememberDraggableState { delta -> dragOffset += delta }
+    val dragOffset = remember { Animatable(0f) }
+    val scope = rememberCoroutineScope()
+    val haptics = LocalHapticFeedback.current
+    val dragState = rememberDraggableState { delta ->
+        scope.launch { dragOffset.snapTo(dragOffset.value + delta) }
+    }
 
     Box(
         modifier = Modifier
             .padding(start = 12.dp, end = 12.dp, bottom = 8.dp)
-            .offset { IntOffset(dragOffset.roundToInt() / 3, 0) }
+            .graphicsLayer { translationX = dragOffset.value / DRAG_RESISTANCE }
             .fillMaxWidth()
             .glassSurface()
             .draggable(
                 state = dragState,
                 orientation = Orientation.Horizontal,
-                onDragStopped = {
-                    handleSwipe(dragOffset, player)
-                    dragOffset = 0f
+                onDragStopped = { velocity ->
+                    scope.launch { settleSwipe(dragOffset, velocity, player, haptics) }
                 },
             )
             .clickable(onClick = onOpen),
@@ -107,17 +132,8 @@ private fun MiniPlayerCard(track: Track, player: PlayerController, onOpen: () ->
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(10.dp),
         ) {
-            Cover(track.thumbnails, size = 40.dp)
-            Column(modifier = Modifier.weight(1f)) {
-                Text(track.title, style = MaterialTheme.typography.titleSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                Text(
-                    text = track.artistNames,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = OtterTheme.colors.textMuted,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-            }
+            Cover(track.thumbnails, size = 40.dp, modifier = sharedCover)
+            TrackTitles(track = track, modifier = Modifier.weight(1f))
             PlayPauseButton(isPlaying = isPlaying, isBuffering = isBuffering, onClick = player::toggle)
             IconButton(onClick = player::next) {
                 Icon(OtterIcons.SkipForward.filled, contentDescription = "Next")
@@ -127,14 +143,52 @@ private fun MiniPlayerCard(track: Track, player: PlayerController, onOpen: () ->
     }
 }
 
-private fun handleSwipe(dragOffset: Float, player: PlayerController) {
-    if (dragOffset < -SWIPE_THRESHOLD_PIXELS) {
+// The text cross-fades when the track changes, e.g. after a swipe or a skip.
+@Composable
+private fun TrackTitles(track: Track, modifier: Modifier = Modifier) {
+    AnimatedContent(
+        targetState = track,
+        modifier = modifier,
+        transitionSpec = { fadeIn(tween(200)) togetherWith fadeOut(tween(120)) },
+        contentKey = { shownTrack -> shownTrack.videoId },
+        label = "miniTrackTitles",
+    ) { shownTrack ->
+        Column {
+            Text(shownTrack.title, style = MaterialTheme.typography.titleSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(
+                text = shownTrack.artistNames,
+                style = MaterialTheme.typography.bodySmall,
+                color = OtterTheme.colors.textMuted,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
+    }
+}
+
+private suspend fun settleSwipe(
+    dragOffset: Animatable<Float, *>,
+    velocity: Float,
+    player: PlayerController,
+    haptics: HapticFeedback,
+) {
+    val offset = dragOffset.value
+    val isFarEnough = abs(offset) > SWIPE_THRESHOLD_PIXELS
+    val isFastEnough = abs(velocity) > SWIPE_VELOCITY_THRESHOLD && velocity * offset >= 0f
+    if (isFarEnough || isFastEnough) {
+        haptics.performHapticFeedback(HapticFeedbackType.SegmentTick)
+        skipInDirection(offset, velocity, player)
+    }
+    dragOffset.animateTo(0f, spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessMedium), velocity)
+}
+
+private fun skipInDirection(offset: Float, velocity: Float, player: PlayerController) {
+    val direction = if (offset != 0f) offset else velocity
+    if (direction < 0f) {
         player.next()
         return
     }
-    if (dragOffset > SWIPE_THRESHOLD_PIXELS) {
-        player.previous()
-    }
+    player.previous()
 }
 
 @Composable
@@ -160,21 +214,19 @@ private fun PlayPauseButton(isPlaying: Boolean, isBuffering: Boolean, onClick: (
 private fun MiniProgressLine(player: PlayerController, modifier: Modifier = Modifier) {
     val positionMs by player.positionMs.collectAsStateWithLifecycle()
     val durationMs by player.durationMs.collectAsStateWithLifecycle()
-    var fraction = 0f
-    if (durationMs > 0) {
-        fraction = (positionMs.toFloat() / durationMs).coerceIn(0f, 1f)
-    }
-    Box(
+    val trackColor = OtterTheme.colors.border
+    val progressColor = MaterialTheme.colorScheme.primary
+    // Position is read while drawing, so the ticker never recomposes the card.
+    Spacer(
         modifier = modifier
             .fillMaxWidth()
             .height(2.dp)
-            .background(OtterTheme.colors.border),
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth(fraction)
-                .height(2.dp)
-                .background(MaterialTheme.colorScheme.primary),
-        )
-    }
+            .drawBehind {
+                drawRect(trackColor)
+                if (durationMs > 0) {
+                    val fraction = (positionMs.toFloat() / durationMs).coerceIn(0f, 1f)
+                    drawRect(progressColor, size = Size(size.width * fraction, size.height))
+                }
+            },
+    )
 }
