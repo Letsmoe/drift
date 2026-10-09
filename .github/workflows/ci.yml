@@ -31,24 +31,24 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
-          path: otter-music
+          path: drift-music
       - uses: actions/setup-go@v7
         with:
-          go-version-file: otter-music/go.work
-          cache-dependency-path: 'otter-music/**/go.sum'
-      - uses: ./otter-music/.github/actions/setup-frontend
+          go-version-file: drift-music/go.work
+          cache-dependency-path: 'drift-music/**/go.sum'
+      - uses: ./drift-music/.github/actions/setup-frontend
         with:
           neoworks-dev-token: ${{ secrets.NEOWORKS_DEV_TOKEN }}
       - name: Lint frontend
-        working-directory: otter-music
+        working-directory: drift-music
         run: bun run lint:frontend
       - uses: golangci/golangci-lint-action@v9
         with:
           version: v2.14.0
-          working-directory: otter-music/apps/desktop
+          working-directory: drift-music/apps/desktop
       - name: Test backend
-        working-directory: otter-music/apps/desktop
+        working-directory: drift-music/apps/desktop
         run: go test -race ./...
       - name: Build
-        working-directory: otter-music
+        working-directory: drift-music
         run: bun run desktop:build
