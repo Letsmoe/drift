@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/letsmoe/drift-music/core/music"
+	"github.com/letsmoe/drift/core/music"
 )
 
 const maxCoverBytes = 4 << 20

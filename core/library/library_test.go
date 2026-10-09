@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/letsmoe/drift-music/core/music"
+	"github.com/letsmoe/drift/core/music"
 )
 
 // testClock is a clock tests advance by hand.

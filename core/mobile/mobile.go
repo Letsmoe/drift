@@ -16,16 +16,16 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/letsmoe/drift-music/core/account"
-	"github.com/letsmoe/drift-music/core/download"
-	"github.com/letsmoe/drift-music/core/importer"
-	"github.com/letsmoe/drift-music/core/innertube"
-	"github.com/letsmoe/drift-music/core/library"
-	"github.com/letsmoe/drift-music/core/lyrics"
-	"github.com/letsmoe/drift-music/core/podcasts"
-	"github.com/letsmoe/drift-music/core/queue"
-	"github.com/letsmoe/drift-music/core/recommend"
-	"github.com/letsmoe/drift-music/core/stream"
+	"github.com/letsmoe/drift/core/account"
+	"github.com/letsmoe/drift/core/download"
+	"github.com/letsmoe/drift/core/importer"
+	"github.com/letsmoe/drift/core/innertube"
+	"github.com/letsmoe/drift/core/library"
+	"github.com/letsmoe/drift/core/lyrics"
+	"github.com/letsmoe/drift/core/podcasts"
+	"github.com/letsmoe/drift/core/queue"
+	"github.com/letsmoe/drift/core/recommend"
+	"github.com/letsmoe/drift/core/stream"
 )
 
 const shutdownTimeout = 2 * time.Second

@@ -3,7 +3,7 @@ package recommend
 import (
 	"slices"
 
-	"github.com/letsmoe/drift-music/core/music"
+	"github.com/letsmoe/drift/core/music"
 )
 
 // rerankState tracks the page being filled: diversity counters and the run of

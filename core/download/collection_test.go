@@ -6,7 +6,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/letsmoe/drift-music/core/music"
+	"github.com/letsmoe/drift/core/music"
 )
 
 // fakeCatalog serves one album whose tracks the test can change.

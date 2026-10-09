@@ -8,9 +8,9 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/letsmoe/drift-music/core/innertube"
-	"github.com/letsmoe/drift-music/core/library"
-	"github.com/letsmoe/drift-music/core/music"
+	"github.com/letsmoe/drift/core/innertube"
+	"github.com/letsmoe/drift/core/library"
+	"github.com/letsmoe/drift/core/music"
 )
 
 // fakeAccount is a signed-in YouTube Music library held in memory.

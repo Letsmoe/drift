@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/letsmoe/drift-music/core/music"
+	"github.com/letsmoe/drift/core/music"
 )
 
 // segmentSeparator splits the subtitle column into artists • album • duration.

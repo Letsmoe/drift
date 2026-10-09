@@ -3,7 +3,7 @@ package download
 import (
 	"time"
 
-	"github.com/letsmoe/drift-music/core/music"
+	"github.com/letsmoe/drift/core/music"
 )
 
 // State is where a download is in its life.

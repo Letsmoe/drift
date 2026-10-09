@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 
-	"github.com/letsmoe/drift-music/core/importer"
+	"github.com/letsmoe/drift/core/importer"
 )
 
 var errImportUnavailable = errors.New("importing needs the local library, which could not be opened")

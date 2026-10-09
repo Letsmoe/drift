@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/letsmoe/drift-music/core/innertube"
+	"github.com/letsmoe/drift/core/innertube"
 )
 
 // fakePlayers answers Player calls per profile name and counts them.

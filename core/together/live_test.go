@@ -7,8 +7,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/letsmoe/drift-music/core/music"
-	"github.com/letsmoe/drift-music/core/queue"
+	"github.com/letsmoe/drift/core/music"
+	"github.com/letsmoe/drift/core/queue"
 )
 
 // Uses the public relays and STUN servers.

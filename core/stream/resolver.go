@@ -10,7 +10,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/letsmoe/drift-music/core/innertube"
+	"github.com/letsmoe/drift/core/innertube"
 )
 
 // expiryMargin renews URLs before YouTube's expiry so a long track never starts on a dying URL.

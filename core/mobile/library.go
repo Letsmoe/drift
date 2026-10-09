@@ -1,8 +1,8 @@
 package mobile
 
 import (
-	"github.com/letsmoe/drift-music/core/library"
-	"github.com/letsmoe/drift-music/core/music"
+	"github.com/letsmoe/drift/core/library"
+	"github.com/letsmoe/drift/core/music"
 )
 
 // resumePosition is where an unfinished episode should pick up.

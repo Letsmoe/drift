@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/letsmoe/drift-music/core/music"
+	"github.com/letsmoe/drift/core/music"
 )
 
 func parseSuggestions(response suggestionsResponse) []string {

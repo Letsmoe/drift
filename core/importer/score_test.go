@@ -3,8 +3,8 @@ package importer
 import (
 	"testing"
 
-	"github.com/letsmoe/drift-music/core/music"
-	"github.com/letsmoe/drift-music/core/spotify"
+	"github.com/letsmoe/drift/core/music"
+	"github.com/letsmoe/drift/core/spotify"
 )
 
 func song(title string, artists ...string) music.Track {

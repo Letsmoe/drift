@@ -4,7 +4,7 @@ import (
 	"context"
 	"strings"
 
-	"github.com/letsmoe/drift-music/core/music"
+	"github.com/letsmoe/drift/core/music"
 )
 
 // Catalog is the part of YouTube Music the engine reads. The innertube client

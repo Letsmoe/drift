@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/letsmoe/drift-music/core/music"
+	"github.com/letsmoe/drift/core/music"
 )
 
 // lrcTimestamp matches one leading "[mm:ss]", "[mm:ss.x]", "[mm:ss.xx]" or "[mm:ss.xxx]" tag.

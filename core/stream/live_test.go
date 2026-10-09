@@ -11,7 +11,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/letsmoe/drift-music/core/innertube"
+	"github.com/letsmoe/drift/core/innertube"
 )
 
 // liveDownloadBytes is past the CDN's 1 MiB window that unauthenticated clients get cut off at.

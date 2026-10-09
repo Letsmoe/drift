@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/letsmoe/drift-music/core/library"
-	"github.com/letsmoe/drift-music/core/music"
+	"github.com/letsmoe/drift/core/library"
+	"github.com/letsmoe/drift/core/music"
 )
 
 // profileOf returns the engine's current profile.

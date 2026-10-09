@@ -6,8 +6,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/letsmoe/drift-music/core/music"
-	"github.com/letsmoe/drift-music/core/stream"
+	"github.com/letsmoe/drift/core/music"
+	"github.com/letsmoe/drift/core/stream"
 )
 
 // Cancel stops and forgets a download that has not finished. Finished

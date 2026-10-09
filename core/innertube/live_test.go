@@ -5,7 +5,7 @@ package innertube
 import (
 	"testing"
 
-	"github.com/letsmoe/drift-music/core/music"
+	"github.com/letsmoe/drift/core/music"
 )
 
 func TestLiveHome(t *testing.T) {
