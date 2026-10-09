@@ -21,8 +21,7 @@ const appOrigin = `${appScheme}://app`;
 const devServerUrl = process.env.DRIFT_DEV_URL;
 const devBackendBinary = process.env.DRIFT_BACKEND_BINARY;
 
-const backendBinaryName =
-	process.platform === 'win32' ? 'drift-backend.exe' : 'drift-backend';
+const backendBinaryName = process.platform === 'win32' ? 'drift-backend.exe' : 'drift-backend';
 
 let backend: Backend | undefined;
 let mainWindow: BrowserWindow | undefined;

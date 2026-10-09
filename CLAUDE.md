@@ -199,25 +199,25 @@ Electron shell + Go backend, two processes (WebKitGTK was too slow for the UI on
 
 Run from the repo root:
 
-| Command                   | What it does                                                                                                                                                                     |
-| ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `bun install`             | install frontend deps                                                                                                                                                            |
-| `bun run tools`           | install golangci-lint v2 into `~/go/bin`                                                                                                                                         |
-| `bun run desktop:dev`     | Vite (hot reload) + fresh backend build + Electron (`scripts/desktop-dev.ts`; restart for Go changes)                                                                            |
+| Command                   | What it does                                                                                                                                                               |
+| ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `bun install`             | install frontend deps                                                                                                                                                      |
+| `bun run tools`           | install golangci-lint v2 into `~/go/bin`                                                                                                                                   |
+| `bun run desktop:dev`     | Vite (hot reload) + fresh backend build + Electron (`scripts/desktop-dev.ts`; restart for Go changes)                                                                      |
 | `bun run desktop:build`   | frontend, backend (`build/bin/drift-backend`), Electron bundle, `electron-builder --dir` → `apps/desktop/build/electron/`                                                  |
-| `bun run desktop:start`   | run the last production build (Linux)                                                                                                                                            |
+| `bun run desktop:start`   | run the last production build (Linux)                                                                                                                                      |
 | `bun run desktop:install` | build, then install for the current user (`scripts/install-desktop.ts`: Linux → `~/.local/share/drift/app` + `~/.local/bin` link + desktop entry, macOS → `/Applications`) |
-| `bun run bindings`        | regenerate `frontend/src/lib/backend/generated` after changing exported `App` methods or their types                                                                             |
-| `bun run android:core`    | build `apps/android/app/libs/drift-core.aar` from `core/mobile` (needs gomobile + Android SDK/NDK; skips when up to date)                                                        |
-| `bun run android:build`   | debug APK (`gradlew assembleDebug`; builds the core AAR first)                                                                                                                   |
-| `bun run android:install` | install the debug build on the connected device/emulator                                                                                                                         |
-| `bun run android:start`   | install, then launch the app                                                                                                                                                     |
-| `bun run android:logs`    | logcat of the running app only                                                                                                                                                   |
-| `bun run android:lint`    | Android lint                                                                                                                                                                     |
-| `bun run test`            | Go tests for core                                                                                                                                                                |
-| `bun run test:live`       | live tests against real YouTube (`-tags live`), same as the daily canary                                                                                                         |
-| `bun run lint`            | golangci-lint (core + desktop), prettier, eslint, svelte-check                                                                                                                   |
-| `bun run format`          | gofumpt + goimports via `golangci-lint fmt`, then prettier                                                                                                                       |
+| `bun run bindings`        | regenerate `frontend/src/lib/backend/generated` after changing exported `App` methods or their types                                                                       |
+| `bun run android:core`    | build `apps/android/app/libs/drift-core.aar` from `core/mobile` (needs gomobile + Android SDK/NDK; skips when up to date)                                                  |
+| `bun run android:build`   | debug APK (`gradlew assembleDebug`; builds the core AAR first)                                                                                                             |
+| `bun run android:install` | install the debug build on the connected device/emulator                                                                                                                   |
+| `bun run android:start`   | install, then launch the app                                                                                                                                               |
+| `bun run android:logs`    | logcat of the running app only                                                                                                                                             |
+| `bun run android:lint`    | Android lint                                                                                                                                                               |
+| `bun run test`            | Go tests for core                                                                                                                                                          |
+| `bun run test:live`       | live tests against real YouTube (`-tags live`), same as the daily canary                                                                                                   |
+| `bun run lint`            | golangci-lint (core + desktop), prettier, eslint, svelte-check                                                                                                             |
+| `bun run format`          | gofumpt + goimports via `golangci-lint fmt`, then prettier                                                                                                                 |
 
 After writing changes, run `bun run lint` and `bun run test` and fix everything they report. Run `bun run test:live` after touching `innertube` or `stream`.
 
