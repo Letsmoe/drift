@@ -2,6 +2,7 @@ package neoworks
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/letsmoe/drift/core/library"
@@ -19,12 +20,11 @@ type playlistContent struct {
 	Entries     []playlistEntryContent `json:"entries,omitempty"`
 	CreatedAt   string                 `json:"createdAt"`
 	UpdatedAt   string                 `json:"updatedAt"`
+	ID          string                 `json:"id"`
 }
 
-// playlistMapping maps the user's own playlists. The collection's schema has no
-// playlist ID: a playlist keeps its local ID as natural key on the install that
-// made it, and a playlist that arrives from another install is created locally
-// under its node's ID.
+// playlistMapping maps the user's own playlists, keyed by the playlist ID the
+// creating install chose, which every install keeps as its local ID.
 type playlistMapping struct {
 	library *library.Library
 }
@@ -48,7 +48,7 @@ func (mapping playlistMapping) local(ctx context.Context) ([]entity, error) {
 		if err != nil {
 			return nil, err
 		}
-		item, err := playlistEntity(summary.ID, playlistContentOf(playlist), playlist.UpdatedAt)
+		item, err := playlistEntity(playlistContentOf(playlist), playlist.UpdatedAt)
 		if err != nil {
 			return nil, err
 		}
@@ -63,6 +63,7 @@ func playlistContentOf(playlist library.Playlist) playlistContent {
 		Description: playlist.Description,
 		CreatedAt:   library.FormatTime(playlist.CreatedAt),
 		UpdatedAt:   library.FormatTime(playlist.UpdatedAt),
+		ID:          playlist.ID,
 	}
 	for _, entry := range playlist.Entries {
 		content.Entries = append(content.Entries, playlistEntryContent{
@@ -73,18 +74,21 @@ func playlistContentOf(playlist library.Playlist) playlistContent {
 	return content
 }
 
-func playlistEntity(key string, content playlistContent, updatedAt time.Time) (entity, error) {
+func playlistEntity(content playlistContent, updatedAt time.Time) (entity, error) {
 	canonical, err := canonicalJSON(content)
 	if err != nil {
 		return entity{}, err
 	}
-	return entity{key: key, canonical: canonical, updatedAt: updatedAt, model: content}, nil
+	return entity{key: content.ID, canonical: canonical, updatedAt: updatedAt, model: content}, nil
 }
 
-func (playlistMapping) decode(nodeID string, raw []byte) (entity, error) {
+func (playlistMapping) decode(_ string, raw []byte) (entity, error) {
 	content, err := decodeModel[playlistContent](raw)
 	if err != nil {
 		return entity{}, err
+	}
+	if content.ID == "" {
+		return entity{}, errors.New("the playlist has no id")
 	}
 	content.CreatedAt, err = normalizeTime(content.CreatedAt)
 	if err != nil {
@@ -100,7 +104,7 @@ func (playlistMapping) decode(nodeID string, raw []byte) (entity, error) {
 			return entity{}, err
 		}
 	}
-	return playlistEntity(nodeID, content, parseNodeTime(content.UpdatedAt))
+	return playlistEntity(content, parseNodeTime(content.UpdatedAt))
 }
 
 func (mapping playlistMapping) apply(ctx context.Context, remote entity) error {

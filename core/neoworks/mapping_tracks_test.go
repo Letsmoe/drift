@@ -167,6 +167,26 @@ func TestAnotherInstallReceivesTheRatingAndTheTrackWithoutAskingYouTube(t *testi
 	}
 }
 
+func TestAnEpisodeArrivesAsAnEpisode(t *testing.T) {
+	store := newFakeNodeStore()
+	laptop := newTestInstall(t, store, "laptop")
+	phone := newTestInstall(t, store, "phone")
+	ctx := t.Context()
+	_ = laptop.library.SetRating(ctx, syncedTestTrack("ep1"), music.ItemKindEpisode, library.RatingLike)
+	laptop.reconcile(t)
+
+	phone.reconcile(t)
+
+	tracks := store.liveItems("tracks")
+	if len(tracks) != 1 || tracks[0]["kind"] != "episode" {
+		t.Fatalf("track nodes = %v", tracks)
+	}
+	records, err := phone.library.ReferencedTracks(ctx)
+	if err != nil || len(records) != 1 || records[0].Kind != music.ItemKindEpisode {
+		t.Fatalf("phone tracks = %+v, %v", records, err)
+	}
+}
+
 func TestAnUnlikeOnOneInstallRemovesTheLikeOnTheOther(t *testing.T) {
 	store := newFakeNodeStore()
 	laptop := newTestInstall(t, store, "laptop")

@@ -31,6 +31,7 @@ type trackContent struct {
 	Album           *albumContent   `json:"album,omitempty"`
 	DurationSeconds int             `json:"durationSeconds"`
 	ThumbnailURL    string          `json:"thumbnailUrl,omitempty"`
+	Kind            string          `json:"kind"`
 }
 
 // trackMapping maps every cached track that another collection refers to.
@@ -56,7 +57,7 @@ func (mapping trackMapping) local(ctx context.Context) ([]entity, error) {
 	}
 	entities := make([]entity, 0, len(records))
 	for _, record := range records {
-		item, err := trackEntity(trackContentOf(record.Track), record.UpdatedAt)
+		item, err := trackEntity(trackContentOf(record), record.UpdatedAt)
 		if err != nil {
 			return nil, err
 		}
@@ -65,12 +66,14 @@ func (mapping trackMapping) local(ctx context.Context) ([]entity, error) {
 	return entities, nil
 }
 
-func trackContentOf(track music.Track) trackContent {
+func trackContentOf(record library.TrackRecord) trackContent {
+	track := record.Track
 	content := trackContent{
 		VideoID:         track.VideoID,
 		Title:           track.Title,
 		DurationSeconds: track.DurationSeconds,
 		ThumbnailURL:    syncedThumbnailURL(track.Thumbnails),
+		Kind:            string(syncedTrackKind(record.Kind)),
 	}
 	for _, artist := range track.Artists {
 		content.Artists = append(content.Artists, artistContent{ID: artist.ID, Name: artist.Name})
@@ -112,7 +115,15 @@ func (mapping trackMapping) apply(ctx context.Context, remote entity) error {
 	if content.Album != nil {
 		track.Album = &music.Album{ID: content.Album.ID, Name: content.Album.Name}
 	}
-	return mapping.library.SaveTracks(ctx, []music.Track{track}, music.ItemKindSong)
+	return mapping.library.SaveTracks(ctx, []music.Track{track}, syncedTrackKind(music.ItemKind(content.Kind)))
+}
+
+// syncedTrackKind narrows a kind to the two the tracks collection knows.
+func syncedTrackKind(kind music.ItemKind) music.ItemKind {
+	if kind == music.ItemKindEpisode {
+		return music.ItemKindEpisode
+	}
+	return music.ItemKindSong
 }
 
 // remove keeps the cached track: other rows may still refer to it.
