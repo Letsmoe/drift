@@ -59,6 +59,8 @@ func NewLibrarySync(config LibrarySyncConfig) *LibrarySync {
 		mappings: []collectionMapping{
 			trackMapping{library: config.Library},
 			ratingMapping{library: config.Library},
+			savedMapping{library: config.Library},
+			playlistMapping{library: config.Library},
 		},
 	}
 }
