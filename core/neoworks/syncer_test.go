@@ -19,6 +19,9 @@ type recordingSession struct {
 	events    *[]string
 	signedIn  bool
 	syncError error
+	// failingSyncs makes this many syncs fail before they succeed.
+	failingSyncs int
+	syncTimes    []time.Time
 }
 
 func (session *recordingSession) SignedIn() bool { return session.signedIn }
@@ -27,6 +30,11 @@ func (session *recordingSession) Sync(context.Context) (libneoworks.SyncReport, 
 	session.mutex.Lock()
 	defer session.mutex.Unlock()
 	*session.events = append(*session.events, "sync")
+	session.syncTimes = append(session.syncTimes, time.Now())
+	if session.failingSyncs > 0 {
+		session.failingSyncs--
+		return libneoworks.SyncReport{}, errors.New("offline")
+	}
 	return libneoworks.SyncReport{}, session.syncError
 }
 
@@ -365,5 +373,43 @@ func TestSigningOutForgetsTheSequences(t *testing.T) {
 	defer syncer.sequenceMutex.Unlock()
 	if syncer.pulledSequence != 0 || syncer.announcedSequence != 0 {
 		t.Errorf("sequences survived the sign-out: pulled %d, announced %d", syncer.pulledSequence, syncer.announcedSequence)
+	}
+}
+
+func TestAFailedPassIsRetriedWithAGrowingDelayUntilItSucceeds(t *testing.T) {
+	syncer, session, _ := newRecordingSyncer(0)
+	syncer.config.RetryDelay = 20 * time.Millisecond
+	syncer.config.MaxRetryDelay = time.Second
+	session.failingSyncs = 3
+	syncer.Start(t.Context())
+	defer syncer.Stop()
+
+	events := waitForEvents(t, session, 5)
+	time.Sleep(200 * time.Millisecond)
+
+	if got := session.snapshot(); len(got) != len(events) {
+		t.Fatalf("passes went on after one succeeded: %v", got)
+	}
+	session.mutex.Lock()
+	times := append([]time.Time(nil), session.syncTimes...)
+	session.mutex.Unlock()
+	firstWait := times[2].Sub(times[1])
+	secondWait := times[3].Sub(times[2])
+	if firstWait < 20*time.Millisecond || secondWait < 2*firstWait-10*time.Millisecond {
+		t.Errorf("waits between retries = %v then %v, want a doubling from 20ms", firstWait, secondWait)
+	}
+}
+
+func TestASignedOutPassIsNotRetried(t *testing.T) {
+	syncer, session, _ := newRecordingSyncer(0)
+	syncer.config.RetryDelay = 10 * time.Millisecond
+	session.signedIn = false
+	syncer.Start(t.Context())
+	defer syncer.Stop()
+
+	time.Sleep(150 * time.Millisecond)
+
+	if got := session.snapshot(); len(got) != 0 {
+		t.Fatalf("a signed-out syncer ran %v", got)
 	}
 }
