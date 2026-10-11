@@ -39,6 +39,7 @@ func (library *Library) BlockRecommendation(ctx context.Context, kind BlockKind,
 	if err != nil {
 		return fmt.Errorf("library: block %s %s: %w", kind, id, err)
 	}
+	library.emitChange(ctx, Change{Kind: ChangeBlocks})
 	return nil
 }
 
@@ -48,6 +49,7 @@ func (library *Library) UnblockRecommendation(ctx context.Context, kind BlockKin
 	if err != nil {
 		return fmt.Errorf("library: unblock %s %s: %w", kind, id, err)
 	}
+	library.emitChange(ctx, Change{Kind: ChangeBlocks})
 	return nil
 }
 

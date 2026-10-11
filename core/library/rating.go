@@ -21,7 +21,7 @@ const (
 // SetRating rates a track and caches its metadata; RatingNone removes the rating.
 func (library *Library) SetRating(ctx context.Context, track music.Track, kind music.ItemKind, rating Rating) error {
 	err := library.storeTrackRating(ctx, track, kind, rating)
-	return library.notifyChange(err, Change{Kind: ChangeLikes})
+	return library.notifyChange(ctx, err, Change{Kind: ChangeLikes})
 }
 
 func (library *Library) storeTrackRating(ctx context.Context, track music.Track, kind music.ItemKind, rating Rating) error {
