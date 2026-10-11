@@ -136,6 +136,18 @@ export namespace library {
 }
 
 export namespace main {
+	export interface NeoworksStatus {
+		available: boolean;
+		signedIn: boolean;
+		signingIn: boolean;
+		name: string;
+		email: string;
+		syncing: boolean;
+		lastSyncedAt: string | null;
+		error: string;
+		keyInFile: boolean;
+	}
+
 	export interface QueueStep {
 		state: queue.State;
 		moved: boolean;

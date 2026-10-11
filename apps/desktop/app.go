@@ -47,7 +47,9 @@ type App struct {
 	downloads *download.Manager
 	palette   *palette.Service
 	// together stays nil when the library could not be opened.
-	together      *together.Together
+	together *together.Together
+	// neoworks is set at startup; its session is nil when it could not be opened.
+	neoworks      *neoworksAccount
 	dataDirectory string
 
 	// streamBaseURL is the backend server's origin; the proxy routes live under it.
@@ -79,6 +81,7 @@ func NewApp(logger *slog.Logger, streamBaseURL string, emit eventEmitter) *App {
 func (app *App) startup(ctx context.Context) {
 	app.ctx = ctx
 	app.openLibrary()
+	app.openNeoworks()
 	app.openTogether()
 	app.startDownloads()
 	go app.refreshPodcastCovers()
@@ -140,6 +143,7 @@ func migrateLegacyDirectory(logger *slog.Logger, legacyDirectory, directory stri
 
 func (app *App) shutdown() {
 	app.closeTogether()
+	app.closeNeoworks()
 	if app.downloads != nil {
 		app.downloads.Close()
 	}

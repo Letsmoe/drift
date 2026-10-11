@@ -5,18 +5,21 @@ go 1.27.1
 require (
 	github.com/gorilla/websocket v1.5.3
 	github.com/letsmoe/drift/core v0.0.0
+	github.com/zalando/go-keyring v0.2.8
 )
 
 require (
 	github.com/btcsuite/btcd/btcec/v2 v2.5.0 // indirect
 	github.com/btcsuite/btcd/chainhash/v2 v2.0.0 // indirect
+	github.com/danieljoos/wincred v1.2.3 // indirect
 	github.com/decred/dcrd/crypto/blake256 v1.1.0 // indirect
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.4.0 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
-	github.com/godbus/dbus/v5 v5.1.0 // indirect
+	github.com/godbus/dbus/v5 v5.2.2 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/mattn/go-isatty v0.0.24 // indirect
 	github.com/ncruces/go-strftime v1.0.0 // indirect
+	github.com/neoworks-dev/libneoworks-go v0.0.0-20261011112906-7b4bbfbf7a56 // indirect
 	github.com/pion/datachannel v1.6.3 // indirect
 	github.com/pion/dtls/v3 v3.1.9 // indirect
 	github.com/pion/ice/v4 v4.4.4 // indirect

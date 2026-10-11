@@ -127,6 +127,26 @@ export function MovePlaylistEntry(id: string, entryID: number, newIndex: number)
 	return call('MovePlaylistEntry', [id, entryID, newIndex]);
 }
 
+export function NeoworksCancelSignIn(): Promise<void> {
+	return call('NeoworksCancelSignIn', []);
+}
+
+export function NeoworksSignIn(): Promise<string> {
+	return call('NeoworksSignIn', []);
+}
+
+export function NeoworksSignOut(): Promise<void> {
+	return call('NeoworksSignOut', []);
+}
+
+export function NeoworksStatus(): Promise<main.NeoworksStatus> {
+	return call('NeoworksStatus', []);
+}
+
+export function NeoworksSync(): Promise<void> {
+	return call('NeoworksSync', []);
+}
+
 export function PauseDownloads(): Promise<void> {
 	return call('PauseDownloads', []);
 }

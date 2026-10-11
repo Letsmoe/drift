@@ -7,7 +7,8 @@ import (
 	libneoworks "github.com/neoworks-dev/libneoworks-go"
 )
 
-// Sync pushes local changes to Neoworks and pulls remote ones. The first run
+// Sync pushes local changes to Neoworks and pulls remote ones; a failure
+// libneoworks hit ends the run and comes back as the error. The first run
 // of a session confirms with the registry that the bundled descriptors are
 // the published ones; the store refuses the collections until then.
 func (session *Session) Sync(ctx context.Context) (libneoworks.SyncReport, error) {
@@ -21,7 +22,16 @@ func (session *Session) Sync(ctx context.Context) (libneoworks.SyncReport, error
 	if err != nil {
 		return report, fmt.Errorf("neoworks: sync: %w", err)
 	}
-	return report, nil
+	return report, syncFailure(report)
+}
+
+// syncFailure is the failure libneoworks reported, nil for a clean run. The
+// report names the status even then ("ok"), so only its code tells.
+func syncFailure(report libneoworks.SyncReport) error {
+	if report.FailureCode == 0 {
+		return nil
+	}
+	return fmt.Errorf("neoworks: sync: %w", report.FailureCode)
 }
 
 func (session *Session) registerDescriptors(ctx context.Context) error {
