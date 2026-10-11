@@ -210,3 +210,53 @@ func TestEveryEditOfASyncedKindReportsAChange(t *testing.T) {
 		t.Errorf("changes = %v, want %v", changes, want)
 	}
 }
+
+func TestRestoredPlaysAndSearchesAreOtherInstallsHistoryAndAddedOnce(t *testing.T) {
+	ctx := context.Background()
+	lib, _ := openTestLibrary(t)
+	if err := lib.SaveTracks(ctx, []music.Track{testTrack("a")}, music.ItemKindSong); err != nil {
+		t.Fatal(err)
+	}
+	startedAt := time.Date(2026, 4, 5, 6, 7, 8, 0, time.UTC)
+	plays := []PlayRecord{{VideoID: "a", Context: "queue", StartedAt: startedAt, ProgressSeconds: 90, Completed: true}}
+	searches := []SearchRecord{{Query: "Daft Punk", SearchedAt: startedAt}}
+	for range 2 {
+		if err := lib.RestorePlays(ctx, "phone", plays); err != nil {
+			t.Fatal(err)
+		}
+		if err := lib.RestoreSearches(ctx, "phone", searches); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if _, err := lib.StartPlay(ctx, testTrack("a"), music.ItemKindSong, "radio"); err != nil {
+		t.Fatal(err)
+	}
+
+	own, err := lib.OwnPlays(ctx)
+	if err != nil || len(own) != 1 || own[0].Context != "radio" {
+		t.Errorf("own plays = %v, %v", own, err)
+	}
+	var total int
+	if err = lib.DB().QueryRowContext(ctx, `SELECT COUNT(*) FROM play WHERE origin = 'phone' AND duration_seconds = 200 AND completed = 1`).Scan(&total); err != nil || total != 1 {
+		t.Errorf("restored plays = %d, %v", total, err)
+	}
+	if ownSearches, _ := lib.OwnSearches(ctx); len(ownSearches) != 0 {
+		t.Errorf("own searches = %v", ownSearches)
+	}
+	if recent, _ := lib.RecentSearches(ctx, 5); !slices.Equal(recent, []string{"Daft Punk"}) {
+		t.Errorf("recent searches = %v", recent)
+	}
+}
+
+func TestRestoreBlockKeepsItsCreationTime(t *testing.T) {
+	ctx := context.Background()
+	lib, _ := openTestLibrary(t)
+	createdAt := time.Date(2026, 4, 5, 6, 7, 8, 0, time.UTC)
+	if err := lib.RestoreBlock(ctx, RecommendationBlock{Kind: BlockPodcast, ID: "UC1", Name: "Show", CreatedAt: createdAt}); err != nil {
+		t.Fatal(err)
+	}
+	blocks, err := lib.RecommendationBlocks(ctx)
+	if err != nil || len(blocks) != 1 || !blocks[0].CreatedAt.Equal(createdAt) || blocks[0].Kind != BlockPodcast {
+		t.Errorf("blocks = %+v, %v", blocks, err)
+	}
+}

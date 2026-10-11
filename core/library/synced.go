@@ -155,3 +155,129 @@ func restoreEntries(ctx context.Context, tx *sql.Tx, playlist Playlist) error {
 	}
 	return nil
 }
+
+// PlayRecord is one play as the synced history holds it.
+type PlayRecord struct {
+	VideoID         string
+	Context         string
+	StartedAt       time.Time
+	ProgressSeconds int
+	Completed       bool
+}
+
+// SearchRecord is one search as the synced history holds it.
+type SearchRecord struct {
+	Query      string
+	SearchedAt time.Time
+}
+
+// OwnPlays lists the plays made on this install, oldest first. Plays that came
+// from other installs are left out.
+func (library *Library) OwnPlays(ctx context.Context) ([]PlayRecord, error) {
+	rows, err := library.db.QueryContext(ctx, `SELECT video_id, context, started_at, progress_seconds, completed
+		FROM play WHERE origin = '' ORDER BY started_at, id`)
+	if err != nil {
+		return nil, fmt.Errorf("library: query own plays: %w", err)
+	}
+	defer func() { _ = rows.Close() }()
+	plays := []PlayRecord{}
+	for rows.Next() {
+		var play PlayRecord
+		var startedAt string
+		err = rows.Scan(&play.VideoID, &play.Context, &startedAt, &play.ProgressSeconds, &play.Completed)
+		if err != nil {
+			return nil, fmt.Errorf("library: scan play: %w", err)
+		}
+		play.StartedAt, err = ParseTime(startedAt)
+		if err != nil {
+			return nil, err
+		}
+		plays = append(plays, play)
+	}
+	err = rows.Err()
+	if err != nil {
+		return nil, fmt.Errorf("library: read own plays: %w", err)
+	}
+	return plays, nil
+}
+
+// OwnSearches lists the searches made on this install, oldest first.
+func (library *Library) OwnSearches(ctx context.Context) ([]SearchRecord, error) {
+	rows, err := library.db.QueryContext(ctx, `SELECT query, created_at FROM search_history
+		WHERE origin = '' ORDER BY created_at, id`)
+	if err != nil {
+		return nil, fmt.Errorf("library: query own searches: %w", err)
+	}
+	defer func() { _ = rows.Close() }()
+	searches := []SearchRecord{}
+	for rows.Next() {
+		var search SearchRecord
+		var searchedAt string
+		err = rows.Scan(&search.Query, &searchedAt)
+		if err != nil {
+			return nil, fmt.Errorf("library: scan search: %w", err)
+		}
+		search.SearchedAt, err = ParseTime(searchedAt)
+		if err != nil {
+			return nil, err
+		}
+		searches = append(searches, search)
+	}
+	err = rows.Err()
+	if err != nil {
+		return nil, fmt.Errorf("library: read own searches: %w", err)
+	}
+	return searches, nil
+}
+
+// RestorePlays adds the plays of another install's synced history, reporting no
+// change. A play already present (same video and start time from that origin)
+// is left as it is. The tracks must be cached already.
+func (library *Library) RestorePlays(ctx context.Context, origin string, plays []PlayRecord) error {
+	return library.inTransaction(ctx, func(tx *sql.Tx) error {
+		for _, play := range plays {
+			_, err := tx.ExecContext(ctx, `INSERT INTO play
+				(video_id, context, started_at, updated_at, progress_seconds, duration_seconds, completed, origin)
+				SELECT ?, ?, ?, ?, ?, t.duration_seconds, ?, ? FROM track t
+				WHERE t.video_id = ? AND NOT EXISTS (
+					SELECT 1 FROM play WHERE origin = ? AND video_id = ? AND started_at = ?)`,
+				play.VideoID, play.Context, FormatTime(play.StartedAt), FormatTime(play.StartedAt), play.ProgressSeconds,
+				play.Completed, origin, play.VideoID, origin, play.VideoID, FormatTime(play.StartedAt))
+			if err != nil {
+				return fmt.Errorf("restore play of %s: %w", play.VideoID, err)
+			}
+		}
+		return nil
+	})
+}
+
+// RestoreSearches adds the searches of another install's synced history,
+// reporting no change; one already present is left as it is.
+func (library *Library) RestoreSearches(ctx context.Context, origin string, searches []SearchRecord) error {
+	return library.inTransaction(ctx, func(tx *sql.Tx) error {
+		for _, search := range searches {
+			_, err := tx.ExecContext(ctx, `INSERT INTO search_history (query, normalized_query, created_at, origin)
+				SELECT ?, ?, ?, ? WHERE NOT EXISTS (
+					SELECT 1 FROM search_history WHERE origin = ? AND normalized_query = ? AND created_at = ?)`,
+				search.Query, normalizeQuery(search.Query), FormatTime(search.SearchedAt), origin,
+				origin, normalizeQuery(search.Query), FormatTime(search.SearchedAt))
+			if err != nil {
+				return fmt.Errorf("restore search %q: %w", search.Query, err)
+			}
+		}
+		return nil
+	})
+}
+
+// RestoreBlock writes a recommendation block that came from a synced copy,
+// keeping its creation time and reporting no change.
+func (library *Library) RestoreBlock(ctx context.Context, block RecommendationBlock) error {
+	_, err := library.db.ExecContext(ctx, `INSERT INTO recommendation_block (kind, id, name, created_at)
+		VALUES (?, ?, ?, ?)
+		ON CONFLICT (kind, id) DO UPDATE SET name = excluded.name, created_at = excluded.created_at`,
+		string(block.Kind), block.ID, block.Name, FormatTime(block.CreatedAt))
+	if err != nil {
+		return fmt.Errorf("library: restore block %s %s: %w", block.Kind, block.ID, err)
+	}
+	return nil
+}

@@ -46,8 +46,8 @@ type situation struct {
 // one that did not; when both changed, or nothing was linked yet and the
 // contents differ, the newer updatedAt wins. A deletion on one side removes
 // the other only when that other did not change since the link. Entities this
-// install owns are never overwritten from a node, and nodes that outlive their
-// entities are never deleted.
+// install owns are never overwritten from a node, which is made to match them
+// instead, and nodes that outlive their entities are never deleted.
 func decide(state situation) action {
 	if !state.hasNode {
 		return decideWithoutNode(state)
@@ -102,7 +102,10 @@ func applyUnlessOwned(state situation) action {
 }
 
 func decideLinked(state situation) action {
-	remoteChanged := !state.owned && state.remoteHash != state.linkHash
+	if state.owned {
+		return decideOwned(state)
+	}
+	remoteChanged := state.remoteHash != state.linkHash
 	if !state.hasLocal {
 		return decideLocalDeletion(state, remoteChanged)
 	}
@@ -120,8 +123,21 @@ func decideLinked(state situation) action {
 	return actionNothing
 }
 
+// decideOwned makes the node match the entity this install owns, whatever the node holds.
+func decideOwned(state situation) action {
+	switch {
+	case !state.hasLocal:
+		return actionNothing
+	case state.localHash != state.remoteHash:
+		return actionUpdateNode
+	case state.nodeMoved:
+		return actionLinkOnly
+	}
+	return actionNothing
+}
+
 func decideLocalDeletion(state situation, remoteChanged bool) action {
-	if state.owned || state.keepsNodes {
+	if state.keepsNodes {
 		return actionNothing
 	}
 	if remoteChanged {

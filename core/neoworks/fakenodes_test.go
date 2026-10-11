@@ -190,10 +190,11 @@ type testInstall struct {
 	library *library.Library
 	nodes   *fakeNodes
 	sync    *LibrarySync
+	config  LibrarySyncConfig
 	clock   *time.Time
 }
 
-func newTestInstall(t *testing.T, store *fakeNodeStore) *testInstall {
+func newTestInstall(t *testing.T, store *fakeNodeStore, deviceID string) *testInstall {
 	t.Helper()
 	install := &testInstall{nodes: newFakeNodes(store), clock: new(time.Time)}
 	*install.clock = time.Date(2026, 10, 2, 9, 0, 0, 0, time.UTC)
@@ -204,11 +205,14 @@ func newTestInstall(t *testing.T, store *fakeNodeStore) *testInstall {
 		t.Fatal(err)
 	}
 	t.Cleanup(func() { _ = install.library.Close() })
-	install.sync = NewLibrarySync(LibrarySyncConfig{
-		Library: install.library,
-		Nodes:   install.nodes,
-		UserID:  func() string { return testUserID },
-	})
+	install.config = LibrarySyncConfig{
+		Library:  install.library,
+		Nodes:    install.nodes,
+		UserID:   func() string { return testUserID },
+		Device:   Device{ID: deviceID, Name: "Drift on " + deviceID},
+		Location: time.UTC,
+	}
+	install.sync = NewLibrarySync(install.config)
 	return install
 }
 
@@ -223,4 +227,10 @@ func (install *testInstall) reconcile(t *testing.T) ReconcileReport {
 		t.Fatalf("reconcile: %v", err)
 	}
 	return report
+}
+
+// inLocation makes the install's days follow the given time zone.
+func (install *testInstall) inLocation(location *time.Location) {
+	install.config.Location = location
+	install.sync = NewLibrarySync(install.config)
 }

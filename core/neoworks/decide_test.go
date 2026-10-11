@@ -63,8 +63,11 @@ func TestDecideFollowsTheMergeRules(t *testing.T) {
 		"shared cache recreates a deleted node": {
 			situation{hasLocal: true, localHash: "a", linked: true, linkHash: "a", tombstone: true, keepsNodes: true}, actionCreateNode,
 		},
-		"owned entity ignores remote edits": {
-			situation{hasLocal: true, localHash: "a", hasNode: true, remoteHash: "b", linked: true, linkHash: "a", owned: true}, actionNothing,
+		"owned entity repairs a node edited elsewhere": {
+			situation{hasLocal: true, localHash: "a", hasNode: true, remoteHash: "b", linked: true, linkHash: "a", owned: true, nodeMoved: true}, actionUpdateNode,
+		},
+		"owned entity in step with its node": {
+			situation{hasLocal: true, localHash: "a", hasNode: true, remoteHash: "a", linked: true, linkHash: "a", owned: true}, actionNothing,
 		},
 		"owned entity is pushed": {
 			situation{hasLocal: true, localHash: "b", hasNode: true, remoteHash: "a", linked: true, linkHash: "a", owned: true}, actionUpdateNode,
