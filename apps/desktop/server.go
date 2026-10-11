@@ -11,12 +11,14 @@ import (
 var errBackendStarting = errors.New("the backend is still starting")
 
 // newServerHandler routes the backend's single loopback origin: /stream and
-// /cover go to the proxy, /rpc to the hub, everything else to the SPA.
-func newServerHandler(proxy http.Handler, rpc http.Handler, assets fs.FS) http.Handler {
+// /cover go to the proxy, /rpc to the hub, the Neoworks sign-in callback to
+// neoworksCallback, everything else to the SPA.
+func newServerHandler(proxy, rpc, neoworksCallback http.Handler, assets fs.FS) http.Handler {
 	mux := http.NewServeMux()
 	mux.Handle("/stream/", proxy)
 	mux.Handle("/cover/", proxy)
 	mux.Handle("/rpc", rpc)
+	mux.Handle(neoworksCallbackPath, neoworksCallback)
 	mux.Handle("/", spaHandler(assets))
 	return mux
 }
