@@ -4,10 +4,12 @@ go 1.27.1
 
 require (
 	github.com/btcsuite/btcd/btcec/v2 v2.5.0
-	github.com/godbus/dbus/v5 v5.1.0
+	github.com/godbus/dbus/v5 v5.2.2
 	github.com/google/uuid v1.6.0
 	github.com/gorilla/websocket v1.5.3
+	github.com/neoworks-dev/libneoworks-go v0.0.0-20261011112906-7b4bbfbf7a56
 	github.com/pion/webrtc/v4 v4.2.22
+	github.com/zalando/go-keyring v0.2.8
 	golang.org/x/crypto v0.57.0
 	golang.org/x/image v0.46.0
 	modernc.org/sqlite v1.60.1
@@ -15,6 +17,7 @@ require (
 
 require (
 	github.com/btcsuite/btcd/chainhash/v2 v2.0.0 // indirect
+	github.com/danieljoos/wincred v1.2.3 // indirect
 	github.com/decred/dcrd/crypto/blake256 v1.1.0 // indirect
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.4.0 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
