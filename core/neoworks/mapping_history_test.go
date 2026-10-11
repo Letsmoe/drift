@@ -29,15 +29,10 @@ func logsByDay(store *fakeNodeStore) map[string]map[string]any {
 	return logs
 }
 
-func TestPlaysAndSearchesBecomeOneLogPerLocalDay(t *testing.T) {
+func TestPlaysAndSearchesBecomeOneLogPerUTCDay(t *testing.T) {
 	store := newFakeNodeStore()
 	laptop := newTestInstall(t, store, "laptop")
-	berlin, err := time.LoadLocation("Europe/Berlin")
-	if err != nil {
-		t.Skip("no time zone database")
-	}
-	laptop.inLocation(berlin)
-	lateEvening := time.Date(2026, 10, 2, 21, 30, 0, 0, time.UTC)
+	lateEvening := time.Date(2026, 10, 2, 23, 30, 0, 0, time.UTC)
 	playID := play(t, laptop, lateEvening, "abc")
 	_ = laptop.library.UpdatePlay(t.Context(), playID, 200, true)
 	play(t, laptop, lateEvening.Add(time.Hour), "def")
@@ -48,7 +43,7 @@ func TestPlaysAndSearchesBecomeOneLogPerLocalDay(t *testing.T) {
 
 	logs := logsByDay(store)
 	if len(logs) != 2 {
-		t.Fatalf("logs = %v, want one for 2026-10-02 and one for 2026-10-03 in Berlin", logs)
+		t.Fatalf("logs = %v, want one for 2026-10-02 and one for 2026-10-03", logs)
 	}
 	first := logs["laptop|2026-10-02"]
 	plays, _ := first["plays"].([]any)
