@@ -39,14 +39,13 @@ type dayLogContent struct {
 	Searches   []searchContent `json:"searches,omitempty"`
 }
 
-// historyMapping maps plays and searches as one log per device and local day,
+// historyMapping maps plays and searches as one log per device and UTC day,
 // keyed by device ID and day. Only the device a log belongs to writes it: this
 // install's logs are never applied back, and other installs' logs only add
 // plays and searches.
 type historyMapping struct {
-	library  *library.Library
-	device   Device
-	location *time.Location
+	library *library.Library
+	device  Device
 }
 
 func (historyMapping) name() string { return "history" }
@@ -86,11 +85,12 @@ func (mapping historyMapping) local(ctx context.Context) ([]entity, error) {
 	return entities, nil
 }
 
-// groupByDay files plays and searches under the local day they happened on.
+// groupByDay files plays and searches under the UTC day they happened on, so
+// a log never moves between days when the device changes time zone.
 func (mapping historyMapping) groupByDay(plays []library.PlayRecord, searches []library.SearchRecord) map[string]*dayLogContent {
 	logs := map[string]*dayLogContent{}
 	logOf := func(moment time.Time) *dayLogContent {
-		day := moment.In(mapping.location).Format(dayLayout)
+		day := moment.UTC().Format(dayLayout)
 		if logs[day] == nil {
 			logs[day] = &dayLogContent{DeviceID: mapping.device.ID, DeviceName: mapping.device.Name, Day: day}
 		}
