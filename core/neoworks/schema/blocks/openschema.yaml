@@ -1,0 +1,6 @@
+scope: drift
+name: blocks
+version: 0.1.0
+title: "Don't recommend"
+description: 'The tracks, artists and podcasts you asked Drift never to recommend.'
+entry: blocks.schema

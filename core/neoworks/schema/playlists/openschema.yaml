@@ -1,0 +1,6 @@
+scope: drift
+name: playlists
+version: 0.1.0
+title: 'Playlists'
+description: 'Your Drift playlists and their tracks.'
+entry: playlists.schema
