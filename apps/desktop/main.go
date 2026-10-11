@@ -78,7 +78,7 @@ func run(logger *slog.Logger, exitWithStdin bool) error {
 	rpc := newHub(token, logger)
 	app := NewApp(logger, baseURL, rpc.broadcast)
 	server := &http.Server{
-		Handler:           newServerHandler(app.proxyHandler(), rpc, assets),
+		Handler:           newServerHandler(app.proxyHandler(), rpc, app.neoworksCallbackHandler(), assets),
 		ReadHeaderTimeout: 5 * time.Second,
 	}
 	serveErrors := make(chan error, 1)

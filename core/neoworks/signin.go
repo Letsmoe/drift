@@ -58,6 +58,13 @@ func (session *Session) BeginSignIn(redirectURI string) (string, error) {
 	return session.config.OAuthURL + "/oauth/authorize?" + query.Encode(), nil
 }
 
+// CancelSignIn forgets the pending sign-in, so its callback is refused.
+func (session *Session) CancelSignIn() {
+	session.mutex.Lock()
+	defer session.mutex.Unlock()
+	session.pending = nil
+}
+
 // CompleteSignIn takes the callback's query: it exchanges the code, takes in
 // the grant the user consented to and keeps the tokens.
 func (session *Session) CompleteSignIn(ctx context.Context, callback url.Values) error {

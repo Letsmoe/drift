@@ -39,6 +39,7 @@ func newFakeNeoworks(t *testing.T) *fakeNeoworks {
 	mux := http.NewServeMux()
 	mux.HandleFunc("POST /oauth/token", fake.token)
 	mux.HandleFunc("GET /api/v1/keys/identity", fake.identity)
+	mux.HandleFunc("GET /oauth/userinfo", fake.userinfo)
 	mux.HandleFunc("/api/", fake.api)
 	fake.server = httptest.NewServer(mux)
 	t.Cleanup(fake.server.Close)
@@ -67,6 +68,14 @@ func (fake *fakeNeoworks) identity(response http.ResponseWriter, request *http.R
 	fake.identityRequests = append(fake.identityRequests, request)
 	fake.mutex.Unlock()
 	_, _ = response.Write([]byte(`{"userId":"user-1","encPub":"AA","signPub":"AA","selfSig":"AA","version":1}`))
+}
+
+func (fake *fakeNeoworks) userinfo(response http.ResponseWriter, request *http.Request) {
+	if request.Header.Get("Authorization") != "Bearer "+testAccessToken {
+		http.Error(response, "unauthorized", http.StatusUnauthorized)
+		return
+	}
+	_, _ = response.Write([]byte(`{"sub":"user-1","name":"Ada Lovelace","email":"ada@example.com"}`))
 }
 
 func (fake *fakeNeoworks) api(response http.ResponseWriter, request *http.Request) {
@@ -269,5 +278,33 @@ func TestSyncNeedsASignedInUser(t *testing.T) {
 	session := openTestSession(t, testConfig(t, newFakeNeoworks(t), t.TempDir()))
 	if _, err := session.Sync(context.Background()); !errors.Is(err, ErrSignedOut) {
 		t.Fatalf("got %v, want %v", err, ErrSignedOut)
+	}
+}
+
+func TestProfileNamesTheSignedInUser(t *testing.T) {
+	keyring.MockInit()
+	session, _ := signedInSession(t, newFakeNeoworks(t), time.Hour)
+	profile, err := session.Profile(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := Profile{UserID: "user-1", Name: "Ada Lovelace", Email: "ada@example.com"}
+	if profile != want {
+		t.Fatalf("profile %+v, want %+v", profile, want)
+	}
+}
+
+func TestACancelledSignInRefusesItsCallback(t *testing.T) {
+	keyring.MockInit()
+	fake := newFakeNeoworks(t)
+	session := openTestSession(t, testConfig(t, fake, t.TempDir()))
+	if _, err := session.BeginSignIn("http://127.0.0.1/neoworks/callback"); err != nil {
+		t.Fatal(err)
+	}
+	state := session.pending.state
+	session.CancelSignIn()
+	err := session.CompleteSignIn(context.Background(), url.Values{"state": {state}, "code": {"code-1"}})
+	if !errors.Is(err, ErrSignInState) {
+		t.Fatalf("got %v, want %v", err, ErrSignInState)
 	}
 }

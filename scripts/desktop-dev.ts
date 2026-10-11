@@ -2,7 +2,9 @@
 // UI), a fresh build of the Go backend and Electron pointed at both. Go changes
 // need a restart of this script.
 import { spawn, spawnSync, type ChildProcess } from 'node:child_process';
+import { existsSync } from 'node:fs';
 import net from 'node:net';
+import { homedir } from 'node:os';
 import path from 'node:path';
 
 const desktopDirectory = path.resolve(import.meta.dirname, '../apps/desktop');
@@ -12,6 +14,12 @@ const backendBinary = path.join(desktopDirectory, 'build/bin/drift-backend');
 const devServerPort = await findFreePort();
 const devServerUrl = `http://localhost:${devServerPort}`;
 const devServerTimeoutMs = 30_000;
+// Development signs in to the local Neoworks stack (neoworks.dev's process-compose) unless told otherwise.
+const localNeoworksDomain = 'neoworks.localhost:8443';
+const localNeoworksAuthority = path.join(
+	homedir(),
+	'.local/share/caddy/pki/authorities/local/root.crt'
+);
 
 // Asks the OS for an unused port; --strictPort makes Vite fail loudly if it is taken in between.
 function findFreePort(): Promise<number> {
@@ -23,6 +31,14 @@ function findFreePort(): Promise<number> {
 			server.close(() => resolve(address.port));
 		});
 	});
+}
+
+function neoworksEnvironment(): Record<string, string> {
+	const environment: Record<string, string> = { DRIFT_NEOWORKS_DOMAIN: localNeoworksDomain };
+	if (existsSync(localNeoworksAuthority)) {
+		environment.DRIFT_NEOWORKS_CA = localNeoworksAuthority;
+	}
+	return environment;
 }
 
 function runOrExit(command: string, args: string[], directory: string): void {
@@ -63,7 +79,12 @@ await waitForDevServer();
 const electron = spawn('bun', ['x', 'electron', '.'], {
 	cwd: electronDirectory,
 	stdio: 'inherit',
-	env: { ...process.env, DRIFT_DEV_URL: devServerUrl, DRIFT_BACKEND_BINARY: backendBinary }
+	env: {
+		...neoworksEnvironment(),
+		...process.env,
+		DRIFT_DEV_URL: devServerUrl,
+		DRIFT_BACKEND_BINARY: backendBinary
+	}
 });
 
 electron.on('exit', (code) => {
