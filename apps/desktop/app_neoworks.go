@@ -234,26 +234,21 @@ func (app *App) syncNeoworks() {
 	app.updateNeoworksStatus(func(status *NeoworksStatus) {
 		status.Syncing = true
 	})
-	report, err := session.Sync(app.ctx)
+	_, err := session.Sync(app.ctx)
 	app.updateNeoworksStatus(func(status *NeoworksStatus) {
 		status.Syncing = false
 		status.SignedIn = session.SignedIn()
-		status.Error = syncFailure(report.Failure, err)
-		if status.Error == "" {
-			now := time.Now()
-			status.LastSyncedAt = &now
+		status.Error = ""
+		if err != nil {
+			status.Error = err.Error()
+			return
 		}
+		now := time.Now()
+		status.LastSyncedAt = &now
 	})
-	if err != nil || report.Failure != "" {
-		app.logger.Warn("neoworks sync", "error", err, "failure", report.Failure)
-	}
-}
-
-func syncFailure(failure string, err error) string {
 	if err != nil {
-		return err.Error()
+		app.logger.Warn("neoworks sync", "error", err)
 	}
-	return failure
 }
 
 func (app *App) refreshNeoworksProfile() {
