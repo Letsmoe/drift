@@ -69,7 +69,7 @@ func TestThumbnailsKeepTheAspectRatioAndSizelessURLs(t *testing.T) {
 
 func TestARatingBecomesATrackNodeAndARatingNode(t *testing.T) {
 	store := newFakeNodeStore()
-	install := newTestInstall(t, store)
+	install := newTestInstall(t, store, "laptop")
 	ctx := t.Context()
 	if err := install.library.SetRating(ctx, syncedTestTrack("abc"), music.ItemKindSong, library.RatingLike); err != nil {
 		t.Fatal(err)
@@ -95,7 +95,7 @@ func TestARatingBecomesATrackNodeAndARatingNode(t *testing.T) {
 
 func TestAReconcileWithoutChangesWritesNothing(t *testing.T) {
 	store := newFakeNodeStore()
-	install := newTestInstall(t, store)
+	install := newTestInstall(t, store, "laptop")
 	if err := install.library.SetRating(t.Context(), syncedTestTrack("abc"), music.ItemKindSong, library.RatingLike); err != nil {
 		t.Fatal(err)
 	}
@@ -109,7 +109,7 @@ func TestAReconcileWithoutChangesWritesNothing(t *testing.T) {
 
 func TestChangingAndRemovingARatingUpdatesAndDeletesItsNode(t *testing.T) {
 	store := newFakeNodeStore()
-	install := newTestInstall(t, store)
+	install := newTestInstall(t, store, "laptop")
 	ctx := t.Context()
 	track := syncedTestTrack("abc")
 	_ = install.library.SetRating(ctx, track, music.ItemKindSong, library.RatingLike)
@@ -138,8 +138,8 @@ func TestChangingAndRemovingARatingUpdatesAndDeletesItsNode(t *testing.T) {
 
 func TestAnotherInstallReceivesTheRatingAndTheTrackWithoutAskingYouTube(t *testing.T) {
 	store := newFakeNodeStore()
-	laptop := newTestInstall(t, store)
-	phone := newTestInstall(t, store)
+	laptop := newTestInstall(t, store, "laptop")
+	phone := newTestInstall(t, store, "phone")
 	ctx := t.Context()
 	_ = laptop.library.SetRating(ctx, syncedTestTrack("abc"), music.ItemKindSong, library.RatingLike)
 	laptop.reconcile(t)
@@ -169,8 +169,8 @@ func TestAnotherInstallReceivesTheRatingAndTheTrackWithoutAskingYouTube(t *testi
 
 func TestAnUnlikeOnOneInstallRemovesTheLikeOnTheOther(t *testing.T) {
 	store := newFakeNodeStore()
-	laptop := newTestInstall(t, store)
-	phone := newTestInstall(t, store)
+	laptop := newTestInstall(t, store, "laptop")
+	phone := newTestInstall(t, store, "phone")
 	ctx := t.Context()
 	track := syncedTestTrack("abc")
 	_ = laptop.library.SetRating(ctx, track, music.ItemKindSong, library.RatingLike)
@@ -189,8 +189,8 @@ func TestAnUnlikeOnOneInstallRemovesTheLikeOnTheOther(t *testing.T) {
 
 func TestTwoOfflineLikesMergeIntoTheNewestAndTheDuplicateNodeGoes(t *testing.T) {
 	store := newFakeNodeStore()
-	laptop := newTestInstall(t, store)
-	phone := newTestInstall(t, store)
+	laptop := newTestInstall(t, store, "laptop")
+	phone := newTestInstall(t, store, "phone")
 	ctx := t.Context()
 	track := syncedTestTrack("abc")
 	laptop.advance(time.Hour)
@@ -231,7 +231,7 @@ func TestACollectionWithoutARootIsSkipped(t *testing.T) {
 			delete(store.nodes, nodeID)
 		}
 	}
-	install := newTestInstall(t, store)
+	install := newTestInstall(t, store, "laptop")
 	_ = install.library.SetRating(t.Context(), syncedTestTrack("def"), music.ItemKindSong, library.RatingLike)
 
 	report := install.reconcile(t)
@@ -245,7 +245,7 @@ func TestACollectionWithoutARootIsSkipped(t *testing.T) {
 
 func TestReconcileNeedsASignedInUser(t *testing.T) {
 	store := newFakeNodeStore()
-	install := newTestInstall(t, store)
+	install := newTestInstall(t, store, "laptop")
 	install.sync.userID = func() string { return "" }
 	if _, err := install.sync.Reconcile(t.Context()); !errors.Is(err, ErrSignedOut) {
 		t.Errorf("err = %v, want ErrSignedOut", err)

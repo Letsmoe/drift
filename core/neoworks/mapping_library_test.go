@@ -23,8 +23,8 @@ func testAlbum(browseID string) music.Item {
 
 func TestASavedAlbumReachesAnotherInstallAndUnsavingRemovesIt(t *testing.T) {
 	store := newFakeNodeStore()
-	laptop := newTestInstall(t, store)
-	phone := newTestInstall(t, store)
+	laptop := newTestInstall(t, store, "laptop")
+	phone := newTestInstall(t, store, "phone")
 	ctx := t.Context()
 	if err := laptop.library.Save(ctx, testAlbum("MPREb_1")); err != nil {
 		t.Fatal(err)
@@ -58,7 +58,7 @@ func TestASavedAlbumReachesAnotherInstallAndUnsavingRemovesIt(t *testing.T) {
 
 func TestSavedItemsOfTwoKindsWithTheSameIDStayApart(t *testing.T) {
 	store := newFakeNodeStore()
-	install := newTestInstall(t, store)
+	install := newTestInstall(t, store, "laptop")
 	ctx := t.Context()
 	album := testAlbum("same")
 	artist := music.Item{Kind: music.ItemKindArtist, ID: "same", Title: "Artist"}
@@ -107,8 +107,8 @@ func playlistVideoIDs(t *testing.T, install *testInstall, playlistID string) []s
 
 func TestAPlaylistKeepsItsOrderOnAnotherInstall(t *testing.T) {
 	store := newFakeNodeStore()
-	laptop := newTestInstall(t, store)
-	phone := newTestInstall(t, store)
+	laptop := newTestInstall(t, store, "laptop")
+	phone := newTestInstall(t, store, "phone")
 	playlist := orderedPlaylist(t, laptop, "Road trip", "c", "a", "b")
 	laptop.reconcile(t)
 
@@ -153,7 +153,7 @@ func TestAPlaylistKeepsItsOrderOnAnotherInstall(t *testing.T) {
 
 func TestEmptyingAPlaylistClearsItsEntriesAndDescriptionOnTheNode(t *testing.T) {
 	store := newFakeNodeStore()
-	install := newTestInstall(t, store)
+	install := newTestInstall(t, store, "laptop")
 	playlist := orderedPlaylist(t, install, "Mix", "a")
 	_ = install.library.RenamePlaylist(t.Context(), playlist.ID, "Mix", "About")
 	install.reconcile(t)
@@ -175,8 +175,8 @@ func TestEmptyingAPlaylistClearsItsEntriesAndDescriptionOnTheNode(t *testing.T) 
 
 func TestDeletingAPlaylistDeletesItEverywhere(t *testing.T) {
 	store := newFakeNodeStore()
-	laptop := newTestInstall(t, store)
-	phone := newTestInstall(t, store)
+	laptop := newTestInstall(t, store, "laptop")
+	phone := newTestInstall(t, store, "phone")
 	playlist := orderedPlaylist(t, laptop, "Mix", "a")
 	laptop.reconcile(t)
 	phone.reconcile(t)
@@ -195,8 +195,8 @@ func TestDeletingAPlaylistDeletesItEverywhere(t *testing.T) {
 
 func TestAPlaylistWaitsForTracksThatHaveNotArrived(t *testing.T) {
 	store := newFakeNodeStore()
-	laptop := newTestInstall(t, store)
-	phone := newTestInstall(t, store)
+	laptop := newTestInstall(t, store, "laptop")
+	phone := newTestInstall(t, store, "phone")
 	orderedPlaylist(t, laptop, "Mix", "a")
 	laptop.reconcile(t)
 	for _, node := range store.nodes {
@@ -215,8 +215,8 @@ func TestAPlaylistWaitsForTracksThatHaveNotArrived(t *testing.T) {
 
 func TestTwoOfflineSavesOfOneAlbumMergeIntoTheNewest(t *testing.T) {
 	store := newFakeNodeStore()
-	laptop := newTestInstall(t, store)
-	phone := newTestInstall(t, store)
+	laptop := newTestInstall(t, store, "laptop")
+	phone := newTestInstall(t, store, "phone")
 	ctx := t.Context()
 	_ = laptop.library.Save(ctx, testAlbum("MPREb_1"))
 	laptop.reconcile(t)

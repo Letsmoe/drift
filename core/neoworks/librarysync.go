@@ -31,7 +31,11 @@ type LibrarySyncConfig struct {
 	Nodes   Nodes
 	// UserID returns the signed-in user's ID, empty when signed out.
 	UserID func() string
-	Logger *slog.Logger
+	// Device names this install in the history it writes.
+	Device Device
+	// Location decides which local day a play or search belongs to; it defaults to time.Local.
+	Location *time.Location
+	Logger   *slog.Logger
 }
 
 // LibrarySync maps the library to the nodes of the @drift collections and
@@ -47,6 +51,10 @@ type LibrarySync struct {
 
 // NewLibrarySync builds the mapping for every @drift collection.
 func NewLibrarySync(config LibrarySyncConfig) *LibrarySync {
+	location := config.Location
+	if location == nil {
+		location = time.Local
+	}
 	logger := config.Logger
 	if logger == nil {
 		logger = slog.New(slog.DiscardHandler)
@@ -61,6 +69,8 @@ func NewLibrarySync(config LibrarySyncConfig) *LibrarySync {
 			ratingMapping{library: config.Library},
 			savedMapping{library: config.Library},
 			playlistMapping{library: config.Library},
+			historyMapping{library: config.Library, device: config.Device, location: location},
+			blockMapping{library: config.Library},
 		},
 	}
 }
