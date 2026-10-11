@@ -242,3 +242,128 @@ func TestTheObserverHearsEachPass(t *testing.T) {
 		t.Errorf("states = %+v", states)
 	}
 }
+
+func TestTheDefaultIntervalIsTheFallbackForAnUnconnectedFeed(t *testing.T) {
+	if DefaultInterval != 15*time.Minute {
+		t.Errorf("DefaultInterval = %v", DefaultInterval)
+	}
+}
+
+func TestAnAnnouncedRemoteChangeSchedulesAPass(t *testing.T) {
+	syncer, session, _ := newRecordingSyncer(0)
+	syncer.Start(t.Context())
+	t.Cleanup(syncer.Stop)
+	waitForEvents(t, session, 2)
+	before := len(session.snapshot())
+
+	syncer.NoteRemoteChange(5)
+
+	waitForEvents(t, session, before+2)
+}
+
+func TestARemoteChangeAlreadyPulledSchedulesNothing(t *testing.T) {
+	syncer, session, _ := newRecordingSyncer(0)
+	syncer.Start(t.Context())
+	t.Cleanup(syncer.Stop)
+	waitForEvents(t, session, 2)
+	syncer.NoteRemoteChange(5)
+	waitForEvents(t, session, 4)
+	time.Sleep(100 * time.Millisecond)
+	before := len(session.snapshot())
+
+	syncer.NoteRemoteChange(5)
+	syncer.NoteRemoteChange(3)
+	time.Sleep(150 * time.Millisecond)
+
+	if got := len(session.snapshot()); got != before {
+		t.Errorf("old sequences made %d more events", got-before)
+	}
+}
+
+func TestANewerRemoteChangeThanThePullSchedulesAnotherPass(t *testing.T) {
+	syncer, session, _ := newRecordingSyncer(0)
+	syncer.Start(t.Context())
+	t.Cleanup(syncer.Stop)
+	waitForEvents(t, session, 2)
+	syncer.NoteRemoteChange(5)
+	waitForEvents(t, session, 4)
+	time.Sleep(100 * time.Millisecond)
+	before := len(session.snapshot())
+
+	syncer.NoteRemoteChange(6)
+
+	waitForEvents(t, session, before+2)
+}
+
+func TestAChangeAnnouncedDuringAPassIsNotCountedAsPulled(t *testing.T) {
+	syncer, _, _ := newRecordingSyncer(0)
+	if _, err := syncer.SyncNow(t.Context()); err != nil {
+		t.Fatal(err)
+	}
+	syncer.NoteRemoteChange(8)
+	syncer.sequenceMutex.Lock()
+	pulledBeforeThePass := syncer.pulledSequence
+	syncer.sequenceMutex.Unlock()
+
+	if pulledBeforeThePass != 0 {
+		t.Fatalf("announcing must not mark anything as pulled, pulled = %d", pulledBeforeThePass)
+	}
+	if _, err := syncer.SyncNow(t.Context()); err != nil {
+		t.Fatal(err)
+	}
+	syncer.sequenceMutex.Lock()
+	defer syncer.sequenceMutex.Unlock()
+	if syncer.pulledSequence != 8 {
+		t.Errorf("a pass started after the announcement pulls it, pulled = %d", syncer.pulledSequence)
+	}
+}
+
+func TestAFailedPullDoesNotCountAnnouncedChangesAsPulled(t *testing.T) {
+	syncer, session, _ := newRecordingSyncer(0)
+	session.syncError = errors.New("offline")
+	syncer.NoteRemoteChange(8)
+
+	_, _ = syncer.SyncNow(t.Context())
+
+	syncer.sequenceMutex.Lock()
+	defer syncer.sequenceMutex.Unlock()
+	if syncer.pulledSequence != 0 {
+		t.Errorf("pulled = %d after a pull that failed", syncer.pulledSequence)
+	}
+}
+
+func TestAResyncMakesTheNextChangeCountEvenWithALowerSequence(t *testing.T) {
+	syncer, session, _ := newRecordingSyncer(0)
+	syncer.Start(t.Context())
+	t.Cleanup(syncer.Stop)
+	waitForEvents(t, session, 2)
+	syncer.NoteRemoteChange(50)
+	waitForEvents(t, session, 4)
+	time.Sleep(100 * time.Millisecond)
+
+	syncer.NoteResync()
+	waitForEvents(t, session, 6)
+	time.Sleep(100 * time.Millisecond)
+	before := len(session.snapshot())
+	syncer.NoteRemoteChange(2)
+
+	waitForEvents(t, session, before+2)
+}
+
+func TestSigningOutForgetsTheSequences(t *testing.T) {
+	syncer, _, _ := newRecordingSyncer(0)
+	syncer.NoteRemoteChange(9)
+	if _, err := syncer.SyncNow(t.Context()); err != nil {
+		t.Fatal(err)
+	}
+
+	if err := syncer.SignOut(t.Context()); err != nil {
+		t.Fatal(err)
+	}
+
+	syncer.sequenceMutex.Lock()
+	defer syncer.sequenceMutex.Unlock()
+	if syncer.pulledSequence != 0 || syncer.announcedSequence != 0 {
+		t.Errorf("sequences survived the sign-out: pulled %d, announced %d", syncer.pulledSequence, syncer.announcedSequence)
+	}
+}
