@@ -2,9 +2,9 @@
   "lockfileVersion": 1,
   "generator": "openschema 0.1.0",
   "createdAt": "2026-10-11T10:42:29.872Z",
-  "updatedAt": "2026-10-11T12:35:55.146Z",
+  "updatedAt": "2026-10-11T12:39:12.326Z",
   "baseline": false,
-  "digest": "sha256-4da6754eb1f7a392664944cab3bfff1177f04865480a3e40dc92465d1fad9e8d",
+  "digest": "sha256-44fbe3a80004bfb8990b2f9c22761b45985b9c2f44d9e255e13f35eb609b5763",
   "spaces": {
     "enum:drift.tracks.TrackKind": {
       "kind": "enum",
@@ -111,7 +111,7 @@
         "7": {
           "state": "active",
           "name": "kind",
-          "type": "TrackKind",
+          "type": "TrackKind?",
           "encoding": "singular:varint",
           "since": "2026-10-11T12:35:55.146Z"
         }

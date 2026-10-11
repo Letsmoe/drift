@@ -118,13 +118,13 @@
           "name": "kind",
           "container": {
             "kind": "singular",
-            "nullable": false
+            "nullable": true
           },
           "value": {
             "kind": "enum",
             "name": "TrackKind"
           },
-          "required": true,
+          "required": false,
           "constraints": {}
         }
       ]

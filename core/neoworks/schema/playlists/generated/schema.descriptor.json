@@ -86,13 +86,13 @@
           "name": "id",
           "container": {
             "kind": "singular",
-            "nullable": false
+            "nullable": true
           },
           "value": {
             "kind": "scalar",
             "scalar": "string"
           },
-          "required": true,
+          "required": false,
           "constraints": {
             "minLength": 1,
             "maxLength": 64
