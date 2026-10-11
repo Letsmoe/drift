@@ -125,3 +125,88 @@ func TestReferencedTracksAreThoseARatingPlaylistPlayOrBlockNames(t *testing.T) {
 		t.Errorf("referenced = %v, want %v", videoIDs, want)
 	}
 }
+
+func TestRestorePlaylistReplacesEntriesAndKeepsTimes(t *testing.T) {
+	ctx := context.Background()
+	lib, _ := openTestLibrary(t)
+	var changes []Change
+	lib.OnChange(func(change Change) { changes = append(changes, change) })
+	for _, videoID := range []string{"a", "b"} {
+		if err := lib.SaveTracks(ctx, []music.Track{testTrack(videoID)}, music.ItemKindSong); err != nil {
+			t.Fatal(err)
+		}
+	}
+	createdAt := time.Date(2026, 1, 2, 3, 4, 5, 0, time.UTC)
+	updatedAt := createdAt.Add(time.Hour)
+	restore := func(videoIDs ...string) {
+		playlist := Playlist{ID: "p1", Name: "Mix", Description: "d", CreatedAt: createdAt, UpdatedAt: updatedAt}
+		for _, videoID := range videoIDs {
+			playlist.Entries = append(playlist.Entries, PlaylistEntry{Track: music.Track{VideoID: videoID}, AddedAt: createdAt})
+		}
+		if err := lib.RestorePlaylist(ctx, playlist); err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	restore("a", "b")
+	restore("b", "a", "b")
+
+	playlist, err := lib.Playlist(ctx, "p1")
+	if err != nil {
+		t.Fatal(err)
+	}
+	assertVideoIDs(t, []music.Track{playlist.Entries[0].Track, playlist.Entries[1].Track, playlist.Entries[2].Track}, "b", "a", "b")
+	if !playlist.CreatedAt.Equal(createdAt) || !playlist.UpdatedAt.Equal(updatedAt) || playlist.Description != "d" {
+		t.Errorf("playlist = %+v", playlist)
+	}
+	if len(changes) != 0 {
+		t.Errorf("restoring reported %v", changes)
+	}
+}
+
+func TestRestoreSavedItemKeepsItsSavingTime(t *testing.T) {
+	ctx := context.Background()
+	lib, _ := openTestLibrary(t)
+	savedAt := time.Date(2026, 2, 3, 4, 5, 6, 0, time.UTC)
+	item := music.Item{Kind: music.ItemKindAlbum, ID: "MPREb_1", Title: "Album", Thumbnails: []music.Thumbnail{{URL: "u", Width: 1, Height: 1}}}
+
+	if err := lib.RestoreSavedItem(ctx, SavedItem{Item: item, SavedAt: savedAt}); err != nil {
+		t.Fatal(err)
+	}
+	item.Title = "Album (Deluxe)"
+	if err := lib.RestoreSavedItem(ctx, SavedItem{Item: item, SavedAt: savedAt.Add(time.Hour)}); err != nil {
+		t.Fatal(err)
+	}
+
+	saved, err := lib.SavedItems(ctx)
+	if err != nil || len(saved) != 1 || saved[0].Item.Title != "Album (Deluxe)" || !saved[0].SavedAt.Equal(savedAt.Add(time.Hour)) {
+		t.Errorf("saved = %+v, %v", saved, err)
+	}
+}
+
+func TestEveryEditOfASyncedKindReportsAChange(t *testing.T) {
+	ctx := context.Background()
+	lib, _ := openTestLibrary(t)
+	var changes []ChangeKind
+	lib.OnChange(func(change Change) { changes = append(changes, change.Kind) })
+
+	_ = lib.Save(ctx, music.Item{Kind: music.ItemKindAlbum, ID: "x", Title: "X"})
+	_ = lib.Unsave(ctx, music.ItemKindAlbum, "x")
+	_ = lib.BlockRecommendation(ctx, BlockArtist, "UC1", "Artist")
+	_ = lib.UnblockRecommendation(ctx, BlockArtist, "UC1")
+	playlist, _ := lib.CreatePlaylist(ctx, "Mix")
+	_ = lib.RenamePlaylist(ctx, playlist.ID, "Mix 2", "")
+	playID, _ := lib.StartPlay(ctx, testTrack("a"), music.ItemKindSong, "queue")
+	_ = lib.UpdatePlay(ctx, playID, 10, false)
+	_ = lib.UpdatePlay(ctx, playID, 200, true)
+	_ = lib.RecordSearch(ctx, "daft punk")
+	_ = lib.ClearSearches(ctx)
+
+	want := []ChangeKind{
+		ChangeSaved, ChangeSaved, ChangeBlocks, ChangeBlocks, ChangePlaylist, ChangePlaylist,
+		ChangeHistory, ChangeHistory, ChangeHistory, ChangeHistory,
+	}
+	if !slices.Equal(changes, want) {
+		t.Errorf("changes = %v, want %v", changes, want)
+	}
+}

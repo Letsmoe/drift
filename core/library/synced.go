@@ -2,6 +2,7 @@ package library
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"time"
 
@@ -103,4 +104,54 @@ func (library *Library) ReferencedTracks(ctx context.Context) ([]TrackRecord, er
 		return nil, fmt.Errorf("library: read referenced tracks: %w", err)
 	}
 	return records, nil
+}
+
+// RestoreSavedItem writes a saved item that came from a synced copy, keeping its
+// saving time and reporting no change.
+func (library *Library) RestoreSavedItem(ctx context.Context, saved SavedItem) error {
+	thumbnails, err := marshalList(saved.Item.Thumbnails)
+	if err != nil {
+		return fmt.Errorf("library: %w", err)
+	}
+	_, err = library.db.ExecContext(ctx, `INSERT INTO saved_item (kind, id, title, subtitle, thumbnails, saved_at)
+		VALUES (?, ?, ?, ?, ?, ?)
+		ON CONFLICT (kind, id) DO UPDATE SET
+			title = excluded.title, subtitle = excluded.subtitle, thumbnails = excluded.thumbnails, saved_at = excluded.saved_at`,
+		string(saved.Item.Kind), saved.Item.ID, saved.Item.Title, saved.Item.Subtitle, thumbnails, FormatTime(saved.SavedAt))
+	if err != nil {
+		return fmt.Errorf("library: restore saved %s %s: %w", saved.Item.Kind, saved.Item.ID, err)
+	}
+	return nil
+}
+
+// RestorePlaylist writes a playlist that came from a synced copy: it creates
+// the playlist or replaces its name, description, times and entries, and
+// reports no change. The entries' tracks must be cached already.
+func (library *Library) RestorePlaylist(ctx context.Context, playlist Playlist) error {
+	return library.inTransaction(ctx, func(tx *sql.Tx) error {
+		_, err := tx.ExecContext(ctx, `INSERT INTO playlist (id, name, description, created_at, updated_at)
+			VALUES (?, ?, ?, ?, ?)
+			ON CONFLICT (id) DO UPDATE SET name = excluded.name, description = excluded.description,
+				created_at = excluded.created_at, updated_at = excluded.updated_at`,
+			playlist.ID, playlist.Name, playlist.Description, FormatTime(playlist.CreatedAt), FormatTime(playlist.UpdatedAt))
+		if err != nil {
+			return fmt.Errorf("restore playlist %s: %w", playlist.ID, err)
+		}
+		_, err = tx.ExecContext(ctx, `DELETE FROM playlist_entry WHERE playlist_id = ?`, playlist.ID)
+		if err != nil {
+			return fmt.Errorf("clear entries of playlist %s: %w", playlist.ID, err)
+		}
+		return restoreEntries(ctx, tx, playlist)
+	})
+}
+
+func restoreEntries(ctx context.Context, tx *sql.Tx, playlist Playlist) error {
+	for position, entry := range playlist.Entries {
+		_, err := tx.ExecContext(ctx, `INSERT INTO playlist_entry (playlist_id, video_id, position, added_at) VALUES (?, ?, ?, ?)`,
+			playlist.ID, entry.Track.VideoID, position, FormatTime(entry.AddedAt))
+		if err != nil {
+			return fmt.Errorf("restore entry %s of playlist %s: %w", entry.Track.VideoID, playlist.ID, err)
+		}
+	}
+	return nil
 }
