@@ -17,7 +17,8 @@ model Track {
   /// The largest cover; Google image URLs carry their size and are resized by rewriting it.
   @format("uri")
   6 thumbnailUrl: string?
-  7 kind: TrackKind
+  /// Absent means a song.
+  7 kind: TrackKind?
 }
 
 /// Episodes keep their resume position; songs start from the beginning.
