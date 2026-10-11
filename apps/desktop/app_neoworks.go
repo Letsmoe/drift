@@ -50,10 +50,12 @@ type NeoworksStatus struct {
 type neoworksAccount struct {
 	session *neoworks.Session
 	// syncer keeps the library in step with Neoworks; nil when the library could not be opened.
-	syncer    *neoworks.Syncer
-	keyInFile bool
-	mutex     sync.Mutex
-	status    NeoworksStatus
+	syncer *neoworks.Syncer
+	// changeFeed tells the syncer about changes made on other devices; nil with the syncer.
+	changeFeed *neoworks.ChangeFeed
+	keyInFile  bool
+	mutex      sync.Mutex
+	status     NeoworksStatus
 }
 
 // signedOutStatus is the status of an available session nobody signed in to.
@@ -98,7 +100,8 @@ func (app *App) openNeoworks() {
 }
 
 // startNeoworksSync keeps the library in step with Neoworks from now on: after
-// every change to it, on an interval and once at startup, while signed in.
+// every change to it, as soon as another device changes something, on an
+// interval and once at startup, while signed in.
 func (app *App) startNeoworksSync(session *neoworks.Session) {
 	if app.library == nil {
 		return
@@ -119,6 +122,21 @@ func (app *App) startNeoworksSync(session *neoworks.Session) {
 	syncer.Watch(app.library)
 	syncer.Start(app.ctx)
 	app.neoworks.syncer = syncer
+	changeFeed := neoworks.NewChangeFeed(neoworks.ChangeFeedConfig{
+		Session: session,
+		Changes: syncer,
+		Logger:  app.logger,
+	})
+	changeFeed.Start(app.ctx)
+	app.neoworks.changeFeed = changeFeed
+}
+
+// wakeNeoworksChangeFeed makes the change feed connect after a sign-in and
+// close its stream after a sign-out.
+func (app *App) wakeNeoworksChangeFeed() {
+	if app.neoworks.changeFeed != nil {
+		app.neoworks.changeFeed.Wake()
+	}
 }
 
 func neoworksConfig(directory string, keystore *oskeystore.Keystore) (neoworks.Config, error) {
@@ -175,6 +193,9 @@ func installName() string {
 func (app *App) closeNeoworks() {
 	if app.neoworks == nil || app.neoworks.session == nil {
 		return
+	}
+	if app.neoworks.changeFeed != nil {
+		app.neoworks.changeFeed.Stop()
 	}
 	if app.neoworks.syncer != nil {
 		app.neoworks.syncer.Stop()
@@ -245,6 +266,7 @@ func (app *App) NeoworksSignOut() error {
 		return err
 	}
 	err = app.signOutNeoworks(session)
+	app.wakeNeoworksChangeFeed()
 	app.updateNeoworksStatus(func(status *NeoworksStatus) {
 		*status = app.neoworks.signedOutStatus()
 	})
@@ -344,6 +366,7 @@ func (app *App) neoworksCallbackHandler() http.Handler {
 			return
 		}
 		_ = callbackPage.Execute(writer, callbackPageData{})
+		app.wakeNeoworksChangeFeed()
 		go app.refreshNeoworksProfile()
 		go app.syncNeoworks()
 	})
