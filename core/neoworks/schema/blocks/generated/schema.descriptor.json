@@ -1,0 +1,112 @@
+{
+  "descriptorVersion": 1,
+  "namespace": "drift.blocks",
+  "enums": [
+    {
+      "name": "BlockKind",
+      "variants": [
+        {
+          "name": "track",
+          "ordinal": 1
+        },
+        {
+          "name": "artist",
+          "ordinal": 2
+        },
+        {
+          "name": "podcast",
+          "ordinal": 3
+        }
+      ]
+    }
+  ],
+  "models": [
+    {
+      "name": "Block",
+      "fields": [
+        {
+          "ordinal": 1,
+          "name": "kind",
+          "container": {
+            "kind": "singular",
+            "nullable": false
+          },
+          "value": {
+            "kind": "enum",
+            "name": "BlockKind"
+          },
+          "required": true,
+          "constraints": {}
+        },
+        {
+          "ordinal": 2,
+          "name": "targetId",
+          "container": {
+            "kind": "singular",
+            "nullable": false
+          },
+          "value": {
+            "kind": "scalar",
+            "scalar": "string"
+          },
+          "required": true,
+          "constraints": {
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        {
+          "ordinal": 3,
+          "name": "name",
+          "container": {
+            "kind": "singular",
+            "nullable": false
+          },
+          "value": {
+            "kind": "scalar",
+            "scalar": "string"
+          },
+          "required": true,
+          "constraints": {
+            "maxLength": 500
+          }
+        },
+        {
+          "ordinal": 4,
+          "name": "createdAt",
+          "container": {
+            "kind": "singular",
+            "nullable": false
+          },
+          "value": {
+            "kind": "scalar",
+            "scalar": "timestamp"
+          },
+          "required": true,
+          "constraints": {}
+        }
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "kind": "item",
+      "model": "Block",
+      "facets": [
+        {
+          "name": "default",
+          "tag": 1,
+          "fields": [
+            1,
+            2,
+            3,
+            4
+          ]
+        }
+      ],
+      "searchable": [],
+      "title": 3,
+      "timeRange": null
+    }
+  ]
+}

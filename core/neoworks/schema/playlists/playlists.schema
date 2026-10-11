@@ -1,0 +1,22 @@
+// playlists.schema — the @drift/playlists collection: the user's own playlists,
+// one item each, directly under the root, with their tracks in play order.
+
+namespace drift.playlists
+
+@neoworks.node("item")
+model Playlist {
+  @neoworks.title @neoworks.searchable @minLength(1) @maxLength(200)
+  1 name: string
+  @maxLength(5000)
+  2 description: string?
+  3 entries: [PlaylistEntry]?
+  4 createdAt: timestamp
+  5 updatedAt: timestamp
+}
+
+model PlaylistEntry {
+  /// The track, in @drift/tracks.
+  @minLength(1) @maxLength(64)
+  1 videoId: string
+  2 addedAt: timestamp
+}

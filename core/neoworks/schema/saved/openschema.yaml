@@ -1,0 +1,6 @@
+scope: drift
+name: saved
+version: 0.1.0
+title: 'Saved'
+description: 'The albums, artists, podcasts and YouTube playlists you saved in Drift.'
+entry: saved.schema

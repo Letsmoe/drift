@@ -1,0 +1,37 @@
+// history.schema — the @drift/history collection: what was played and searched,
+// as one log item per device per day, directly under the root. Only the device a
+// log belongs to writes it, so two devices never conflict over one log.
+
+namespace drift.history
+
+@neoworks.node("item")
+model DayLog {
+  /// The install that writes this log.
+  @minLength(1) @maxLength(200)
+  1 deviceId: string
+  @maxLength(200)
+  2 deviceName: string?
+  /// The day in the device's local time zone.
+  3 day: date
+  4 plays: [Play]?
+  5 searches: [Search]?
+}
+
+model Play {
+  /// The played track, in @drift/tracks.
+  @minLength(1) @maxLength(64)
+  1 videoId: string
+  /// Where the play started, e.g. an album or playlist; absent for a single track.
+  @maxLength(500)
+  2 context: string?
+  3 startedAt: timestamp
+  4 progressSeconds: u32
+  /// Played to the end, or at least 80 percent of the track.
+  5 completed: bool
+}
+
+model Search {
+  @minLength(1) @maxLength(500)
+  1 query: string
+  2 searchedAt: timestamp
+}

@@ -1,0 +1,200 @@
+{
+  "descriptorVersion": 1,
+  "namespace": "drift.tracks",
+  "enums": [],
+  "models": [
+    {
+      "name": "Track",
+      "fields": [
+        {
+          "ordinal": 1,
+          "name": "videoId",
+          "container": {
+            "kind": "singular",
+            "nullable": false
+          },
+          "value": {
+            "kind": "scalar",
+            "scalar": "string"
+          },
+          "required": true,
+          "constraints": {
+            "minLength": 1,
+            "maxLength": 64
+          }
+        },
+        {
+          "ordinal": 2,
+          "name": "title",
+          "container": {
+            "kind": "singular",
+            "nullable": false
+          },
+          "value": {
+            "kind": "scalar",
+            "scalar": "string"
+          },
+          "required": true,
+          "constraints": {
+            "maxLength": 500
+          }
+        },
+        {
+          "ordinal": 3,
+          "name": "artists",
+          "container": {
+            "kind": "wrapperRepeated",
+            "packed": false
+          },
+          "value": {
+            "kind": "message",
+            "name": "Artist"
+          },
+          "required": false,
+          "constraints": {}
+        },
+        {
+          "ordinal": 4,
+          "name": "album",
+          "container": {
+            "kind": "singular",
+            "nullable": true
+          },
+          "value": {
+            "kind": "message",
+            "name": "Album"
+          },
+          "required": false,
+          "constraints": {}
+        },
+        {
+          "ordinal": 5,
+          "name": "durationSeconds",
+          "container": {
+            "kind": "singular",
+            "nullable": false
+          },
+          "value": {
+            "kind": "scalar",
+            "scalar": "u32"
+          },
+          "required": true,
+          "constraints": {
+            "minValue": 0
+          }
+        },
+        {
+          "ordinal": 6,
+          "name": "thumbnailUrl",
+          "container": {
+            "kind": "singular",
+            "nullable": true
+          },
+          "value": {
+            "kind": "scalar",
+            "scalar": "string"
+          },
+          "required": false,
+          "constraints": {
+            "format": "uri"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Artist",
+      "fields": [
+        {
+          "ordinal": 1,
+          "name": "id",
+          "container": {
+            "kind": "singular",
+            "nullable": true
+          },
+          "value": {
+            "kind": "scalar",
+            "scalar": "string"
+          },
+          "required": false,
+          "constraints": {}
+        },
+        {
+          "ordinal": 2,
+          "name": "name",
+          "container": {
+            "kind": "singular",
+            "nullable": false
+          },
+          "value": {
+            "kind": "scalar",
+            "scalar": "string"
+          },
+          "required": true,
+          "constraints": {
+            "maxLength": 500
+          }
+        }
+      ]
+    },
+    {
+      "name": "Album",
+      "fields": [
+        {
+          "ordinal": 1,
+          "name": "id",
+          "container": {
+            "kind": "singular",
+            "nullable": false
+          },
+          "value": {
+            "kind": "scalar",
+            "scalar": "string"
+          },
+          "required": true,
+          "constraints": {}
+        },
+        {
+          "ordinal": 2,
+          "name": "name",
+          "container": {
+            "kind": "singular",
+            "nullable": false
+          },
+          "value": {
+            "kind": "scalar",
+            "scalar": "string"
+          },
+          "required": true,
+          "constraints": {
+            "maxLength": 500
+          }
+        }
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "kind": "item",
+      "model": "Track",
+      "facets": [
+        {
+          "name": "default",
+          "tag": 1,
+          "fields": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ]
+        }
+      ],
+      "searchable": [
+        2
+      ],
+      "title": 2,
+      "timeRange": null
+    }
+  ]
+}

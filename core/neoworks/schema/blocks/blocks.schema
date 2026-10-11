@@ -1,0 +1,22 @@
+// blocks.schema — the @drift/blocks collection: tracks, artists and podcasts the
+// user asked never to be recommended, one item each, directly under the root.
+// Unlike a dislike this is no taste signal; it only filters recommendations.
+
+namespace drift.blocks
+
+@neoworks.node("item")
+model Block {
+  1 kind: BlockKind
+  /// The video ID of a track, in @drift/tracks, or the browse ID of an artist or podcast.
+  @minLength(1) @maxLength(200)
+  2 targetId: string
+  @neoworks.title @maxLength(500)
+  3 name: string
+  4 createdAt: timestamp
+}
+
+enum BlockKind {
+  1 track
+  2 artist
+  3 podcast
+}

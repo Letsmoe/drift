@@ -1,0 +1,6 @@
+scope: drift
+name: tracks
+version: 0.1.0
+title: 'Tracks'
+description: 'The tracks your other Drift collections refer to: title, artists, album, duration and cover.'
+entry: tracks.schema
