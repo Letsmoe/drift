@@ -80,6 +80,23 @@
           },
           "required": true,
           "constraints": {}
+        },
+        {
+          "ordinal": 6,
+          "name": "id",
+          "container": {
+            "kind": "singular",
+            "nullable": false
+          },
+          "value": {
+            "kind": "scalar",
+            "scalar": "string"
+          },
+          "required": true,
+          "constraints": {
+            "minLength": 1,
+            "maxLength": 64
+          }
         }
       ]
     },
@@ -133,7 +150,8 @@
             2,
             3,
             4,
-            5
+            5,
+            6
           ]
         }
       ],

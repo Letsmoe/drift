@@ -48,7 +48,9 @@ type NeoworksStatus struct {
 
 // neoworksAccount is the Neoworks session and what the menu knows about it.
 type neoworksAccount struct {
-	session   *neoworks.Session
+	session *neoworks.Session
+	// syncer keeps the library in step with Neoworks; nil when the library could not be opened.
+	syncer    *neoworks.Syncer
 	keyInFile bool
 	mutex     sync.Mutex
 	status    NeoworksStatus
@@ -89,9 +91,34 @@ func (app *App) openNeoworks() {
 	app.neoworks.keyInFile = keystore.Backend() == oskeystore.BackendFile
 	app.neoworks.status = app.neoworks.signedOutStatus()
 	app.neoworks.status.SignedIn = session.SignedIn()
+	app.startNeoworksSync(session)
 	if session.SignedIn() {
 		go app.refreshNeoworksProfile()
 	}
+}
+
+// startNeoworksSync keeps the library in step with Neoworks from now on: after
+// every change to it, on an interval and once at startup, while signed in.
+func (app *App) startNeoworksSync(session *neoworks.Session) {
+	if app.library == nil {
+		return
+	}
+	librarySync := neoworks.NewLibrarySync(neoworks.LibrarySyncConfig{
+		Library: app.library,
+		Nodes:   session.Nodes(),
+		UserID:  session.UserID,
+		Device:  neoworks.Device{ID: session.InstallID(), Name: installName()},
+		Logger:  app.logger,
+	})
+	syncer := neoworks.NewSyncer(neoworks.SyncerConfig{
+		Session:     session,
+		LibrarySync: librarySync,
+		OnState:     app.observeNeoworksSync,
+		Logger:      app.logger,
+	})
+	syncer.Watch(app.library)
+	syncer.Start(app.ctx)
+	app.neoworks.syncer = syncer
 }
 
 func neoworksConfig(directory string, keystore *oskeystore.Keystore) (neoworks.Config, error) {
@@ -146,9 +173,13 @@ func installName() string {
 }
 
 func (app *App) closeNeoworks() {
-	if app.neoworks != nil && app.neoworks.session != nil {
-		app.neoworks.session.Close()
+	if app.neoworks == nil || app.neoworks.session == nil {
+		return
 	}
+	if app.neoworks.syncer != nil {
+		app.neoworks.syncer.Stop()
+	}
+	app.neoworks.session.Close()
 }
 
 func (app *App) requireNeoworks() (*neoworks.Session, error) {
@@ -213,11 +244,20 @@ func (app *App) NeoworksSignOut() error {
 	if err != nil {
 		return err
 	}
-	err = session.SignOut()
+	err = app.signOutNeoworks(session)
 	app.updateNeoworksStatus(func(status *NeoworksStatus) {
 		*status = app.neoworks.signedOutStatus()
 	})
 	return err
+}
+
+// signOutNeoworks also forgets which nodes hold which library entities, so a
+// later sign-in does not mistake the wiped nodes for deletions.
+func (app *App) signOutNeoworks(session *neoworks.Session) error {
+	if app.neoworks.syncer == nil {
+		return session.SignOut()
+	}
+	return app.neoworks.syncer.SignOut(app.ctx)
 }
 
 // NeoworksSync syncs now; the outcome arrives as a neoworks event.
@@ -230,25 +270,36 @@ func (app *App) NeoworksSync() error {
 }
 
 func (app *App) syncNeoworks() {
+	if app.neoworks.syncer != nil {
+		_, _ = app.neoworks.syncer.SyncNow(app.ctx)
+		return
+	}
+	session := app.neoworks.session
+	app.observeNeoworksSync(neoworks.SyncState{Syncing: true})
+	_, err := session.Sync(app.ctx)
+	app.observeNeoworksSync(neoworks.SyncState{Err: err})
+	if err != nil {
+		app.logger.Warn("neoworks sync", "error", err)
+	}
+}
+
+// observeNeoworksSync shows a sync pass in the account menu.
+func (app *App) observeNeoworksSync(state neoworks.SyncState) {
 	session := app.neoworks.session
 	app.updateNeoworksStatus(func(status *NeoworksStatus) {
-		status.Syncing = true
-	})
-	_, err := session.Sync(app.ctx)
-	app.updateNeoworksStatus(func(status *NeoworksStatus) {
-		status.Syncing = false
+		status.Syncing = state.Syncing
+		if state.Syncing {
+			return
+		}
 		status.SignedIn = session.SignedIn()
 		status.Error = ""
-		if err != nil {
-			status.Error = err.Error()
+		if state.Err != nil {
+			status.Error = state.Err.Error()
 			return
 		}
 		now := time.Now()
 		status.LastSyncedAt = &now
 	})
-	if err != nil {
-		app.logger.Warn("neoworks sync", "error", err)
-	}
 }
 
 func (app *App) refreshNeoworksProfile() {

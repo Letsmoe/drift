@@ -129,6 +129,17 @@ func (session *Session) UserID() string {
 	return session.tokens.UserID
 }
 
+// InstallID identifies this install; it names the device in the synced history.
+func (session *Session) InstallID() string {
+	return session.description.InstallID
+}
+
+// Nodes is the encrypted node store of this session. Its collections can only
+// be used once a Sync registered the descriptors.
+func (session *Session) Nodes() Nodes {
+	return session.client
+}
+
 // SignOut forgets the tokens and wipes the local store. The install keeps its
 // keys, so signing in again needs a new consent but no new install.
 func (session *Session) SignOut() error {

@@ -2,10 +2,29 @@
   "lockfileVersion": 1,
   "generator": "openschema 0.1.0",
   "createdAt": "2026-10-11T10:42:29.872Z",
-  "updatedAt": "2026-10-11T10:42:29.872Z",
-  "baseline": true,
-  "digest": "sha256-289957381805ec53b1ade30a97f97fd4bec29a3c36557c93d6a41a615ec1eb00",
+  "updatedAt": "2026-10-11T12:35:55.146Z",
+  "baseline": false,
+  "digest": "sha256-4da6754eb1f7a392664944cab3bfff1177f04865480a3e40dc92465d1fad9e8d",
   "spaces": {
+    "enum:drift.tracks.TrackKind": {
+      "kind": "enum",
+      "ordinals": {
+        "1": {
+          "state": "active",
+          "name": "song",
+          "type": null,
+          "encoding": null,
+          "since": "2026-10-11T12:35:55.146Z"
+        },
+        "2": {
+          "state": "active",
+          "name": "episode",
+          "type": null,
+          "encoding": null,
+          "since": "2026-10-11T12:35:55.146Z"
+        }
+      }
+    },
     "model:drift.tracks.Album": {
       "kind": "model",
       "ordinals": {
@@ -88,6 +107,13 @@
           "type": "string?",
           "encoding": "singular:len",
           "since": "2026-10-11T10:42:29.872Z"
+        },
+        "7": {
+          "state": "active",
+          "name": "kind",
+          "type": "TrackKind",
+          "encoding": "singular:varint",
+          "since": "2026-10-11T12:35:55.146Z"
         }
       }
     }

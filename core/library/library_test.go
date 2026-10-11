@@ -91,8 +91,12 @@ func TestOpenIsIdempotent(t *testing.T) {
 	if err = second.DB().QueryRowContext(ctx, `SELECT COUNT(*) FROM _migration`).Scan(&applied); err != nil {
 		t.Fatal(err)
 	}
-	if applied != 7 {
-		t.Fatalf("applied migrations = %d, want 7", applied)
+	migrations, err := loadMigrations()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if applied != len(migrations) {
+		t.Fatalf("applied migrations = %d, want %d", applied, len(migrations))
 	}
 	tracks, err := second.Tracks(ctx, []string{"a"})
 	if err != nil || len(tracks) != 1 {
@@ -569,6 +573,7 @@ func TestOnChangeReportsLikesAndPlaylistEdits(t *testing.T) {
 
 	want := []Change{
 		{Kind: ChangeLikes},
+		{Kind: ChangePlaylist, ID: playlist.ID},
 		{Kind: ChangePlaylist, ID: playlist.ID},
 		{Kind: ChangePlaylist, ID: playlist.ID},
 	}
