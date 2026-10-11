@@ -26,6 +26,7 @@
 		"android:logs": "adb logcat --pid=$(adb shell pidof -s dev.letsmoe.drift)",
 		"android:lint": "cd apps/android && ./gradlew lint",
 		"neoworks:schemas": "bun scripts/neoworks-schemas.ts",
+		"neoworks:dev": "bun scripts/neoworks-dev.ts",
 		"test:live": "cd core && go test -tags live -run Live -v ./..."
 	},
 	"devDependencies": {
