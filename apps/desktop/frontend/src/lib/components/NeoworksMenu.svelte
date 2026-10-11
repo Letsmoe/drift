@@ -125,6 +125,13 @@
 					>
 				{/if}
 
+				{#if neoworksAccount.status?.keyInFile}
+					<p class="text-xs text-dim">
+						No system keyring answered, so the key that protects your Neoworks sign-in is kept in a
+						file in Drift's data folder.
+					</p>
+				{/if}
+
 				{#if neoworksAccount.errorMessage !== ''}
 					<p class="text-sm text-red">{neoworksAccount.errorMessage}</p>
 				{/if}

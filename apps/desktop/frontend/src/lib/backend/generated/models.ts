@@ -145,6 +145,7 @@ export namespace main {
 		syncing: boolean;
 		lastSyncedAt: string | null;
 		error: string;
+		keyInFile: boolean;
 	}
 
 	export interface QueueStep {

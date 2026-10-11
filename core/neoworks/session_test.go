@@ -90,7 +90,7 @@ var testAccessToken = "e30." + base64.RawURLEncoding.EncodeToString([]byte(`{"su
 
 func testConfig(t *testing.T, fake *fakeNeoworks, directory string) Config {
 	t.Helper()
-	keystore, err := oskeystore.Open("neoworks-test")
+	keystore, err := oskeystore.Open("neoworks-test", t.TempDir())
 	if err != nil {
 		t.Fatal(err)
 	}

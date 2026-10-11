@@ -30,7 +30,7 @@ func (recorded *recordedEvents) emit(name string, _ any) {
 func newNeoworksTestApp(t *testing.T) (*App, *recordedEvents) {
 	t.Helper()
 	keyring.MockInit()
-	keystore, err := oskeystore.Open("neoworks-test")
+	keystore, err := oskeystore.Open("neoworks-test", t.TempDir())
 	if err != nil {
 		t.Fatal(err)
 	}

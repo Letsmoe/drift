@@ -41,13 +41,22 @@ type NeoworksStatus struct {
 	LastSyncedAt *time.Time `json:"lastSyncedAt"`
 	// Error is the last sign-in or sync failure, empty after a success.
 	Error string `json:"error"`
+	// KeyInFile is true when no system keyring answered and the key that seals
+	// the tokens and install keys lives in a file in Drift's data directory.
+	KeyInFile bool `json:"keyInFile"`
 }
 
 // neoworksAccount is the Neoworks session and what the menu knows about it.
 type neoworksAccount struct {
-	session *neoworks.Session
-	mutex   sync.Mutex
-	status  NeoworksStatus
+	session   *neoworks.Session
+	keyInFile bool
+	mutex     sync.Mutex
+	status    NeoworksStatus
+}
+
+// signedOutStatus is the status of an available session nobody signed in to.
+func (account *neoworksAccount) signedOutStatus() NeoworksStatus {
+	return NeoworksStatus{Available: true, KeyInFile: account.keyInFile}
 }
 
 // openNeoworks opens the Neoworks session next to the library. Failure leaves
@@ -57,7 +66,16 @@ func (app *App) openNeoworks() {
 	if app.dataDirectory == "" {
 		return
 	}
-	config, err := neoworksConfig(app.dataDirectory)
+	directory := filepath.Join(app.dataDirectory, "neoworks")
+	keystore, err := oskeystore.Open("neoworks", directory)
+	if err != nil {
+		app.logger.Error("neoworks keystore", "error", err)
+		return
+	}
+	if keystore.Backend() == oskeystore.BackendFile {
+		app.logger.Warn("no system keyring answered; the Neoworks key is kept in a file", "directory", directory)
+	}
+	config, err := neoworksConfig(directory, keystore)
 	if err != nil {
 		app.logger.Error("neoworks config", "error", err)
 		return
@@ -68,17 +86,15 @@ func (app *App) openNeoworks() {
 		return
 	}
 	app.neoworks.session = session
-	app.neoworks.status = NeoworksStatus{Available: true, SignedIn: session.SignedIn()}
+	app.neoworks.keyInFile = keystore.Backend() == oskeystore.BackendFile
+	app.neoworks.status = app.neoworks.signedOutStatus()
+	app.neoworks.status.SignedIn = session.SignedIn()
 	if session.SignedIn() {
 		go app.refreshNeoworksProfile()
 	}
 }
 
-func neoworksConfig(dataDirectory string) (neoworks.Config, error) {
-	keystore, err := oskeystore.Open("neoworks")
-	if err != nil {
-		return neoworks.Config{}, err
-	}
+func neoworksConfig(directory string, keystore *oskeystore.Keystore) (neoworks.Config, error) {
 	httpClient, err := neoworksHTTPClient()
 	if err != nil {
 		return neoworks.Config{}, err
@@ -92,7 +108,7 @@ func neoworksConfig(dataDirectory string) (neoworks.Config, error) {
 		APIURL:      "https://api." + domain,
 		ClientID:    neoworksClientID,
 		InstallName: installName(),
-		Directory:   filepath.Join(dataDirectory, "neoworks"),
+		Directory:   directory,
 		Keystore:    keystore,
 		HTTPClient:  httpClient,
 	}, nil
@@ -199,7 +215,7 @@ func (app *App) NeoworksSignOut() error {
 	}
 	err = session.SignOut()
 	app.updateNeoworksStatus(func(status *NeoworksStatus) {
-		*status = NeoworksStatus{Available: true}
+		*status = app.neoworks.signedOutStatus()
 	})
 	return err
 }
