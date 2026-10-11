@@ -19,6 +19,11 @@ const (
 	// The change feed announces remote changes, so this is only the fallback for
 	// when it is not connected.
 	DefaultInterval = 15 * time.Minute
+	// DefaultRetryDelay is the wait after a failed automatic pass; it doubles
+	// with every further failure.
+	DefaultRetryDelay = 5 * time.Second
+	// DefaultMaxRetryDelay is the longest wait between retries.
+	DefaultMaxRetryDelay = 5 * time.Minute
 )
 
 // syncSession is the part of Session a Syncer drives.
@@ -44,12 +49,14 @@ type SyncState struct {
 	Report ReconcileReport
 }
 
-// SyncerConfig holds what a Syncer needs; Debounce and Interval default to the package defaults.
+// SyncerConfig holds what a Syncer needs; the durations default to the package defaults.
 type SyncerConfig struct {
-	Session     syncSession
-	LibrarySync reconciler
-	Debounce    time.Duration
-	Interval    time.Duration
+	Session       syncSession
+	LibrarySync   reconciler
+	Debounce      time.Duration
+	Interval      time.Duration
+	RetryDelay    time.Duration
+	MaxRetryDelay time.Duration
 	// OnState hears every pass start and end, from the goroutine that runs it.
 	OnState func(SyncState)
 	Logger  *slog.Logger
@@ -83,6 +90,12 @@ func NewSyncer(config SyncerConfig) *Syncer {
 	}
 	if config.Interval <= 0 {
 		config.Interval = DefaultInterval
+	}
+	if config.RetryDelay <= 0 {
+		config.RetryDelay = DefaultRetryDelay
+	}
+	if config.MaxRetryDelay <= 0 {
+		config.MaxRetryDelay = DefaultMaxRetryDelay
 	}
 	if config.Logger == nil {
 		config.Logger = slog.New(slog.DiscardHandler)
@@ -164,10 +177,13 @@ func (syncer *Syncer) Stop() {
 	syncer.running.Wait()
 }
 
+// loop runs the automatic passes. A pass that fails is retried after a
+// doubling delay; any pass that succeeds, whatever started it, ends the retries.
 func (syncer *Syncer) loop(ctx context.Context) {
 	ticker := time.NewTicker(syncer.config.Interval)
 	defer ticker.Stop()
-	var due <-chan time.Time
+	backoff := retryBackoff{initial: syncer.config.RetryDelay, limit: syncer.config.MaxRetryDelay, next: syncer.config.RetryDelay}
+	var due, retry <-chan time.Time
 	for {
 		select {
 		case <-ctx.Done():
@@ -176,18 +192,43 @@ func (syncer *Syncer) loop(ctx context.Context) {
 			due = time.After(syncer.config.Debounce)
 		case <-due:
 			due = nil
-			syncer.automaticPass(ctx)
+			retry = syncer.automaticPass(ctx, &backoff)
+		case <-retry:
+			retry = syncer.automaticPass(ctx, &backoff)
 		case <-ticker.C:
-			syncer.automaticPass(ctx)
+			retry = syncer.automaticPass(ctx, &backoff)
 		}
 	}
 }
 
-func (syncer *Syncer) automaticPass(ctx context.Context) {
+// automaticPass runs a pass and returns when to retry it, or nil when it
+// needs no retry.
+func (syncer *Syncer) automaticPass(ctx context.Context, backoff *retryBackoff) <-chan time.Time {
 	_, err := syncer.SyncNow(ctx)
-	if err != nil && !errors.Is(err, ErrSignedOut) && !errors.Is(err, context.Canceled) {
-		syncer.config.Logger.Warn("neoworks: sync", "error", err)
+	if err == nil || errors.Is(err, ErrSignedOut) || errors.Is(err, context.Canceled) {
+		backoff.reset()
+		return nil
 	}
+	delay := backoff.failed()
+	syncer.config.Logger.Warn("neoworks: sync", "error", err, "retryIn", delay)
+	return time.After(delay)
+}
+
+type retryBackoff struct {
+	initial time.Duration
+	limit   time.Duration
+	next    time.Duration
+}
+
+// failed returns the wait before the next retry and doubles the one after it.
+func (backoff *retryBackoff) failed() time.Duration {
+	delay := backoff.next
+	backoff.next = min(delay*2, backoff.limit)
+	return delay
+}
+
+func (backoff *retryBackoff) reset() {
+	backoff.next = backoff.initial
 }
 
 // SyncNow runs one pass and waits for it, behind a pass that is running.
