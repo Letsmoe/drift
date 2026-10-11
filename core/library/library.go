@@ -37,8 +37,8 @@ type Library struct {
 	db  *sql.DB
 	now func() time.Time
 
-	listenerMutex  sync.RWMutex
-	changeListener func(Change)
+	listenerMutex   sync.RWMutex
+	changeListeners []func(Change)
 }
 
 // Option configures Open.

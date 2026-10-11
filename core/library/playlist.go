@@ -56,6 +56,7 @@ func (library *Library) CreatePlaylist(ctx context.Context, name string) (Playli
 	if err != nil {
 		return Playlist{}, fmt.Errorf("library: create playlist: %w", err)
 	}
+	library.emitChange(ctx, Change{Kind: ChangePlaylist, ID: identifier})
 	return Playlist{ID: identifier, Name: name, CreatedAt: now, UpdatedAt: now, Entries: []PlaylistEntry{}}, nil
 }
 
@@ -75,7 +76,8 @@ func (library *Library) RenamePlaylist(ctx context.Context, id, name, descriptio
 	if err != nil {
 		return fmt.Errorf("library: rename playlist %s: %w", id, err)
 	}
-	return requireAffected(result, "playlist "+id)
+	err = requireAffected(result, "playlist "+id)
+	return library.notifyChange(ctx, err, Change{Kind: ChangePlaylist, ID: id})
 }
 
 // DeletePlaylist removes a playlist and its entries.
@@ -85,7 +87,7 @@ func (library *Library) DeletePlaylist(ctx context.Context, id string) error {
 		return fmt.Errorf("library: delete playlist %s: %w", id, err)
 	}
 	err = requireAffected(result, "playlist "+id)
-	return library.notifyChange(err, Change{Kind: ChangePlaylist, ID: id})
+	return library.notifyChange(ctx, err, Change{Kind: ChangePlaylist, ID: id})
 }
 
 func requireAffected(result sql.Result, subject string) error {
@@ -222,7 +224,7 @@ func (library *Library) AddToPlaylist(ctx context.Context, id string, tracks []m
 		}
 		return library.appendEntries(ctx, tx, id, tracks)
 	})
-	return library.notifyChange(err, Change{Kind: ChangePlaylist, ID: id})
+	return library.notifyChange(ctx, err, Change{Kind: ChangePlaylist, ID: id})
 }
 
 func (library *Library) appendEntries(ctx context.Context, tx *sql.Tx, id string, tracks []music.Track) error {
@@ -277,7 +279,7 @@ func (library *Library) MovePlaylistEntry(ctx context.Context, id string, entryI
 // order and rewrites dense positions; removedEntryID (if not 0) is deleted.
 func (library *Library) reorder(ctx context.Context, id string, arrange func([]int64) ([]int64, error), removedEntryID int64) error {
 	err := library.rewriteOrder(ctx, id, arrange, removedEntryID)
-	return library.notifyChange(err, Change{Kind: ChangePlaylist, ID: id})
+	return library.notifyChange(ctx, err, Change{Kind: ChangePlaylist, ID: id})
 }
 
 func (library *Library) rewriteOrder(ctx context.Context, id string, arrange func([]int64) ([]int64, error), removedEntryID int64) error {
