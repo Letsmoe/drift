@@ -1,0 +1,6 @@
+scope: drift
+name: ratings
+version: 0.1.0
+title: 'Ratings'
+description: 'The tracks you liked or disliked in Drift.'
+entry: ratings.schema

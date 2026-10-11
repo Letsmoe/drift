@@ -1,0 +1,95 @@
+{
+  "lockfileVersion": 1,
+  "generator": "openschema 0.1.0",
+  "createdAt": "2026-10-11T10:42:29.872Z",
+  "updatedAt": "2026-10-11T10:42:29.872Z",
+  "baseline": true,
+  "digest": "sha256-289957381805ec53b1ade30a97f97fd4bec29a3c36557c93d6a41a615ec1eb00",
+  "spaces": {
+    "model:drift.tracks.Album": {
+      "kind": "model",
+      "ordinals": {
+        "1": {
+          "state": "active",
+          "name": "id",
+          "type": "string",
+          "encoding": "singular:len",
+          "since": "2026-10-11T10:42:29.872Z"
+        },
+        "2": {
+          "state": "active",
+          "name": "name",
+          "type": "string",
+          "encoding": "singular:len",
+          "since": "2026-10-11T10:42:29.872Z"
+        }
+      }
+    },
+    "model:drift.tracks.Artist": {
+      "kind": "model",
+      "ordinals": {
+        "1": {
+          "state": "active",
+          "name": "id",
+          "type": "string?",
+          "encoding": "singular:len",
+          "since": "2026-10-11T10:42:29.872Z"
+        },
+        "2": {
+          "state": "active",
+          "name": "name",
+          "type": "string",
+          "encoding": "singular:len",
+          "since": "2026-10-11T10:42:29.872Z"
+        }
+      }
+    },
+    "model:drift.tracks.Track": {
+      "kind": "model",
+      "ordinals": {
+        "1": {
+          "state": "active",
+          "name": "videoId",
+          "type": "string",
+          "encoding": "singular:len",
+          "since": "2026-10-11T10:42:29.872Z"
+        },
+        "2": {
+          "state": "active",
+          "name": "title",
+          "type": "string",
+          "encoding": "singular:len",
+          "since": "2026-10-11T10:42:29.872Z"
+        },
+        "3": {
+          "state": "active",
+          "name": "artists",
+          "type": "[Artist]?",
+          "encoding": "wrapper:repeated",
+          "since": "2026-10-11T10:42:29.872Z"
+        },
+        "4": {
+          "state": "active",
+          "name": "album",
+          "type": "Album?",
+          "encoding": "singular:len",
+          "since": "2026-10-11T10:42:29.872Z"
+        },
+        "5": {
+          "state": "active",
+          "name": "durationSeconds",
+          "type": "u32",
+          "encoding": "singular:varint",
+          "since": "2026-10-11T10:42:29.872Z"
+        },
+        "6": {
+          "state": "active",
+          "name": "thumbnailUrl",
+          "type": "string?",
+          "encoding": "singular:len",
+          "since": "2026-10-11T10:42:29.872Z"
+        }
+      }
+    }
+  }
+}

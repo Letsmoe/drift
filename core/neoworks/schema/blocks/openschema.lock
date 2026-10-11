@@ -1,0 +1,69 @@
+{
+  "lockfileVersion": 1,
+  "generator": "openschema 0.1.0",
+  "createdAt": "2026-10-11T10:46:05.984Z",
+  "updatedAt": "2026-10-11T10:46:05.984Z",
+  "baseline": true,
+  "digest": "sha256-a117cfde94321ecf8a047708a5eb65d755d5cc6d7a3c40b196c414a19984f390",
+  "spaces": {
+    "enum:drift.blocks.BlockKind": {
+      "kind": "enum",
+      "ordinals": {
+        "1": {
+          "state": "active",
+          "name": "track",
+          "type": null,
+          "encoding": null,
+          "since": "2026-10-11T10:46:05.984Z"
+        },
+        "2": {
+          "state": "active",
+          "name": "artist",
+          "type": null,
+          "encoding": null,
+          "since": "2026-10-11T10:46:05.984Z"
+        },
+        "3": {
+          "state": "active",
+          "name": "podcast",
+          "type": null,
+          "encoding": null,
+          "since": "2026-10-11T10:46:05.984Z"
+        }
+      }
+    },
+    "model:drift.blocks.Block": {
+      "kind": "model",
+      "ordinals": {
+        "1": {
+          "state": "active",
+          "name": "kind",
+          "type": "BlockKind",
+          "encoding": "singular:varint",
+          "since": "2026-10-11T10:46:05.984Z"
+        },
+        "2": {
+          "state": "active",
+          "name": "targetId",
+          "type": "string",
+          "encoding": "singular:len",
+          "since": "2026-10-11T10:46:05.984Z"
+        },
+        "3": {
+          "state": "active",
+          "name": "name",
+          "type": "string",
+          "encoding": "singular:len",
+          "since": "2026-10-11T10:46:05.984Z"
+        },
+        "4": {
+          "state": "active",
+          "name": "createdAt",
+          "type": "timestamp",
+          "encoding": "singular:varint",
+          "since": "2026-10-11T10:46:05.984Z"
+        }
+      }
+    }
+  }
+}

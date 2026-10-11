@@ -1,0 +1,109 @@
+{
+  "lockfileVersion": 1,
+  "generator": "openschema 0.1.0",
+  "createdAt": "2026-10-11T10:42:30.134Z",
+  "updatedAt": "2026-10-11T10:42:30.134Z",
+  "baseline": true,
+  "digest": "sha256-fc56e2d288a367ec93b18ac9b20774004f1ea59e88126a1390434137254573f7",
+  "spaces": {
+    "model:drift.history.DayLog": {
+      "kind": "model",
+      "ordinals": {
+        "1": {
+          "state": "active",
+          "name": "deviceId",
+          "type": "string",
+          "encoding": "singular:len",
+          "since": "2026-10-11T10:42:30.134Z"
+        },
+        "2": {
+          "state": "active",
+          "name": "deviceName",
+          "type": "string?",
+          "encoding": "singular:len",
+          "since": "2026-10-11T10:42:30.134Z"
+        },
+        "3": {
+          "state": "active",
+          "name": "day",
+          "type": "date",
+          "encoding": "singular:varint",
+          "since": "2026-10-11T10:42:30.134Z"
+        },
+        "4": {
+          "state": "active",
+          "name": "plays",
+          "type": "[Play]?",
+          "encoding": "wrapper:repeated",
+          "since": "2026-10-11T10:42:30.134Z"
+        },
+        "5": {
+          "state": "active",
+          "name": "searches",
+          "type": "[Search]?",
+          "encoding": "wrapper:repeated",
+          "since": "2026-10-11T10:42:30.134Z"
+        }
+      }
+    },
+    "model:drift.history.Play": {
+      "kind": "model",
+      "ordinals": {
+        "1": {
+          "state": "active",
+          "name": "videoId",
+          "type": "string",
+          "encoding": "singular:len",
+          "since": "2026-10-11T10:42:30.134Z"
+        },
+        "2": {
+          "state": "active",
+          "name": "context",
+          "type": "string?",
+          "encoding": "singular:len",
+          "since": "2026-10-11T10:42:30.134Z"
+        },
+        "3": {
+          "state": "active",
+          "name": "startedAt",
+          "type": "timestamp",
+          "encoding": "singular:varint",
+          "since": "2026-10-11T10:42:30.134Z"
+        },
+        "4": {
+          "state": "active",
+          "name": "progressSeconds",
+          "type": "u32",
+          "encoding": "singular:varint",
+          "since": "2026-10-11T10:42:30.134Z"
+        },
+        "5": {
+          "state": "active",
+          "name": "completed",
+          "type": "bool",
+          "encoding": "singular:varint",
+          "since": "2026-10-11T10:42:30.134Z"
+        }
+      }
+    },
+    "model:drift.history.Search": {
+      "kind": "model",
+      "ordinals": {
+        "1": {
+          "state": "active",
+          "name": "query",
+          "type": "string",
+          "encoding": "singular:len",
+          "since": "2026-10-11T10:42:30.134Z"
+        },
+        "2": {
+          "state": "active",
+          "name": "searchedAt",
+          "type": "timestamp",
+          "encoding": "singular:varint",
+          "since": "2026-10-11T10:42:30.134Z"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,33 @@
+// tracks.schema — the @drift/tracks collection: one item per track the other
+// @drift collections mention, directly under the root. They refer to a track by
+// its video ID, so another device can show it without asking YouTube first.
+
+namespace drift.tracks
+
+@neoworks.node("item")
+model Track {
+  @minLength(1) @maxLength(64)
+  1 videoId: string
+  @neoworks.title @neoworks.searchable @maxLength(500)
+  2 title: string
+  3 artists: [Artist]?
+  4 album: Album?
+  @minValue(0)
+  5 durationSeconds: u32
+  /// The largest cover; Google image URLs carry their size and are resized by rewriting it.
+  @format("uri")
+  6 thumbnailUrl: string?
+}
+
+/// A credited artist; `id` is absent when YouTube Music does not link them.
+model Artist {
+  1 id: string?
+  @maxLength(500)
+  2 name: string
+}
+
+model Album {
+  1 id: string
+  @maxLength(500)
+  2 name: string
+}
