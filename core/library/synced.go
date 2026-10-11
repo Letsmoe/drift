@@ -69,13 +69,14 @@ func (library *Library) RestoreRating(ctx context.Context, record RatingRecord) 
 // TrackRecord is a cached track with the time it was last cached.
 type TrackRecord struct {
 	Track     music.Track
+	Kind      music.ItemKind
 	UpdatedAt time.Time
 }
 
 // ReferencedTracks lists the cached tracks that a rating, a playlist entry, a
 // play or a track block refers to, ordered by video ID.
 func (library *Library) ReferencedTracks(ctx context.Context) ([]TrackRecord, error) {
-	rows, err := library.db.QueryContext(ctx, `SELECT t.updated_at, `+trackColumns+` FROM track t
+	rows, err := library.db.QueryContext(ctx, `SELECT t.updated_at, t.kind, `+trackColumns+` FROM track t
 		WHERE t.video_id IN (SELECT video_id FROM track_rating)
 			OR t.video_id IN (SELECT video_id FROM playlist_entry)
 			OR t.video_id IN (SELECT video_id FROM play)
@@ -87,12 +88,12 @@ func (library *Library) ReferencedTracks(ctx context.Context) ([]TrackRecord, er
 	defer func() { _ = rows.Close() }()
 	records := []TrackRecord{}
 	for rows.Next() {
-		var updatedAt string
-		track, err := scanTrack(rows, &updatedAt)
+		var updatedAt, kind string
+		track, err := scanTrack(rows, &updatedAt, &kind)
 		if err != nil {
 			return nil, fmt.Errorf("library: %w", err)
 		}
-		record := TrackRecord{Track: track}
+		record := TrackRecord{Track: track, Kind: music.ItemKind(kind)}
 		record.UpdatedAt, err = ParseTime(updatedAt)
 		if err != nil {
 			return nil, err

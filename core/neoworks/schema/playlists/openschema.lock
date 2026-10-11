@@ -2,9 +2,9 @@
   "lockfileVersion": 1,
   "generator": "openschema 0.1.0",
   "createdAt": "2026-10-11T10:42:30.070Z",
-  "updatedAt": "2026-10-11T10:42:30.070Z",
-  "baseline": true,
-  "digest": "sha256-871675e3f8af424fdfc0873865328b7165d95787ac2acf0d17285beb91bb817a",
+  "updatedAt": "2026-10-11T12:35:55.337Z",
+  "baseline": false,
+  "digest": "sha256-7c9c0b97470f8de04c7c175d9e115672d53b939c3a7b2a23ba5a77a7f3e8014e",
   "spaces": {
     "model:drift.playlists.Playlist": {
       "kind": "model",
@@ -43,6 +43,13 @@
           "type": "timestamp",
           "encoding": "singular:varint",
           "since": "2026-10-11T10:42:30.070Z"
+        },
+        "6": {
+          "state": "active",
+          "name": "id",
+          "type": "string",
+          "encoding": "singular:len",
+          "since": "2026-10-11T12:35:55.337Z"
         }
       }
     },

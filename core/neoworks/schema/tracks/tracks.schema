@@ -17,6 +17,13 @@ model Track {
   /// The largest cover; Google image URLs carry their size and are resized by rewriting it.
   @format("uri")
   6 thumbnailUrl: string?
+  7 kind: TrackKind
+}
+
+/// Episodes keep their resume position; songs start from the beginning.
+enum TrackKind {
+  1 song
+  2 episode
 }
 
 /// A credited artist; `id` is absent when YouTube Music does not link them.

@@ -151,6 +151,29 @@ func TestAPlaylistKeepsItsOrderOnAnotherInstall(t *testing.T) {
 	}
 }
 
+func TestAPlaylistKeepsItsIDEverywhereAndRelinksAfterLinksAreLost(t *testing.T) {
+	store := newFakeNodeStore()
+	laptop := newTestInstall(t, store, "laptop")
+	phone := newTestInstall(t, store, "phone")
+	playlist := orderedPlaylist(t, laptop, "Mix", "a")
+	laptop.reconcile(t)
+	phone.reconcile(t)
+
+	summaries, _ := phone.library.Playlists(t.Context())
+	if len(summaries) != 1 || summaries[0].ID != playlist.ID {
+		t.Fatalf("phone playlists = %v, want the id %s", summaries, playlist.ID)
+	}
+	if err := laptop.library.ClearNodeLinks(t.Context()); err != nil {
+		t.Fatal(err)
+	}
+	if again := laptop.reconcile(t); again.NodesWritten != 0 || again.LibraryWritten != 0 {
+		t.Errorf("relinking must write nothing, wrote %+v", again)
+	}
+	if nodes := store.liveItems("playlists"); len(nodes) != 1 || nodes[0]["id"] != playlist.ID {
+		t.Errorf("playlist nodes = %v", nodes)
+	}
+}
+
 func TestEmptyingAPlaylistClearsItsEntriesAndDescriptionOnTheNode(t *testing.T) {
 	store := newFakeNodeStore()
 	install := newTestInstall(t, store, "laptop")
