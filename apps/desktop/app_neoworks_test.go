@@ -123,3 +123,23 @@ func TestNeoworksSyncReactsToLibraryChangesAndSignOutForgetsTheLinks(t *testing.
 		t.Errorf("links after sign-out = %v, %v", links, err)
 	}
 }
+
+func TestNeoworksChangeFeedRunsBesideTheSyncerAndSignedOutItStaysQuiet(t *testing.T) {
+	app, _ := newNeoworksTestApp(t)
+	app.wakeNeoworksChangeFeed()
+	lib, err := library.Open(t.Context(), filepath.Join(t.TempDir(), "library.db"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = lib.Close() })
+	app.library = lib
+
+	app.startNeoworksSync(app.neoworks.session)
+
+	if app.neoworks.changeFeed == nil {
+		t.Fatal("the change feed must start with the syncer")
+	}
+	t.Cleanup(app.neoworks.syncer.Stop)
+	t.Cleanup(app.neoworks.changeFeed.Stop)
+	app.wakeNeoworksChangeFeed()
+}
