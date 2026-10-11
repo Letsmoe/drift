@@ -5,12 +5,14 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"path/filepath"
 	"strings"
 	"sync"
 	"testing"
 
 	"github.com/zalando/go-keyring"
 
+	"github.com/letsmoe/drift/core/library"
 	"github.com/letsmoe/drift/core/neoworks"
 	"github.com/letsmoe/drift/core/neoworks/oskeystore"
 )
@@ -91,5 +93,33 @@ func TestNeoworksCallbackBeforeStartupAnswersUnavailable(t *testing.T) {
 	app.neoworksCallbackHandler().ServeHTTP(recorder, request)
 	if recorder.Code != http.StatusServiceUnavailable {
 		t.Fatalf("callback answered %d", recorder.Code)
+	}
+}
+
+func TestNeoworksSyncReactsToLibraryChangesAndSignOutForgetsTheLinks(t *testing.T) {
+	app, _ := newNeoworksTestApp(t)
+	lib, err := library.Open(t.Context(), filepath.Join(t.TempDir(), "library.db"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = lib.Close() })
+	app.library = lib
+	app.startNeoworksSync(app.neoworks.session)
+	if app.neoworks.syncer == nil {
+		t.Fatal("a library and a session must start the syncer")
+	}
+	t.Cleanup(app.neoworks.syncer.Stop)
+	link := library.NodeLink{Collection: "ratings", Key: "abc", NodeID: "node-1", ContentHash: "h"}
+	if err = lib.SaveNodeLink(t.Context(), link); err != nil {
+		t.Fatal(err)
+	}
+
+	if err = app.NeoworksSignOut(); err != nil {
+		t.Fatal(err)
+	}
+
+	links, err := lib.NodeLinks(t.Context(), "ratings")
+	if err != nil || len(links) != 0 {
+		t.Errorf("links after sign-out = %v, %v", links, err)
 	}
 }
