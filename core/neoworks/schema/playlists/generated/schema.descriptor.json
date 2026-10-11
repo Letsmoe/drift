@@ -1,0 +1,147 @@
+{
+  "descriptorVersion": 1,
+  "namespace": "drift.playlists",
+  "enums": [],
+  "models": [
+    {
+      "name": "Playlist",
+      "fields": [
+        {
+          "ordinal": 1,
+          "name": "name",
+          "container": {
+            "kind": "singular",
+            "nullable": false
+          },
+          "value": {
+            "kind": "scalar",
+            "scalar": "string"
+          },
+          "required": true,
+          "constraints": {
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        {
+          "ordinal": 2,
+          "name": "description",
+          "container": {
+            "kind": "singular",
+            "nullable": true
+          },
+          "value": {
+            "kind": "scalar",
+            "scalar": "string"
+          },
+          "required": false,
+          "constraints": {
+            "maxLength": 5000
+          }
+        },
+        {
+          "ordinal": 3,
+          "name": "entries",
+          "container": {
+            "kind": "wrapperRepeated",
+            "packed": false
+          },
+          "value": {
+            "kind": "message",
+            "name": "PlaylistEntry"
+          },
+          "required": false,
+          "constraints": {}
+        },
+        {
+          "ordinal": 4,
+          "name": "createdAt",
+          "container": {
+            "kind": "singular",
+            "nullable": false
+          },
+          "value": {
+            "kind": "scalar",
+            "scalar": "timestamp"
+          },
+          "required": true,
+          "constraints": {}
+        },
+        {
+          "ordinal": 5,
+          "name": "updatedAt",
+          "container": {
+            "kind": "singular",
+            "nullable": false
+          },
+          "value": {
+            "kind": "scalar",
+            "scalar": "timestamp"
+          },
+          "required": true,
+          "constraints": {}
+        }
+      ]
+    },
+    {
+      "name": "PlaylistEntry",
+      "fields": [
+        {
+          "ordinal": 1,
+          "name": "videoId",
+          "container": {
+            "kind": "singular",
+            "nullable": false
+          },
+          "value": {
+            "kind": "scalar",
+            "scalar": "string"
+          },
+          "required": true,
+          "constraints": {
+            "minLength": 1,
+            "maxLength": 64
+          }
+        },
+        {
+          "ordinal": 2,
+          "name": "addedAt",
+          "container": {
+            "kind": "singular",
+            "nullable": false
+          },
+          "value": {
+            "kind": "scalar",
+            "scalar": "timestamp"
+          },
+          "required": true,
+          "constraints": {}
+        }
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "kind": "item",
+      "model": "Playlist",
+      "facets": [
+        {
+          "name": "default",
+          "tag": 1,
+          "fields": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        }
+      ],
+      "searchable": [
+        1
+      ],
+      "title": 1,
+      "timeRange": null
+    }
+  ]
+}

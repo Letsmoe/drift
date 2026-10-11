@@ -1,0 +1,90 @@
+{
+  "lockfileVersion": 1,
+  "generator": "openschema 0.1.0",
+  "createdAt": "2026-10-11T10:42:30.007Z",
+  "updatedAt": "2026-10-11T10:42:30.007Z",
+  "baseline": true,
+  "digest": "sha256-cfee7b93c263590c23b21e6500e2c3a3bb18137f97cb75b93bfebcdf770700f6",
+  "spaces": {
+    "enum:drift.saved.SavedKind": {
+      "kind": "enum",
+      "ordinals": {
+        "1": {
+          "state": "active",
+          "name": "album",
+          "type": null,
+          "encoding": null,
+          "since": "2026-10-11T10:42:30.007Z"
+        },
+        "2": {
+          "state": "active",
+          "name": "artist",
+          "type": null,
+          "encoding": null,
+          "since": "2026-10-11T10:42:30.007Z"
+        },
+        "3": {
+          "state": "active",
+          "name": "playlist",
+          "type": null,
+          "encoding": null,
+          "since": "2026-10-11T10:42:30.007Z"
+        },
+        "4": {
+          "state": "active",
+          "name": "podcast",
+          "type": null,
+          "encoding": null,
+          "since": "2026-10-11T10:42:30.007Z"
+        }
+      }
+    },
+    "model:drift.saved.SavedItem": {
+      "kind": "model",
+      "ordinals": {
+        "1": {
+          "state": "active",
+          "name": "kind",
+          "type": "SavedKind",
+          "encoding": "singular:varint",
+          "since": "2026-10-11T10:42:30.007Z"
+        },
+        "2": {
+          "state": "active",
+          "name": "browseId",
+          "type": "string",
+          "encoding": "singular:len",
+          "since": "2026-10-11T10:42:30.007Z"
+        },
+        "3": {
+          "state": "active",
+          "name": "title",
+          "type": "string",
+          "encoding": "singular:len",
+          "since": "2026-10-11T10:42:30.007Z"
+        },
+        "4": {
+          "state": "active",
+          "name": "subtitle",
+          "type": "string?",
+          "encoding": "singular:len",
+          "since": "2026-10-11T10:42:30.007Z"
+        },
+        "5": {
+          "state": "active",
+          "name": "thumbnailUrl",
+          "type": "string?",
+          "encoding": "singular:len",
+          "since": "2026-10-11T10:42:30.007Z"
+        },
+        "6": {
+          "state": "active",
+          "name": "savedAt",
+          "type": "timestamp",
+          "encoding": "singular:varint",
+          "since": "2026-10-11T10:42:30.007Z"
+        }
+      }
+    }
+  }
+}

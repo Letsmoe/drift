@@ -1,0 +1,225 @@
+{
+  "descriptorVersion": 1,
+  "namespace": "drift.history",
+  "enums": [],
+  "models": [
+    {
+      "name": "DayLog",
+      "fields": [
+        {
+          "ordinal": 1,
+          "name": "deviceId",
+          "container": {
+            "kind": "singular",
+            "nullable": false
+          },
+          "value": {
+            "kind": "scalar",
+            "scalar": "string"
+          },
+          "required": true,
+          "constraints": {
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        {
+          "ordinal": 2,
+          "name": "deviceName",
+          "container": {
+            "kind": "singular",
+            "nullable": true
+          },
+          "value": {
+            "kind": "scalar",
+            "scalar": "string"
+          },
+          "required": false,
+          "constraints": {
+            "maxLength": 200
+          }
+        },
+        {
+          "ordinal": 3,
+          "name": "day",
+          "container": {
+            "kind": "singular",
+            "nullable": false
+          },
+          "value": {
+            "kind": "scalar",
+            "scalar": "date"
+          },
+          "required": true,
+          "constraints": {}
+        },
+        {
+          "ordinal": 4,
+          "name": "plays",
+          "container": {
+            "kind": "wrapperRepeated",
+            "packed": false
+          },
+          "value": {
+            "kind": "message",
+            "name": "Play"
+          },
+          "required": false,
+          "constraints": {}
+        },
+        {
+          "ordinal": 5,
+          "name": "searches",
+          "container": {
+            "kind": "wrapperRepeated",
+            "packed": false
+          },
+          "value": {
+            "kind": "message",
+            "name": "Search"
+          },
+          "required": false,
+          "constraints": {}
+        }
+      ]
+    },
+    {
+      "name": "Play",
+      "fields": [
+        {
+          "ordinal": 1,
+          "name": "videoId",
+          "container": {
+            "kind": "singular",
+            "nullable": false
+          },
+          "value": {
+            "kind": "scalar",
+            "scalar": "string"
+          },
+          "required": true,
+          "constraints": {
+            "minLength": 1,
+            "maxLength": 64
+          }
+        },
+        {
+          "ordinal": 2,
+          "name": "context",
+          "container": {
+            "kind": "singular",
+            "nullable": true
+          },
+          "value": {
+            "kind": "scalar",
+            "scalar": "string"
+          },
+          "required": false,
+          "constraints": {
+            "maxLength": 500
+          }
+        },
+        {
+          "ordinal": 3,
+          "name": "startedAt",
+          "container": {
+            "kind": "singular",
+            "nullable": false
+          },
+          "value": {
+            "kind": "scalar",
+            "scalar": "timestamp"
+          },
+          "required": true,
+          "constraints": {}
+        },
+        {
+          "ordinal": 4,
+          "name": "progressSeconds",
+          "container": {
+            "kind": "singular",
+            "nullable": false
+          },
+          "value": {
+            "kind": "scalar",
+            "scalar": "u32"
+          },
+          "required": true,
+          "constraints": {}
+        },
+        {
+          "ordinal": 5,
+          "name": "completed",
+          "container": {
+            "kind": "singular",
+            "nullable": false
+          },
+          "value": {
+            "kind": "scalar",
+            "scalar": "bool"
+          },
+          "required": true,
+          "constraints": {}
+        }
+      ]
+    },
+    {
+      "name": "Search",
+      "fields": [
+        {
+          "ordinal": 1,
+          "name": "query",
+          "container": {
+            "kind": "singular",
+            "nullable": false
+          },
+          "value": {
+            "kind": "scalar",
+            "scalar": "string"
+          },
+          "required": true,
+          "constraints": {
+            "minLength": 1,
+            "maxLength": 500
+          }
+        },
+        {
+          "ordinal": 2,
+          "name": "searchedAt",
+          "container": {
+            "kind": "singular",
+            "nullable": false
+          },
+          "value": {
+            "kind": "scalar",
+            "scalar": "timestamp"
+          },
+          "required": true,
+          "constraints": {}
+        }
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "kind": "item",
+      "model": "DayLog",
+      "facets": [
+        {
+          "name": "default",
+          "tag": 1,
+          "fields": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        }
+      ],
+      "searchable": [],
+      "title": null,
+      "timeRange": null
+    }
+  ]
+}

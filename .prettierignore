@@ -7,3 +7,4 @@ bun.lock
 graft
 .claude
 core/spotify/testdata/*.html
+core/neoworks/schema/*/generated

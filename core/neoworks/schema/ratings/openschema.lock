@@ -1,0 +1,55 @@
+{
+  "lockfileVersion": 1,
+  "generator": "openschema 0.1.0",
+  "createdAt": "2026-10-11T10:42:29.936Z",
+  "updatedAt": "2026-10-11T10:42:29.936Z",
+  "baseline": true,
+  "digest": "sha256-f566b60edd1ba691ef933de5464c691acff08c836b1ac06a3a02ea5725e3beb2",
+  "spaces": {
+    "enum:drift.ratings.Opinion": {
+      "kind": "enum",
+      "ordinals": {
+        "1": {
+          "state": "active",
+          "name": "like",
+          "type": null,
+          "encoding": null,
+          "since": "2026-10-11T10:42:29.936Z"
+        },
+        "2": {
+          "state": "active",
+          "name": "dislike",
+          "type": null,
+          "encoding": null,
+          "since": "2026-10-11T10:42:29.936Z"
+        }
+      }
+    },
+    "model:drift.ratings.Rating": {
+      "kind": "model",
+      "ordinals": {
+        "1": {
+          "state": "active",
+          "name": "videoId",
+          "type": "string",
+          "encoding": "singular:len",
+          "since": "2026-10-11T10:42:29.936Z"
+        },
+        "2": {
+          "state": "active",
+          "name": "opinion",
+          "type": "Opinion",
+          "encoding": "singular:varint",
+          "since": "2026-10-11T10:42:29.936Z"
+        },
+        "3": {
+          "state": "active",
+          "name": "updatedAt",
+          "type": "timestamp",
+          "encoding": "singular:varint",
+          "since": "2026-10-11T10:42:29.936Z"
+        }
+      }
+    }
+  }
+}

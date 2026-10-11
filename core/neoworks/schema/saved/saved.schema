@@ -1,0 +1,27 @@
+// saved.schema — the @drift/saved collection: one item per album, artist,
+// podcast or YouTube playlist the user saved, directly under the root.
+
+namespace drift.saved
+
+@neoworks.node("item")
+model SavedItem {
+  1 kind: SavedKind
+  /// The YouTube Music browse ID of what was saved.
+  @minLength(1) @maxLength(200)
+  2 browseId: string
+  @neoworks.title @neoworks.searchable @maxLength(500)
+  3 title: string
+  @maxLength(500)
+  4 subtitle: string?
+  /// The largest cover; Google image URLs carry their size and are resized by rewriting it.
+  @format("uri")
+  5 thumbnailUrl: string?
+  6 savedAt: timestamp
+}
+
+enum SavedKind {
+  1 album
+  2 artist
+  3 playlist
+  4 podcast
+}

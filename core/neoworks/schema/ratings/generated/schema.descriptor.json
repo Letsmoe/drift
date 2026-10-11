@@ -1,0 +1,91 @@
+{
+  "descriptorVersion": 1,
+  "namespace": "drift.ratings",
+  "enums": [
+    {
+      "name": "Opinion",
+      "variants": [
+        {
+          "name": "like",
+          "ordinal": 1
+        },
+        {
+          "name": "dislike",
+          "ordinal": 2
+        }
+      ]
+    }
+  ],
+  "models": [
+    {
+      "name": "Rating",
+      "fields": [
+        {
+          "ordinal": 1,
+          "name": "videoId",
+          "container": {
+            "kind": "singular",
+            "nullable": false
+          },
+          "value": {
+            "kind": "scalar",
+            "scalar": "string"
+          },
+          "required": true,
+          "constraints": {
+            "minLength": 1,
+            "maxLength": 64
+          }
+        },
+        {
+          "ordinal": 2,
+          "name": "opinion",
+          "container": {
+            "kind": "singular",
+            "nullable": false
+          },
+          "value": {
+            "kind": "enum",
+            "name": "Opinion"
+          },
+          "required": true,
+          "constraints": {}
+        },
+        {
+          "ordinal": 3,
+          "name": "updatedAt",
+          "container": {
+            "kind": "singular",
+            "nullable": false
+          },
+          "value": {
+            "kind": "scalar",
+            "scalar": "timestamp"
+          },
+          "required": true,
+          "constraints": {}
+        }
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "kind": "item",
+      "model": "Rating",
+      "facets": [
+        {
+          "name": "default",
+          "tag": 1,
+          "fields": [
+            1,
+            2,
+            3
+          ]
+        }
+      ],
+      "searchable": [],
+      "title": null,
+      "timeRange": null
+    }
+  ]
+}

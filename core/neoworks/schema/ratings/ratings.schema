@@ -1,0 +1,18 @@
+// ratings.schema — the @drift/ratings collection: one item per liked or
+// disliked track, directly under the root. Removing a rating deletes its item.
+
+namespace drift.ratings
+
+@neoworks.node("item")
+model Rating {
+  /// The rated track, in @drift/tracks.
+  @minLength(1) @maxLength(64)
+  1 videoId: string
+  2 opinion: Opinion
+  3 updatedAt: timestamp
+}
+
+enum Opinion {
+  1 like
+  2 dislike
+}

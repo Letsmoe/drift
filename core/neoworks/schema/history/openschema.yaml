@@ -1,0 +1,6 @@
+scope: drift
+name: history
+version: 0.1.0
+title: 'Listening history'
+description: 'What you played and searched for in Drift, per device and day.'
+entry: history.schema
