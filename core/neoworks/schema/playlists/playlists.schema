@@ -12,6 +12,9 @@ model Playlist {
   3 entries: [PlaylistEntry]?
   4 createdAt: timestamp
   5 updatedAt: timestamp
+  /// Chosen by the device that created the playlist; every device keeps it as the local ID.
+  @minLength(1) @maxLength(64)
+  6 id: string
 }
 
 model PlaylistEntry {

@@ -29,6 +29,7 @@ func (library *Library) Save(ctx context.Context, item music.Item) error {
 	if err != nil {
 		return fmt.Errorf("library: save %s %s: %w", item.Kind, item.ID, err)
 	}
+	library.emitChange(ctx, Change{Kind: ChangeSaved})
 	return nil
 }
 
@@ -38,6 +39,7 @@ func (library *Library) Unsave(ctx context.Context, kind music.ItemKind, id stri
 	if err != nil {
 		return fmt.Errorf("library: unsave %s %s: %w", kind, id, err)
 	}
+	library.emitChange(ctx, Change{Kind: ChangeSaved})
 	return nil
 }
 

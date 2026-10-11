@@ -286,8 +286,12 @@ func (manager *Manager) Collections(ctx context.Context) ([]Collection, error) {
 // handleLibraryChange keeps kept local collections in sync with edits to likes and playlists.
 func (manager *Manager) handleLibraryChange(change library.Change) {
 	ref := CollectionRef{Kind: CollectionLikes, ID: LikedID}
-	if change.Kind == library.ChangePlaylist {
+	switch change.Kind {
+	case library.ChangeLikes:
+	case library.ChangePlaylist:
 		ref = CollectionRef{Kind: CollectionLocalPlaylist, ID: change.ID}
+	default:
+		return
 	}
 	manager.group.Add(1)
 	go func() {

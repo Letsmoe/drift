@@ -17,6 +17,7 @@ func (library *Library) RecordSearch(ctx context.Context, query string) error {
 	if err != nil {
 		return fmt.Errorf("library: record search: %w", err)
 	}
+	library.emitChange(ctx, Change{Kind: ChangeHistory})
 	return nil
 }
 
@@ -57,5 +58,6 @@ func (library *Library) ClearSearches(ctx context.Context) error {
 	if err != nil {
 		return fmt.Errorf("library: clear searches: %w", err)
 	}
+	library.emitChange(ctx, Change{Kind: ChangeHistory})
 	return nil
 }

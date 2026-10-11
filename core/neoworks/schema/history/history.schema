@@ -11,7 +11,7 @@ model DayLog {
   1 deviceId: string
   @maxLength(200)
   2 deviceName: string?
-  /// The day in the device's local time zone.
+  /// The day in UTC that the plays and searches fall on.
   3 day: date
   4 plays: [Play]?
   5 searches: [Search]?

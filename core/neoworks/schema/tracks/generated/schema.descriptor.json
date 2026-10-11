@@ -1,7 +1,21 @@
 {
   "descriptorVersion": 1,
   "namespace": "drift.tracks",
-  "enums": [],
+  "enums": [
+    {
+      "name": "TrackKind",
+      "variants": [
+        {
+          "name": "song",
+          "ordinal": 1
+        },
+        {
+          "name": "episode",
+          "ordinal": 2
+        }
+      ]
+    }
+  ],
   "models": [
     {
       "name": "Track",
@@ -98,6 +112,20 @@
           "constraints": {
             "format": "uri"
           }
+        },
+        {
+          "ordinal": 7,
+          "name": "kind",
+          "container": {
+            "kind": "singular",
+            "nullable": false
+          },
+          "value": {
+            "kind": "enum",
+            "name": "TrackKind"
+          },
+          "required": true,
+          "constraints": {}
         }
       ]
     },
@@ -186,7 +214,8 @@
             3,
             4,
             5,
-            6
+            6,
+            7
           ]
         }
       ],

@@ -34,11 +34,16 @@ func (library *Library) StartPlay(ctx context.Context, track music.Track, kind m
 		}
 		return nil
 	})
-	return playID, err
+	if err != nil {
+		return playID, err
+	}
+	library.emitChange(ctx, Change{Kind: ChangeHistory})
+	return playID, nil
 }
 
 // UpdatePlay reports playback progress. The furthest progress is kept and
-// completed, once true, stays true.
+// completed, once true, stays true. Only a completed play is reported as a
+// change, so progress ticks do not trigger a sync each.
 func (library *Library) UpdatePlay(ctx context.Context, playID int64, progressSeconds int, completed bool) error {
 	result, err := library.db.ExecContext(ctx, `UPDATE play SET
 		progress_seconds = MAX(progress_seconds, ?),
@@ -48,7 +53,11 @@ func (library *Library) UpdatePlay(ctx context.Context, playID int64, progressSe
 	if err != nil {
 		return fmt.Errorf("library: update play %d: %w", playID, err)
 	}
-	return requireAffected(result, fmt.Sprintf("play %d", playID))
+	err = requireAffected(result, fmt.Sprintf("play %d", playID))
+	if !completed {
+		return err
+	}
+	return library.notifyChange(ctx, err, Change{Kind: ChangeHistory})
 }
 
 // RecentTracks lists distinct played tracks, the most recently played first.
