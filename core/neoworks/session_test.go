@@ -308,3 +308,14 @@ func TestACancelledSignInRefusesItsCallback(t *testing.T) {
 		t.Fatalf("got %v, want %v", err, ErrSignInState)
 	}
 }
+
+func TestOnlyAFailureCodeFailsASync(t *testing.T) {
+	clean := libneoworks.SyncReport{Failure: "ok"}
+	if err := syncFailure(clean); err != nil {
+		t.Fatalf("a clean run reported %v", err)
+	}
+	refused := libneoworks.SyncReport{Failure: "forbidden", FailureCode: libneoworks.StatusForbidden}
+	if err := syncFailure(refused); !errors.Is(err, libneoworks.StatusForbidden) {
+		t.Fatalf("got %v, want %v", err, libneoworks.StatusForbidden)
+	}
+}
