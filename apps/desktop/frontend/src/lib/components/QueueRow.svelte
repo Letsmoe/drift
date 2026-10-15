@@ -43,8 +43,21 @@
 	$effect(() => {
 		downloads.ensureStates([entry.track.videoId]);
 	});
+
+	function playEntry(): void {
+		if (!current) {
+			player.jump(entry.id);
+		}
+	}
+
+	function removeEntry(event: MouseEvent): void {
+		event.stopPropagation();
+		player.remove(entry.id);
+	}
 </script>
 
+<!-- Clicking anywhere on the row plays it; keyboard users have the row's play button. -->
+<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_noninteractive_element_interactions -->
 <div
 	role="listitem"
 	{draggable}
@@ -53,12 +66,14 @@
 	{ondrop}
 	{ondragend}
 	oncontextmenu={(event) => contextMenu.openAtPointer(event)}
+	onclick={playEntry}
 	class={[
 		'group/queuerow duration-fast flex items-center rounded-md transition-colors hover:bg-hover',
 		size === 'compact' && 'gap-2.5 px-1.5 py-1',
 		size === 'comfortable' && 'gap-3 p-2',
 		dropTarget && 'border-t-2 border-action',
-		played && 'opacity-60 hover:opacity-100'
+		played && 'opacity-60 hover:opacity-100',
+		!current && 'cursor-pointer'
 	]}
 >
 	{#if size === 'comfortable'}
@@ -101,7 +116,10 @@
 				type="button"
 				aria-label="Play {entry.track.title}"
 				class="rounded-full p-1 text-muted hover:text-default"
-				onclick={() => player.jump(entry.id)}
+				onclick={(event) => {
+					event.stopPropagation();
+					playEntry();
+				}}
 			>
 				<PlayIcon size={14} weight="fill" />
 			</button>
@@ -109,7 +127,7 @@
 				type="button"
 				aria-label="Remove {entry.track.title} from queue"
 				class="rounded-full p-1 text-muted hover:text-default"
-				onclick={() => player.remove(entry.id)}
+				onclick={removeEntry}
 			>
 				<XIcon size={14} />
 			</button>
