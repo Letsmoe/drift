@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { onDestroy, onMount } from 'svelte';
 	import { LoadingSpinner } from '@neoworks-dev/ui';
 	import Dialog from '#lib/components/Dialog.svelte';
 	import ImportPreviewStep from '#lib/components/ImportPreviewStep.svelte';
@@ -7,14 +6,9 @@
 	import ImportSourceStep from '#lib/components/ImportSourceStep.svelte';
 	import ImportSummaryStep from '#lib/components/ImportSummaryStep.svelte';
 	import YouTubeSignInStep from '#lib/components/YouTubeSignInStep.svelte';
-	import { MusicImportFlow } from '#lib/import/musicImport.svelte.ts';
+	import { musicImport as flow } from '#lib/import/musicImport.svelte.ts';
 
-	let { onclose }: { onclose: () => void } = $props();
-
-	const flow = new MusicImportFlow();
-
-	onMount(() => flow.youtube.refresh());
-	onDestroy(() => flow.dispose());
+	const onclose = () => flow.closeDialog();
 </script>
 
 <Dialog title="Import music" wide {onclose}>

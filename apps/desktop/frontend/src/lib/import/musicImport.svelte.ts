@@ -25,11 +25,31 @@ import { YouTubeAccountState } from '#lib/import/youtubeAccount.svelte.ts';
 import { describeError } from '#lib/format.ts';
 import { library } from '#lib/library/library.svelte.ts';
 
+const matchingLabels: Record<string, string> = {
+	tracks: 'Matching songs',
+	albums: 'Matching albums',
+	artists: 'Matching artists',
+	shows: 'Matching podcasts',
+	saving: 'Saving to your library'
+};
+
+const readingLabels: Record<string, string> = {
+	tracks: 'Reading songs and playlists',
+	albums: 'Reading albums',
+	artists: 'Reading artists',
+	shows: 'Reading podcasts',
+	saving: 'Saving to your library'
+};
+
 export type ImportStep = 'source' | 'signin' | 'loading' | 'preview' | 'running' | 'done';
 
-/** The import flow: choose a source, pick what to import, watch it run, read the summary. */
+/**
+ * The import flow: choose a source, pick what to import, watch it run, read the summary.
+ * It outlives its dialog, so an import keeps reporting while the dialog is closed.
+ */
 export class MusicImportFlow {
 	step = $state<ImportStep>('source');
+	dialogOpen = $state(false);
 	sourceKind = $state<ImportSourceKind>('youtube-account');
 	readonly youtube = new YouTubeAccountState();
 	linkText = $state('');
@@ -47,9 +67,30 @@ export class MusicImportFlow {
 	#location = '';
 	#stopListening: (() => void) | null = null;
 
+	/** True while an import runs or its summary has not been opened yet. */
+	get hasBackgroundStatus(): boolean {
+		return this.step === 'running' || this.step === 'done';
+	}
+
 	/** True when the items already are YouTube Music items, so nothing is matched. */
 	get isAccountSource(): boolean {
 		return this.sourceKind === 'youtube-account';
+	}
+
+	/** What the running import does right now, e.g. "Matching songs". */
+	get phaseLabel(): string {
+		if (!this.progress) {
+			return 'Starting';
+		}
+		let labels = matchingLabels;
+		if (this.isAccountSource) {
+			labels = readingLabels;
+		}
+		const label = labels[this.progress.phase];
+		if (label === undefined) {
+			return this.progress.phase;
+		}
+		return label;
 	}
 
 	/** 0 to 1 share of the items matched so far. */
@@ -77,6 +118,19 @@ export class MusicImportFlow {
 		count += this.#flagCount(this.includeArtists, this.summary.artists);
 		count += this.#flagCount(this.includeShows, this.summary.shows);
 		return count;
+	}
+
+	openDialog(): void {
+		this.dialogOpen = true;
+		void this.youtube.refresh();
+	}
+
+	/** Closes the dialog; a running import goes on, a read summary is cleared. */
+	closeDialog(): void {
+		this.dialogOpen = false;
+		if (this.step === 'done') {
+			this.restart();
+		}
 	}
 
 	openSignIn(): void {
@@ -191,11 +245,6 @@ export class MusicImportFlow {
 		this.cancelled = false;
 	}
 
-	/** Stops listening to a running import's events; the import itself keeps its own lifetime. */
-	dispose(): void {
-		this.#stopImportListening();
-	}
-
 	async #chooseExport(pick: () => Promise<string>): Promise<void> {
 		this.errorMessage = '';
 		const path = await pick();
@@ -285,3 +334,5 @@ export class MusicImportFlow {
 		}
 	}
 }
+
+export const musicImport = new MusicImportFlow();
