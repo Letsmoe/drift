@@ -3,6 +3,7 @@ package spotify
 import (
 	"bytes"
 	"encoding/csv"
+	"slices"
 	"strconv"
 	"strings"
 )
@@ -29,12 +30,21 @@ func addExportifyFile(library *Library, fileName string, contents []byte) {
 	baseName := exportifyBaseName(fileName)
 	switch strings.ToLower(baseName) {
 	case exportifyLikedSongsName:
-		library.LikedTracks = append(library.LikedTracks, tracks...)
+		library.LikedTracks = append(library.LikedTracks, oldestFirst(tracks)...)
 	case exportifySavedAlbumsName:
 		library.Albums = append(library.Albums, groupSavedAlbums(tracks)...)
 	default:
 		library.Playlists = append(library.Playlists, exportifyPlaylist(baseName, tracks))
 	}
+}
+
+// oldestFirst reverses Liked_Songs.csv, which lists the newest like first:
+// the importer likes in slice order, so the newest Spotify like stays the
+// newest local one.
+func oldestFirst(tracks []Track) []Track {
+	reversed := slices.Clone(tracks)
+	slices.Reverse(reversed)
+	return reversed
 }
 
 func exportifyBaseName(fileName string) string {
@@ -138,7 +148,7 @@ func parseMillis(value string) int {
 // "," or "/".
 func splitExportifyArtists(artists string) []string {
 	names := []string{}
-	for _, name := range strings.Split(artists, ";") {
+	for name := range strings.SplitSeq(artists, ";") {
 		name = strings.TrimSpace(name)
 		if name != "" {
 			names = append(names, name)
