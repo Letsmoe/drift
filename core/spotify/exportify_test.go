@@ -103,7 +103,11 @@ func assertExportifyLiked(t *testing.T, library Library) {
 	if len(library.LikedTracks) != 2 {
 		t.Fatalf("liked tracks = %d, want 2", len(library.LikedTracks))
 	}
-	liked := library.LikedTracks[0]
+	// The CSV lists the newest like first; the library holds the oldest first.
+	if library.LikedTracks[0].Title != "Bohemian Rhapsody" {
+		t.Errorf("first liked track = %q, want the CSV's last row", library.LikedTracks[0].Title)
+	}
+	liked := library.LikedTracks[1]
 	if liked.Title != "Mr. Brightside" || liked.DurationMillis != 222973 || liked.Album != "Hot Fuss" {
 		t.Errorf("liked track = %+v", liked)
 	}
