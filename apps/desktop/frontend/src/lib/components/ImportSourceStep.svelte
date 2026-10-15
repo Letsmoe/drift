@@ -22,9 +22,13 @@
 			extracted folder. It holds your liked songs, playlists, saved albums, followed artists and
 			podcasts.
 		</p>
+		<p class="text-sm text-muted">
+			For a quick start, exportify.net exports your playlists, liked songs and saved albums as a zip
+			of CSV files in seconds, with no waiting for Spotify's email.
+		</p>
 		<div class="flex flex-wrap gap-2">
 			<Button variant="primary" onclick={() => flow.chooseExportFile()}
-				>Choose zip or JSON file</Button
+				>Choose zip, JSON or CSV file</Button
 			>
 			<Button onclick={() => flow.chooseExportFolder()}>Choose extracted folder</Button>
 		</div>
