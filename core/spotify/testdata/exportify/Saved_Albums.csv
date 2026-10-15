@@ -1,0 +1,4 @@
+Track URI,ISRC,Track Name,Album Name,Artist Name(s),Release Date,Duration (ms),Popularity,Explicit,Added By,Added At,Genres,Record Label,Danceability,Energy,Key,Loudness,Mode,Speechiness,Acousticness,Instrumentalness,Liveness,Valence,Tempo,Time Signature
+spotify:track:0000000000000000000006,GBXX00000006,"Airbag","OK Computer",Radiohead,1997-05-21,284000,70,false,,2020-01-01T00:00:00Z,"pop,rock",Label,0.5,0.5,1,-5.0,1,0.1,0.1,0,0.1,0.5,120.0,4
+spotify:track:0000000000000000000007,GBXX00000007,"Paranoid Android","OK Computer",Radiohead,1997-05-21,386000,72,false,,2020-01-01T00:00:00Z,"pop,rock",Label,0.5,0.5,1,-5.0,1,0.1,0.1,0,0.1,0.5,120.0,4
+spotify:track:0000000000000000000008,GBXX00000008,"Teardrop","Mezzanine","Massive Attack;Elizabeth Fraser",1998-04-20,330000,75,false,,2020-01-01T00:00:00Z,"pop,rock",Label,0.5,0.5,1,-5.0,1,0.1,0.1,0,0.1,0.5,120.0,4

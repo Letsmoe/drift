@@ -1,0 +1,2 @@
+Track URI,ISRC,Track Name,Album Name,Artist Name(s),Release Date,Duration (ms),Popularity,Explicit,Added By,Added At,Genres,Record Label,Danceability,Energy,Key,Loudness,Mode,Speechiness,Acousticness,Instrumentalness,Liveness,Valence,Tempo,Time Signature
+spotify:track:0000000000000000000009,,"Emoji Song","Emoji Album",Emoji Artist,2020-01-01,100000,1,false,,2020-01-01T00:00:00Z,"pop,rock",Label,0.5,0.5,1,-5.0,1,0.1,0.1,0,0.1,0.5,120.0,4
