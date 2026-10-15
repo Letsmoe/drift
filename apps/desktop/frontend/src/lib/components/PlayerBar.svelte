@@ -19,9 +19,12 @@
 	import { formatDuration } from '#lib/format.ts';
 	import { panels } from '#lib/layout/panels.svelte.ts';
 	import { library } from '#lib/library/library.svelte.ts';
+	import { connectMediaSession } from '#lib/player/mediaSession.svelte.ts';
 	import { player } from '#lib/player/player.svelte.ts';
 	import { shuffleIcon, shuffleLabel } from '#lib/player/shuffleMode.ts';
 	import type { ItemKind } from '#lib/api/music.ts';
+
+	connectMediaSession(player);
 
 	const VolumeIcon = $derived(pickVolumeIcon());
 	const liked = $derived(player.track !== null && library.isLiked(player.track.videoId));
