@@ -124,11 +124,12 @@ function blockArtistEntry(label: string, artist: Artist): MenuEntry {
 }
 
 /** "New playlist" plus one entry per local playlist, each adding track to it. */
+// Newest playlist last: the menu opens near the bottom of the window, so the cursor lands there.
 export function playlistEntries(track: Track): MenuEntry[] {
 	const entries: MenuEntry[] = [
 		{ label: 'New playlist', icon: PlusIcon, onselect: () => addToNewPlaylist(track) }
 	];
-	for (const summary of library.playlists) {
+	for (const summary of library.playlists.toReversed()) {
 		entries.push({
 			label: summary.name,
 			onselect: () => library.addToPlaylist(summary.id, [track])
