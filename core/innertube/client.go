@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -14,6 +15,11 @@ import (
 
 const defaultTimeout = 15 * time.Second
 
+// defaultRetryDelays are the pauses before each retry of an anonymous request
+// YouTube refused with a transient status. It intermittently answers 403 to
+// requests that go through when repeated.
+var defaultRetryDelays = []time.Duration{400 * time.Millisecond, 1200 * time.Millisecond}
+
 // Client sends InnerTube requests. It is safe for concurrent use.
 type Client struct {
 	httpClient *http.Client
@@ -21,6 +27,8 @@ type Client struct {
 	baseURL  string
 	language string
 	region   string
+	// retryDelays are the pauses before each retry; one entry per retry.
+	retryDelays []time.Duration
 
 	visitorMutex sync.Mutex
 	visitorData  string
@@ -62,8 +70,9 @@ func WithVisitorData(visitorData string) Option {
 func NewClient(options ...Option) *Client {
 	client := &Client{
 		httpClient: &http.Client{Timeout: defaultTimeout},
-		language:   "en",
-		region:     "US",
+		language:    "en",
+		region:      "US",
+		retryDelays: defaultRetryDelays,
 	}
 	for _, option := range options {
 		option(client)
@@ -107,7 +116,37 @@ type apiCall struct {
 	session *Session
 }
 
+// post sends call, retrying an anonymous call YouTube refused with a
+// transient status. A signed-in call is never retried: there a 403 means the
+// session expired.
 func (client *Client) post(ctx context.Context, call apiCall, response any) error {
+	err := client.postOnce(ctx, call, response)
+	for _, delay := range client.retryDelays {
+		if call.session != nil || !isTransient(err) {
+			return err
+		}
+		select {
+		case <-ctx.Done():
+			return err
+		case <-time.After(delay):
+		}
+		err = client.postOnce(ctx, call, response)
+	}
+	return err
+}
+
+// isTransient reports whether err is a status YouTube often answers once and
+// not on the next attempt: 403, 429 and server errors.
+func isTransient(err error) bool {
+	var statusError *StatusError
+	if !errors.As(err, &statusError) {
+		return false
+	}
+	code := statusError.StatusCode
+	return code == http.StatusForbidden || code == http.StatusTooManyRequests || code >= http.StatusInternalServerError
+}
+
+func (client *Client) postOnce(ctx context.Context, call apiCall, response any) error {
 	request, err := client.newRequest(ctx, call)
 	if err != nil {
 		return err
