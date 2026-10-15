@@ -5,7 +5,7 @@
 	import { playlistEntries } from '#lib/menu/trackMenuEntries.ts';
 	import { PopupMenu } from '#lib/menu/popupMenu.svelte.ts';
 
-	let { track }: { track: Track } = $props();
+	let { track, large = false }: { track: Track; large?: boolean } = $props();
 
 	const popup = new PopupMenu();
 
@@ -26,9 +26,17 @@
 	aria-haspopup="menu"
 	aria-expanded={popup.isOpen}
 	onclick={toggle}
-	class="duration-fast flex size-8 items-center justify-center rounded-full text-muted transition-colors hover:bg-hover hover:text-default"
+	class={[
+		'duration-fast flex items-center justify-center rounded-full text-muted transition-colors hover:bg-hover hover:text-default',
+		large && 'p-2',
+		!large && 'size-8'
+	]}
 >
-	<PlusCircleIcon size={20} />
+	{#if large}
+		<PlusCircleIcon size={24} />
+	{:else}
+		<PlusCircleIcon size={20} />
+	{/if}
 </button>
 
 {#if popup.position}
