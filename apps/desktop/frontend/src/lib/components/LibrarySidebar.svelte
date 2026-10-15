@@ -7,10 +7,12 @@
 	import ArrowCircleDownIcon from 'phosphor-svelte/lib/ArrowCircleDownIcon';
 	import HeartIcon from 'phosphor-svelte/lib/HeartIcon';
 	import PlusIcon from 'phosphor-svelte/lib/PlusIcon';
+	import ImportStatusCard from '#lib/components/ImportStatusCard.svelte';
 	import MusicImportDialog from '#lib/components/MusicImportDialog.svelte';
 	import Chip from '#lib/components/Chip.svelte';
 	import LibraryRow from '#lib/components/LibraryRow.svelte';
 	import { listenToImport } from '#lib/api/musicImport.ts';
+	import { musicImport } from '#lib/import/musicImport.svelte.ts';
 	import { downloads } from '#lib/downloads/downloads.svelte.ts';
 	import { formatSongCount } from '#lib/format.ts';
 	import { library } from '#lib/library/library.svelte.ts';
@@ -18,7 +20,6 @@
 	import { LibraryListing, libraryFilters } from '#lib/library/libraryListing.svelte.ts';
 
 	const listing = new LibraryListing();
-	let importDialogOpen = $state(false);
 	const showPlaylistPrompt = $derived(
 		library.playlists.length === 0 && (listing.filter === 'all' || listing.filter === 'playlist')
 	);
@@ -64,7 +65,7 @@
 				size="sm"
 				variant="ghost"
 				icon={DownloadSimpleIcon}
-				onclick={() => (importDialogOpen = true)}
+				onclick={() => musicImport.openDialog()}
 			/>
 		</span>
 		<span title="Create playlist" class="flex">
@@ -165,7 +166,7 @@
 						</p>
 					</div>
 					<div class="self-start">
-						<Button variant="primary" size="sm" onclick={() => (importDialogOpen = true)}>
+						<Button variant="primary" size="sm" onclick={() => musicImport.openDialog()}>
 							Import your music
 						</Button>
 					</div>
@@ -173,8 +174,12 @@
 			{/if}
 		</div>
 	</FloatingScrollbar>
+
+	{#if musicImport.hasBackgroundStatus && !musicImport.dialogOpen}
+		<ImportStatusCard flow={musicImport} />
+	{/if}
 </aside>
 
-{#if importDialogOpen}
-	<MusicImportDialog onclose={() => (importDialogOpen = false)} />
+{#if musicImport.dialogOpen}
+	<MusicImportDialog />
 {/if}
