@@ -69,7 +69,7 @@ func WithVisitorData(visitorData string) Option {
 // NewClient creates a client with English/US defaults.
 func NewClient(options ...Option) *Client {
 	client := &Client{
-		httpClient: &http.Client{Timeout: defaultTimeout},
+		httpClient:  &http.Client{Timeout: defaultTimeout},
 		language:    "en",
 		region:      "US",
 		retryDelays: defaultRetryDelays,
