@@ -1,3 +1,4 @@
+import { tick } from 'svelte';
 import type { ItemKind, Track } from '#lib/api/music.ts';
 import { resumePosition, startPlay, updatePlay } from '#lib/api/library.ts';
 import {
@@ -29,6 +30,9 @@ import { describeError } from '#lib/format.ts';
 /** Seconds into a track after which Previous restarts it instead of going back. */
 const restartThresholdSeconds = 3;
 const progressReportIntervalMs = 15_000;
+/** Unplayable tracks skipped in a row before giving up, so a dead connection doesn't run through the queue. */
+const maximumFailedSkips = 5;
+const unplayableMessage = 'This song could not be played.';
 
 /** Where someone else's player was when it arrived, for an entry that is still loading here. */
 interface PendingRemoteStart {
@@ -62,6 +66,8 @@ export class Player {
 	#playIdPromise: Promise<number | null> | null = null;
 	#userActionListeners: Array<() => void> = [];
 	#pendingRemoteStart: PendingRemoteStart | null = null;
+	#retriedEntryId: number | undefined = undefined;
+	#failedSkips = 0;
 
 	constructor() {
 		onQueueChange((state) => this.#applyState(state));
@@ -255,6 +261,32 @@ export class Player {
 		return this.isCurrent(track) && !this.paused;
 	}
 
+	/** Called by the <audio> element when the track cannot be played: tries once more, then skips it. */
+	async playbackFailed(): Promise<void> {
+		const entry = this.entry;
+		if (!entry || !this.source) {
+			return;
+		}
+		if (this.#retriedEntryId !== entry.id) {
+			this.#retriedEntryId = entry.id;
+			await this.#reloadSource();
+			return;
+		}
+		if (this.#failedSkips >= maximumFailedSkips) {
+			this.fail(unplayableMessage);
+			return;
+		}
+		this.#failedSkips += 1;
+		this.fail(unplayableMessage);
+		await this.next();
+	}
+
+	/** Called by the <audio> element once playback moves on with data loaded. */
+	playbackAdvanced(): void {
+		this.buffering = false;
+		this.#failedSkips = 0;
+	}
+
 	fail(message: string): void {
 		this.#reportPlay(false);
 		this.errorMessage = message;
@@ -332,6 +364,18 @@ export class Player {
 				this.fail(describeError(error));
 			}
 		}
+	}
+
+	// Unsetting the source first makes the <audio> element request the stream again.
+	async #reloadSource(): Promise<void> {
+		const source = this.source;
+		const position = this.currentTime;
+		this.source = undefined;
+		await tick();
+		this.source = source;
+		this.currentTime = position;
+		this.buffering = true;
+		this.paused = false;
 	}
 
 	#startPlayback(source: string, resumeSeconds: number): void {

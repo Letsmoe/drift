@@ -126,7 +126,7 @@
 		const advanced = audio.currentTime !== lastPosition;
 		lastPosition = audio.currentTime;
 		if (advanced && !audio.paused && audio.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
-			player.buffering = false;
+			player.playbackAdvanced();
 		}
 	}
 
@@ -152,7 +152,7 @@
 	onplaying={() => (player.buffering = false)}
 	ontimeupdate={endBufferingWhenAdvancing}
 	onended={() => player.trackEnded()}
-	onerror={() => player.fail('This song could not be played.')}
+	onerror={() => player.playbackFailed()}
 ></audio>
 
 <footer class="grid h-18 shrink-0 grid-cols-[1fr_minmax(0,2fr)_1fr] items-center gap-4 px-2">
