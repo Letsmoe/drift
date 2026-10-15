@@ -5,6 +5,7 @@
 	import CaretRightIcon from 'phosphor-svelte/lib/CaretRightIcon';
 	import ClockCounterClockwiseIcon from 'phosphor-svelte/lib/ClockCounterClockwiseIcon';
 	import HouseIcon from 'phosphor-svelte/lib/HouseIcon';
+	import GearSixIcon from 'phosphor-svelte/lib/GearSixIcon';
 	import MagnifyingGlassIcon from 'phosphor-svelte/lib/MagnifyingGlassIcon';
 	import NeoworksMenu from '#lib/components/NeoworksMenu.svelte';
 	import SearchField from '#lib/components/SearchField.svelte';
@@ -192,6 +193,14 @@
 	</div>
 	<div class="absolute right-2 flex items-center gap-2">
 		<TogetherMenu />
+		<a
+			href="/settings"
+			aria-label="Settings"
+			title="Settings"
+			class="duration-fast glass flex size-9 items-center justify-center rounded-full text-dim transition-colors hover:bg-hover hover:text-default"
+		>
+			<GearSixIcon size={20} />
+		</a>
 		<NeoworksMenu />
 	</div>
 </header>

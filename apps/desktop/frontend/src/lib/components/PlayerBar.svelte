@@ -19,12 +19,31 @@
 	import { formatDuration } from '#lib/format.ts';
 	import { panels } from '#lib/layout/panels.svelte.ts';
 	import { library } from '#lib/library/library.svelte.ts';
+	import { Crossfade } from '#lib/player/crossfade.svelte.ts';
 	import { connectMediaSession } from '#lib/player/mediaSession.svelte.ts';
 	import { player } from '#lib/player/player.svelte.ts';
 	import { shuffleIcon, shuffleLabel } from '#lib/player/shuffleMode.ts';
 	import type { ItemKind } from '#lib/api/music.ts';
 
 	connectMediaSession(player);
+
+	const crossfade = new Crossfade(player);
+	let mainAudio = $state<HTMLAudioElement>();
+	let outgoingAudio = $state<HTMLAudioElement>();
+
+	$effect(() => {
+		if (mainAudio && outgoingAudio) {
+			crossfade.attach(mainAudio, outgoingAudio);
+		}
+		return () => crossfade.finish();
+	});
+
+	// The fade-in scales the element's volume without touching the user's volume setting.
+	$effect(() => {
+		if (mainAudio) {
+			mainAudio.volume = player.volume * crossfade.incomingGain;
+		}
+	});
 
 	const VolumeIcon = $derived(pickVolumeIcon());
 	const liked = $derived(player.track !== null && library.isLiked(player.track.videoId));
@@ -128,6 +147,7 @@
 		if (advanced && !audio.paused && audio.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
 			player.playbackAdvanced();
 		}
+		crossfade.check();
 	}
 
 	function shownVolume(): number {
@@ -141,12 +161,12 @@
 <svelte:window onkeydown={handleKeydown} />
 
 <audio
+	bind:this={mainAudio}
 	src={player.source}
 	autoplay
 	bind:paused={player.paused}
 	bind:currentTime={player.currentTime}
 	bind:duration={player.duration}
-	bind:volume={player.volume}
 	bind:muted={player.muted}
 	onwaiting={startBuffering}
 	onplaying={() => (player.buffering = false)}
@@ -154,6 +174,7 @@
 	onended={() => player.trackEnded()}
 	onerror={() => player.playbackFailed()}
 ></audio>
+<audio bind:this={outgoingAudio}></audio>
 
 <footer class="grid h-18 shrink-0 grid-cols-[1fr_minmax(0,2fr)_1fr] items-center gap-4 px-2">
 	<div class="flex min-w-0 items-center gap-3">
