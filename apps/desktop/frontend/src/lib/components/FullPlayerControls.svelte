@@ -5,6 +5,7 @@
 	import RepeatOnceIcon from 'phosphor-svelte/lib/RepeatOnceIcon';
 	import SkipBackIcon from 'phosphor-svelte/lib/SkipBackIcon';
 	import SkipForwardIcon from 'phosphor-svelte/lib/SkipForwardIcon';
+	import AddToPlaylistButton from '#lib/components/AddToPlaylistButton.svelte';
 	import PlayOverlayButton from '#lib/components/PlayOverlayButton.svelte';
 	import RangeSlider from '#lib/components/RangeSlider.svelte';
 	import { formatDuration } from '#lib/format.ts';
@@ -74,6 +75,9 @@
 	{/if}
 
 	<div class="flex items-center justify-center gap-3">
+		{#if player.track}
+			<AddToPlaylistButton track={player.track} large />
+		{/if}
 		<span
 			title={shuffleLabel(player.queue)}
 			class={[player.queue.shuffle && '[&>button]:text-action']}
