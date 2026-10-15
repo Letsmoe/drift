@@ -1,0 +1,4 @@
+Track URI,ISRC,Track Name,Album Name,Artist Name(s),Release Date,Duration (ms),Popularity,Explicit,Added By,Added At,Genres,Record Label,Danceability,Energy,Key,Loudness,Mode,Speechiness,Acousticness,Instrumentalness,Liveness,Valence,Tempo,Time Signature
+spotify:track:4cOdK2wGLETKBW3PvgPWqT,USXX00000001,"Never Gonna Give You Up","Whenever You Need Somebody",Rick Astley,1987-07-27,213573,80,false,,2020-01-01T00:00:00Z,"pop,rock",Label,0.5,0.5,1,-5.0,1,0.1,0.1,0,0.1,0.5,120.0,4
+spotify:track:0000000000000000000002,DEXX00000002,"Hello, World (Live; Remastered)","Songs, Vol. 1","Duo A;Band / Crew",2019-09-26,165134,55,false,,2020-01-01T00:00:00Z,"pop,rock",Label,0.5,0.5,1,-5.0,1,0.1,0.1,0,0.1,0.5,120.0,4
+spotify:track:0000000000000000000003,,,"Nameless Album",Nobody,2019-01-01,1000,1,false,,2020-01-01T00:00:00Z,"pop,rock",Label,0.5,0.5,1,-5.0,1,0.1,0.1,0,0.1,0.5,120.0,4

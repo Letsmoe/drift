@@ -1,13 +1,13 @@
 // Package spotify reads the user's Spotify data without an account: the data
-// export (a zip, a folder or single JSON files) and public playlist and album
-// links. It only parses and fetches; matching to YouTube Music lives in
+// export (a zip, a folder or single JSON files), an Exportify export (a zip,
+// a folder or single CSV files) and public playlist and album links. It only parses and fetches; matching to YouTube Music lives in
 // package importer.
 package spotify
 
 import "strings"
 
-// Track is a song as Spotify names it. DurationMillis is 0 when unknown: the
-// data export carries no durations.
+// Track is a song as Spotify names it. DurationMillis is 0 when unknown:
+// Spotify's JSON data export carries no durations, Exportify does.
 type Track struct {
 	URI            string   `json:"uri"`
 	Title          string   `json:"title"`

@@ -13,7 +13,7 @@ import (
 	"strings"
 )
 
-// maxExportFileBytes bounds one JSON file read from an export.
+// maxExportFileBytes bounds one data file (JSON or CSV) read from an export.
 const maxExportFileBytes = 256 << 20
 
 // ErrNoLibraryData means a path held no Spotify library or playlist data.
@@ -70,14 +70,22 @@ type exportFile struct {
 	Playlists []exportPlaylist `json:"playlists"`
 }
 
+// exportFileContents is one data file of an export with its base name; the
+// name matters for Exportify, where it is the playlist's name.
+type exportFileContents struct {
+	name string
+	data []byte
+}
+
 // ParseExport reads a Spotify data export from a zip, an extracted folder or
-// a single JSON file (YourLibrary.json or PlaylistN.json).
+// a single file: YourLibrary.json or PlaylistN.json from Spotify's own
+// export, or a CSV from Exportify.
 func ParseExport(path string) (Library, error) {
 	info, err := os.Stat(path)
 	if err != nil {
 		return Library{}, fmt.Errorf("spotify: open export: %w", err)
 	}
-	var files [][]byte
+	var files []exportFileContents
 	switch {
 	case info.IsDir():
 		files, err = readDirectory(path)
@@ -92,16 +100,16 @@ func ParseExport(path string) (Library, error) {
 	return buildLibrary(files)
 }
 
-func readSingleFile(path string) ([][]byte, error) {
+func readSingleFile(path string) ([]exportFileContents, error) {
 	contents, err := os.ReadFile(path)
 	if err != nil {
 		return nil, fmt.Errorf("spotify: read %s: %w", path, err)
 	}
-	return [][]byte{contents}, nil
+	return []exportFileContents{{name: filepath.Base(path), data: contents}}, nil
 }
 
-func readDirectory(root string) ([][]byte, error) {
-	var files [][]byte
+func readDirectory(root string) ([]exportFileContents, error) {
+	var files []exportFileContents
 	err := filepath.WalkDir(root, func(path string, entry fs.DirEntry, walkErr error) error {
 		if walkErr != nil {
 			return walkErr
@@ -113,7 +121,7 @@ func readDirectory(root string) ([][]byte, error) {
 		if err != nil {
 			return fmt.Errorf("read %s: %w", path, err)
 		}
-		files = append(files, contents)
+		files = append(files, exportFileContents{name: entry.Name(), data: contents})
 		return nil
 	})
 	if err != nil {
@@ -122,13 +130,13 @@ func readDirectory(root string) ([][]byte, error) {
 	return files, nil
 }
 
-func readZip(path string) ([][]byte, error) {
+func readZip(path string) ([]exportFileContents, error) {
 	archive, err := zip.OpenReader(path)
 	if err != nil {
 		return nil, fmt.Errorf("spotify: open zip: %w", err)
 	}
 	defer func() { _ = archive.Close() }()
-	var files [][]byte
+	var files []exportFileContents
 	for _, entry := range archive.File {
 		if entry.FileInfo().IsDir() || !isExportDataFile(filepath.Base(entry.Name)) {
 			continue
@@ -137,7 +145,7 @@ func readZip(path string) ([][]byte, error) {
 		if err != nil {
 			return nil, err
 		}
-		files = append(files, contents)
+		files = append(files, exportFileContents{name: filepath.Base(entry.Name), data: contents})
 	}
 	return files, nil
 }
@@ -155,31 +163,43 @@ func readZipEntry(entry *zip.File) ([]byte, error) {
 	return contents, nil
 }
 
-// isExportDataFile picks the files that hold library data; the export's
-// streaming history and other large files are not read.
+// isExportDataFile picks the files that hold library data: YourLibrary and
+// Playlist JSON files, and any CSV (whether it is an Exportify file is
+// decided by its header). The export's streaming history is not read.
 func isExportDataFile(name string) bool {
 	lowered := strings.ToLower(name)
+	if strings.HasSuffix(lowered, ".csv") {
+		return true
+	}
 	if !strings.HasSuffix(lowered, ".json") {
 		return false
 	}
 	return strings.HasPrefix(lowered, "yourlibrary") || strings.HasPrefix(lowered, "playlist")
 }
 
-func buildLibrary(files [][]byte) (Library, error) {
+func buildLibrary(files []exportFileContents) (Library, error) {
 	library := Library{LikedTracks: []Track{}, Playlists: []Playlist{}, Albums: []Album{}, Artists: []Artist{}, Shows: []Show{}}
-	for _, contents := range files {
-		var parsed exportFile
-		err := json.Unmarshal(contents, &parsed)
-		if err != nil {
-			continue
-		}
-		addExportFile(&library, parsed)
+	for _, file := range files {
+		addFile(&library, file)
 	}
 	if library.isEmpty() {
 		return Library{}, ErrNoLibraryData
 	}
 	assignPlaylistKeys(library.Playlists)
 	return library, nil
+}
+
+func addFile(library *Library, file exportFileContents) {
+	if strings.HasSuffix(strings.ToLower(file.name), ".csv") {
+		addExportifyFile(library, file.name, file.data)
+		return
+	}
+	var parsed exportFile
+	err := json.Unmarshal(file.data, &parsed)
+	if err != nil {
+		return
+	}
+	addExportFile(library, parsed)
 }
 
 func addExportFile(library *Library, parsed exportFile) {
@@ -238,9 +258,13 @@ func splitArtists(artist string) []string {
 }
 
 // assignPlaylistKeys makes keys from names, numbering repeated names.
+// Playlists that already carry a key (Exportify's) are left as they are.
 func assignPlaylistKeys(playlists []Playlist) {
 	used := []string{}
 	for index := range playlists {
+		if playlists[index].Key != "" {
+			continue
+		}
 		key := "export:playlist:" + playlists[index].Name
 		for suffix := 2; slices.Contains(used, key); suffix++ {
 			key = fmt.Sprintf("export:playlist:%s#%d", playlists[index].Name, suffix)

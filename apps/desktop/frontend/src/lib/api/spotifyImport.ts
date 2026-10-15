@@ -10,7 +10,7 @@ import { pickFile, pickFolder } from '#lib/backend/shell.ts';
 export function pickExportFile(): Promise<string> {
 	return pickFile({
 		title: 'Choose your Spotify data export',
-		filters: [{ name: 'Spotify export (*.zip, *.json)', extensions: ['zip', 'json'] }]
+		filters: [{ name: 'Spotify export (*.zip, *.json, *.csv)', extensions: ['zip', 'json', 'csv'] }]
 	});
 }
 
