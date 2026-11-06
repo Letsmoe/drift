@@ -22,6 +22,7 @@ import (
 	"github.com/letsmoe/drift/core/innertube"
 	"github.com/letsmoe/drift/core/library"
 	"github.com/letsmoe/drift/core/lyrics"
+	"github.com/letsmoe/drift/core/palette"
 	"github.com/letsmoe/drift/core/podcasts"
 	"github.com/letsmoe/drift/core/queue"
 	"github.com/letsmoe/drift/core/recommend"
@@ -54,6 +55,7 @@ type Core struct {
 	innertube        *innertube.Client
 	podcasts         *podcasts.Directory
 	lyrics           *lyrics.Service
+	palette          *palette.Service
 	proxy            *stream.Proxy
 	// library and engine stay nil when the library database could not be opened.
 	library  *library.Library
@@ -85,6 +87,7 @@ func Open(dataDir string, listener Listener) (*Core, error) {
 		innertube: innertubeClient,
 		podcasts:  podcasts.New(innertubeClient, logger),
 		lyrics:    lyrics.New(innertubeClient, lyrics.NewLRCLIB(nil, ""), logger),
+		palette:   newPaletteService(),
 		resolver:  resolver,
 		proxy:     stream.NewProxy(resolver, logger),
 	}

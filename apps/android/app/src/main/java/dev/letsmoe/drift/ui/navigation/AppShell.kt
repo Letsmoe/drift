@@ -35,6 +35,7 @@ import dev.letsmoe.drift.ui.LocalBottomOverlayPadding
 import dev.letsmoe.drift.ui.LocalNavController
 import dev.letsmoe.drift.ui.player.MiniPlayer
 import dev.letsmoe.drift.ui.player.NowPlayingOverlay
+import dev.letsmoe.drift.ui.player.rememberNowPlayingArtColors
 import dev.letsmoe.drift.ui.screens.album.AlbumScreen
 import dev.letsmoe.drift.ui.screens.artist.ArtistScreen
 import dev.letsmoe.drift.ui.screens.home.HomeScreen
@@ -46,6 +47,8 @@ import dev.letsmoe.drift.ui.screens.playlist.PlaylistScreen
 import dev.letsmoe.drift.ui.screens.podcast.PodcastScreen
 import dev.letsmoe.drift.ui.screens.search.SearchScreen
 import dev.letsmoe.drift.ui.theme.Canvas
+import dev.letsmoe.drift.ui.theme.LocalArtColors
+import dev.letsmoe.drift.ui.theme.artBackdrop
 
 /**
  * The app frame: the NavHost under a floating stack of mini player + tab bar, with the Now
@@ -64,10 +67,12 @@ fun AppShell() {
     var overlayHeight by remember { mutableStateOf(0.dp) }
     val density = LocalDensity.current
     val isPlayerShown = isNowPlayingOpen && currentTrack != null
+    val artColors = rememberNowPlayingArtColors()
 
     CompositionLocalProvider(
         LocalNavController provides navController,
         LocalBottomOverlayPadding provides overlayHeight,
+        LocalArtColors provides artColors,
     ) {
         SharedTransitionLayout {
             Box(modifier = Modifier.fillMaxSize().background(Canvas)) {
@@ -152,11 +157,11 @@ private fun AppNavHost(navController: androidx.navigation.NavHostController) {
     }
 }
 
-// Every destination paints an opaque canvas so overlapping transitions never show through.
+// Every destination paints the opaque backdrop so overlapping transitions never show through.
 private inline fun <reified Route : Any> NavGraphBuilder.screen(
     crossinline content: @Composable (NavBackStackEntry) -> Unit,
 ) {
     composable<Route> { entry ->
-        Box(modifier = Modifier.fillMaxSize().background(Canvas)) { content(entry) }
+        Box(modifier = Modifier.fillMaxSize().artBackdrop(LocalArtColors.current)) { content(entry) }
     }
 }

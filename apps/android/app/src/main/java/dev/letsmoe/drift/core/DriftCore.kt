@@ -2,6 +2,7 @@ package dev.letsmoe.drift.core
 
 import dev.letsmoe.drift.core.model.AlbumPage
 import dev.letsmoe.drift.core.model.ArtistPage
+import dev.letsmoe.drift.core.model.CoverColors
 import dev.letsmoe.drift.core.model.HomePage
 import dev.letsmoe.drift.core.model.ImportOptions
 import dev.letsmoe.drift.core.model.ImportProgress
@@ -286,6 +287,10 @@ class DriftCore(dataDirectory: String) {
                 listener.onFinished(DriftJson.decodeFromString<ImportResult>(resultJson))
             }
         }
+
+    // Artwork
+
+    suspend fun coverColors(url: String): CoverColors = call { DriftJson.decodeFromString(core.coverColors(url)) }
 }
 
 /** Receives the events of a running import, on a core thread. */
