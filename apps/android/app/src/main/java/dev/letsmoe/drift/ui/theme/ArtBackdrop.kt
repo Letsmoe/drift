@@ -37,7 +37,7 @@ data class ArtColors(val first: Color, val second: Color, val third: Color, val 
 val LocalArtColors = staticCompositionLocalOf<State<ArtColors>> { mutableStateOf(ArtColors.Untinted) }
 
 private const val BACKDROP_OPACITY = 0.85f
-private const val DARKENING_ALPHA = 0.4f
+private const val DARKENING_ALPHA = 0.6f
 private val BackdropLayerPaint = Paint().apply { alpha = BACKDROP_OPACITY }
 
 // One blob: an ellipse with radii relative to the size, centered at a relative point.
