@@ -14,9 +14,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import dev.letsmoe.drift.core.model.CollectionKind
+import dev.letsmoe.drift.core.model.LIKED_COLLECTION_ID
 import dev.letsmoe.drift.core.model.Track
 import dev.letsmoe.drift.ui.LocalAppContainer
 import dev.letsmoe.drift.ui.appViewModel
+import dev.letsmoe.drift.ui.components.CollectionDownloadButton
 import dev.letsmoe.drift.ui.components.CollectionMoreButton
 import dev.letsmoe.drift.ui.components.EnsureRatings
 import dev.letsmoe.drift.ui.components.PlayShuffleButtons
@@ -70,7 +73,14 @@ private fun LikedSongsContent(loadedTracks: List<Track>, modifier: Modifier) {
                 }
             }
             item {
-                DetailActionRow { CollectionMoreButton(title = "Liked Songs", tracks = tracks) }
+                DetailActionRow {
+                    CollectionDownloadButton(
+                        kind = CollectionKind.Likes,
+                        id = LIKED_COLLECTION_ID,
+                        title = "Liked Songs",
+                    )
+                    CollectionMoreButton(title = "Liked Songs", tracks = tracks)
+                }
             }
             item {
                 PlayShuffleButtons(

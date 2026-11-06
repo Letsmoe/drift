@@ -68,6 +68,7 @@ fun TrackRow(
     val currentTrack by container.playerController.currentTrack.collectAsStateWithLifecycle()
     val isPlaying by container.playerController.isPlaying.collectAsStateWithLifecycle()
     val likedVideoIds by container.libraryState.likedVideoIds.collectAsStateWithLifecycle()
+    val downloadState by rememberDownloadState(track.videoId)
     var showActions by remember { mutableStateOf(false) }
     val haptics = LocalHapticFeedback.current
 
@@ -121,6 +122,7 @@ fun TrackRow(
                 modifier = Modifier.size(16.dp),
             )
         }
+        DownloadMark(state = downloadState)
         if (showDuration && track.durationSeconds > 0) {
             Text(
                 text = formatDuration(track.durationSeconds),

@@ -13,6 +13,7 @@ import dev.letsmoe.drift.core.model.StorageUsage
 import dev.letsmoe.drift.core.model.Track
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -68,11 +69,12 @@ class DownloadsState(
     private val stateLookupScheduled = AtomicBoolean(false)
     private val listRefreshScheduled = AtomicBoolean(false)
     private val listWatchers = AtomicInteger(0)
+    private var initialLoad: Job? = null
 
     /** Loads collections and the summary and starts listening for updates; call once at startup. */
     fun start() {
         core.listenToDownloads { update -> applyUpdate(update) }
-        scope.launch {
+        initialLoad = scope.launch {
             refreshCollections()
             refreshSummary()
         }
@@ -159,6 +161,7 @@ class DownloadsState(
 
     /** Called when a collection's page opens: a kept YouTube collection checks for new tracks. */
     suspend fun refreshOnOpen(kind: CollectionKind, id: String) {
+        initialLoad?.join()
         val collection = collection(kind, id)
         if (collection == null || !collection.keep) {
             return
