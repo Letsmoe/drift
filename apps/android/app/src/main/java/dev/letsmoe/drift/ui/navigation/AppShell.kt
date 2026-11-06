@@ -1,7 +1,5 @@
 package dev.letsmoe.drift.ui.navigation
 
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.foundation.background
@@ -132,8 +130,8 @@ private fun AppNavHost(navController: androidx.navigation.NavHostController) {
         navController = navController,
         startDestination = Routes.Home,
         enterTransition = { enterTransitionFor(initialState.destination, targetState.destination) },
-        exitTransition = { ExitTransition.None },
-        popEnterTransition = { EnterTransition.None },
+        exitTransition = { exitTransitionFor(initialState.destination, targetState.destination) },
+        popEnterTransition = { popEnterTransitionFor(initialState.destination, targetState.destination) },
         popExitTransition = { popExitTransitionFor(initialState.destination, targetState.destination) },
     ) {
         screen<Routes.Home> { HomeScreen() }
