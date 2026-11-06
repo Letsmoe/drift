@@ -18,7 +18,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import dev.letsmoe.drift.core.model.Thumbnail
 import dev.letsmoe.drift.ui.components.CoverFill
-import dev.letsmoe.drift.ui.theme.Canvas
 
 val ArtistHeroHeight = 360.dp
 private const val HERO_REQUEST_WIDTH_DP = 480
@@ -40,7 +39,7 @@ fun ArtistHero(name: String, thumbnails: List<Thumbnail>, modifier: Modifier = M
                     Brush.verticalGradient(
                         0.0f to Color.Black.copy(alpha = 0.35f),
                         0.45f to Color.Transparent,
-                        1.0f to Canvas,
+                        1.0f to Color.Transparent,
                     ),
                 ),
         )

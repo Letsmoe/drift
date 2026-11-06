@@ -2,6 +2,7 @@ package dev.letsmoe.drift.core
 
 import dev.letsmoe.drift.core.model.AlbumPage
 import dev.letsmoe.drift.core.model.ArtistPage
+import dev.letsmoe.drift.core.model.CoverColors
 import dev.letsmoe.drift.core.model.HomePage
 import dev.letsmoe.drift.core.model.Impression
 import dev.letsmoe.drift.core.model.Item
@@ -215,4 +216,8 @@ class DriftCore(dataDirectory: String) {
 
     suspend fun recommendedFeed(limit: Int, offset: Int, refresh: Boolean): List<RecommendedItem> =
         call { DriftJson.decodeFromString(core.recommendedFeed(limit.toLong(), offset.toLong(), refresh)) }
+
+    // Artwork
+
+    suspend fun coverColors(url: String): CoverColors = call { DriftJson.decodeFromString(core.coverColors(url)) }
 }
