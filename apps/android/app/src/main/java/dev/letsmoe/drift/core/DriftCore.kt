@@ -3,6 +3,11 @@ package dev.letsmoe.drift.core
 import dev.letsmoe.drift.core.model.AlbumPage
 import dev.letsmoe.drift.core.model.ArtistPage
 import dev.letsmoe.drift.core.model.HomePage
+import dev.letsmoe.drift.core.model.ImportOptions
+import dev.letsmoe.drift.core.model.ImportProgress
+import dev.letsmoe.drift.core.model.ImportResult
+import dev.letsmoe.drift.core.model.ImportSourceKind
+import dev.letsmoe.drift.core.model.ImportSummary
 import dev.letsmoe.drift.core.model.Impression
 import dev.letsmoe.drift.core.model.Item
 import dev.letsmoe.drift.core.model.ItemKind
@@ -21,6 +26,8 @@ import dev.letsmoe.drift.core.model.ResumePosition
 import dev.letsmoe.drift.core.model.SavedItem
 import dev.letsmoe.drift.core.model.SearchResults
 import dev.letsmoe.drift.core.model.Track
+import dev.letsmoe.drift.core.model.YouTubeAccountStatus
+import dev.letsmoe.drift.mobile.ImportListener
 import dev.letsmoe.drift.mobile.Core
 import dev.letsmoe.drift.mobile.Listener
 import dev.letsmoe.drift.mobile.Mobile
@@ -215,4 +222,81 @@ class DriftCore(dataDirectory: String) {
 
     suspend fun recommendedFeed(limit: Int, offset: Int, refresh: Boolean): List<RecommendedItem> =
         call { DriftJson.decodeFromString(core.recommendedFeed(limit.toLong(), offset.toLong(), refresh)) }
+
+    // Import
+
+    /** Counts what a Spotify data export (zip, folder or JSON) or an Exportify file or folder holds. */
+    suspend fun spotifyPreviewExport(path: String): ImportSummary =
+        call { DriftJson.decodeFromString(core.spotifyPreviewExport(path)) }
+
+    /** Counts what a public open.spotify.com playlist or album link holds. */
+    suspend fun spotifyPreviewUrl(link: String): ImportSummary =
+        call { DriftJson.decodeFromString(core.spotifyPreviewURL(link)) }
+
+    /**
+     * Starts a Spotify import in the background; [listener] hears its progress and its end. Throws
+     * when the import cannot start, e.g. because another one is running.
+     */
+    suspend fun spotifyImport(
+        sourceKind: ImportSourceKind,
+        pathOrUrl: String,
+        options: ImportOptions,
+        listener: ImportEventListener,
+    ) {
+        call {
+            core.spotifyImport(sourceKind.wireName, pathOrUrl, DriftJson.encodeToString(options), importBridge(listener))
+        }
+    }
+
+    /** Stops the running import; without one it does nothing. */
+    suspend fun cancelImport() {
+        call { core.spotifyCancelImport() }
+    }
+
+    /** Validates a music.youtube.com Cookie header and stores it for library import. */
+    suspend fun youTubeSignIn(cookieHeader: String): YouTubeAccountStatus =
+        call { DriftJson.decodeFromString(core.youTubeSignIn(cookieHeader)) }
+
+    /** The stored sign-in; makes no network request. */
+    suspend fun youTubeAccount(): YouTubeAccountStatus = call { DriftJson.decodeFromString(core.youTubeAccount()) }
+
+    suspend fun youTubeSignOut() {
+        call { core.youTubeSignOut() }
+    }
+
+    /** Counts the signed-in account's library. */
+    suspend fun youTubePreview(): ImportSummary = call { DriftJson.decodeFromString(core.youTubePreview()) }
+
+    /** Imports the account's library in the background; run it again to re-sync. */
+    suspend fun youTubeImport(options: ImportOptions, listener: ImportEventListener) {
+        call { core.youTubeImport(DriftJson.encodeToString(options), importBridge(listener)) }
+    }
+
+    private fun importBridge(listener: ImportEventListener): ImportListener =
+        object : ImportListener {
+            override fun onImportProgress(progressJson: String) {
+                listener.onProgress(DriftJson.decodeFromString<ImportProgress>(progressJson))
+            }
+
+            override fun onImportDone(resultJson: String, errorMessage: String) {
+                if (errorMessage.isNotEmpty()) {
+                    listener.onFailed(errorMessage)
+                    return
+                }
+                listener.onFinished(DriftJson.decodeFromString<ImportResult>(resultJson))
+            }
+        }
 }
+
+/** Receives the events of a running import, on a core thread. */
+interface ImportEventListener {
+    fun onProgress(progress: ImportProgress)
+
+    fun onFinished(result: ImportResult)
+
+    /** [message] is [IMPORT_CANCELLED_MESSAGE] when the user cancelled. */
+    fun onFailed(message: String)
+}
+
+/** What the core reports when an import was cancelled. */
+const val IMPORT_CANCELLED_MESSAGE = "cancelled"
