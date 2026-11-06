@@ -43,6 +43,7 @@ import dev.letsmoe.drift.ui.screens.likedsongs.LikedSongsScreen
 import dev.letsmoe.drift.ui.screens.localplaylist.LocalPlaylistScreen
 import dev.letsmoe.drift.ui.screens.playlist.PlaylistScreen
 import dev.letsmoe.drift.ui.screens.podcast.PodcastScreen
+import dev.letsmoe.drift.ui.screens.podcasts.PodcastsScreen
 import dev.letsmoe.drift.ui.screens.search.SearchScreen
 import dev.letsmoe.drift.ui.theme.Canvas
 
@@ -115,6 +116,7 @@ private fun tabOwning(destination: androidx.navigation.NavDestination): Tab? {
     val routesByTab = listOf(
         Tab.Home to listOf(Routes.Home::class),
         Tab.Search to listOf(Routes.Search::class),
+        Tab.Podcasts to listOf(Routes.Podcasts::class),
         Tab.Library to listOf(Routes.Library::class, Routes.LikedSongs::class, Routes.LocalPlaylist::class),
     )
     for ((tab, routes) in routesByTab) {
@@ -138,6 +140,7 @@ private fun AppNavHost(navController: androidx.navigation.NavHostController) {
     ) {
         screen<Routes.Home> { HomeScreen() }
         screen<Routes.Search> { SearchScreen() }
+        screen<Routes.Podcasts> { PodcastsScreen() }
         screen<Routes.Library> { LibraryScreen() }
         screen<Routes.Album> { entry -> AlbumScreen(albumId = entry.toRoute<Routes.Album>().id) }
         screen<Routes.Playlist> { entry -> PlaylistScreen(playlistId = entry.toRoute<Routes.Playlist>().id) }

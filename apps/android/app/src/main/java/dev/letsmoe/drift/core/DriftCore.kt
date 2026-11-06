@@ -97,6 +97,11 @@ class DriftCore(dataDirectory: String) {
 
     suspend fun podcast(browseId: String): PodcastPage = call { DriftJson.decodeFromString(core.podcast(browseId)) }
 
+    suspend fun podcastShows(): HomePage = call { DriftJson.decodeFromString(core.podcastShows()) }
+
+    suspend fun podcastShowsContinuation(token: String): HomePage =
+        call { DriftJson.decodeFromString(core.podcastShowsContinuation(token)) }
+
     suspend fun podcastContinuation(token: String): PodcastEpisodes =
         call { DriftJson.decodeFromString(core.podcastContinuation(token)) }
 

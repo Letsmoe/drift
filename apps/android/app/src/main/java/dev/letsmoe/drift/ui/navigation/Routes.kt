@@ -11,6 +11,9 @@ object Routes {
     data object Search
 
     @Serializable
+    data object Podcasts
+
+    @Serializable
     data object Library
 
     @Serializable
