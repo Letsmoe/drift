@@ -21,6 +21,10 @@ fun NavController.openPodcast(browseId: String) {
     navigate(Routes.Podcast(browseId))
 }
 
+fun NavController.openSearch(podcasts: Boolean = false) {
+    navigate(Routes.Search(podcasts))
+}
+
 fun NavController.openLikedSongs() {
     navigate(Routes.LikedSongs)
 }

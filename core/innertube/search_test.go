@@ -134,3 +134,34 @@ func artistRun(name, browseID string) run {
 	endpoint.BrowseEndpointContextSupportedConfigs.BrowseEndpointContextMusicConfig.PageType = pageTypeArtist
 	return run{Text: name, NavigationEndpoint: &navigationEndpoint{BrowseEndpoint: endpoint}}
 }
+
+func TestSearchPodcastsReturnsShowsThenEpisodes(t *testing.T) {
+	server := newFakeServer(t)
+	server.respondWithFixtureForParams(t, "search", podcastsFilterParams, "testdata/search_podcasts.json")
+	server.respondWithFixtureForParams(t, "search", episodesFilterParams, "testdata/search_episodes.json")
+
+	results, err := server.client().SearchPodcasts(t.Context(), "lex fridman")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if len(results.Shelves) != 2 {
+		t.Fatalf("shelves = %+v, want podcasts and episodes", results.Shelves)
+	}
+	shows, episodes := results.Shelves[0], results.Shelves[1]
+	if shows.Title != "Podcasts" || len(shows.Items) != 3 || shows.Items[0].Kind != music.ItemKindPodcast {
+		t.Errorf("shows = %+v", shows)
+	}
+	if shows.Items[0].Title != "Lex Fridman Podcast" || shows.Items[0].ID != "MPSPPLrAXtmErZgOdP_8GztsuKi9nrraNbKKp4" {
+		t.Errorf("first show = %+v", shows.Items[0])
+	}
+	if episodes.Title != "Episodes" || len(episodes.Items) != 3 || episodes.Items[0].Kind != music.ItemKindEpisode {
+		t.Errorf("episodes = %+v", episodes)
+	}
+	if episodes.Items[0].Track == nil || episodes.Items[0].Track.VideoID != "ZAzWPE9CItg" {
+		t.Errorf("first episode = %+v", episodes.Items[0])
+	}
+	if server.requestCount("search") != 2 {
+		t.Errorf("search requests = %d, want 2", server.requestCount("search"))
+	}
+}

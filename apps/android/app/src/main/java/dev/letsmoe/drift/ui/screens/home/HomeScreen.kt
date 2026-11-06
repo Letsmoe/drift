@@ -29,6 +29,8 @@ import dev.letsmoe.drift.core.model.RecommendedRow
 import dev.letsmoe.drift.core.model.Shelf
 import dev.letsmoe.drift.ui.LocalAppContainer
 import dev.letsmoe.drift.ui.LocalBottomOverlayPadding
+import dev.letsmoe.drift.ui.LocalNavController
+import dev.letsmoe.drift.ui.navigation.openSearch
 import dev.letsmoe.drift.ui.appViewModel
 import dev.letsmoe.drift.ui.components.ErrorState
 import dev.letsmoe.drift.ui.components.LoadingMoreFooter
@@ -37,6 +39,7 @@ import dev.letsmoe.drift.ui.components.OnNearEnd
 import dev.letsmoe.drift.ui.components.DriftChip
 import dev.letsmoe.drift.ui.components.DriftPullToRefresh
 import dev.letsmoe.drift.ui.components.RootTopBar
+import dev.letsmoe.drift.ui.components.SearchAction
 import dev.letsmoe.drift.ui.components.SectionHeader
 import dev.letsmoe.drift.ui.components.ShelfRow
 import dev.letsmoe.drift.ui.components.Skeleton
@@ -61,10 +64,13 @@ fun HomeScreen(modifier: Modifier = Modifier) {
     val isRefreshing by viewModel.isRefreshing.collectAsStateWithLifecycle()
     val filter by viewModel.filter.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
+    val navController = LocalNavController.current
     listState.OnNearEnd(isEnabled = hasMoreShelves, onNearEnd = viewModel.shelfPager::loadMore)
 
     Column(modifier = modifier.fillMaxSize()) {
-        RootTopBar(title = greeting())
+        RootTopBar(title = greeting()) {
+            SearchAction(onClick = { navController.openSearch() })
+        }
         DriftPullToRefresh(isRefreshing = isRefreshing, onRefresh = viewModel::refresh) {
             LazyColumn(
                 state = listState,

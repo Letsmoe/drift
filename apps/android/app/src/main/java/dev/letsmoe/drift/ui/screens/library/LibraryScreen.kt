@@ -34,6 +34,7 @@ import dev.letsmoe.drift.ui.appViewModel
 import dev.letsmoe.drift.ui.components.NewPlaylistDialog
 import dev.letsmoe.drift.ui.components.DriftChip
 import dev.letsmoe.drift.ui.components.RootTopBar
+import dev.letsmoe.drift.ui.components.SearchAction
 import dev.letsmoe.drift.ui.formatSongCount
 import dev.letsmoe.drift.ui.icons.DriftIcons
 import dev.letsmoe.drift.ui.navigation.openAlbum
@@ -44,6 +45,8 @@ import dev.letsmoe.drift.ui.navigation.openLocalPlaylist
 import dev.letsmoe.drift.ui.navigation.openPlaylist
 import dev.letsmoe.drift.ui.navigation.openPodcast
 import dev.letsmoe.drift.ui.screens.importing.ImportLibraryEntry
+
+import dev.letsmoe.drift.ui.navigation.openSearch
 import dev.letsmoe.drift.ui.showToastOnFailure
 import dev.letsmoe.drift.ui.theme.DriftTheme
 import androidx.navigation.NavController
@@ -67,6 +70,7 @@ fun LibraryScreen(modifier: Modifier = Modifier) {
 
     Column(modifier = modifier.fillMaxSize()) {
         RootTopBar(title = "Your Library") {
+            SearchAction(onClick = { navController.openSearch() })
             IconButton(onClick = { showNewPlaylistDialog = true }) {
                 Icon(DriftIcons.Add.outline, contentDescription = "New playlist")
             }

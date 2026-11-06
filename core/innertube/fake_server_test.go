@@ -50,6 +50,17 @@ func (server *fakeServer) respondWithFixture(t *testing.T, endpoint, fixturePath
 	server.responses[endpoint] = fixture
 }
 
+// respondWithFixtureForParams answers requests to endpoint whose body carries params with the
+// fixture, so one test can tell filtered searches apart.
+func (server *fakeServer) respondWithFixtureForParams(t *testing.T, endpoint, params, fixturePath string) {
+	t.Helper()
+	server.respondWithFixture(t, paramsKey(endpoint, params), fixturePath)
+}
+
+func paramsKey(endpoint, params string) string {
+	return endpoint + "?params=" + params
+}
+
 func (server *fakeServer) handle(writer http.ResponseWriter, request *http.Request) {
 	endpoint := strings.TrimPrefix(request.URL.Path, "/youtubei/v1/")
 
@@ -59,6 +70,13 @@ func (server *fakeServer) handle(writer http.ResponseWriter, request *http.Reque
 	server.mutex.Lock()
 	server.requests[endpoint] = append(server.requests[endpoint], recordedRequest{headers: request.Header, body: body})
 	response, found := server.responses[endpoint]
+	params, hasParams := body["params"].(string)
+	if hasParams {
+		byParams, foundByParams := server.responses[paramsKey(endpoint, params)]
+		if foundByParams {
+			response, found = byParams, true
+		}
+	}
 	server.mutex.Unlock()
 
 	if !found {
