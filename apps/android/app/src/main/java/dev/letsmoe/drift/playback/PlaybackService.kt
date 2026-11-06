@@ -17,6 +17,7 @@ class PlaybackService : MediaSessionService() {
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private lateinit var exoPlayer: ExoPlayer
     private lateinit var driver: QueuePlaybackDriver
+    private lateinit var crossfader: Crossfader
     private var mediaSession: MediaSession? = null
 
     override fun onCreate() {
@@ -24,19 +25,39 @@ class PlaybackService : MediaSessionService() {
         val container = (application as DriftApplication).container
         exoPlayer = buildExoPlayer()
         driver = QueuePlaybackDriver(exoPlayer, container.core, container.playbackEvents, serviceScope)
+        crossfader = Crossfader(
+            mainPlayer = exoPlayer,
+            createOutgoingPlayer = ::buildOutgoingPlayer,
+            settings = container.settings,
+            core = container.core,
+            scope = serviceScope,
+            advanceQueue = { driver.advanceForCrossfade() },
+        )
         driver.start()
-        mediaSession = MediaSession.Builder(this, QueuePlayer(exoPlayer, driver)).build()
+        crossfader.start()
+        mediaSession = MediaSession.Builder(this, QueuePlayer(exoPlayer, driver, crossfader)).build()
     }
 
     private fun buildExoPlayer(): ExoPlayer {
-        val musicAttributes = AudioAttributes.Builder()
-            .setUsage(C.USAGE_MEDIA)
-            .setContentType(C.AUDIO_CONTENT_TYPE_MUSIC)
-            .build()
         return ExoPlayer.Builder(this)
-            .setAudioAttributes(musicAttributes, true)
+            .setAudioAttributes(musicAudioAttributes(), true)
             .setHandleAudioBecomingNoisy(true)
             .setWakeMode(C.WAKE_MODE_NETWORK)
+            .build()
+    }
+
+    // The ending song during a crossfade; the main player keeps the audio focus and the session.
+    private fun buildOutgoingPlayer(): ExoPlayer {
+        return ExoPlayer.Builder(this)
+            .setAudioAttributes(musicAudioAttributes(), false)
+            .setWakeMode(C.WAKE_MODE_NETWORK)
+            .build()
+    }
+
+    private fun musicAudioAttributes(): AudioAttributes {
+        return AudioAttributes.Builder()
+            .setUsage(C.USAGE_MEDIA)
+            .setContentType(C.AUDIO_CONTENT_TYPE_MUSIC)
             .build()
     }
 
@@ -49,6 +70,7 @@ class PlaybackService : MediaSessionService() {
     }
 
     override fun onDestroy() {
+        crossfader.release()
         driver.release()
         mediaSession?.release()
         mediaSession = null
