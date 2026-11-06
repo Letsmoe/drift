@@ -56,8 +56,7 @@ import dev.letsmoe.drift.ui.components.TrackRow
 import dev.letsmoe.drift.ui.formatSongCount
 import dev.letsmoe.drift.ui.formatTotalDuration
 import dev.letsmoe.drift.ui.icons.DriftIcons
-import dev.letsmoe.drift.ui.navigation.Routes
-import dev.letsmoe.drift.ui.navigation.switchToTab
+import dev.letsmoe.drift.ui.navigation.openSearch
 import dev.letsmoe.drift.ui.screens.detail.DetailActionRow
 import dev.letsmoe.drift.ui.screens.detail.DetailHeader
 import dev.letsmoe.drift.ui.screens.detail.DetailLoadState
@@ -122,7 +121,7 @@ private fun LocalPlaylistContent(playlist: LibraryPlaylist, viewModel: LocalPlay
                 viewModel = viewModel,
                 onEdit = { openDialog = PlaylistDialog.Edit },
                 onDelete = { openDialog = PlaylistDialog.Delete },
-                onAddSongs = { navController.switchToTab(Routes.Search) },
+                onAddSongs = { navController.openSearch() },
                 onRemove = ::removeWithUndo,
             )
         }

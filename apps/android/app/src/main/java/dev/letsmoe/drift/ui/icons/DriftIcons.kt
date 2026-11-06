@@ -15,6 +15,8 @@ import com.adamglin.phosphoricons.regular.Books as RegularBooks
 import com.adamglin.phosphoricons.fill.CaretDown as FillCaretdown
 import com.adamglin.phosphoricons.regular.CaretDown as RegularCaretdown
 import com.adamglin.phosphoricons.fill.Check as FillCheck
+import com.adamglin.phosphoricons.fill.Microphone as FillMicrophone
+import com.adamglin.phosphoricons.regular.Microphone as RegularMicrophone
 import com.adamglin.phosphoricons.regular.Check as RegularCheck
 import com.adamglin.phosphoricons.fill.Clock as FillClock
 import com.adamglin.phosphoricons.regular.Clock as RegularClock
@@ -89,6 +91,7 @@ object DriftIcons {
     val Home = DriftIcon(PhosphorIcons.Regular.RegularHouse, PhosphorIcons.Fill.FillHouse)
     val Search = DriftIcon(PhosphorIcons.Regular.RegularMagnifyingglass, PhosphorIcons.Fill.FillMagnifyingglass)
     val Library = DriftIcon(PhosphorIcons.Regular.RegularBooks, PhosphorIcons.Fill.FillBooks)
+    val Podcast = DriftIcon(PhosphorIcons.Regular.RegularMicrophone, PhosphorIcons.Fill.FillMicrophone)
     val Play = DriftIcon(PhosphorIcons.Regular.RegularPlay, PhosphorIcons.Fill.FillPlay)
     val Pause = DriftIcon(PhosphorIcons.Regular.RegularPause, PhosphorIcons.Fill.FillPause)
     val Heart = DriftIcon(PhosphorIcons.Regular.RegularHeart, PhosphorIcons.Fill.FillHeart)

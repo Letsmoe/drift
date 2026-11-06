@@ -68,6 +68,19 @@ func TestLiveSearch(t *testing.T) {
 	}
 }
 
+func TestLiveSearchPodcasts(t *testing.T) {
+	results, err := NewClient().SearchPodcasts(t.Context(), "lex fridman")
+	if err != nil {
+		t.Fatalf("search podcasts: %v", err)
+	}
+	if len(results.Shelves) != 2 || len(results.Shelves[0].Items) == 0 || len(results.Shelves[1].Items) == 0 {
+		t.Fatalf("search podcasts returned %+v; the response layout probably changed", results.Shelves)
+	}
+	if results.Shelves[0].Items[0].Kind != music.ItemKindPodcast || results.Shelves[1].Items[0].Kind != music.ItemKindEpisode {
+		t.Errorf("first items = %s and %s, want a podcast and an episode", results.Shelves[0].Items[0].Kind, results.Shelves[1].Items[0].Kind)
+	}
+}
+
 func TestLiveSearchSuggestions(t *testing.T) {
 	suggestions, err := NewClient().SearchSuggestions(t.Context(), "daft p")
 	if err != nil {

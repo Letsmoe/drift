@@ -89,6 +89,9 @@ class DriftCore(dataDirectory: String) {
 
     suspend fun search(query: String): SearchResults = call { DriftJson.decodeFromString(core.search(query)) }
 
+    suspend fun searchPodcasts(query: String): SearchResults =
+        call { DriftJson.decodeFromString(core.searchPodcasts(query)) }
+
     suspend fun searchSuggestions(query: String): List<String> =
         call { DriftJson.decodeFromString(core.searchSuggestions(query)) }
 
@@ -104,6 +107,11 @@ class DriftCore(dataDirectory: String) {
     suspend fun radio(videoId: String): List<Track> = call { DriftJson.decodeFromString(core.radio(videoId)) }
 
     suspend fun podcast(browseId: String): PodcastPage = call { DriftJson.decodeFromString(core.podcast(browseId)) }
+
+    suspend fun podcastShows(): HomePage = call { DriftJson.decodeFromString(core.podcastShows()) }
+
+    suspend fun podcastShowsContinuation(token: String): HomePage =
+        call { DriftJson.decodeFromString(core.podcastShowsContinuation(token)) }
 
     suspend fun podcastContinuation(token: String): PodcastEpisodes =
         call { DriftJson.decodeFromString(core.podcastContinuation(token)) }
