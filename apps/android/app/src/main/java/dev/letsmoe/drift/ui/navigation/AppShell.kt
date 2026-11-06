@@ -38,6 +38,7 @@ import dev.letsmoe.drift.ui.player.NowPlayingOverlay
 import dev.letsmoe.drift.ui.screens.album.AlbumScreen
 import dev.letsmoe.drift.ui.screens.artist.ArtistScreen
 import dev.letsmoe.drift.ui.screens.home.HomeScreen
+import dev.letsmoe.drift.ui.screens.importing.ImportScreen
 import dev.letsmoe.drift.ui.screens.library.LibraryScreen
 import dev.letsmoe.drift.ui.screens.likedsongs.LikedSongsScreen
 import dev.letsmoe.drift.ui.screens.localplaylist.LocalPlaylistScreen
@@ -115,7 +116,7 @@ private fun tabOwning(destination: androidx.navigation.NavDestination): Tab? {
     val routesByTab = listOf(
         Tab.Home to listOf(Routes.Home::class),
         Tab.Search to listOf(Routes.Search::class),
-        Tab.Library to listOf(Routes.Library::class, Routes.LikedSongs::class, Routes.LocalPlaylist::class),
+        Tab.Library to listOf(Routes.Library::class, Routes.LikedSongs::class, Routes.LocalPlaylist::class, Routes.Import::class),
     )
     for ((tab, routes) in routesByTab) {
         val owns = destination.hierarchy.any { node -> routes.any { route -> node.hasRoute(route) } }
@@ -144,6 +145,7 @@ private fun AppNavHost(navController: androidx.navigation.NavHostController) {
         screen<Routes.Artist> { entry -> ArtistScreen(artistId = entry.toRoute<Routes.Artist>().id) }
         screen<Routes.Podcast> { entry -> PodcastScreen(podcastId = entry.toRoute<Routes.Podcast>().id) }
         screen<Routes.LikedSongs> { LikedSongsScreen() }
+        screen<Routes.Import> { ImportScreen() }
         screen<Routes.LocalPlaylist> { entry ->
             LocalPlaylistScreen(playlistId = entry.toRoute<Routes.LocalPlaylist>().id)
         }

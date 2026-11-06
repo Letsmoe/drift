@@ -50,6 +50,19 @@ class LibraryState(
         refreshSavedItems()
     }
 
+    /** Picks up what an import wrote: playlists, saved items and liked songs. */
+    suspend fun refreshAfterImport() {
+        refreshPlaylists()
+        refreshSavedItems()
+        try {
+            val likedIds = core.likedTracks().map { track -> track.videoId }
+            mutableRatings.value = mutableRatings.value + likedIds.associateWith { LIKED }
+            requestedRatingIds.addAll(likedIds)
+        } catch (error: Exception) {
+            reportError(error)
+        }
+    }
+
     /** Loads the ratings of [videoIds] that have not been looked up yet. */
     fun ensureRatings(videoIds: List<String>) {
         val missingIds = videoIds.filter { videoId -> videoId !in requestedRatingIds }.distinct()

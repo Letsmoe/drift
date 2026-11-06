@@ -29,5 +29,8 @@ object Routes {
     data object LikedSongs
 
     @Serializable
+    data object Import
+
+    @Serializable
     data class LocalPlaylist(val id: String)
 }
