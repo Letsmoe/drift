@@ -19,7 +19,6 @@ private const val SLIDE_DIVISOR = 6
 
 private fun isTabRoot(destination: NavDestination): Boolean =
     destination.hasRoute<Routes.Home>() ||
-        destination.hasRoute<Routes.Search>() ||
         destination.hasRoute<Routes.Podcasts>() ||
         destination.hasRoute<Routes.Library>()
 

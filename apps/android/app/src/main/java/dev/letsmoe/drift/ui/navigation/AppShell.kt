@@ -115,7 +115,6 @@ private fun selectedTabOf(navController: androidx.navigation.NavController): Tab
 private fun tabOwning(destination: androidx.navigation.NavDestination): Tab? {
     val routesByTab = listOf(
         Tab.Home to listOf(Routes.Home::class),
-        Tab.Search to listOf(Routes.Search::class),
         Tab.Podcasts to listOf(Routes.Podcasts::class),
         Tab.Library to listOf(Routes.Library::class, Routes.LikedSongs::class, Routes.LocalPlaylist::class),
     )
@@ -139,7 +138,7 @@ private fun AppNavHost(navController: androidx.navigation.NavHostController) {
         popExitTransition = { popExitTransitionFor(initialState.destination, targetState.destination) },
     ) {
         screen<Routes.Home> { HomeScreen() }
-        screen<Routes.Search> { SearchScreen() }
+        screen<Routes.Search> { entry -> SearchScreen(podcasts = entry.toRoute<Routes.Search>().podcasts) }
         screen<Routes.Podcasts> { PodcastsScreen() }
         screen<Routes.Library> { LibraryScreen() }
         screen<Routes.Album> { entry -> AlbumScreen(albumId = entry.toRoute<Routes.Album>().id) }

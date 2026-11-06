@@ -7,8 +7,9 @@ object Routes {
     @Serializable
     data object Home
 
+    /** Search as a page; [podcasts] searches shows and episodes instead of music. */
     @Serializable
-    data object Search
+    data class Search(val podcasts: Boolean = false)
 
     @Serializable
     data object Podcasts

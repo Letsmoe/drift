@@ -26,13 +26,14 @@ import dev.letsmoe.drift.ui.theme.DriftTheme
 /** Recent searches for an empty field: tap to search again, "Clear all" forgets them. */
 fun LazyListScope.recentSearches(
     recentQueries: List<String>,
+    emptyHint: String,
     onSearch: (String) -> Unit,
     onClearAll: () -> Unit,
 ) {
     if (recentQueries.isEmpty()) {
         item(key = "recent-empty") {
             Text(
-                text = "Search for songs, albums, artists and more.",
+                text = emptyHint,
                 style = MaterialTheme.typography.bodyMedium,
                 color = DriftTheme.colors.textDim,
                 textAlign = TextAlign.Center,

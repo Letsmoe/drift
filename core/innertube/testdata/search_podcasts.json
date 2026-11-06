@@ -1,897 +1,888 @@
 {
- "contents": {
-  "tabbedSearchResultsRenderer": {
-   "tabs": [
-    {
-     "tabRenderer": {
-      "title": "YT Music",
-      "selected": true,
-      "content": {
-       "sectionListRenderer": {
-        "contents": [
-         {
-          "itemSectionRenderer": {
-           "contents": [
-            {
-             "messageRenderer": {
-              "button": {
-               "buttonRenderer": {
-                "style": "STYLE_TEXT",
-                "isDisabled": false,
-                "text": {
-                 "simpleText": "About these results"
-                },
-                "icon": {
-                 "iconType": "INFO_OUTLINE"
-                },
-                "navigationEndpoint": {
-                 "urlEndpoint": {
-                  "url": "https://www.youtube.com/howyoutubeworks/product-features/search/",
-                  "target": "TARGET_NEW_WINDOW"
-                 }
-                },
-                "iconPosition": "BUTTON_ICON_POSITION_TYPE_RIGHT_OF_TEXT"
-               }
-              },
-              "style": {
-               "value": "RENDER_STYLE_PANEL"
-              }
-             }
-            }
-           ]
-          }
-         },
-         {
-          "musicShelfRenderer": {
-           "title": {
-            "runs": [
-             {
-              "text": "Podcasts"
-             }
-            ]
-           },
-           "contents": [
-            {
-             "musicResponsiveListItemRenderer": {
-              "thumbnail": {
-               "musicThumbnailRenderer": {
-                "thumbnail": {
-                 "thumbnails": [
-                  {
-                   "url": "https://i.ytimg.com/pl_c/PLrAXtmErZgOdP_8GztsuKi9nrraNbKKp4/studio_square_thumbnail.jpg?sqp=CO_zt9cG-oaymwEICDwQPCAASFqi85f_AwYI15SpoAY&rs=AMzJL3n0v8SITkWLNkfKerpzehiU7QJj_A",
-                   "width": 60,
-                   "height": 60
-                  },
-                  {
-                   "url": "https://i.ytimg.com/pl_c/PLrAXtmErZgOdP_8GztsuKi9nrraNbKKp4/studio_square_thumbnail.jpg?sqp=CO_zt9cG-oaymwEICHgQeCAASFqi85f_AwYI15SpoAY&rs=AMzJL3lkU989NL5Qa6zrzLXJGvPeppApbg",
-                   "width": 120,
-                   "height": 120
-                  },
-                  {
-                   "url": "https://i.ytimg.com/pl_c/PLrAXtmErZgOdP_8GztsuKi9nrraNbKKp4/studio_square_thumbnail.jpg?sqp=CO_zt9cG-oaymwEKCOIBEOIBIABIWqLzl_8DBgjXlKmgBg&rs=AMzJL3ntzKe5W2CRB78MAK0XKPbFWgKthg",
-                   "width": 226,
-                   "height": 226
-                  },
-                  {
-                   "url": "https://i.ytimg.com/pl_c/PLrAXtmErZgOdP_8GztsuKi9nrraNbKKp4/studio_square_thumbnail.jpg?sqp=CO_zt9cG-oaymwEKCKAEEKAEIABIWqLzl_8DBgjXlKmgBg&rs=AMzJL3lJBB5zhpxaKBrCQmoT_MRMV9dFuw",
-                   "width": 544,
-                   "height": 544
-                  }
-                 ]
-                },
-                "thumbnailCrop": "MUSIC_THUMBNAIL_CROP_UNSPECIFIED",
-                "thumbnailScale": "MUSIC_THUMBNAIL_SCALE_ASPECT_FIT"
-               }
-              },
-              "overlay": {
-               "musicItemThumbnailOverlayRenderer": {
-                "background": {
-                 "verticalGradient": {
-                  "gradientLayerColors": [
-                   "3422552064",
-                   "3422552064"
-                  ]
-                 }
-                },
-                "content": {
-                 "musicPlayButtonRenderer": {
-                  "playNavigationEndpoint": {
-                   "watchPlaylistEndpoint": {
-                    "playlistId": "PLrAXtmErZgOdP_8GztsuKi9nrraNbKKp4"
-                   }
-                  },
-                  "playIcon": {
-                   "iconType": "PLAY_ARROW"
-                  },
-                  "pauseIcon": {
-                   "iconType": "PAUSE"
-                  },
-                  "iconColor": 4294967295,
-                  "backgroundColor": 0,
-                  "activeBackgroundColor": 0,
-                  "loadingIndicatorColor": 14745645,
-                  "playingIcon": {
-                   "iconType": "VOLUME_UP"
-                  },
-                  "iconLoadingColor": 0,
-                  "activeScaleFactor": 1,
-                  "buttonSize": "MUSIC_PLAY_BUTTON_SIZE_SMALL",
-                  "rippleTarget": "MUSIC_PLAY_BUTTON_RIPPLE_TARGET_SELF",
-                  "accessibilityPlayData": {},
-                  "accessibilityPauseData": {}
-                 }
-                },
-                "contentPosition": "MUSIC_ITEM_THUMBNAIL_OVERLAY_CONTENT_POSITION_CENTERED",
-                "displayStyle": "MUSIC_ITEM_THUMBNAIL_OVERLAY_DISPLAY_STYLE_PERSISTENT"
-               }
-              },
-              "flexColumns": [
-               {
-                "musicResponsiveListItemFlexColumnRenderer": {
-                 "text": {
-                  "runs": [
-                   {
-                    "text": "Lex Fridman Podcast"
-                   }
-                  ]
-                 },
-                 "displayPriority": "MUSIC_RESPONSIVE_LIST_ITEM_COLUMN_DISPLAY_PRIORITY_HIGH"
-                }
-               },
-               {
-                "musicResponsiveListItemFlexColumnRenderer": {
-                 "text": {
-                  "runs": [
-                   {
-                    "text": "Lex Fridman",
-                    "navigationEndpoint": {
-                     "browseEndpoint": {
-                      "browseId": "UCSHZKyawb77ixDdsGog4iWA",
-                      "browseEndpointContextSupportedConfigs": {
-                       "browseEndpointContextMusicConfig": {
-                        "pageType": "MUSIC_PAGE_TYPE_USER_CHANNEL"
-                       }
-                      }
-                     }
-                    }
-                   }
-                  ]
-                 },
-                 "displayPriority": "MUSIC_RESPONSIVE_LIST_ITEM_COLUMN_DISPLAY_PRIORITY_HIGH"
-                }
-               }
-              ],
-              "menu": {
-               "menuRenderer": {
-                "items": [
-                 {
-                  "toggleMenuServiceItemRenderer": {
-                   "defaultText": {
-                    "runs": [
-                     {
-                      "text": "Save to library"
-                     }
-                    ]
-                   },
-                   "defaultIcon": {
-                    "iconType": "BOOKMARK_BORDER"
-                   },
-                   "defaultServiceEndpoint": {
-                    "modalEndpoint": {
-                     "modal": {
-                      "modalWithTitleAndButtonRenderer": {
-                       "title": {
-                        "runs": [
-                         {
-                          "text": "Save this for later"
-                         }
-                        ]
-                       },
-                       "content": {
-                        "runs": [
-                         {
-                          "text": "Save favorites to your library after signing in"
-                         }
-                        ]
-                       },
-                       "button": {
-                        "buttonRenderer": {
-                         "style": "STYLE_BLUE_TEXT",
-                         "isDisabled": false,
-                         "text": {
-                          "runs": [
-                           {
-                            "text": "Sign in"
-                           }
-                          ]
-                         },
-                         "navigationEndpoint": {
-                          "signInEndpoint": {
-                           "hack": true
-                          }
-                         }
-                        }
-                       }
-                      }
-                     }
-                    }
-                   },
-                   "toggledText": {
-                    "runs": [
-                     {
-                      "text": "Remove from library"
-                     }
-                    ]
-                   },
-                   "toggledIcon": {
-                    "iconType": "BOOKMARK"
-                   },
-                   "toggledServiceEndpoint": {
-                    "likeEndpoint": {
-                     "status": "INDIFFERENT",
-                     "target": {
-                      "playlistId": "PLrAXtmErZgOdP_8GztsuKi9nrraNbKKp4"
-                     }
-                    }
-                   },
-                   "isToggled": false
-                  }
-                 },
-                 {
-                  "menuNavigationItemRenderer": {
-                   "text": {
-                    "runs": [
-                     {
-                      "text": "Share"
-                     }
-                    ]
-                   },
-                   "icon": {
-                    "iconType": "SHARE"
-                   },
-                   "navigationEndpoint": {
-                    "shareEntityEndpoint": {
-                     "serializedShareEntity": "EiJQTHJBWHRtRXJaZ09kUF84R3p0c3VLaTlucnJhTmJLS3A0",
-                     "sharePanelType": "SHARE_PANEL_TYPE_UNIFIED_SHARE_PANEL"
-                    }
-                   }
-                  }
-                 }
-                ]
-               }
-              },
-              "flexColumnDisplayStyle": "MUSIC_RESPONSIVE_LIST_ITEM_FLEX_COLUMN_DISPLAY_STYLE_TWO_LINE_STACK",
-              "navigationEndpoint": {
-               "browseEndpoint": {
-                "browseId": "MPSPPLrAXtmErZgOdP_8GztsuKi9nrraNbKKp4",
-                "browseEndpointContextSupportedConfigs": {
-                 "browseEndpointContextMusicConfig": {
-                  "pageType": "MUSIC_PAGE_TYPE_PODCAST_SHOW_DETAIL_PAGE"
-                 }
-                }
-               }
-              },
-              "itemHeight": "MUSIC_RESPONSIVE_LIST_ITEM_HEIGHT_TALL"
-             }
-            },
-            {
-             "musicResponsiveListItemRenderer": {
-              "thumbnail": {
-               "musicThumbnailRenderer": {
-                "thumbnail": {
-                 "thumbnails": [
-                  {
-                   "url": "https://yt3.googleusercontent.com/U5sXxjpfA9jY4-mLsHknDrkEXloEuHoG-aFHtZE0miow_1b32WMutliXFhhF8CpzlIc4Qly6Bw=w60-c-h60-k-c0x00ffffff-no-l90-rj",
-                   "width": 60,
-                   "height": 60
-                  },
-                  {
-                   "url": "https://yt3.googleusercontent.com/U5sXxjpfA9jY4-mLsHknDrkEXloEuHoG-aFHtZE0miow_1b32WMutliXFhhF8CpzlIc4Qly6Bw=w120-c-h120-k-c0x00ffffff-no-l90-rj",
-                   "width": 120,
-                   "height": 120
-                  },
-                  {
-                   "url": "https://yt3.googleusercontent.com/U5sXxjpfA9jY4-mLsHknDrkEXloEuHoG-aFHtZE0miow_1b32WMutliXFhhF8CpzlIc4Qly6Bw=w226-c-h226-k-c0x00ffffff-no-l90-rj",
-                   "width": 226,
-                   "height": 226
-                  },
-                  {
-                   "url": "https://yt3.googleusercontent.com/U5sXxjpfA9jY4-mLsHknDrkEXloEuHoG-aFHtZE0miow_1b32WMutliXFhhF8CpzlIc4Qly6Bw=w544-c-h544-k-c0x00ffffff-no-l90-rj",
-                   "width": 544,
-                   "height": 544
-                  }
-                 ]
-                },
-                "thumbnailCrop": "MUSIC_THUMBNAIL_CROP_UNSPECIFIED",
-                "thumbnailScale": "MUSIC_THUMBNAIL_SCALE_ASPECT_FIT"
-               }
-              },
-              "overlay": {
-               "musicItemThumbnailOverlayRenderer": {
-                "background": {
-                 "verticalGradient": {
-                  "gradientLayerColors": [
-                   "3422552064",
-                   "3422552064"
-                  ]
-                 }
-                },
-                "content": {
-                 "musicPlayButtonRenderer": {
-                  "playNavigationEndpoint": {
-                   "watchPlaylistEndpoint": {
-                    "playlistId": "PLtvziyWU7Qk3pDNUlyWuPDGAGp0hOeaUN"
-                   }
-                  },
-                  "playIcon": {
-                   "iconType": "PLAY_ARROW"
-                  },
-                  "pauseIcon": {
-                   "iconType": "PAUSE"
-                  },
-                  "iconColor": 4294967295,
-                  "backgroundColor": 0,
-                  "activeBackgroundColor": 0,
-                  "loadingIndicatorColor": 14745645,
-                  "playingIcon": {
-                   "iconType": "VOLUME_UP"
-                  },
-                  "iconLoadingColor": 0,
-                  "activeScaleFactor": 1,
-                  "buttonSize": "MUSIC_PLAY_BUTTON_SIZE_SMALL",
-                  "rippleTarget": "MUSIC_PLAY_BUTTON_RIPPLE_TARGET_SELF",
-                  "accessibilityPlayData": {},
-                  "accessibilityPauseData": {}
-                 }
-                },
-                "contentPosition": "MUSIC_ITEM_THUMBNAIL_OVERLAY_CONTENT_POSITION_CENTERED",
-                "displayStyle": "MUSIC_ITEM_THUMBNAIL_OVERLAY_DISPLAY_STYLE_PERSISTENT"
-               }
-              },
-              "flexColumns": [
-               {
-                "musicResponsiveListItemFlexColumnRenderer": {
-                 "text": {
-                  "runs": [
-                   {
-                    "text": "Pavel Durov CEO of Telegram Podcast With Lex Fridman"
-                   }
-                  ]
-                 },
-                 "displayPriority": "MUSIC_RESPONSIVE_LIST_ITEM_COLUMN_DISPLAY_PRIORITY_HIGH"
-                }
-               },
-               {
-                "musicResponsiveListItemFlexColumnRenderer": {
-                 "text": {
-                  "runs": [
-                   {
-                    "text": "David Yee’s Channel",
-                    "navigationEndpoint": {
-                     "browseEndpoint": {
-                      "browseId": "UCl8ASfWsZyqHa9SSRgE0dGg",
-                      "browseEndpointContextSupportedConfigs": {
-                       "browseEndpointContextMusicConfig": {
-                        "pageType": "MUSIC_PAGE_TYPE_USER_CHANNEL"
-                       }
-                      }
-                     }
-                    }
-                   }
-                  ]
-                 },
-                 "displayPriority": "MUSIC_RESPONSIVE_LIST_ITEM_COLUMN_DISPLAY_PRIORITY_HIGH"
-                }
-               }
-              ],
-              "menu": {
-               "menuRenderer": {
-                "items": [
-                 {
-                  "toggleMenuServiceItemRenderer": {
-                   "defaultText": {
-                    "runs": [
-                     {
-                      "text": "Save to library"
-                     }
-                    ]
-                   },
-                   "defaultIcon": {
-                    "iconType": "BOOKMARK_BORDER"
-                   },
-                   "defaultServiceEndpoint": {
-                    "modalEndpoint": {
-                     "modal": {
-                      "modalWithTitleAndButtonRenderer": {
-                       "title": {
-                        "runs": [
-                         {
-                          "text": "Save this for later"
-                         }
-                        ]
-                       },
-                       "content": {
-                        "runs": [
-                         {
-                          "text": "Save favorites to your library after signing in"
-                         }
-                        ]
-                       },
-                       "button": {
-                        "buttonRenderer": {
-                         "style": "STYLE_BLUE_TEXT",
-                         "isDisabled": false,
-                         "text": {
-                          "runs": [
-                           {
-                            "text": "Sign in"
-                           }
-                          ]
-                         },
-                         "navigationEndpoint": {
-                          "signInEndpoint": {
-                           "hack": true
-                          }
-                         }
-                        }
-                       }
-                      }
-                     }
-                    }
-                   },
-                   "toggledText": {
-                    "runs": [
-                     {
-                      "text": "Remove from library"
-                     }
-                    ]
-                   },
-                   "toggledIcon": {
-                    "iconType": "BOOKMARK"
-                   },
-                   "toggledServiceEndpoint": {
-                    "likeEndpoint": {
-                     "status": "INDIFFERENT",
-                     "target": {
-                      "playlistId": "PLtvziyWU7Qk3pDNUlyWuPDGAGp0hOeaUN"
-                     }
-                    }
-                   },
-                   "isToggled": false
-                  }
-                 },
-                 {
-                  "menuNavigationItemRenderer": {
-                   "text": {
-                    "runs": [
-                     {
-                      "text": "Share"
-                     }
-                    ]
-                   },
-                   "icon": {
-                    "iconType": "SHARE"
-                   },
-                   "navigationEndpoint": {
-                    "shareEntityEndpoint": {
-                     "serializedShareEntity": "EiJQTHR2eml5V1U3UWszcEROVWx5V3VQREdBR3AwaE9lYVVO",
-                     "sharePanelType": "SHARE_PANEL_TYPE_UNIFIED_SHARE_PANEL"
-                    }
-                   }
-                  }
-                 }
-                ]
-               }
-              },
-              "flexColumnDisplayStyle": "MUSIC_RESPONSIVE_LIST_ITEM_FLEX_COLUMN_DISPLAY_STYLE_TWO_LINE_STACK",
-              "navigationEndpoint": {
-               "browseEndpoint": {
-                "browseId": "MPSPPLtvziyWU7Qk3pDNUlyWuPDGAGp0hOeaUN",
-                "browseEndpointContextSupportedConfigs": {
-                 "browseEndpointContextMusicConfig": {
-                  "pageType": "MUSIC_PAGE_TYPE_PODCAST_SHOW_DETAIL_PAGE"
-                 }
-                }
-               }
-              },
-              "itemHeight": "MUSIC_RESPONSIVE_LIST_ITEM_HEIGHT_TALL"
-             }
-            },
-            {
-             "musicResponsiveListItemRenderer": {
-              "thumbnail": {
-               "musicThumbnailRenderer": {
-                "thumbnail": {
-                 "thumbnails": [
-                  {
-                   "url": "https://i.ytimg.com/podcasts_artwork/PLddFGycaoQR4/rss_feed_ingested.jpg?sqp=CO_zt9cG-oaymwEICDwQPCAASFo&rs=AMzJL3nYvP761UEmhbKjFg1D3bRjjxZqiA",
-                   "width": 60,
-                   "height": 60
-                  },
-                  {
-                   "url": "https://i.ytimg.com/podcasts_artwork/PLddFGycaoQR4/rss_feed_ingested.jpg?sqp=CO_zt9cG-oaymwEICHgQeCAASFo&rs=AMzJL3n9e8r2aV1xiayDpXkzy6jCse2TMw",
-                   "width": 120,
-                   "height": 120
-                  },
-                  {
-                   "url": "https://i.ytimg.com/podcasts_artwork/PLddFGycaoQR4/rss_feed_ingested.jpg?sqp=CO_zt9cG-oaymwEKCOIBEOIBIABIWg&rs=AMzJL3no_UW2F3bAwNjWzBCgNoNIn4WQTQ",
-                   "width": 226,
-                   "height": 226
-                  },
-                  {
-                   "url": "https://i.ytimg.com/podcasts_artwork/PLddFGycaoQR4/rss_feed_ingested.jpg?sqp=CO_zt9cG-oaymwEKCKAEEKAEIABIWg&rs=AMzJL3leE5lrknSFb3GEq58CDEOm5A3T_Q",
-                   "width": 544,
-                   "height": 544
-                  }
-                 ]
-                },
-                "thumbnailCrop": "MUSIC_THUMBNAIL_CROP_UNSPECIFIED",
-                "thumbnailScale": "MUSIC_THUMBNAIL_SCALE_ASPECT_FIT"
-               }
-              },
-              "overlay": {
-               "musicItemThumbnailOverlayRenderer": {
-                "background": {
-                 "verticalGradient": {
-                  "gradientLayerColors": [
-                   "3422552064",
-                   "3422552064"
-                  ]
-                 }
-                },
-                "content": {
-                 "musicPlayButtonRenderer": {
-                  "playNavigationEndpoint": {
-                   "watchPlaylistEndpoint": {
-                    "playlistId": "PLddFGycaoQR4"
-                   }
-                  },
-                  "playIcon": {
-                   "iconType": "PLAY_ARROW"
-                  },
-                  "pauseIcon": {
-                   "iconType": "PAUSE"
-                  },
-                  "iconColor": 4294967295,
-                  "backgroundColor": 0,
-                  "activeBackgroundColor": 0,
-                  "loadingIndicatorColor": 14745645,
-                  "playingIcon": {
-                   "iconType": "VOLUME_UP"
-                  },
-                  "iconLoadingColor": 0,
-                  "activeScaleFactor": 1,
-                  "buttonSize": "MUSIC_PLAY_BUTTON_SIZE_SMALL",
-                  "rippleTarget": "MUSIC_PLAY_BUTTON_RIPPLE_TARGET_SELF",
-                  "accessibilityPlayData": {},
-                  "accessibilityPauseData": {}
-                 }
-                },
-                "contentPosition": "MUSIC_ITEM_THUMBNAIL_OVERLAY_CONTENT_POSITION_CENTERED",
-                "displayStyle": "MUSIC_ITEM_THUMBNAIL_OVERLAY_DISPLAY_STYLE_PERSISTENT"
-               }
-              },
-              "flexColumns": [
-               {
-                "musicResponsiveListItemFlexColumnRenderer": {
-                 "text": {
-                  "runs": [
-                   {
-                    "text": "Lex Fridman Podcast"
-                   }
-                  ]
-                 },
-                 "displayPriority": "MUSIC_RESPONSIVE_LIST_ITEM_COLUMN_DISPLAY_PRIORITY_HIGH"
-                }
-               },
-               {
-                "musicResponsiveListItemFlexColumnRenderer": {
-                 "text": {
-                  "runs": [
-                   {
-                    "text": "Zenvora Productions",
-                    "navigationEndpoint": {
-                     "browseEndpoint": {
-                      "browseId": "UCdF191WViIs5VDj49WbQZKg",
-                      "browseEndpointContextSupportedConfigs": {
-                       "browseEndpointContextMusicConfig": {
-                        "pageType": "MUSIC_PAGE_TYPE_USER_CHANNEL"
-                       }
-                      }
-                     }
-                    }
-                   }
-                  ]
-                 },
-                 "displayPriority": "MUSIC_RESPONSIVE_LIST_ITEM_COLUMN_DISPLAY_PRIORITY_HIGH"
-                }
-               }
-              ],
-              "menu": {
-               "menuRenderer": {
-                "items": [
-                 {
-                  "toggleMenuServiceItemRenderer": {
-                   "defaultText": {
-                    "runs": [
-                     {
-                      "text": "Save to library"
-                     }
-                    ]
-                   },
-                   "defaultIcon": {
-                    "iconType": "BOOKMARK_BORDER"
-                   },
-                   "defaultServiceEndpoint": {
-                    "modalEndpoint": {
-                     "modal": {
-                      "modalWithTitleAndButtonRenderer": {
-                       "title": {
-                        "runs": [
-                         {
-                          "text": "Save this for later"
-                         }
-                        ]
-                       },
-                       "content": {
-                        "runs": [
-                         {
-                          "text": "Save favorites to your library after signing in"
-                         }
-                        ]
-                       },
-                       "button": {
-                        "buttonRenderer": {
-                         "style": "STYLE_BLUE_TEXT",
-                         "isDisabled": false,
-                         "text": {
-                          "runs": [
-                           {
-                            "text": "Sign in"
-                           }
-                          ]
-                         },
-                         "navigationEndpoint": {
-                          "signInEndpoint": {
-                           "hack": true
-                          }
-                         }
-                        }
-                       }
-                      }
-                     }
-                    }
-                   },
-                   "toggledText": {
-                    "runs": [
-                     {
-                      "text": "Remove from library"
-                     }
-                    ]
-                   },
-                   "toggledIcon": {
-                    "iconType": "BOOKMARK"
-                   },
-                   "toggledServiceEndpoint": {
-                    "likeEndpoint": {
-                     "status": "INDIFFERENT",
-                     "target": {
-                      "playlistId": "PLddFGycaoQR4"
-                     }
-                    }
-                   },
-                   "isToggled": false
-                  }
-                 },
-                 {
-                  "menuNavigationItemRenderer": {
-                   "text": {
-                    "runs": [
-                     {
-                      "text": "Share"
-                     }
-                    ]
-                   },
-                   "icon": {
-                    "iconType": "SHARE"
-                   },
-                   "navigationEndpoint": {
-                    "shareEntityEndpoint": {
-                     "serializedShareEntity": "Eg1QTGRkRkd5Y2FvUVI0",
-                     "sharePanelType": "SHARE_PANEL_TYPE_UNIFIED_SHARE_PANEL"
-                    }
-                   }
-                  }
-                 }
-                ]
-               }
-              },
-              "flexColumnDisplayStyle": "MUSIC_RESPONSIVE_LIST_ITEM_FLEX_COLUMN_DISPLAY_STYLE_TWO_LINE_STACK",
-              "navigationEndpoint": {
-               "browseEndpoint": {
-                "browseId": "MPSPPLddFGycaoQR4",
-                "browseEndpointContextSupportedConfigs": {
-                 "browseEndpointContextMusicConfig": {
-                  "pageType": "MUSIC_PAGE_TYPE_PODCAST_SHOW_DETAIL_PAGE"
-                 }
-                }
-               }
-              },
-              "itemHeight": "MUSIC_RESPONSIVE_LIST_ITEM_HEIGHT_TALL"
-             }
-            }
-           ],
-           "shelfDivider": {
-            "musicShelfDividerRenderer": {
-             "hidden": true
-            }
-           }
-          }
-         }
-        ],
-        "header": {
-         "chipCloudRenderer": {
-          "chips": [
-           {
-            "chipCloudChipRenderer": {
-             "style": {
-              "styleType": "STYLE_SECONDARY"
-             },
-             "navigationEndpoint": {
-              "searchEndpoint": {
-               "query": "lex fridman"
-              }
-             },
-             "icon": {
-              "iconType": "CLOSE"
-             },
-             "isSelected": false,
-             "uniqueId": "Clear filters"
-            }
-           },
-           {
-            "chipCloudChipRenderer": {
-             "style": {
-              "styleType": "STYLE_DEFAULT"
-             },
-             "text": {
-              "runs": [
-               {
-                "text": "Featured playlists"
-               }
-              ]
-             },
-             "navigationEndpoint": {
-              "searchEndpoint": {
-               "query": "lex fridman",
-               "params": "EgeKAQQoADgBagwQDhAKEAMQBBAJEAU%3D"
-              }
-             },
-             "isSelected": false,
-             "uniqueId": "Featured playlists"
-            }
-           },
-           {
-            "chipCloudChipRenderer": {
-             "style": {
-              "styleType": "STYLE_DEFAULT"
-             },
-             "text": {
-              "runs": [
-               {
-                "text": "Community playlists"
-               }
-              ]
-             },
-             "navigationEndpoint": {
-              "searchEndpoint": {
-               "query": "lex fridman",
-               "params": "EgeKAQQoAEABagwQDhAKEAMQBBAJEAU%3D"
-              }
-             },
-             "isSelected": false,
-             "uniqueId": "Community playlists"
-            }
-           },
-           {
-            "chipCloudChipRenderer": {
-             "style": {
-              "styleType": "STYLE_DEFAULT"
-             },
-             "text": {
-              "runs": [
-               {
-                "text": "Songs"
-               }
-              ]
-             },
-             "navigationEndpoint": {
-              "searchEndpoint": {
-               "query": "lex fridman",
-               "params": "EgWKAQIIAWoMEA4QChADEAQQCRAF"
-              }
-             },
-             "isSelected": false,
-             "uniqueId": "Songs"
-            }
-           },
-           {
-            "chipCloudChipRenderer": {
-             "style": {
-              "styleType": "STYLE_DEFAULT"
-             },
-             "text": {
-              "runs": [
-               {
-                "text": "Videos"
-               }
-              ]
-             },
-             "navigationEndpoint": {
-              "searchEndpoint": {
-               "query": "lex fridman",
-               "params": "EgWKAQIQAWoMEA4QChADEAQQCRAF"
-              }
-             },
-             "isSelected": false,
-             "uniqueId": "Videos"
-            }
-           },
-           {
-            "chipCloudChipRenderer": {
-             "style": {
-              "styleType": "STYLE_DEFAULT"
-             },
-             "text": {
-              "runs": [
-               {
-                "text": "Albums"
-               }
-              ]
-             },
-             "navigationEndpoint": {
-              "searchEndpoint": {
-               "query": "lex fridman",
-               "params": "EgWKAQIYAWoMEA4QChADEAQQCRAF"
-              }
-             },
-             "isSelected": false,
-             "uniqueId": "Albums"
-            }
-           },
-           {
-            "chipCloudChipRenderer": {
-             "style": {
-              "styleType": "STYLE_DEFAULT"
-             },
-             "text": {
-              "runs": [
-               {
-                "text": "Artists"
-               }
-              ]
-             },
-             "navigationEndpoint": {
-              "searchEndpoint": {
-               "query": "lex fridman",
-               "params": "EgWKAQIgAWoMEA4QChADEAQQCRAF"
-              }
-             },
-             "isSelected": false,
-             "uniqueId": "Artists"
-            }
-           }
-          ],
-          "collapsedRowCount": 1,
-          "horizontalScrollable": true
-         }
-        }
-       }
-      },
-      "tabIdentifier": "music_search_catalog"
-     }
-    }
-   ]
-  }
- }
+	"contents": {
+		"tabbedSearchResultsRenderer": {
+			"tabs": [
+				{
+					"tabRenderer": {
+						"title": "YT Music",
+						"selected": true,
+						"content": {
+							"sectionListRenderer": {
+								"contents": [
+									{
+										"itemSectionRenderer": {
+											"contents": [
+												{
+													"messageRenderer": {
+														"button": {
+															"buttonRenderer": {
+																"style": "STYLE_TEXT",
+																"isDisabled": false,
+																"text": {
+																	"simpleText": "About these results"
+																},
+																"icon": {
+																	"iconType": "INFO_OUTLINE"
+																},
+																"navigationEndpoint": {
+																	"urlEndpoint": {
+																		"url": "https://www.youtube.com/howyoutubeworks/product-features/search/",
+																		"target": "TARGET_NEW_WINDOW"
+																	}
+																},
+																"iconPosition": "BUTTON_ICON_POSITION_TYPE_RIGHT_OF_TEXT"
+															}
+														},
+														"style": {
+															"value": "RENDER_STYLE_PANEL"
+														}
+													}
+												}
+											]
+										}
+									},
+									{
+										"musicShelfRenderer": {
+											"title": {
+												"runs": [
+													{
+														"text": "Podcasts"
+													}
+												]
+											},
+											"contents": [
+												{
+													"musicResponsiveListItemRenderer": {
+														"thumbnail": {
+															"musicThumbnailRenderer": {
+																"thumbnail": {
+																	"thumbnails": [
+																		{
+																			"url": "https://i.ytimg.com/pl_c/PLrAXtmErZgOdP_8GztsuKi9nrraNbKKp4/studio_square_thumbnail.jpg?sqp=CO_zt9cG-oaymwEICDwQPCAASFqi85f_AwYI15SpoAY&rs=AMzJL3n0v8SITkWLNkfKerpzehiU7QJj_A",
+																			"width": 60,
+																			"height": 60
+																		},
+																		{
+																			"url": "https://i.ytimg.com/pl_c/PLrAXtmErZgOdP_8GztsuKi9nrraNbKKp4/studio_square_thumbnail.jpg?sqp=CO_zt9cG-oaymwEICHgQeCAASFqi85f_AwYI15SpoAY&rs=AMzJL3lkU989NL5Qa6zrzLXJGvPeppApbg",
+																			"width": 120,
+																			"height": 120
+																		},
+																		{
+																			"url": "https://i.ytimg.com/pl_c/PLrAXtmErZgOdP_8GztsuKi9nrraNbKKp4/studio_square_thumbnail.jpg?sqp=CO_zt9cG-oaymwEKCOIBEOIBIABIWqLzl_8DBgjXlKmgBg&rs=AMzJL3ntzKe5W2CRB78MAK0XKPbFWgKthg",
+																			"width": 226,
+																			"height": 226
+																		},
+																		{
+																			"url": "https://i.ytimg.com/pl_c/PLrAXtmErZgOdP_8GztsuKi9nrraNbKKp4/studio_square_thumbnail.jpg?sqp=CO_zt9cG-oaymwEKCKAEEKAEIABIWqLzl_8DBgjXlKmgBg&rs=AMzJL3lJBB5zhpxaKBrCQmoT_MRMV9dFuw",
+																			"width": 544,
+																			"height": 544
+																		}
+																	]
+																},
+																"thumbnailCrop": "MUSIC_THUMBNAIL_CROP_UNSPECIFIED",
+																"thumbnailScale": "MUSIC_THUMBNAIL_SCALE_ASPECT_FIT"
+															}
+														},
+														"overlay": {
+															"musicItemThumbnailOverlayRenderer": {
+																"background": {
+																	"verticalGradient": {
+																		"gradientLayerColors": ["3422552064", "3422552064"]
+																	}
+																},
+																"content": {
+																	"musicPlayButtonRenderer": {
+																		"playNavigationEndpoint": {
+																			"watchPlaylistEndpoint": {
+																				"playlistId": "PLrAXtmErZgOdP_8GztsuKi9nrraNbKKp4"
+																			}
+																		},
+																		"playIcon": {
+																			"iconType": "PLAY_ARROW"
+																		},
+																		"pauseIcon": {
+																			"iconType": "PAUSE"
+																		},
+																		"iconColor": 4294967295,
+																		"backgroundColor": 0,
+																		"activeBackgroundColor": 0,
+																		"loadingIndicatorColor": 14745645,
+																		"playingIcon": {
+																			"iconType": "VOLUME_UP"
+																		},
+																		"iconLoadingColor": 0,
+																		"activeScaleFactor": 1,
+																		"buttonSize": "MUSIC_PLAY_BUTTON_SIZE_SMALL",
+																		"rippleTarget": "MUSIC_PLAY_BUTTON_RIPPLE_TARGET_SELF",
+																		"accessibilityPlayData": {},
+																		"accessibilityPauseData": {}
+																	}
+																},
+																"contentPosition": "MUSIC_ITEM_THUMBNAIL_OVERLAY_CONTENT_POSITION_CENTERED",
+																"displayStyle": "MUSIC_ITEM_THUMBNAIL_OVERLAY_DISPLAY_STYLE_PERSISTENT"
+															}
+														},
+														"flexColumns": [
+															{
+																"musicResponsiveListItemFlexColumnRenderer": {
+																	"text": {
+																		"runs": [
+																			{
+																				"text": "Lex Fridman Podcast"
+																			}
+																		]
+																	},
+																	"displayPriority": "MUSIC_RESPONSIVE_LIST_ITEM_COLUMN_DISPLAY_PRIORITY_HIGH"
+																}
+															},
+															{
+																"musicResponsiveListItemFlexColumnRenderer": {
+																	"text": {
+																		"runs": [
+																			{
+																				"text": "Lex Fridman",
+																				"navigationEndpoint": {
+																					"browseEndpoint": {
+																						"browseId": "UCSHZKyawb77ixDdsGog4iWA",
+																						"browseEndpointContextSupportedConfigs": {
+																							"browseEndpointContextMusicConfig": {
+																								"pageType": "MUSIC_PAGE_TYPE_USER_CHANNEL"
+																							}
+																						}
+																					}
+																				}
+																			}
+																		]
+																	},
+																	"displayPriority": "MUSIC_RESPONSIVE_LIST_ITEM_COLUMN_DISPLAY_PRIORITY_HIGH"
+																}
+															}
+														],
+														"menu": {
+															"menuRenderer": {
+																"items": [
+																	{
+																		"toggleMenuServiceItemRenderer": {
+																			"defaultText": {
+																				"runs": [
+																					{
+																						"text": "Save to library"
+																					}
+																				]
+																			},
+																			"defaultIcon": {
+																				"iconType": "BOOKMARK_BORDER"
+																			},
+																			"defaultServiceEndpoint": {
+																				"modalEndpoint": {
+																					"modal": {
+																						"modalWithTitleAndButtonRenderer": {
+																							"title": {
+																								"runs": [
+																									{
+																										"text": "Save this for later"
+																									}
+																								]
+																							},
+																							"content": {
+																								"runs": [
+																									{
+																										"text": "Save favorites to your library after signing in"
+																									}
+																								]
+																							},
+																							"button": {
+																								"buttonRenderer": {
+																									"style": "STYLE_BLUE_TEXT",
+																									"isDisabled": false,
+																									"text": {
+																										"runs": [
+																											{
+																												"text": "Sign in"
+																											}
+																										]
+																									},
+																									"navigationEndpoint": {
+																										"signInEndpoint": {
+																											"hack": true
+																										}
+																									}
+																								}
+																							}
+																						}
+																					}
+																				}
+																			},
+																			"toggledText": {
+																				"runs": [
+																					{
+																						"text": "Remove from library"
+																					}
+																				]
+																			},
+																			"toggledIcon": {
+																				"iconType": "BOOKMARK"
+																			},
+																			"toggledServiceEndpoint": {
+																				"likeEndpoint": {
+																					"status": "INDIFFERENT",
+																					"target": {
+																						"playlistId": "PLrAXtmErZgOdP_8GztsuKi9nrraNbKKp4"
+																					}
+																				}
+																			},
+																			"isToggled": false
+																		}
+																	},
+																	{
+																		"menuNavigationItemRenderer": {
+																			"text": {
+																				"runs": [
+																					{
+																						"text": "Share"
+																					}
+																				]
+																			},
+																			"icon": {
+																				"iconType": "SHARE"
+																			},
+																			"navigationEndpoint": {
+																				"shareEntityEndpoint": {
+																					"serializedShareEntity": "EiJQTHJBWHRtRXJaZ09kUF84R3p0c3VLaTlucnJhTmJLS3A0",
+																					"sharePanelType": "SHARE_PANEL_TYPE_UNIFIED_SHARE_PANEL"
+																				}
+																			}
+																		}
+																	}
+																]
+															}
+														},
+														"flexColumnDisplayStyle": "MUSIC_RESPONSIVE_LIST_ITEM_FLEX_COLUMN_DISPLAY_STYLE_TWO_LINE_STACK",
+														"navigationEndpoint": {
+															"browseEndpoint": {
+																"browseId": "MPSPPLrAXtmErZgOdP_8GztsuKi9nrraNbKKp4",
+																"browseEndpointContextSupportedConfigs": {
+																	"browseEndpointContextMusicConfig": {
+																		"pageType": "MUSIC_PAGE_TYPE_PODCAST_SHOW_DETAIL_PAGE"
+																	}
+																}
+															}
+														},
+														"itemHeight": "MUSIC_RESPONSIVE_LIST_ITEM_HEIGHT_TALL"
+													}
+												},
+												{
+													"musicResponsiveListItemRenderer": {
+														"thumbnail": {
+															"musicThumbnailRenderer": {
+																"thumbnail": {
+																	"thumbnails": [
+																		{
+																			"url": "https://yt3.googleusercontent.com/U5sXxjpfA9jY4-mLsHknDrkEXloEuHoG-aFHtZE0miow_1b32WMutliXFhhF8CpzlIc4Qly6Bw=w60-c-h60-k-c0x00ffffff-no-l90-rj",
+																			"width": 60,
+																			"height": 60
+																		},
+																		{
+																			"url": "https://yt3.googleusercontent.com/U5sXxjpfA9jY4-mLsHknDrkEXloEuHoG-aFHtZE0miow_1b32WMutliXFhhF8CpzlIc4Qly6Bw=w120-c-h120-k-c0x00ffffff-no-l90-rj",
+																			"width": 120,
+																			"height": 120
+																		},
+																		{
+																			"url": "https://yt3.googleusercontent.com/U5sXxjpfA9jY4-mLsHknDrkEXloEuHoG-aFHtZE0miow_1b32WMutliXFhhF8CpzlIc4Qly6Bw=w226-c-h226-k-c0x00ffffff-no-l90-rj",
+																			"width": 226,
+																			"height": 226
+																		},
+																		{
+																			"url": "https://yt3.googleusercontent.com/U5sXxjpfA9jY4-mLsHknDrkEXloEuHoG-aFHtZE0miow_1b32WMutliXFhhF8CpzlIc4Qly6Bw=w544-c-h544-k-c0x00ffffff-no-l90-rj",
+																			"width": 544,
+																			"height": 544
+																		}
+																	]
+																},
+																"thumbnailCrop": "MUSIC_THUMBNAIL_CROP_UNSPECIFIED",
+																"thumbnailScale": "MUSIC_THUMBNAIL_SCALE_ASPECT_FIT"
+															}
+														},
+														"overlay": {
+															"musicItemThumbnailOverlayRenderer": {
+																"background": {
+																	"verticalGradient": {
+																		"gradientLayerColors": ["3422552064", "3422552064"]
+																	}
+																},
+																"content": {
+																	"musicPlayButtonRenderer": {
+																		"playNavigationEndpoint": {
+																			"watchPlaylistEndpoint": {
+																				"playlistId": "PLtvziyWU7Qk3pDNUlyWuPDGAGp0hOeaUN"
+																			}
+																		},
+																		"playIcon": {
+																			"iconType": "PLAY_ARROW"
+																		},
+																		"pauseIcon": {
+																			"iconType": "PAUSE"
+																		},
+																		"iconColor": 4294967295,
+																		"backgroundColor": 0,
+																		"activeBackgroundColor": 0,
+																		"loadingIndicatorColor": 14745645,
+																		"playingIcon": {
+																			"iconType": "VOLUME_UP"
+																		},
+																		"iconLoadingColor": 0,
+																		"activeScaleFactor": 1,
+																		"buttonSize": "MUSIC_PLAY_BUTTON_SIZE_SMALL",
+																		"rippleTarget": "MUSIC_PLAY_BUTTON_RIPPLE_TARGET_SELF",
+																		"accessibilityPlayData": {},
+																		"accessibilityPauseData": {}
+																	}
+																},
+																"contentPosition": "MUSIC_ITEM_THUMBNAIL_OVERLAY_CONTENT_POSITION_CENTERED",
+																"displayStyle": "MUSIC_ITEM_THUMBNAIL_OVERLAY_DISPLAY_STYLE_PERSISTENT"
+															}
+														},
+														"flexColumns": [
+															{
+																"musicResponsiveListItemFlexColumnRenderer": {
+																	"text": {
+																		"runs": [
+																			{
+																				"text": "Pavel Durov CEO of Telegram Podcast With Lex Fridman"
+																			}
+																		]
+																	},
+																	"displayPriority": "MUSIC_RESPONSIVE_LIST_ITEM_COLUMN_DISPLAY_PRIORITY_HIGH"
+																}
+															},
+															{
+																"musicResponsiveListItemFlexColumnRenderer": {
+																	"text": {
+																		"runs": [
+																			{
+																				"text": "David Yee’s Channel",
+																				"navigationEndpoint": {
+																					"browseEndpoint": {
+																						"browseId": "UCl8ASfWsZyqHa9SSRgE0dGg",
+																						"browseEndpointContextSupportedConfigs": {
+																							"browseEndpointContextMusicConfig": {
+																								"pageType": "MUSIC_PAGE_TYPE_USER_CHANNEL"
+																							}
+																						}
+																					}
+																				}
+																			}
+																		]
+																	},
+																	"displayPriority": "MUSIC_RESPONSIVE_LIST_ITEM_COLUMN_DISPLAY_PRIORITY_HIGH"
+																}
+															}
+														],
+														"menu": {
+															"menuRenderer": {
+																"items": [
+																	{
+																		"toggleMenuServiceItemRenderer": {
+																			"defaultText": {
+																				"runs": [
+																					{
+																						"text": "Save to library"
+																					}
+																				]
+																			},
+																			"defaultIcon": {
+																				"iconType": "BOOKMARK_BORDER"
+																			},
+																			"defaultServiceEndpoint": {
+																				"modalEndpoint": {
+																					"modal": {
+																						"modalWithTitleAndButtonRenderer": {
+																							"title": {
+																								"runs": [
+																									{
+																										"text": "Save this for later"
+																									}
+																								]
+																							},
+																							"content": {
+																								"runs": [
+																									{
+																										"text": "Save favorites to your library after signing in"
+																									}
+																								]
+																							},
+																							"button": {
+																								"buttonRenderer": {
+																									"style": "STYLE_BLUE_TEXT",
+																									"isDisabled": false,
+																									"text": {
+																										"runs": [
+																											{
+																												"text": "Sign in"
+																											}
+																										]
+																									},
+																									"navigationEndpoint": {
+																										"signInEndpoint": {
+																											"hack": true
+																										}
+																									}
+																								}
+																							}
+																						}
+																					}
+																				}
+																			},
+																			"toggledText": {
+																				"runs": [
+																					{
+																						"text": "Remove from library"
+																					}
+																				]
+																			},
+																			"toggledIcon": {
+																				"iconType": "BOOKMARK"
+																			},
+																			"toggledServiceEndpoint": {
+																				"likeEndpoint": {
+																					"status": "INDIFFERENT",
+																					"target": {
+																						"playlistId": "PLtvziyWU7Qk3pDNUlyWuPDGAGp0hOeaUN"
+																					}
+																				}
+																			},
+																			"isToggled": false
+																		}
+																	},
+																	{
+																		"menuNavigationItemRenderer": {
+																			"text": {
+																				"runs": [
+																					{
+																						"text": "Share"
+																					}
+																				]
+																			},
+																			"icon": {
+																				"iconType": "SHARE"
+																			},
+																			"navigationEndpoint": {
+																				"shareEntityEndpoint": {
+																					"serializedShareEntity": "EiJQTHR2eml5V1U3UWszcEROVWx5V3VQREdBR3AwaE9lYVVO",
+																					"sharePanelType": "SHARE_PANEL_TYPE_UNIFIED_SHARE_PANEL"
+																				}
+																			}
+																		}
+																	}
+																]
+															}
+														},
+														"flexColumnDisplayStyle": "MUSIC_RESPONSIVE_LIST_ITEM_FLEX_COLUMN_DISPLAY_STYLE_TWO_LINE_STACK",
+														"navigationEndpoint": {
+															"browseEndpoint": {
+																"browseId": "MPSPPLtvziyWU7Qk3pDNUlyWuPDGAGp0hOeaUN",
+																"browseEndpointContextSupportedConfigs": {
+																	"browseEndpointContextMusicConfig": {
+																		"pageType": "MUSIC_PAGE_TYPE_PODCAST_SHOW_DETAIL_PAGE"
+																	}
+																}
+															}
+														},
+														"itemHeight": "MUSIC_RESPONSIVE_LIST_ITEM_HEIGHT_TALL"
+													}
+												},
+												{
+													"musicResponsiveListItemRenderer": {
+														"thumbnail": {
+															"musicThumbnailRenderer": {
+																"thumbnail": {
+																	"thumbnails": [
+																		{
+																			"url": "https://i.ytimg.com/podcasts_artwork/PLddFGycaoQR4/rss_feed_ingested.jpg?sqp=CO_zt9cG-oaymwEICDwQPCAASFo&rs=AMzJL3nYvP761UEmhbKjFg1D3bRjjxZqiA",
+																			"width": 60,
+																			"height": 60
+																		},
+																		{
+																			"url": "https://i.ytimg.com/podcasts_artwork/PLddFGycaoQR4/rss_feed_ingested.jpg?sqp=CO_zt9cG-oaymwEICHgQeCAASFo&rs=AMzJL3n9e8r2aV1xiayDpXkzy6jCse2TMw",
+																			"width": 120,
+																			"height": 120
+																		},
+																		{
+																			"url": "https://i.ytimg.com/podcasts_artwork/PLddFGycaoQR4/rss_feed_ingested.jpg?sqp=CO_zt9cG-oaymwEKCOIBEOIBIABIWg&rs=AMzJL3no_UW2F3bAwNjWzBCgNoNIn4WQTQ",
+																			"width": 226,
+																			"height": 226
+																		},
+																		{
+																			"url": "https://i.ytimg.com/podcasts_artwork/PLddFGycaoQR4/rss_feed_ingested.jpg?sqp=CO_zt9cG-oaymwEKCKAEEKAEIABIWg&rs=AMzJL3leE5lrknSFb3GEq58CDEOm5A3T_Q",
+																			"width": 544,
+																			"height": 544
+																		}
+																	]
+																},
+																"thumbnailCrop": "MUSIC_THUMBNAIL_CROP_UNSPECIFIED",
+																"thumbnailScale": "MUSIC_THUMBNAIL_SCALE_ASPECT_FIT"
+															}
+														},
+														"overlay": {
+															"musicItemThumbnailOverlayRenderer": {
+																"background": {
+																	"verticalGradient": {
+																		"gradientLayerColors": ["3422552064", "3422552064"]
+																	}
+																},
+																"content": {
+																	"musicPlayButtonRenderer": {
+																		"playNavigationEndpoint": {
+																			"watchPlaylistEndpoint": {
+																				"playlistId": "PLddFGycaoQR4"
+																			}
+																		},
+																		"playIcon": {
+																			"iconType": "PLAY_ARROW"
+																		},
+																		"pauseIcon": {
+																			"iconType": "PAUSE"
+																		},
+																		"iconColor": 4294967295,
+																		"backgroundColor": 0,
+																		"activeBackgroundColor": 0,
+																		"loadingIndicatorColor": 14745645,
+																		"playingIcon": {
+																			"iconType": "VOLUME_UP"
+																		},
+																		"iconLoadingColor": 0,
+																		"activeScaleFactor": 1,
+																		"buttonSize": "MUSIC_PLAY_BUTTON_SIZE_SMALL",
+																		"rippleTarget": "MUSIC_PLAY_BUTTON_RIPPLE_TARGET_SELF",
+																		"accessibilityPlayData": {},
+																		"accessibilityPauseData": {}
+																	}
+																},
+																"contentPosition": "MUSIC_ITEM_THUMBNAIL_OVERLAY_CONTENT_POSITION_CENTERED",
+																"displayStyle": "MUSIC_ITEM_THUMBNAIL_OVERLAY_DISPLAY_STYLE_PERSISTENT"
+															}
+														},
+														"flexColumns": [
+															{
+																"musicResponsiveListItemFlexColumnRenderer": {
+																	"text": {
+																		"runs": [
+																			{
+																				"text": "Lex Fridman Podcast"
+																			}
+																		]
+																	},
+																	"displayPriority": "MUSIC_RESPONSIVE_LIST_ITEM_COLUMN_DISPLAY_PRIORITY_HIGH"
+																}
+															},
+															{
+																"musicResponsiveListItemFlexColumnRenderer": {
+																	"text": {
+																		"runs": [
+																			{
+																				"text": "Zenvora Productions",
+																				"navigationEndpoint": {
+																					"browseEndpoint": {
+																						"browseId": "UCdF191WViIs5VDj49WbQZKg",
+																						"browseEndpointContextSupportedConfigs": {
+																							"browseEndpointContextMusicConfig": {
+																								"pageType": "MUSIC_PAGE_TYPE_USER_CHANNEL"
+																							}
+																						}
+																					}
+																				}
+																			}
+																		]
+																	},
+																	"displayPriority": "MUSIC_RESPONSIVE_LIST_ITEM_COLUMN_DISPLAY_PRIORITY_HIGH"
+																}
+															}
+														],
+														"menu": {
+															"menuRenderer": {
+																"items": [
+																	{
+																		"toggleMenuServiceItemRenderer": {
+																			"defaultText": {
+																				"runs": [
+																					{
+																						"text": "Save to library"
+																					}
+																				]
+																			},
+																			"defaultIcon": {
+																				"iconType": "BOOKMARK_BORDER"
+																			},
+																			"defaultServiceEndpoint": {
+																				"modalEndpoint": {
+																					"modal": {
+																						"modalWithTitleAndButtonRenderer": {
+																							"title": {
+																								"runs": [
+																									{
+																										"text": "Save this for later"
+																									}
+																								]
+																							},
+																							"content": {
+																								"runs": [
+																									{
+																										"text": "Save favorites to your library after signing in"
+																									}
+																								]
+																							},
+																							"button": {
+																								"buttonRenderer": {
+																									"style": "STYLE_BLUE_TEXT",
+																									"isDisabled": false,
+																									"text": {
+																										"runs": [
+																											{
+																												"text": "Sign in"
+																											}
+																										]
+																									},
+																									"navigationEndpoint": {
+																										"signInEndpoint": {
+																											"hack": true
+																										}
+																									}
+																								}
+																							}
+																						}
+																					}
+																				}
+																			},
+																			"toggledText": {
+																				"runs": [
+																					{
+																						"text": "Remove from library"
+																					}
+																				]
+																			},
+																			"toggledIcon": {
+																				"iconType": "BOOKMARK"
+																			},
+																			"toggledServiceEndpoint": {
+																				"likeEndpoint": {
+																					"status": "INDIFFERENT",
+																					"target": {
+																						"playlistId": "PLddFGycaoQR4"
+																					}
+																				}
+																			},
+																			"isToggled": false
+																		}
+																	},
+																	{
+																		"menuNavigationItemRenderer": {
+																			"text": {
+																				"runs": [
+																					{
+																						"text": "Share"
+																					}
+																				]
+																			},
+																			"icon": {
+																				"iconType": "SHARE"
+																			},
+																			"navigationEndpoint": {
+																				"shareEntityEndpoint": {
+																					"serializedShareEntity": "Eg1QTGRkRkd5Y2FvUVI0",
+																					"sharePanelType": "SHARE_PANEL_TYPE_UNIFIED_SHARE_PANEL"
+																				}
+																			}
+																		}
+																	}
+																]
+															}
+														},
+														"flexColumnDisplayStyle": "MUSIC_RESPONSIVE_LIST_ITEM_FLEX_COLUMN_DISPLAY_STYLE_TWO_LINE_STACK",
+														"navigationEndpoint": {
+															"browseEndpoint": {
+																"browseId": "MPSPPLddFGycaoQR4",
+																"browseEndpointContextSupportedConfigs": {
+																	"browseEndpointContextMusicConfig": {
+																		"pageType": "MUSIC_PAGE_TYPE_PODCAST_SHOW_DETAIL_PAGE"
+																	}
+																}
+															}
+														},
+														"itemHeight": "MUSIC_RESPONSIVE_LIST_ITEM_HEIGHT_TALL"
+													}
+												}
+											],
+											"shelfDivider": {
+												"musicShelfDividerRenderer": {
+													"hidden": true
+												}
+											}
+										}
+									}
+								],
+								"header": {
+									"chipCloudRenderer": {
+										"chips": [
+											{
+												"chipCloudChipRenderer": {
+													"style": {
+														"styleType": "STYLE_SECONDARY"
+													},
+													"navigationEndpoint": {
+														"searchEndpoint": {
+															"query": "lex fridman"
+														}
+													},
+													"icon": {
+														"iconType": "CLOSE"
+													},
+													"isSelected": false,
+													"uniqueId": "Clear filters"
+												}
+											},
+											{
+												"chipCloudChipRenderer": {
+													"style": {
+														"styleType": "STYLE_DEFAULT"
+													},
+													"text": {
+														"runs": [
+															{
+																"text": "Featured playlists"
+															}
+														]
+													},
+													"navigationEndpoint": {
+														"searchEndpoint": {
+															"query": "lex fridman",
+															"params": "EgeKAQQoADgBagwQDhAKEAMQBBAJEAU%3D"
+														}
+													},
+													"isSelected": false,
+													"uniqueId": "Featured playlists"
+												}
+											},
+											{
+												"chipCloudChipRenderer": {
+													"style": {
+														"styleType": "STYLE_DEFAULT"
+													},
+													"text": {
+														"runs": [
+															{
+																"text": "Community playlists"
+															}
+														]
+													},
+													"navigationEndpoint": {
+														"searchEndpoint": {
+															"query": "lex fridman",
+															"params": "EgeKAQQoAEABagwQDhAKEAMQBBAJEAU%3D"
+														}
+													},
+													"isSelected": false,
+													"uniqueId": "Community playlists"
+												}
+											},
+											{
+												"chipCloudChipRenderer": {
+													"style": {
+														"styleType": "STYLE_DEFAULT"
+													},
+													"text": {
+														"runs": [
+															{
+																"text": "Songs"
+															}
+														]
+													},
+													"navigationEndpoint": {
+														"searchEndpoint": {
+															"query": "lex fridman",
+															"params": "EgWKAQIIAWoMEA4QChADEAQQCRAF"
+														}
+													},
+													"isSelected": false,
+													"uniqueId": "Songs"
+												}
+											},
+											{
+												"chipCloudChipRenderer": {
+													"style": {
+														"styleType": "STYLE_DEFAULT"
+													},
+													"text": {
+														"runs": [
+															{
+																"text": "Videos"
+															}
+														]
+													},
+													"navigationEndpoint": {
+														"searchEndpoint": {
+															"query": "lex fridman",
+															"params": "EgWKAQIQAWoMEA4QChADEAQQCRAF"
+														}
+													},
+													"isSelected": false,
+													"uniqueId": "Videos"
+												}
+											},
+											{
+												"chipCloudChipRenderer": {
+													"style": {
+														"styleType": "STYLE_DEFAULT"
+													},
+													"text": {
+														"runs": [
+															{
+																"text": "Albums"
+															}
+														]
+													},
+													"navigationEndpoint": {
+														"searchEndpoint": {
+															"query": "lex fridman",
+															"params": "EgWKAQIYAWoMEA4QChADEAQQCRAF"
+														}
+													},
+													"isSelected": false,
+													"uniqueId": "Albums"
+												}
+											},
+											{
+												"chipCloudChipRenderer": {
+													"style": {
+														"styleType": "STYLE_DEFAULT"
+													},
+													"text": {
+														"runs": [
+															{
+																"text": "Artists"
+															}
+														]
+													},
+													"navigationEndpoint": {
+														"searchEndpoint": {
+															"query": "lex fridman",
+															"params": "EgWKAQIgAWoMEA4QChADEAQQCRAF"
+														}
+													},
+													"isSelected": false,
+													"uniqueId": "Artists"
+												}
+											}
+										],
+										"collapsedRowCount": 1,
+										"horizontalScrollable": true
+									}
+								}
+							}
+						},
+						"tabIdentifier": "music_search_catalog"
+					}
+				}
+			]
+		}
+	}
 }

@@ -58,6 +58,14 @@ fun RootTopBar(title: String, modifier: Modifier = Modifier, actions: @Composabl
     }
 }
 
+/** The magnifier in a root top bar's actions; opens search as a page. */
+@Composable
+fun SearchAction(onClick: () -> Unit) {
+    IconButton(onClick = onClick) {
+        Icon(DriftIcons.Search.outline, contentDescription = "Search")
+    }
+}
+
 /**
  * Compact 56dp top bar for detail pages: a back button and the page title, which flies in once
  * [showTitle] turns true (see [LazyListState.hasScrolledPast]).
@@ -116,6 +124,7 @@ fun SearchPill(
     onSearch: (String) -> Unit,
     modifier: Modifier = Modifier,
     placeholder: String = "Songs, albums, artists",
+    fieldModifier: Modifier = Modifier,
 ) {
     Row(
         modifier = modifier
@@ -145,7 +154,7 @@ fun SearchPill(
                 cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
                 keyboardActions = KeyboardActions(onSearch = { onSearch(value) }),
-                modifier = Modifier.fillMaxWidth(),
+                modifier = fieldModifier.fillMaxWidth(),
             )
         }
         if (value.isNotEmpty()) {
