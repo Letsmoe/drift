@@ -6,7 +6,6 @@ import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -78,7 +77,7 @@ fun AppShell() {
         SharedTransitionLayout {
             Box(modifier = Modifier.fillMaxSize().background(Canvas)) {
                 AppNavHost(navController)
-                Column(
+                BottomDock(
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
                         .onSizeChanged { size -> overlayHeight = with(density) { size.height.toDp() } },
