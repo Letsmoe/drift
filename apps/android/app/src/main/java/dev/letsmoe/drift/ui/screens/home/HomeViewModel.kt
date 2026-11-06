@@ -22,20 +22,16 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 
-enum class HomeFilter(val label: String) {
-    All("All"),
-    Music("Music"),
-    Podcasts("Podcasts"),
-}
-
 private const val RECOMMENDATION_ROW_LIMIT = 6
 private const val ITEMS_PER_RECOMMENDATION_ROW = 12
 private const val FEED_SIZE = 20
+private const val RECENT_TRACK_LIMIT = 6
 const val HOME_SURFACE = "home"
 
 /**
- * Home: the "Made for you" feed and reason rows from the recommendation engine, plus YouTube's
- * home shelves with infinite continuation. Each part loads and fails on its own.
+ * Home: recently played songs, the "Made for you" feed and reason rows from the recommendation
+ * engine, plus YouTube's home shelves with infinite continuation. Each part loads and fails on its
+ * own. Podcasts have their own tab, so podcast shelves are left out here.
  */
 class HomeViewModel(
     private val core: DriftCore,
@@ -53,8 +49,8 @@ class HomeViewModel(
     private val mutableIsRefreshing = MutableStateFlow(false)
     val isRefreshing: StateFlow<Boolean> = mutableIsRefreshing.asStateFlow()
 
-    private val mutableFilter = MutableStateFlow(HomeFilter.All)
-    val filter: StateFlow<HomeFilter> = mutableFilter.asStateFlow()
+    private val mutableRecentTracks = MutableStateFlow<List<Track>>(emptyList())
+    val recentTracks: StateFlow<List<Track>> = mutableRecentTracks.asStateFlow()
 
     /** Home shelves; later pages are fetched as the user scrolls. */
     val shelfPager = ContinuationPager<Shelf>(viewModelScope) { token -> fetchMoreShelves(token) }
@@ -63,10 +59,6 @@ class HomeViewModel(
 
     init {
         loadEverything(refreshFeed = false)
-    }
-
-    fun selectFilter(selected: HomeFilter) {
-        mutableFilter.value = selected
     }
 
     /** Pull to refresh: re-ranks the feed and reloads rows and shelves, keeping the old content until the new arrives. */
@@ -111,10 +103,19 @@ class HomeViewModel(
             viewModelScope.launch { loadFeed(refreshFeed) },
             viewModelScope.launch { loadRows() },
             viewModelScope.launch { loadShelves() },
+            viewModelScope.launch { loadRecentTracks() },
         )
 
     private suspend fun loadFeed(refresh: Boolean) {
         mutableFeed.value = attempt { core.recommendedFeed(FEED_SIZE, 0, refresh) }
+    }
+
+    // Recent plays are a shortcut; Home works without them.
+    private suspend fun loadRecentTracks() {
+        val result = attempt { core.recentTracks(RECENT_TRACK_LIMIT) }
+        if (result is LoadState.Content) {
+            mutableRecentTracks.value = result.data
+        }
     }
 
     private suspend fun loadRows() {
@@ -164,4 +165,32 @@ fun Shelf.songTracks(): List<Track>? {
         return null
     }
     return tracks
+}
+
+private const val MINIMUM_SONGS_PER_SHELF = 4
+
+/**
+ * YouTube's music shelves without the songs already shown above them ([shownVideoIds]) and
+ * without podcast shelves. A song shelf left with too few new songs is dropped, so Home never
+ * shows the same quick picks twice.
+ */
+fun List<Shelf>.forHome(shownVideoIds: Set<String>): List<Shelf> {
+    val shelves = mutableListOf<Shelf>()
+    val seenVideoIds = shownVideoIds.toMutableSet()
+    for (shelf in this) {
+        if (shelf.isPodcastShelf()) {
+            continue
+        }
+        if (shelf.songTracks() == null) {
+            shelves.add(shelf)
+            continue
+        }
+        val newItems = shelf.items.filter { item -> item.track != null && item.track.videoId !in seenVideoIds }
+        if (newItems.size < MINIMUM_SONGS_PER_SHELF) {
+            continue
+        }
+        seenVideoIds.addAll(newItems.mapNotNull { item -> item.track?.videoId })
+        shelves.add(shelf.copy(items = newItems))
+    }
+    return shelves
 }
