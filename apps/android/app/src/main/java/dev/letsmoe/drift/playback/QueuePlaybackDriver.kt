@@ -212,6 +212,27 @@ class QueuePlaybackDriver(
         }
     }
 
+    /**
+     * The crossfade moves on before the song ends: closes its play as completed and advances the
+     * queue, whose new current entry is then loaded like any other. Returns the new entry id, or
+     * null when the queue did not move to a different entry.
+     */
+    suspend fun advanceForCrossfade(): Long? {
+        val endingEntryId = core.queueState.value.currentEntry?.id
+        reportProgress(completed = true)
+        try {
+            val step = core.queueAdvance()
+            val newEntryId = step.state.currentEntry?.id
+            if (!step.moved || newEntryId == endingEntryId) {
+                return null
+            }
+            return newEntryId
+        } catch (error: Exception) {
+            fail(describe(error))
+            return null
+        }
+    }
+
     // Repeat one: the same entry plays again, as a new play.
     private fun restartCurrent(state: QueueState) {
         val entry = state.currentEntry
