@@ -39,6 +39,13 @@ func (core *Core) Search(query string) (string, error) {
 	return encode(results)
 }
 
+// SearchPodcasts returns podcast shows, then episodes, as music.SearchResults JSON. It is
+// not recorded in the search history, which feeds song recommendations.
+func (core *Core) SearchPodcasts(query string) (string, error) {
+	results, err := core.innertube.SearchPodcasts(core.ctx, query)
+	return encodeResult(results, err)
+}
+
 // recordSearch stores the query; a failure only costs history, so it is logged.
 func (core *Core) recordSearch(query string) {
 	if core.library == nil {
