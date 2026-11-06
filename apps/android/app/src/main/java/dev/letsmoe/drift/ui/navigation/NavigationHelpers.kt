@@ -25,6 +25,10 @@ fun NavController.openLikedSongs() {
     navigate(Routes.LikedSongs)
 }
 
+fun NavController.openImport() {
+    navigate(Routes.Import)
+}
+
 fun NavController.openLocalPlaylist(playlistId: String) {
     navigate(Routes.LocalPlaylist(playlistId))
 }
