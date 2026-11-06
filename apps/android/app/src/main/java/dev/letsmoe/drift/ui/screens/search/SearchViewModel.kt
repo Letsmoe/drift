@@ -6,6 +6,7 @@ import dev.letsmoe.drift.core.DriftCore
 import dev.letsmoe.drift.core.model.Item
 import dev.letsmoe.drift.core.model.Shelf
 import dev.letsmoe.drift.ui.describeError
+import dev.letsmoe.drift.ui.screens.home.isPodcastShelf
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -31,9 +32,10 @@ private const val SONGS_TITLE = "Songs"
 
 /**
  * Search: the field text, debounced suggestions, recent searches and the results of the last
- * submitted query. Lives with the navigation entry, so it all survives tab switches.
+ * submitted query. Lives with the navigation entry, so it all survives tab switches. With
+ * [podcasts] it finds shows and episodes and keeps no recent searches, which hold music queries.
  */
-class SearchViewModel(private val core: DriftCore) : ViewModel() {
+class SearchViewModel(private val core: DriftCore, val podcasts: Boolean) : ViewModel() {
     private val mutableQuery = MutableStateFlow("")
     val query: StateFlow<String> = mutableQuery.asStateFlow()
 
@@ -140,7 +142,7 @@ class SearchViewModel(private val core: DriftCore) : ViewModel() {
 
     private suspend fun runSearch(text: String) {
         try {
-            mutableState.value = SearchState.Done(core.search(text).shelves)
+            mutableState.value = SearchState.Done(searchShelves(text))
         } catch (cancellation: CancellationException) {
             throw cancellation
         } catch (error: Exception) {
@@ -148,7 +150,18 @@ class SearchViewModel(private val core: DriftCore) : ViewModel() {
         }
     }
 
+    // Music search leaves out the few podcasts YouTube mixes in; the Podcasts tab has its own search.
+    private suspend fun searchShelves(text: String): List<Shelf> {
+        if (podcasts) {
+            return core.searchPodcasts(text).shelves
+        }
+        return core.search(text).shelves.filterNot { shelf -> shelf.isPodcastShelf() }
+    }
+
     private fun loadRecentQueries() {
+        if (podcasts) {
+            return
+        }
         viewModelScope.launch {
             try {
                 mutableRecentQueries.value = core.recentSearches(RECENT_SEARCH_LIMIT)

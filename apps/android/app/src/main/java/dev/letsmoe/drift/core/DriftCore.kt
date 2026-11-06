@@ -81,6 +81,9 @@ class DriftCore(dataDirectory: String) {
 
     suspend fun search(query: String): SearchResults = call { DriftJson.decodeFromString(core.search(query)) }
 
+    suspend fun searchPodcasts(query: String): SearchResults =
+        call { DriftJson.decodeFromString(core.searchPodcasts(query)) }
+
     suspend fun searchSuggestions(query: String): List<String> =
         call { DriftJson.decodeFromString(core.searchSuggestions(query)) }
 

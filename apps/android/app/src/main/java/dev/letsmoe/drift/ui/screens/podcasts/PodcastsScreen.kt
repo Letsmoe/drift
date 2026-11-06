@@ -33,11 +33,13 @@ import dev.letsmoe.drift.ui.components.LoadingMoreFooter
 import dev.letsmoe.drift.ui.components.MediaCard
 import dev.letsmoe.drift.ui.components.OnNearEnd
 import dev.letsmoe.drift.ui.components.RootTopBar
+import dev.letsmoe.drift.ui.components.SearchAction
 import dev.letsmoe.drift.ui.components.SectionHeader
 import dev.letsmoe.drift.ui.components.ShelfRow
 import dev.letsmoe.drift.ui.components.Skeleton
 import dev.letsmoe.drift.ui.components.rememberItemOpener
 import dev.letsmoe.drift.ui.navigation.openPodcast
+import dev.letsmoe.drift.ui.navigation.openSearch
 import dev.letsmoe.drift.ui.screens.common.LoadState
 import dev.letsmoe.drift.ui.screens.podcast.EpisodeRow
 
@@ -54,10 +56,13 @@ fun PodcastsScreen(modifier: Modifier = Modifier) {
     val hasMoreShelves by viewModel.shelfPager.hasMore.collectAsStateWithLifecycle()
     val isLoadingMoreShelves by viewModel.shelfPager.isLoadingMore.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
+    val navController = LocalNavController.current
     listState.OnNearEnd(isEnabled = hasMoreShelves, onNearEnd = viewModel.shelfPager::loadMore)
 
     Column(modifier = modifier.fillMaxSize()) {
-        RootTopBar(title = "Podcasts")
+        RootTopBar(title = "Podcasts") {
+            SearchAction(onClick = { navController.openSearch(podcasts = true) })
+        }
         LazyColumn(
             state = listState,
             modifier = Modifier.fillMaxSize(),

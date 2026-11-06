@@ -42,7 +42,6 @@ import dev.letsmoe.drift.ui.icons.DriftIcons
 
 enum class Tab(val label: String, val icon: DriftIcon, val route: Any) {
     Home("Home", DriftIcons.Home, Routes.Home),
-    Search("Search", DriftIcons.Search, Routes.Search),
     Podcasts("Podcasts", DriftIcons.Podcast, Routes.Podcasts),
     Library("Library", DriftIcons.Library, Routes.Library),
 }
