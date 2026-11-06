@@ -11,12 +11,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import dev.letsmoe.drift.core.model.CollectionKind
 import dev.letsmoe.drift.core.model.Item
 import dev.letsmoe.drift.core.model.ItemKind
 import dev.letsmoe.drift.core.model.PlaylistPage
 import dev.letsmoe.drift.ui.LocalAppContainer
 import dev.letsmoe.drift.ui.appViewModel
 import dev.letsmoe.drift.ui.components.EnsureRatings
+import dev.letsmoe.drift.ui.components.CollectionDownloadButton
 import dev.letsmoe.drift.ui.components.CollectionMoreButton
 import dev.letsmoe.drift.ui.components.ExpandableText
 import dev.letsmoe.drift.ui.components.LoadingMoreFooter
@@ -74,6 +76,7 @@ private fun PlaylistContent(
             item {
                 DetailActionRow {
                     SaveButton(item = playlistItem)
+                    CollectionDownloadButton(kind = CollectionKind.Playlist, id = playlistId, title = page.title)
                     CollectionMoreButton(title = page.title, tracks = tracks)
                 }
             }

@@ -52,7 +52,7 @@ import kotlinx.coroutines.launch
 
 /**
  * The "more" sheet of a track, modeled on YouTube Music's: header with like toggle, then play
- * next, add to queue, save to playlist, radio, go to album / artist and (when
+ * next, add to queue, save to playlist, download, radio, go to album / artist and (when
  * [onRemoveFromPlaylist] is given) remove from playlist.
  *
  * [onOpenAlbum] and [onOpenArtist] default to navigating with the app's NavController; override
@@ -143,6 +143,7 @@ private fun TrackActionRows(
             dismiss()
         })
         ActionRow(DriftIcons.AddToPlaylist, "Save to playlist", { onSaveToPlaylist() })
+        DownloadActionRow(track = track, kind = kind, dismiss = dismiss)
         ActionRow(DriftIcons.Radio, "Start radio", {
             scope.launch { startRadio(container.core, container.playerController, track, context) }
             dismiss()
