@@ -36,4 +36,22 @@ fun formatSongCount(count: Int): String {
     return "$count songs"
 }
 
+private const val BYTES_PER_KILOBYTE = 1024L
+private const val BYTES_PER_MEGABYTE = BYTES_PER_KILOBYTE * 1024
+private const val BYTES_PER_GIGABYTE = BYTES_PER_MEGABYTE * 1024
+
+/** "512 B", "340 KB", "12.5 MB" or "1.25 GB". */
+fun formatBytes(bytes: Long): String {
+    if (bytes < BYTES_PER_KILOBYTE) {
+        return "$bytes B"
+    }
+    if (bytes < BYTES_PER_MEGABYTE) {
+        return "${bytes / BYTES_PER_KILOBYTE} KB"
+    }
+    if (bytes < BYTES_PER_GIGABYTE) {
+        return "%.1f MB".format(bytes.toDouble() / BYTES_PER_MEGABYTE)
+    }
+    return "%.2f GB".format(bytes.toDouble() / BYTES_PER_GIGABYTE)
+}
+
 fun describeError(error: Throwable): String = error.message ?: error.javaClass.simpleName

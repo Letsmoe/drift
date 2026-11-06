@@ -5,6 +5,7 @@ import dev.letsmoe.drift.core.model.CollectionKind
 import dev.letsmoe.drift.core.model.DownloadCollection
 import dev.letsmoe.drift.core.model.DownloadState
 import dev.letsmoe.drift.core.model.DownloadUpdate
+import dev.letsmoe.drift.ui.formatBytes
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -45,6 +46,14 @@ class DownloadsTest {
         val update = DriftJson.decodeFromString<DownloadUpdate>(json)
 
         assertEquals(DownloadState.None, update.status.state)
+    }
+
+    @Test
+    fun formatsStorageSizes() {
+        assertEquals("512 B", formatBytes(512))
+        assertEquals("340 KB", formatBytes(340L * 1024))
+        assertTrue(formatBytes(5L * 1024 * 1024).endsWith(" MB"))
+        assertTrue(formatBytes(3L * 1024 * 1024 * 1024).endsWith(" GB"))
     }
 
     @Test
