@@ -26,6 +26,8 @@ import com.adamglin.phosphoricons.fill.DotsThreeVertical as FillDotsthreevertica
 import com.adamglin.phosphoricons.regular.DotsThreeVertical as RegularDotsthreevertical
 import com.adamglin.phosphoricons.fill.Download as FillDownload
 import com.adamglin.phosphoricons.regular.Download as RegularDownload
+import com.adamglin.phosphoricons.fill.Gear as FillGear
+import com.adamglin.phosphoricons.regular.Gear as RegularGear
 import com.adamglin.phosphoricons.fill.Heart as FillHeart
 import com.adamglin.phosphoricons.regular.Heart as RegularHeart
 import com.adamglin.phosphoricons.fill.House as FillHouse
@@ -120,5 +122,6 @@ object DriftIcons {
     val Remove = DriftIcon(PhosphorIcons.Regular.RegularMinus, PhosphorIcons.Fill.FillMinus)
     val Edit = DriftIcon(PhosphorIcons.Regular.RegularPencilsimple, PhosphorIcons.Fill.FillPencilsimple)
     val Download = DriftIcon(PhosphorIcons.Regular.RegularDownload, PhosphorIcons.Fill.FillDownload)
+    val Settings = DriftIcon(PhosphorIcons.Regular.RegularGear, PhosphorIcons.Fill.FillGear)
     val Bookmark = DriftIcon(PhosphorIcons.Regular.RegularBookmarksimple, PhosphorIcons.Fill.FillBookmarksimple)
 }
