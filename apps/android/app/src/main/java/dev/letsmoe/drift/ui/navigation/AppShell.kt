@@ -35,6 +35,7 @@ import dev.letsmoe.drift.ui.player.NowPlayingOverlay
 import dev.letsmoe.drift.ui.player.rememberNowPlayingArtColors
 import dev.letsmoe.drift.ui.screens.album.AlbumScreen
 import dev.letsmoe.drift.ui.screens.artist.ArtistScreen
+import dev.letsmoe.drift.ui.screens.downloads.DownloadsScreen
 import dev.letsmoe.drift.ui.screens.home.HomeScreen
 import dev.letsmoe.drift.ui.screens.importing.ImportScreen
 import dev.letsmoe.drift.ui.screens.library.LibraryScreen
@@ -125,6 +126,7 @@ private fun tabOwning(destination: androidx.navigation.NavDestination): Tab? {
             Routes.LikedSongs::class,
             Routes.LocalPlaylist::class,
             Routes.Import::class,
+            Routes.Downloads::class,
             Routes.Settings::class,
         ),
     )
@@ -157,6 +159,7 @@ private fun AppNavHost(navController: androidx.navigation.NavHostController) {
         screen<Routes.Podcast> { entry -> PodcastScreen(podcastId = entry.toRoute<Routes.Podcast>().id) }
         screen<Routes.LikedSongs> { LikedSongsScreen() }
         screen<Routes.Import> { ImportScreen() }
+        screen<Routes.Downloads> { DownloadsScreen() }
         screen<Routes.Settings> { SettingsScreen() }
         screen<Routes.LocalPlaylist> { entry ->
             LocalPlaylistScreen(playlistId = entry.toRoute<Routes.LocalPlaylist>().id)

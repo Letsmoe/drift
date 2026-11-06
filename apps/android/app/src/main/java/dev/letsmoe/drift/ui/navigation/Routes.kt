@@ -39,5 +39,8 @@ object Routes {
     data class LocalPlaylist(val id: String)
 
     @Serializable
+    data object Downloads
+
+    @Serializable
     data object Settings
 }
