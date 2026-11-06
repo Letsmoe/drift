@@ -271,3 +271,5 @@ Rules:
 ## Tests
 
 Go tests live next to the code (`*_test.go`). InnerTube parsers are tested against trimmed real responses in `testdata/`; when YouTube changes a response shape, capture a fresh one, trim it to the fields the parser reads, and add a test before fixing the parser.
+
+Use Read/Write/Edit instead of sed/awk/python
