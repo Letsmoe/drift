@@ -50,8 +50,8 @@ private val TabHeight = 52.dp
 private val BarPadding = 6.dp
 
 /**
- * Floating pill tab bar (the Otter web app's bottom nav): inset 12dp from the sides and the
- * bottom, translucent, with a highlight pill that slides between tabs with a springy overshoot.
+ * The tabs at the bottom of the dock, with a highlight pill that slides between tabs with a
+ * springy overshoot. The dock around it (see [BottomDock]) draws the glass.
  */
 @Composable
 fun FloatingNavBar(
@@ -60,13 +60,7 @@ fun FloatingNavBar(
     modifier: Modifier = Modifier,
 ) {
     val tabs = Tab.entries
-    Box(
-        modifier = modifier
-            .navigationBarsPadding()
-            .padding(start = 12.dp, end = 12.dp, bottom = 12.dp)
-            .fillMaxWidth()
-            .glassSurface(),
-    ) {
+    Box(modifier = modifier.fillMaxWidth()) {
         BoxWithConstraints(modifier = Modifier.padding(BarPadding)) {
             val tabWidth = maxWidth / tabs.size
             val pillOffset by animateDpAsState(
@@ -133,5 +127,22 @@ private fun TabItem(tab: Tab, isSelected: Boolean, onClick: () -> Unit, modifier
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
         )
+    }
+}
+
+/**
+ * One floating glass surface at the bottom: the mini player on top when something plays, the
+ * tabs below, with no gap between them. Inset 12dp from the sides and the bottom.
+ */
+@Composable
+fun BottomDock(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
+    Column(
+        modifier = modifier
+            .navigationBarsPadding()
+            .padding(start = 12.dp, end = 12.dp, bottom = 12.dp)
+            .fillMaxWidth()
+            .glassSurface(),
+    ) {
+        content()
     }
 }

@@ -21,7 +21,8 @@ import kotlin.math.abs
 import kotlinx.coroutines.launch
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
@@ -51,7 +52,6 @@ import dev.letsmoe.drift.core.model.Track
 import dev.letsmoe.drift.player.PlayerController
 import dev.letsmoe.drift.ui.LocalAppContainer
 import dev.letsmoe.drift.ui.components.Cover
-import dev.letsmoe.drift.ui.components.glassSurface
 import dev.letsmoe.drift.ui.icons.DriftIcons
 import dev.letsmoe.drift.ui.theme.DriftTheme
 
@@ -60,9 +60,10 @@ private const val SWIPE_VELOCITY_THRESHOLD = 900f
 private const val DRAG_RESISTANCE = 3f
 
 /**
- * Floating card above the tab bar: cover, title and artist, play/pause, next and a 2dp progress
- * line. Swipe sideways for next/previous, tap to open Now Playing. Hidden when the queue is empty
- * or while [isVisible] is false (Now Playing is open and owns the shared cover).
+ * The top of the bottom dock, above the tabs: cover, title and artist, play/pause, next and a
+ * 2dp progress line that also divides it from the tabs. Swipe sideways for next/previous, tap to
+ * open Now Playing. Collapsed when the queue is empty or while [isVisible] is false (Now Playing
+ * is open and owns the shared cover).
  */
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
@@ -79,8 +80,8 @@ fun MiniPlayer(
     AnimatedVisibility(
         visible = track != null && isVisible,
         modifier = modifier,
-        enter = slideInVertically { fullHeight -> fullHeight } + fadeIn(),
-        exit = fadeOut(tween(durationMillis = 150)),
+        enter = expandVertically(expandFrom = Alignment.Top) + fadeIn(),
+        exit = shrinkVertically(shrinkTowards = Alignment.Top) + fadeOut(tween(durationMillis = 150)),
     ) {
         if (shownTrack != null) {
             val sharedCover = rememberSharedCoverModifier(sharedTransitionScope, this)
@@ -113,10 +114,8 @@ private fun MiniPlayerCard(track: Track, player: PlayerController, sharedCover: 
 
     Box(
         modifier = Modifier
-            .padding(start = 12.dp, end = 12.dp, bottom = 8.dp)
             .graphicsLayer { translationX = dragOffset.value / DRAG_RESISTANCE }
             .fillMaxWidth()
-            .glassSurface()
             .draggable(
                 state = dragState,
                 orientation = Orientation.Horizontal,
@@ -128,7 +127,7 @@ private fun MiniPlayerCard(track: Track, player: PlayerController, sharedCover: 
     ) {
         Row(
             modifier = Modifier
-                .padding(start = 8.dp, end = 4.dp, top = 8.dp, bottom = 10.dp),
+                .padding(start = 12.dp, end = 8.dp, top = 10.dp, bottom = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(10.dp),
         ) {
