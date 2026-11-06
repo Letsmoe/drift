@@ -37,6 +37,10 @@ fun NavController.openLocalPlaylist(playlistId: String) {
     navigate(Routes.LocalPlaylist(playlistId))
 }
 
+fun NavController.openSettings() {
+    navigate(Routes.Settings)
+}
+
 /**
  * Opens the page behind a shelf item. Songs and episodes have no page: they are handed to
  * [onPlay] instead (typically `playerController.playTracks(...)`).
