@@ -1,5 +1,7 @@
 package dev.letsmoe.drift.ui.screens.home
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,33 +12,41 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.letsmoe.drift.core.model.RecommendedItem
 import dev.letsmoe.drift.core.model.RecommendedRow
 import dev.letsmoe.drift.core.model.Shelf
+import dev.letsmoe.drift.core.model.Track
 import dev.letsmoe.drift.ui.LocalAppContainer
 import dev.letsmoe.drift.ui.LocalBottomOverlayPadding
 import dev.letsmoe.drift.ui.appViewModel
+import dev.letsmoe.drift.ui.components.Cover
+import dev.letsmoe.drift.ui.components.DriftPullToRefresh
 import dev.letsmoe.drift.ui.components.ErrorState
 import dev.letsmoe.drift.ui.components.LoadingMoreFooter
 import dev.letsmoe.drift.ui.components.MediaCard
+import dev.letsmoe.drift.ui.components.MediaCardSize
 import dev.letsmoe.drift.ui.components.OnNearEnd
-import dev.letsmoe.drift.ui.components.DriftChip
-import dev.letsmoe.drift.ui.components.DriftPullToRefresh
-import dev.letsmoe.drift.ui.components.RootTopBar
 import dev.letsmoe.drift.ui.components.SectionHeader
 import dev.letsmoe.drift.ui.components.ShelfRow
 import dev.letsmoe.drift.ui.components.Skeleton
@@ -44,39 +54,49 @@ import dev.letsmoe.drift.ui.components.SongGrid
 import dev.letsmoe.drift.ui.components.rememberItemOpener
 import dev.letsmoe.drift.ui.screens.common.LoadState
 import dev.letsmoe.drift.ui.theme.DriftTheme
-import java.time.LocalTime
 
 private const val FEED_CONTEXT = "recommend:feed"
 private const val HOME_CONTEXT = "home"
+private const val RECENT_CONTEXT = "home:recent"
+private const val RECENT_COLUMNS = 2
+private val FeaturedCardSize = 220.dp
+private val RecentTileHeight = 56.dp
+private val RecentTileShape = RoundedCornerShape(8.dp)
 
+/**
+ * Home, top to bottom: a grid of recently played songs, "Made for you" as quick-pick columns,
+ * the first reason row as large cards and the others as regular ones, then YouTube's shelves
+ * without the songs already shown. No greeting: the page starts with music.
+ */
 @Composable
 fun HomeScreen(modifier: Modifier = Modifier) {
     val viewModel = appViewModel { container -> HomeViewModel(container.core, container.impressionLogger) }
     val feed by viewModel.feed.collectAsStateWithLifecycle()
     val rows by viewModel.rows.collectAsStateWithLifecycle()
+    val recentTracks by viewModel.recentTracks.collectAsStateWithLifecycle()
     val shelvesState by viewModel.shelvesState.collectAsStateWithLifecycle()
     val shelves by viewModel.shelfPager.entries.collectAsStateWithLifecycle()
     val hasMoreShelves by viewModel.shelfPager.hasMore.collectAsStateWithLifecycle()
     val isLoadingMoreShelves by viewModel.shelfPager.isLoadingMore.collectAsStateWithLifecycle()
     val isRefreshing by viewModel.isRefreshing.collectAsStateWithLifecycle()
-    val filter by viewModel.filter.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
     listState.OnNearEnd(isEnabled = hasMoreShelves, onNearEnd = viewModel.shelfPager::loadMore)
+    val shownVideoIds = remember(recentTracks, feed) { shownVideoIdsOf(recentTracks, feed) }
+    val homeShelves = remember(shelves, shownVideoIds) { shelves.forHome(shownVideoIds) }
 
-    Column(modifier = modifier.fillMaxSize()) {
-        RootTopBar(title = greeting())
+    Column(modifier = modifier.fillMaxSize().statusBarsPadding()) {
         DriftPullToRefresh(isRefreshing = isRefreshing, onRefresh = viewModel::refresh) {
             LazyColumn(
                 state = listState,
                 modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(bottom = LocalBottomOverlayPadding.current),
-                verticalArrangement = Arrangement.spacedBy(24.dp),
+                contentPadding = PaddingValues(top = 12.dp, bottom = LocalBottomOverlayPadding.current),
+                verticalArrangement = Arrangement.spacedBy(28.dp),
             ) {
-                item { FilterBar(selected = filter, onSelect = viewModel::selectFilter) }
-                if (filter != HomeFilter.Podcasts) {
-                    recommendationSections(viewModel, feed, rows)
+                if (recentTracks.size >= RECENT_COLUMNS) {
+                    item(key = "recent") { RecentGrid(recentTracks) }
                 }
-                shelfSections(viewModel, shelvesState, shelves, filter)
+                recommendationSections(viewModel, feed, rows)
+                shelfSections(viewModel, shelvesState, homeShelves)
                 if (isLoadingMoreShelves) {
                     item { LoadingMoreFooter() }
                 }
@@ -85,25 +105,56 @@ fun HomeScreen(modifier: Modifier = Modifier) {
     }
 }
 
-private fun greeting(): String {
-    val hour = LocalTime.now().hour
-    return when {
-        hour < 5 -> "Good night"
-        hour < 12 -> "Good morning"
-        hour < 18 -> "Good afternoon"
-        else -> "Good evening"
+private fun shownVideoIdsOf(recentTracks: List<Track>, feed: LoadState<List<RecommendedItem>>): Set<String> {
+    val videoIds = recentTracks.map { track -> track.videoId }.toMutableSet()
+    if (feed is LoadState.Content) {
+        videoIds.addAll(feed.data.map { item -> item.track.videoId })
+    }
+    return videoIds
+}
+
+/** Recently played songs as two columns of compact tiles, the way back into what was on. */
+@Composable
+private fun RecentGrid(tracks: List<Track>) {
+    val playerController = LocalAppContainer.current.playerController
+    Column(
+        modifier = Modifier.padding(horizontal = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        tracks.chunked(RECENT_COLUMNS).forEachIndexed { rowIndex, rowTracks ->
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                rowTracks.forEachIndexed { columnIndex, track ->
+                    val index = rowIndex * RECENT_COLUMNS + columnIndex
+                    RecentTile(
+                        track = track,
+                        onClick = { playerController.playOrToggle(track, tracks, index, RECENT_CONTEXT) },
+                        modifier = Modifier.weight(1f),
+                    )
+                }
+            }
+        }
     }
 }
 
 @Composable
-private fun FilterBar(selected: HomeFilter, onSelect: (HomeFilter) -> Unit) {
+private fun RecentTile(track: Track, onClick: () -> Unit, modifier: Modifier = Modifier) {
     Row(
-        modifier = Modifier.padding(horizontal = 16.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = modifier
+            .height(RecentTileHeight)
+            .clip(RecentTileShape)
+            .background(Color.White.copy(alpha = 0.08f))
+            .clickable(onClick = onClick),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
     ) {
-        for (option in HomeFilter.entries) {
-            DriftChip(label = option.label, isSelected = option == selected, onClick = { onSelect(option) })
-        }
+        Cover(thumbnails = track.thumbnails, size = RecentTileHeight, shape = RoundedCornerShape(0.dp))
+        Text(
+            text = track.title,
+            style = MaterialTheme.typography.labelLarge,
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.weight(1f).padding(end = 8.dp),
+        )
     }
 }
 
@@ -122,8 +173,10 @@ private fun LazyListScope.recommendationSections(
     when (rows) {
         LoadState.Loading -> item(key = "rows-loading") { CardRowSkeleton() }
         is LoadState.Error -> Unit
-        is LoadState.Content -> for (row in rows.data) {
-            item(key = "row-${row.key}") { RecommendedCardRow(row = row, viewModel = viewModel) }
+        is LoadState.Content -> rows.data.forEachIndexed { index, row ->
+            item(key = "row-${row.key}") {
+                RecommendedCardRow(row = row, viewModel = viewModel, isFeatured = index == 0)
+            }
         }
     }
 }
@@ -145,11 +198,13 @@ private fun RecommendedGrid(title: String, items: List<RecommendedItem>, viewMod
     }
 }
 
+// The first reason row is the most personal one, so it gets large cards to break up the page.
 @Composable
-private fun RecommendedCardRow(row: RecommendedRow, viewModel: HomeViewModel) {
+private fun RecommendedCardRow(row: RecommendedRow, viewModel: HomeViewModel, isFeatured: Boolean) {
     val playerController = LocalAppContainer.current.playerController
     val tracks = row.items.map { item -> item.track }
     val context = "recommend:${row.key}"
+    val cardSize = cardSizeFor(isFeatured)
     ShelfRow(title = row.title) {
         itemsIndexed(row.items, key = { _, item -> item.track.videoId }) { index, item ->
             LaunchedEffect(item.track.videoId) { viewModel.impress(item, index) }
@@ -157,6 +212,7 @@ private fun RecommendedCardRow(row: RecommendedRow, viewModel: HomeViewModel) {
                 title = item.track.title,
                 subtitle = item.track.artistNames,
                 thumbnails = item.track.thumbnails,
+                size = cardSize,
                 onClick = {
                     viewModel.click(item, index)
                     playerController.playOrToggle(item.track, tracks, index, context)
@@ -166,11 +222,17 @@ private fun RecommendedCardRow(row: RecommendedRow, viewModel: HomeViewModel) {
     }
 }
 
+private fun cardSizeFor(isFeatured: Boolean): Dp {
+    if (isFeatured) {
+        return FeaturedCardSize
+    }
+    return MediaCardSize
+}
+
 private fun LazyListScope.shelfSections(
     viewModel: HomeViewModel,
     shelvesState: LoadState<Unit>,
     shelves: List<Shelf>,
-    filter: HomeFilter,
 ) {
     when (shelvesState) {
         LoadState.Loading -> {
@@ -182,30 +244,12 @@ private fun LazyListScope.shelfSections(
                 ErrorState(message = shelvesState.message, onRetry = viewModel::retryShelves)
             }
         }
-        is LoadState.Content -> {
-            val visibleShelves = shelves.filter { shelf -> isVisible(shelf, filter) }
-            itemsOf(visibleShelves) { shelf -> HomeShelf(shelf) }
-            if (visibleShelves.isEmpty()) {
-                item(key = "shelves-empty") { SectionNote("Nothing to show here yet.") }
-            }
+        is LoadState.Content -> shelves.forEachIndexed { index, shelf ->
+            item(key = "shelf-$index-${shelf.title}") { HomeShelf(shelf) }
         }
     }
 }
 
-private fun isVisible(shelf: Shelf, filter: HomeFilter): Boolean =
-    when (filter) {
-        HomeFilter.All -> true
-        HomeFilter.Music -> !shelf.isPodcastShelf()
-        HomeFilter.Podcasts -> shelf.isPodcastShelf()
-    }
-
-private fun LazyListScope.itemsOf(shelves: List<Shelf>, content: @Composable (Shelf) -> Unit) {
-    shelves.forEachIndexed { index, shelf ->
-        item(key = "shelf-$index-${shelf.title}") { content(shelf) }
-    }
-}
-
-// Song-only shelves ("Quick picks") render as the paged song grid, the rest as card rows.
 @Composable
 private fun HomeShelf(shelf: Shelf) {
     val playerController = LocalAppContainer.current.playerController
