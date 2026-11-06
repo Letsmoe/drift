@@ -12,6 +12,9 @@ import dev.letsmoe.drift.library.ImpressionLogger
 import dev.letsmoe.drift.library.LibraryState
 import dev.letsmoe.drift.player.PlayerController
 import dev.letsmoe.drift.playback.PlaybackEvents
+import dev.letsmoe.drift.settings.SettingsStore
+import dev.letsmoe.drift.settings.SharedPreferencesStorage
+import dev.letsmoe.drift.settings.StoredSettings
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -26,6 +29,7 @@ class AppContainer(context: Context) {
     val playerController = PlayerController(context, core, playbackEvents, applicationScope)
     val libraryState = LibraryState(core, applicationScope)
     val impressionLogger = ImpressionLogger(core, applicationScope)
+    val settings: SettingsStore = StoredSettings(SharedPreferencesStorage(context))
 }
 
 class DriftApplication : Application(), SingletonImageLoader.Factory {

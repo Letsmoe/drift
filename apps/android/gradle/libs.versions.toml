@@ -14,6 +14,7 @@ reorderable = "3.1.0"
 coreKtx = "1.19.1"
 phosphor = "1.0.0"
 profileinstaller = "1.4.1"
+junit = "4.13.2"
 
 [libraries]
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
@@ -39,6 +40,7 @@ kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutine
 kotlinx-coroutines-guava = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-guava", version.ref = "coroutines" }
 reorderable = { module = "sh.calvin.reorderable:reorderable", version.ref = "reorderable" }
 phosphor-icons = { module = "com.adamglin:phosphor-icon", version.ref = "phosphor" }
+junit = { module = "junit:junit", version.ref = "junit" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
