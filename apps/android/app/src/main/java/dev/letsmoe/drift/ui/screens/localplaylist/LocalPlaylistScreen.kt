@@ -64,7 +64,6 @@ import dev.letsmoe.drift.ui.screens.detail.DetailLoadState
 import dev.letsmoe.drift.ui.screens.detail.DetailScaffold
 import dev.letsmoe.drift.ui.screens.detail.detailListPadding
 import dev.letsmoe.drift.ui.showToastOnFailure
-import dev.letsmoe.drift.ui.theme.Canvas
 import dev.letsmoe.drift.ui.theme.DriftTheme
 import kotlinx.coroutines.launch
 import sh.calvin.reorderable.ReorderableItem
@@ -245,7 +244,7 @@ private fun rowBackground(isDragging: Boolean): Color {
     if (isDragging) {
         return DriftTheme.colors.surfaceHover
     }
-    return Canvas
+    return Color.Transparent
 }
 
 @Composable

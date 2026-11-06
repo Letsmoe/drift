@@ -26,7 +26,6 @@ import dev.letsmoe.drift.core.model.bestFor
 import dev.letsmoe.drift.ui.components.Cover
 import dev.letsmoe.drift.ui.components.CoverShape
 import dev.letsmoe.drift.ui.player.rememberCoverColor
-import dev.letsmoe.drift.ui.theme.Canvas
 
 private val TopBarHeight = 56.dp
 private const val COVER_COLOR_REQUEST_PIXELS = 256
@@ -54,7 +53,7 @@ fun DetailHeader(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .background(Brush.verticalGradient(listOf(topColor, Canvas)))
+            .background(Brush.verticalGradient(listOf(topColor, Color.Transparent)))
             .statusBarsPadding()
             .padding(top = TopBarHeight, bottom = 8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
