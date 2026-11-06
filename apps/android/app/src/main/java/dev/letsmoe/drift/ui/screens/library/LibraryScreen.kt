@@ -27,6 +27,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import dev.letsmoe.drift.importing.ImportState
 import dev.letsmoe.drift.ui.LocalBottomOverlayPadding
 import dev.letsmoe.drift.ui.LocalNavController
 import dev.letsmoe.drift.ui.appViewModel
@@ -37,10 +38,12 @@ import dev.letsmoe.drift.ui.formatSongCount
 import dev.letsmoe.drift.ui.icons.DriftIcons
 import dev.letsmoe.drift.ui.navigation.openAlbum
 import dev.letsmoe.drift.ui.navigation.openArtist
+import dev.letsmoe.drift.ui.navigation.openImport
 import dev.letsmoe.drift.ui.navigation.openLikedSongs
 import dev.letsmoe.drift.ui.navigation.openLocalPlaylist
 import dev.letsmoe.drift.ui.navigation.openPlaylist
 import dev.letsmoe.drift.ui.navigation.openPodcast
+import dev.letsmoe.drift.ui.screens.importing.ImportLibraryEntry
 import dev.letsmoe.drift.ui.showToastOnFailure
 import dev.letsmoe.drift.ui.theme.DriftTheme
 import androidx.navigation.NavController
@@ -58,6 +61,7 @@ fun LibraryScreen(modifier: Modifier = Modifier) {
     val filter by viewModel.filter.collectAsStateWithLifecycle()
     val sort by viewModel.sort.collectAsStateWithLifecycle()
     val likedCount by viewModel.likedCount.collectAsStateWithLifecycle()
+    val importState by LocalAppContainer.current.importController.state.collectAsStateWithLifecycle()
     var showNewPlaylistDialog by remember { mutableStateOf(false) }
     var sheetEntry by remember { mutableStateOf<LibraryEntry?>(null) }
 
@@ -70,7 +74,13 @@ fun LibraryScreen(modifier: Modifier = Modifier) {
         LazyColumn(contentPadding = PaddingValues(bottom = LocalBottomOverlayPadding.current)) {
             item { FilterBar(selected = filter, onToggle = viewModel::toggleFilter) }
             item { SortRow(sort = sort, onToggle = viewModel::toggleSort) }
-            pinnedEntries(filter = filter, likedCount = likedCount, onOpenLikedSongs = navController::openLikedSongs)
+            pinnedEntries(
+                filter = filter,
+                likedCount = likedCount,
+                importState = importState,
+                onOpenLikedSongs = navController::openLikedSongs,
+                onOpenImport = navController::openImport,
+            )
             items(entries, key = { entry -> entry.key }) { entry ->
                 LibraryRow(
                     title = entry.title,
@@ -157,23 +167,28 @@ private fun SortRow(sort: LibrarySort, onToggle: () -> Unit) {
     }
 }
 
-/**
- * Rows pinned above the list. Liked Songs is the only one today; a later "Import from Spotify"
- * entry belongs here, next to it (keep it visible with and without a filter).
- */
-private fun LazyListScope.pinnedEntries(filter: LibraryFilter?, likedCount: Int, onOpenLikedSongs: () -> Unit) {
+/** Rows pinned above the list: Liked Songs, then the import entry (always visible, whatever the filter). */
+private fun LazyListScope.pinnedEntries(
+    filter: LibraryFilter?,
+    likedCount: Int,
+    importState: ImportState,
+    onOpenLikedSongs: () -> Unit,
+    onOpenImport: () -> Unit,
+) {
     val showsLikedSongs = filter == null || filter == LibraryFilter.Playlists
-    if (!showsLikedSongs) {
-        return
+    if (showsLikedSongs) {
+        item(key = "pinned-liked") {
+            LibraryRow(
+                title = "Liked Songs",
+                subtitle = "Playlist • ${formatSongCount(likedCount)}",
+                playContext = "liked",
+                onClick = onOpenLikedSongs,
+                cover = { LikedSongsCover() },
+            )
+        }
     }
-    item(key = "pinned-liked") {
-        LibraryRow(
-            title = "Liked Songs",
-            subtitle = "Playlist • ${formatSongCount(likedCount)}",
-            playContext = "liked",
-            onClick = onOpenLikedSongs,
-            cover = { LikedSongsCover() },
-        )
+    item(key = "pinned-import") {
+        ImportLibraryEntry(state = importState, onClick = onOpenImport)
     }
 }
 

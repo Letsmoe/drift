@@ -8,6 +8,9 @@ import coil3.SingletonImageLoader
 import coil3.memory.MemoryCache
 import coil3.request.crossfade
 import dev.letsmoe.drift.core.DriftCore
+import dev.letsmoe.drift.importing.ImportController
+import dev.letsmoe.drift.importing.platform.ContentResolverImportFileStore
+import dev.letsmoe.drift.importing.platform.ServiceImportKeepAlive
 import dev.letsmoe.drift.library.ImpressionLogger
 import dev.letsmoe.drift.library.LibraryState
 import dev.letsmoe.drift.player.PlayerController
@@ -26,6 +29,13 @@ class AppContainer(context: Context) {
     val playerController = PlayerController(context, core, playbackEvents, applicationScope)
     val libraryState = LibraryState(core, applicationScope)
     val impressionLogger = ImpressionLogger(core, applicationScope)
+    val importController = ImportController(
+        core = core,
+        fileStore = ContentResolverImportFileStore(context),
+        keepAlive = ServiceImportKeepAlive(context),
+        scope = applicationScope,
+        onLibraryChanged = { libraryState.refreshAfterImport() },
+    )
 }
 
 class DriftApplication : Application(), SingletonImageLoader.Factory {
