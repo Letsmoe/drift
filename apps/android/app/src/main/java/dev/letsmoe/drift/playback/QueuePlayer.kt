@@ -12,6 +12,7 @@ import androidx.media3.common.util.UnstableApi
 class QueuePlayer(
     player: Player,
     private val driver: QueuePlaybackDriver,
+    private val crossfader: Crossfader,
 ) : ForwardingPlayer(player) {
 
     override fun getAvailableCommands(): Player.Commands =
@@ -35,19 +36,49 @@ class QueuePlayer(
         driver.play()
     }
 
+    // Pausing, seeking and skipping end a running crossfade at once.
+    override fun pause() {
+        crossfader.finish()
+        super.pause()
+    }
+
+    override fun seekTo(positionMs: Long) {
+        crossfader.finish()
+        super.seekTo(positionMs)
+    }
+
+    override fun seekTo(mediaItemIndex: Int, positionMs: Long) {
+        crossfader.finish()
+        super.seekTo(mediaItemIndex, positionMs)
+    }
+
+    override fun seekBack() {
+        crossfader.finish()
+        super.seekBack()
+    }
+
+    override fun seekForward() {
+        crossfader.finish()
+        super.seekForward()
+    }
+
     override fun seekToNext() {
+        crossfader.finish()
         driver.skipToNext()
     }
 
     override fun seekToNextMediaItem() {
+        crossfader.finish()
         driver.skipToNext()
     }
 
     override fun seekToPrevious() {
+        crossfader.finish()
         driver.skipToPrevious()
     }
 
     override fun seekToPreviousMediaItem() {
+        crossfader.finish()
         driver.skipToPrevious()
     }
 }
