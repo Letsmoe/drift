@@ -105,17 +105,16 @@ core/               Go module github.com/letsmoe/drift/core: the shared, UI-free
 apps/desktop/       desktop backend (Go module …/apps/desktop): core behind a loopback server (SPA, stream proxy, RPC WebSocket)
   electron/         Electron shell: starts the backend, owns the window and native dialogs, packaging
   frontend/         SvelteKit 3 + Tailwind 4 UI (static SPA, embedded into the binary)
-apps/android/       planned: Kotlin + Jetpack Compose + Media3, core via gomobile .aar
-apps/ios/           planned: Swift + SwiftUI + AVPlayer, core via gomobile xcframework
+apps/android/       Android app: Kotlin + Jetpack Compose + Media3, core via gomobile .aar; becomes the shared Compose Multiplatform app for iOS too
 ```
 
 `go.work` ties the Go modules together; the root `package.json` is the bun workspace.
 
 ## Architecture
 
-- **Core is a library, not a backend.** No API server, no GraphQL; the only HTTP server is the loopback stream proxy (on desktop it also serves the UI and its RPC socket, see Desktop). Desktop calls core through that RPC; mobile will call it through gomobile. Keep all logic (search, queue, stream resolving, caching, recommendations) in `core` so the three UIs only display data.
+- **Core is a library, not a backend.** No API server, no GraphQL; the only HTTP server is the loopback stream proxy (on desktop it also serves the UI and its RPC socket, see Desktop). Desktop calls core through that RPC; mobile calls it through gomobile. Keep all logic (search, queue, stream resolving, caching, recommendations) in `core` so the UIs only display data.
 - **Core API is idiomatic Go.** gomobile can't export slices or most structs; a thin adapter package (e.g. `core/mobile`) will wrap the API for mobile later. Don't bend `core` itself around gomobile.
-- **Separate UIs per platform.** Desktop is Svelte, Android is Compose, iOS is SwiftUI. Don't share UI code between them; share data shapes through `core/music`.
+- **Two UIs.** Desktop is Svelte; mobile is one Kotlin Compose Multiplatform app for Android and iOS. iOS is Kotlin too: what differs per platform (playback with Media3 or AVPlayer, the gomobile `.aar` or xcframework, system integration) sits behind a shared interface with an Android and an iOS implementation, both in Kotlin. Swift is limited to the app entry point Xcode needs. Keep platform APIs (Media3, Android `Context`) out of shared code. Desktop and mobile share no UI code, only data shapes through `core/music`.
 - **Domain types carry camelCase JSON tags.** `bun run bindings` generates the TypeScript models from them (`frontend/src/lib/backend/generated/models.ts`).
 
 ### YouTube extraction (three layers)
