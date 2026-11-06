@@ -38,6 +38,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import android.widget.Toast
+import dev.letsmoe.drift.core.model.CollectionKind
 import dev.letsmoe.drift.core.model.LibraryPlaylist
 import dev.letsmoe.drift.core.model.PlaylistEntry
 import dev.letsmoe.drift.core.model.Track
@@ -45,6 +46,7 @@ import dev.letsmoe.drift.ui.LocalAppContainer
 import dev.letsmoe.drift.ui.LocalBottomOverlayPadding
 import dev.letsmoe.drift.ui.LocalNavController
 import dev.letsmoe.drift.ui.appViewModel
+import dev.letsmoe.drift.ui.components.CollectionDownloadButton
 import dev.letsmoe.drift.ui.components.CollectionMoreButton
 import dev.letsmoe.drift.ui.components.ConfirmDialog
 import dev.letsmoe.drift.ui.components.CoverMosaic
@@ -190,6 +192,7 @@ private fun PlaylistList(
         item(key = "header") { PlaylistHeader(playlist = playlist, entries = entries) }
         item(key = "actions") {
             PlaylistActions(
+                playlistId = playlist.id,
                 playlistName = playlist.name,
                 tracks = tracks,
                 onEdit = onEdit,
@@ -275,6 +278,7 @@ private fun playlistSummary(tracks: List<Track>): String {
 
 @Composable
 private fun PlaylistActions(
+    playlistId: String,
     playlistName: String,
     tracks: List<Track>,
     onEdit: () -> Unit,
@@ -282,6 +286,7 @@ private fun PlaylistActions(
     onAddSongs: () -> Unit,
 ) {
     DetailActionRow {
+        CollectionDownloadButton(kind = CollectionKind.LocalPlaylist, id = playlistId, title = playlistName)
         IconButton(onClick = onAddSongs) {
             Icon(DriftIcons.Add.outline, contentDescription = "Add songs", tint = DriftTheme.colors.textMuted)
         }

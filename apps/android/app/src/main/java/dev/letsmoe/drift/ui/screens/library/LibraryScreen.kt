@@ -27,7 +27,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import dev.letsmoe.drift.core.model.DownloadSummary
 import dev.letsmoe.drift.importing.ImportState
+import dev.letsmoe.drift.ui.screens.downloads.DownloadsLibraryEntry
+import dev.letsmoe.drift.ui.navigation.openDownloads
 import dev.letsmoe.drift.ui.LocalBottomOverlayPadding
 import dev.letsmoe.drift.ui.LocalNavController
 import dev.letsmoe.drift.ui.appViewModel
@@ -65,6 +68,7 @@ fun LibraryScreen(modifier: Modifier = Modifier) {
     val sort by viewModel.sort.collectAsStateWithLifecycle()
     val likedCount by viewModel.likedCount.collectAsStateWithLifecycle()
     val importState by LocalAppContainer.current.importController.state.collectAsStateWithLifecycle()
+    val downloadSummary by LocalAppContainer.current.downloadsState.summary.collectAsStateWithLifecycle()
     var showNewPlaylistDialog by remember { mutableStateOf(false) }
     var sheetEntry by remember { mutableStateOf<LibraryEntry?>(null) }
 
@@ -85,7 +89,9 @@ fun LibraryScreen(modifier: Modifier = Modifier) {
                 filter = filter,
                 likedCount = likedCount,
                 importState = importState,
+                downloadSummary = downloadSummary,
                 onOpenLikedSongs = navController::openLikedSongs,
+                onOpenDownloads = navController::openDownloads,
                 onOpenImport = navController::openImport,
             )
             items(entries, key = { entry -> entry.key }) { entry ->
@@ -174,12 +180,14 @@ private fun SortRow(sort: LibrarySort, onToggle: () -> Unit) {
     }
 }
 
-/** Rows pinned above the list: Liked Songs, then the import entry (always visible, whatever the filter). */
+/** Rows pinned above the list: Liked Songs, then Downloads and the import entry (always visible, whatever the filter). */
 private fun LazyListScope.pinnedEntries(
     filter: LibraryFilter?,
     likedCount: Int,
     importState: ImportState,
+    downloadSummary: DownloadSummary,
     onOpenLikedSongs: () -> Unit,
+    onOpenDownloads: () -> Unit,
     onOpenImport: () -> Unit,
 ) {
     val showsLikedSongs = filter == null || filter == LibraryFilter.Playlists
@@ -193,6 +201,9 @@ private fun LazyListScope.pinnedEntries(
                 cover = { LikedSongsCover() },
             )
         }
+    }
+    item(key = "pinned-downloads") {
+        DownloadsLibraryEntry(summary = downloadSummary, onClick = onOpenDownloads)
     }
     item(key = "pinned-import") {
         ImportLibraryEntry(state = importState, onClick = onOpenImport)

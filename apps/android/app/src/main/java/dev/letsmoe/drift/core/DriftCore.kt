@@ -2,7 +2,13 @@ package dev.letsmoe.drift.core
 
 import dev.letsmoe.drift.core.model.AlbumPage
 import dev.letsmoe.drift.core.model.ArtistPage
+import dev.letsmoe.drift.core.model.CollectionKind
 import dev.letsmoe.drift.core.model.CoverColors
+import dev.letsmoe.drift.core.model.DownloadCollection
+import dev.letsmoe.drift.core.model.DownloadItem
+import dev.letsmoe.drift.core.model.DownloadStatus
+import dev.letsmoe.drift.core.model.DownloadSummary
+import dev.letsmoe.drift.core.model.DownloadUpdate
 import dev.letsmoe.drift.core.model.HomePage
 import dev.letsmoe.drift.core.model.ImportOptions
 import dev.letsmoe.drift.core.model.ImportProgress
@@ -26,8 +32,10 @@ import dev.letsmoe.drift.core.model.RepeatMode
 import dev.letsmoe.drift.core.model.ResumePosition
 import dev.letsmoe.drift.core.model.SavedItem
 import dev.letsmoe.drift.core.model.SearchResults
+import dev.letsmoe.drift.core.model.StorageUsage
 import dev.letsmoe.drift.core.model.Track
 import dev.letsmoe.drift.core.model.YouTubeAccountStatus
+import dev.letsmoe.drift.mobile.DownloadListener
 import dev.letsmoe.drift.mobile.ImportListener
 import dev.letsmoe.drift.mobile.Core
 import dev.letsmoe.drift.mobile.Listener
@@ -295,6 +303,81 @@ class DriftCore(dataDirectory: String) {
                 listener.onFinished(DriftJson.decodeFromString<ImportResult>(resultJson))
             }
         }
+
+    // Downloads
+
+    /** [onUpdate] hears every download change on a core thread; a later call replaces the listener. */
+    fun listenToDownloads(onUpdate: (DownloadUpdate) -> Unit) {
+        core.setDownloadListener(
+            DownloadListener { updateJson -> onUpdate(DriftJson.decodeFromString<DownloadUpdate>(updateJson)) },
+        )
+    }
+
+    /** [kind] is [ItemKind.Song] or [ItemKind.Episode]. */
+    suspend fun downloadTracks(tracks: List<Track>, kind: ItemKind) {
+        call { core.downloadTracks(DriftJson.encodeToString(tracks), kind.wireName) }
+    }
+
+    /** With [keep] the collection stays in sync as it changes. [id] is "liked" for likes. */
+    suspend fun downloadCollection(kind: CollectionKind, id: String, keep: Boolean) {
+        call { core.downloadCollection(kind.wireName, id, keep) }
+    }
+
+    /** Re-reads a downloaded collection; call when its page opens. */
+    suspend fun refreshDownloadedCollection(kind: CollectionKind, id: String) {
+        call { core.refreshDownloadedCollection(kind.wireName, id) }
+    }
+
+    /** Forgets the collection and deletes the files nothing else needs. */
+    suspend fun removeDownloadedCollection(kind: CollectionKind, id: String) {
+        call { core.removeDownloadedCollection(kind.wireName, id) }
+    }
+
+    suspend fun cancelDownload(videoId: String) {
+        call { core.cancelDownload(videoId) }
+    }
+
+    suspend fun retryDownload(videoId: String) {
+        call { core.retryDownload(videoId) }
+    }
+
+    suspend fun deleteDownload(videoId: String) {
+        call { core.deleteDownload(videoId) }
+    }
+
+    suspend fun deleteAllDownloads() {
+        call { core.deleteAllDownloads() }
+    }
+
+    suspend fun pauseDownloads() {
+        call { core.pauseDownloads() }
+    }
+
+    suspend fun resumeDownloads() {
+        call { core.resumeDownloads() }
+    }
+
+    /** Lets the app veto downloading, e.g. on mobile data; running transfers resume when allowed again. */
+    suspend fun setAllowDownloads(allowed: Boolean) {
+        call { core.setAllowDownloads(allowed) }
+    }
+
+    /** The states of [videoIds]; videos that were never queued are absent. */
+    suspend fun downloadStates(videoIds: List<String>): Map<String, DownloadStatus> =
+        call { DriftJson.decodeFromString(core.downloadStates(DriftJson.encodeToString(videoIds))) }
+
+    /** Queued, running and failed downloads. */
+    suspend fun downloadQueue(): List<DownloadItem> = call { DriftJson.decodeFromString(core.downloadQueue()) }
+
+    /** Downloaded tracks with the local cover as thumbnail, playable offline. */
+    suspend fun downloadedTracks(): List<Track> = call { DriftJson.decodeFromString(core.downloadedTracks()) }
+
+    suspend fun downloadedCollections(): List<DownloadCollection> =
+        call { DriftJson.decodeFromString(core.downloadedCollections()) }
+
+    suspend fun downloadSummary(): DownloadSummary = call { DriftJson.decodeFromString(core.downloadSummary()) }
+
+    suspend fun storageUsage(): StorageUsage = call { DriftJson.decodeFromString(core.storageUsage()) }
 
     // Artwork
 

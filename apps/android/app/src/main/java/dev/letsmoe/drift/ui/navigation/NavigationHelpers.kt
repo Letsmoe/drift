@@ -37,6 +37,10 @@ fun NavController.openLocalPlaylist(playlistId: String) {
     navigate(Routes.LocalPlaylist(playlistId))
 }
 
+fun NavController.openDownloads() {
+    navigate(Routes.Downloads)
+}
+
 fun NavController.openSettings() {
     navigate(Routes.Settings)
 }

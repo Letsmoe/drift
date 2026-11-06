@@ -11,6 +11,9 @@ import dev.letsmoe.drift.core.DriftCore
 import dev.letsmoe.drift.importing.ImportController
 import dev.letsmoe.drift.importing.platform.ContentResolverImportFileStore
 import dev.letsmoe.drift.importing.platform.ServiceImportKeepAlive
+import dev.letsmoe.drift.downloads.DownloadNetworkPolicy
+import dev.letsmoe.drift.downloads.DownloadsState
+import dev.letsmoe.drift.downloads.platform.ConnectivityNetworkMonitor
 import dev.letsmoe.drift.library.ImpressionLogger
 import dev.letsmoe.drift.library.LibraryState
 import dev.letsmoe.drift.player.PlayerController
@@ -40,6 +43,13 @@ class AppContainer(context: Context) {
         onLibraryChanged = { libraryState.refreshAfterImport() },
     )
     val settings: SettingsStore = StoredSettings(SharedPreferencesStorage(context))
+    val downloadsState = DownloadsState(core, applicationScope)
+    val downloadNetworkPolicy = DownloadNetworkPolicy(
+        core = core,
+        downloadOnlyOnWifi = settings.downloadOnlyOnWifi,
+        networkMonitor = ConnectivityNetworkMonitor(context),
+        scope = applicationScope,
+    )
 }
 
 class DriftApplication : Application(), SingletonImageLoader.Factory {
@@ -58,5 +68,7 @@ class DriftApplication : Application(), SingletonImageLoader.Factory {
         container = AppContainer(this)
         container.playerController.connect()
         container.libraryState.load()
+        container.downloadNetworkPolicy.start()
+        container.downloadsState.start()
     }
 }
