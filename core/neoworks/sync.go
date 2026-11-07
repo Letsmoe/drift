@@ -41,10 +41,8 @@ func (session *Session) registerDescriptors(ctx context.Context) error {
 	if registered {
 		return nil
 	}
-	for _, name := range Collections {
-		if err := session.registerDescriptor(ctx, name); err != nil {
-			return err
-		}
+	if err := session.registerDescriptor(ctx); err != nil {
+		return err
 	}
 	session.mutex.Lock()
 	session.descriptorsRegistered = true
@@ -52,14 +50,10 @@ func (session *Session) registerDescriptors(ctx context.Context) error {
 	return nil
 }
 
-func (session *Session) registerDescriptor(ctx context.Context, name string) error {
-	data, err := descriptor(name)
+func (session *Session) registerDescriptor(ctx context.Context) error {
+	check, err := session.client.RegisterDescriptor(collection, descriptor, schemaVersion)
 	if err != nil {
-		return err
-	}
-	check, err := session.client.RegisterDescriptor(collectionPath(name), data)
-	if err != nil {
-		return fmt.Errorf("neoworks: descriptor of %s: %w", collectionPath(name), err)
+		return fmt.Errorf("neoworks: descriptor of %s: %w", collection, err)
 	}
 	if check == nil {
 		return nil
@@ -68,8 +62,8 @@ func (session *Session) registerDescriptor(ctx context.Context, name string) err
 	if err != nil {
 		return err
 	}
-	if err := session.client.CompleteDescriptorCheck(collectionPath(name), response.Status, response.Body); err != nil {
-		return fmt.Errorf("neoworks: the registry does not confirm %s: %w", collectionPath(name), err)
+	if err := session.client.CompleteDescriptorCheck(collection, response.Status, response.Body); err != nil {
+		return fmt.Errorf("neoworks: the registry does not confirm %s: %w", collection, err)
 	}
 	return nil
 }

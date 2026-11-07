@@ -1,0 +1,968 @@
+{
+  "descriptorVersion": 2,
+  "namespace": "drift",
+  "enums": [
+    {
+      "name": "TrackKind",
+      "variants": [
+        {
+          "name": "song",
+          "ordinal": 1
+        },
+        {
+          "name": "episode",
+          "ordinal": 2
+        }
+      ]
+    },
+    {
+      "name": "Opinion",
+      "variants": [
+        {
+          "name": "like",
+          "ordinal": 1
+        },
+        {
+          "name": "dislike",
+          "ordinal": 2
+        }
+      ]
+    },
+    {
+      "name": "SavedKind",
+      "variants": [
+        {
+          "name": "album",
+          "ordinal": 1
+        },
+        {
+          "name": "artist",
+          "ordinal": 2
+        },
+        {
+          "name": "playlist",
+          "ordinal": 3
+        },
+        {
+          "name": "podcast",
+          "ordinal": 4
+        }
+      ]
+    },
+    {
+      "name": "BlockKind",
+      "variants": [
+        {
+          "name": "track",
+          "ordinal": 1
+        },
+        {
+          "name": "artist",
+          "ordinal": 2
+        },
+        {
+          "name": "podcast",
+          "ordinal": 3
+        }
+      ]
+    }
+  ],
+  "models": [
+    {
+      "name": "Track",
+      "fields": [
+        {
+          "ordinal": 1,
+          "name": "videoId",
+          "container": {
+            "kind": "singular",
+            "nullable": false
+          },
+          "value": {
+            "kind": "scalar",
+            "scalar": "string"
+          },
+          "required": true,
+          "constraints": {
+            "minLength": 1,
+            "maxLength": 64
+          }
+        },
+        {
+          "ordinal": 2,
+          "name": "title",
+          "container": {
+            "kind": "singular",
+            "nullable": false
+          },
+          "value": {
+            "kind": "scalar",
+            "scalar": "string"
+          },
+          "required": true,
+          "constraints": {
+            "maxLength": 500
+          }
+        },
+        {
+          "ordinal": 3,
+          "name": "artists",
+          "container": {
+            "kind": "wrapperRepeated",
+            "packed": false
+          },
+          "value": {
+            "kind": "message",
+            "name": "Artist"
+          },
+          "required": false,
+          "constraints": {}
+        },
+        {
+          "ordinal": 4,
+          "name": "album",
+          "container": {
+            "kind": "singular",
+            "nullable": true
+          },
+          "value": {
+            "kind": "message",
+            "name": "Album"
+          },
+          "required": false,
+          "constraints": {}
+        },
+        {
+          "ordinal": 5,
+          "name": "durationSeconds",
+          "container": {
+            "kind": "singular",
+            "nullable": false
+          },
+          "value": {
+            "kind": "scalar",
+            "scalar": "u32"
+          },
+          "required": true,
+          "constraints": {
+            "minValue": 0
+          }
+        },
+        {
+          "ordinal": 6,
+          "name": "thumbnailUrl",
+          "container": {
+            "kind": "singular",
+            "nullable": true
+          },
+          "value": {
+            "kind": "scalar",
+            "scalar": "string"
+          },
+          "required": false,
+          "constraints": {
+            "format": "uri"
+          }
+        },
+        {
+          "ordinal": 7,
+          "name": "kind",
+          "container": {
+            "kind": "singular",
+            "nullable": true
+          },
+          "value": {
+            "kind": "enum",
+            "name": "TrackKind"
+          },
+          "required": false,
+          "constraints": {}
+        }
+      ]
+    },
+    {
+      "name": "Artist",
+      "fields": [
+        {
+          "ordinal": 1,
+          "name": "id",
+          "container": {
+            "kind": "singular",
+            "nullable": true
+          },
+          "value": {
+            "kind": "scalar",
+            "scalar": "string"
+          },
+          "required": false,
+          "constraints": {}
+        },
+        {
+          "ordinal": 2,
+          "name": "name",
+          "container": {
+            "kind": "singular",
+            "nullable": false
+          },
+          "value": {
+            "kind": "scalar",
+            "scalar": "string"
+          },
+          "required": true,
+          "constraints": {
+            "maxLength": 500
+          }
+        }
+      ]
+    },
+    {
+      "name": "Album",
+      "fields": [
+        {
+          "ordinal": 1,
+          "name": "id",
+          "container": {
+            "kind": "singular",
+            "nullable": false
+          },
+          "value": {
+            "kind": "scalar",
+            "scalar": "string"
+          },
+          "required": true,
+          "constraints": {}
+        },
+        {
+          "ordinal": 2,
+          "name": "name",
+          "container": {
+            "kind": "singular",
+            "nullable": false
+          },
+          "value": {
+            "kind": "scalar",
+            "scalar": "string"
+          },
+          "required": true,
+          "constraints": {
+            "maxLength": 500
+          }
+        }
+      ]
+    },
+    {
+      "name": "Rating",
+      "fields": [
+        {
+          "ordinal": 1,
+          "name": "track",
+          "container": {
+            "kind": "singular",
+            "nullable": false
+          },
+          "value": {
+            "kind": "ref",
+            "model": "drift.Track"
+          },
+          "required": true,
+          "constraints": {}
+        },
+        {
+          "ordinal": 2,
+          "name": "opinion",
+          "container": {
+            "kind": "singular",
+            "nullable": false
+          },
+          "value": {
+            "kind": "enum",
+            "name": "Opinion"
+          },
+          "required": true,
+          "constraints": {}
+        },
+        {
+          "ordinal": 3,
+          "name": "updatedAt",
+          "container": {
+            "kind": "singular",
+            "nullable": false
+          },
+          "value": {
+            "kind": "scalar",
+            "scalar": "timestamp"
+          },
+          "required": true,
+          "constraints": {}
+        }
+      ]
+    },
+    {
+      "name": "SavedItem",
+      "fields": [
+        {
+          "ordinal": 1,
+          "name": "kind",
+          "container": {
+            "kind": "singular",
+            "nullable": false
+          },
+          "value": {
+            "kind": "enum",
+            "name": "SavedKind"
+          },
+          "required": true,
+          "constraints": {}
+        },
+        {
+          "ordinal": 2,
+          "name": "browseId",
+          "container": {
+            "kind": "singular",
+            "nullable": false
+          },
+          "value": {
+            "kind": "scalar",
+            "scalar": "string"
+          },
+          "required": true,
+          "constraints": {
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        {
+          "ordinal": 3,
+          "name": "title",
+          "container": {
+            "kind": "singular",
+            "nullable": false
+          },
+          "value": {
+            "kind": "scalar",
+            "scalar": "string"
+          },
+          "required": true,
+          "constraints": {
+            "maxLength": 500
+          }
+        },
+        {
+          "ordinal": 4,
+          "name": "subtitle",
+          "container": {
+            "kind": "singular",
+            "nullable": true
+          },
+          "value": {
+            "kind": "scalar",
+            "scalar": "string"
+          },
+          "required": false,
+          "constraints": {
+            "maxLength": 500
+          }
+        },
+        {
+          "ordinal": 5,
+          "name": "thumbnailUrl",
+          "container": {
+            "kind": "singular",
+            "nullable": true
+          },
+          "value": {
+            "kind": "scalar",
+            "scalar": "string"
+          },
+          "required": false,
+          "constraints": {
+            "format": "uri"
+          }
+        },
+        {
+          "ordinal": 6,
+          "name": "savedAt",
+          "container": {
+            "kind": "singular",
+            "nullable": false
+          },
+          "value": {
+            "kind": "scalar",
+            "scalar": "timestamp"
+          },
+          "required": true,
+          "constraints": {}
+        }
+      ]
+    },
+    {
+      "name": "Block",
+      "fields": [
+        {
+          "ordinal": 1,
+          "name": "kind",
+          "container": {
+            "kind": "singular",
+            "nullable": false
+          },
+          "value": {
+            "kind": "enum",
+            "name": "BlockKind"
+          },
+          "required": true,
+          "constraints": {}
+        },
+        {
+          "ordinal": 2,
+          "name": "targetId",
+          "container": {
+            "kind": "singular",
+            "nullable": false
+          },
+          "value": {
+            "kind": "scalar",
+            "scalar": "string"
+          },
+          "required": true,
+          "constraints": {
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        {
+          "ordinal": 3,
+          "name": "name",
+          "container": {
+            "kind": "singular",
+            "nullable": false
+          },
+          "value": {
+            "kind": "scalar",
+            "scalar": "string"
+          },
+          "required": true,
+          "constraints": {
+            "maxLength": 500
+          }
+        },
+        {
+          "ordinal": 4,
+          "name": "createdAt",
+          "container": {
+            "kind": "singular",
+            "nullable": false
+          },
+          "value": {
+            "kind": "scalar",
+            "scalar": "timestamp"
+          },
+          "required": true,
+          "constraints": {}
+        }
+      ]
+    },
+    {
+      "name": "Playlist",
+      "fields": [
+        {
+          "ordinal": 1,
+          "name": "id",
+          "container": {
+            "kind": "singular",
+            "nullable": false
+          },
+          "value": {
+            "kind": "scalar",
+            "scalar": "string"
+          },
+          "required": true,
+          "constraints": {
+            "minLength": 1,
+            "maxLength": 64
+          }
+        },
+        {
+          "ordinal": 2,
+          "name": "name",
+          "container": {
+            "kind": "singular",
+            "nullable": false
+          },
+          "value": {
+            "kind": "scalar",
+            "scalar": "string"
+          },
+          "required": true,
+          "constraints": {
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        {
+          "ordinal": 3,
+          "name": "description",
+          "container": {
+            "kind": "singular",
+            "nullable": true
+          },
+          "value": {
+            "kind": "scalar",
+            "scalar": "string"
+          },
+          "required": false,
+          "constraints": {
+            "maxLength": 5000
+          }
+        },
+        {
+          "ordinal": 4,
+          "name": "createdAt",
+          "container": {
+            "kind": "singular",
+            "nullable": false
+          },
+          "value": {
+            "kind": "scalar",
+            "scalar": "timestamp"
+          },
+          "required": true,
+          "constraints": {}
+        },
+        {
+          "ordinal": 5,
+          "name": "updatedAt",
+          "container": {
+            "kind": "singular",
+            "nullable": false
+          },
+          "value": {
+            "kind": "scalar",
+            "scalar": "timestamp"
+          },
+          "required": true,
+          "constraints": {}
+        }
+      ]
+    },
+    {
+      "name": "PlaylistEntry",
+      "fields": [
+        {
+          "ordinal": 1,
+          "name": "playlist",
+          "container": {
+            "kind": "singular",
+            "nullable": false
+          },
+          "value": {
+            "kind": "ref",
+            "model": "drift.Playlist"
+          },
+          "required": true,
+          "constraints": {}
+        },
+        {
+          "ordinal": 2,
+          "name": "track",
+          "container": {
+            "kind": "singular",
+            "nullable": false
+          },
+          "value": {
+            "kind": "ref",
+            "model": "drift.Track"
+          },
+          "required": true,
+          "constraints": {}
+        },
+        {
+          "ordinal": 3,
+          "name": "position",
+          "container": {
+            "kind": "singular",
+            "nullable": false
+          },
+          "value": {
+            "kind": "scalar",
+            "scalar": "f64"
+          },
+          "required": true,
+          "constraints": {}
+        },
+        {
+          "ordinal": 4,
+          "name": "addedAt",
+          "container": {
+            "kind": "singular",
+            "nullable": false
+          },
+          "value": {
+            "kind": "scalar",
+            "scalar": "timestamp"
+          },
+          "required": true,
+          "constraints": {}
+        }
+      ]
+    },
+    {
+      "name": "DayLog",
+      "fields": [
+        {
+          "ordinal": 1,
+          "name": "deviceId",
+          "container": {
+            "kind": "singular",
+            "nullable": false
+          },
+          "value": {
+            "kind": "scalar",
+            "scalar": "string"
+          },
+          "required": true,
+          "constraints": {
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        {
+          "ordinal": 2,
+          "name": "deviceName",
+          "container": {
+            "kind": "singular",
+            "nullable": true
+          },
+          "value": {
+            "kind": "scalar",
+            "scalar": "string"
+          },
+          "required": false,
+          "constraints": {
+            "maxLength": 200
+          }
+        },
+        {
+          "ordinal": 3,
+          "name": "day",
+          "container": {
+            "kind": "singular",
+            "nullable": false
+          },
+          "value": {
+            "kind": "scalar",
+            "scalar": "date"
+          },
+          "required": true,
+          "constraints": {}
+        },
+        {
+          "ordinal": 4,
+          "name": "plays",
+          "container": {
+            "kind": "wrapperRepeated",
+            "packed": false
+          },
+          "value": {
+            "kind": "message",
+            "name": "Play"
+          },
+          "required": false,
+          "constraints": {}
+        },
+        {
+          "ordinal": 5,
+          "name": "searches",
+          "container": {
+            "kind": "wrapperRepeated",
+            "packed": false
+          },
+          "value": {
+            "kind": "message",
+            "name": "Search"
+          },
+          "required": false,
+          "constraints": {}
+        }
+      ]
+    },
+    {
+      "name": "Play",
+      "fields": [
+        {
+          "ordinal": 1,
+          "name": "videoId",
+          "container": {
+            "kind": "singular",
+            "nullable": false
+          },
+          "value": {
+            "kind": "scalar",
+            "scalar": "string"
+          },
+          "required": true,
+          "constraints": {
+            "minLength": 1,
+            "maxLength": 64
+          }
+        },
+        {
+          "ordinal": 2,
+          "name": "context",
+          "container": {
+            "kind": "singular",
+            "nullable": true
+          },
+          "value": {
+            "kind": "scalar",
+            "scalar": "string"
+          },
+          "required": false,
+          "constraints": {
+            "maxLength": 500
+          }
+        },
+        {
+          "ordinal": 3,
+          "name": "startedAt",
+          "container": {
+            "kind": "singular",
+            "nullable": false
+          },
+          "value": {
+            "kind": "scalar",
+            "scalar": "timestamp"
+          },
+          "required": true,
+          "constraints": {}
+        },
+        {
+          "ordinal": 4,
+          "name": "progressSeconds",
+          "container": {
+            "kind": "singular",
+            "nullable": false
+          },
+          "value": {
+            "kind": "scalar",
+            "scalar": "u32"
+          },
+          "required": true,
+          "constraints": {}
+        },
+        {
+          "ordinal": 5,
+          "name": "completed",
+          "container": {
+            "kind": "singular",
+            "nullable": false
+          },
+          "value": {
+            "kind": "scalar",
+            "scalar": "bool"
+          },
+          "required": true,
+          "constraints": {}
+        }
+      ]
+    },
+    {
+      "name": "Search",
+      "fields": [
+        {
+          "ordinal": 1,
+          "name": "query",
+          "container": {
+            "kind": "singular",
+            "nullable": false
+          },
+          "value": {
+            "kind": "scalar",
+            "scalar": "string"
+          },
+          "required": true,
+          "constraints": {
+            "minLength": 1,
+            "maxLength": 500
+          }
+        },
+        {
+          "ordinal": 2,
+          "name": "searchedAt",
+          "container": {
+            "kind": "singular",
+            "nullable": false
+          },
+          "value": {
+            "kind": "scalar",
+            "scalar": "timestamp"
+          },
+          "required": true,
+          "constraints": {}
+        }
+      ]
+    }
+  ],
+  "tables": [
+    {
+      "model": "Track",
+      "facets": [
+        {
+          "name": "default",
+          "tag": 1,
+          "fields": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ]
+        }
+      ],
+      "title": 2,
+      "belongsTo": null,
+      "cascade": [],
+      "indexes": [
+        {
+          "fields": [
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "model": "Rating",
+      "facets": [
+        {
+          "name": "default",
+          "tag": 1,
+          "fields": [
+            1,
+            2,
+            3
+          ]
+        }
+      ],
+      "title": null,
+      "belongsTo": null,
+      "cascade": [
+        1
+      ],
+      "indexes": []
+    },
+    {
+      "model": "SavedItem",
+      "facets": [
+        {
+          "name": "default",
+          "tag": 1,
+          "fields": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ]
+        }
+      ],
+      "title": 3,
+      "belongsTo": null,
+      "cascade": [],
+      "indexes": []
+    },
+    {
+      "model": "Block",
+      "facets": [
+        {
+          "name": "default",
+          "tag": 1,
+          "fields": [
+            1,
+            2,
+            3,
+            4
+          ]
+        }
+      ],
+      "title": 3,
+      "belongsTo": null,
+      "cascade": [],
+      "indexes": []
+    },
+    {
+      "model": "Playlist",
+      "facets": [
+        {
+          "name": "default",
+          "tag": 1,
+          "fields": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        }
+      ],
+      "title": 2,
+      "belongsTo": null,
+      "cascade": [],
+      "indexes": []
+    },
+    {
+      "model": "PlaylistEntry",
+      "facets": [
+        {
+          "name": "default",
+          "tag": 1,
+          "fields": [
+            1,
+            2,
+            3,
+            4
+          ]
+        }
+      ],
+      "title": null,
+      "belongsTo": 1,
+      "cascade": [
+        2
+      ],
+      "indexes": [
+        {
+          "fields": [
+            1
+          ]
+        },
+        {
+          "fields": [
+            1,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "model": "DayLog",
+      "facets": [
+        {
+          "name": "default",
+          "tag": 1,
+          "fields": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        }
+      ],
+      "title": null,
+      "belongsTo": null,
+      "cascade": [],
+      "indexes": []
+    }
+  ]
+}

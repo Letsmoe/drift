@@ -35,6 +35,8 @@ type savedMapping struct {
 
 func (savedMapping) name() string { return "saved" }
 
+func (savedMapping) table() string { return "SavedItem" }
+
 func (savedMapping) optionalFields() []string { return []string{"subtitle", "thumbnailUrl"} }
 
 func (savedMapping) keepsNodes() bool { return false }

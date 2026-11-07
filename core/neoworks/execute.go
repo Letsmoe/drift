@@ -9,7 +9,7 @@ import (
 	"github.com/letsmoe/drift/core/library"
 )
 
-func (pass *collectionPass) execute(ctx context.Context, key string, chosen action) error {
+func (pass *tablePass) execute(ctx context.Context, key string, chosen action) error {
 	switch chosen {
 	case actionCreateNode:
 		return pass.createNode(ctx, key)
@@ -29,27 +29,26 @@ func (pass *collectionPass) execute(ctx context.Context, key string, chosen acti
 	return nil
 }
 
-func (pass *collectionPass) createNode(ctx context.Context, key string) error {
+func (pass *tablePass) createNode(ctx context.Context, key string) error {
 	item := pass.local[key]
 	content, err := item.content()
 	if err != nil {
 		return err
 	}
-	nodeID, err := pass.librarySync.nodes.CreateNode(libneoworks.NewNode{
-		ParentID:   pass.rootID,
-		Collection: pass.path(),
-		Kind:       libneoworks.NodeKindItem,
+	nodeID, err := pass.librarySync.nodes.CreateRow(libneoworks.NewRow{
+		Collection: collection,
+		Table:      pass.mapping.table(),
 		Content:    content,
 	})
 	if err != nil {
-		return fmt.Errorf("create node: %w", err)
+		return fmt.Errorf("create row: %w", err)
 	}
 	pass.report.NodesWritten++
 	pass.written[key] = nodeID
 	return pass.saveLink(ctx, key, nodeID, item.hash(), "")
 }
 
-func (pass *collectionPass) updateNode(ctx context.Context, key string) error {
+func (pass *tablePass) updateNode(ctx context.Context, key string) error {
 	item := pass.local[key]
 	node := pass.remote[key]
 	changes, err := pass.changesFor(item)
@@ -66,7 +65,7 @@ func (pass *collectionPass) updateNode(ctx context.Context, key string) error {
 }
 
 // changesFor is the whole content, with the optional fields the entity lacks cleared.
-func (pass *collectionPass) changesFor(item entity) (map[string]any, error) {
+func (pass *tablePass) changesFor(item entity) (map[string]any, error) {
 	changes, err := item.content()
 	if err != nil {
 		return nil, err
@@ -79,9 +78,9 @@ func (pass *collectionPass) changesFor(item entity) (map[string]any, error) {
 	return changes, nil
 }
 
-func (pass *collectionPass) deleteNode(ctx context.Context, key string) error {
+func (pass *tablePass) deleteNode(ctx context.Context, key string) error {
 	node := pass.remote[key]
-	err := pass.librarySync.nodes.DeleteNode(node.summary.ID, false)
+	_, err := pass.librarySync.nodes.DeleteNode(node.summary.ID)
 	if err != nil {
 		return fmt.Errorf("delete node %s: %w", node.summary.ID, err)
 	}
@@ -89,7 +88,7 @@ func (pass *collectionPass) deleteNode(ctx context.Context, key string) error {
 	return pass.librarySync.library.DeleteNodeLink(ctx, pass.mapping.name(), key)
 }
 
-func (pass *collectionPass) applyRemote(ctx context.Context, key string) error {
+func (pass *tablePass) applyRemote(ctx context.Context, key string) error {
 	node := pass.remote[key]
 	item, err := pass.read(node)
 	if err != nil {
@@ -104,7 +103,7 @@ func (pass *collectionPass) applyRemote(ctx context.Context, key string) error {
 	return pass.saveLink(ctx, key, node.summary.ID, item.hash(), node.summary.UpdatedAt)
 }
 
-func (pass *collectionPass) removeLocal(ctx context.Context, key string) error {
+func (pass *tablePass) removeLocal(ctx context.Context, key string) error {
 	err := pass.mapping.remove(ctx, key)
 	if err != nil {
 		return fmt.Errorf("remove: %w", err)
@@ -113,7 +112,7 @@ func (pass *collectionPass) removeLocal(ctx context.Context, key string) error {
 	return pass.librarySync.library.DeleteNodeLink(ctx, pass.mapping.name(), key)
 }
 
-func (pass *collectionPass) linkRemote(ctx context.Context, key string) error {
+func (pass *tablePass) linkRemote(ctx context.Context, key string) error {
 	node := pass.remote[key]
 	item, err := pass.read(node)
 	if err != nil {
@@ -122,7 +121,7 @@ func (pass *collectionPass) linkRemote(ctx context.Context, key string) error {
 	return pass.saveLink(ctx, key, node.summary.ID, item.hash(), node.summary.UpdatedAt)
 }
 
-func (pass *collectionPass) saveLink(ctx context.Context, key, nodeID, hash, nodeUpdatedAt string) error {
+func (pass *tablePass) saveLink(ctx context.Context, key, nodeID, hash, nodeUpdatedAt string) error {
 	return pass.librarySync.library.SaveNodeLink(ctx, library.NodeLink{
 		Collection:    pass.mapping.name(),
 		Key:           key,
@@ -134,11 +133,11 @@ func (pass *collectionPass) saveLink(ctx context.Context, key, nodeID, hash, nod
 
 // refreshWrittenLinks records the update time the store gave the nodes this
 // pass wrote, so the next pass does not mistake them for remote edits.
-func (pass *collectionPass) refreshWrittenLinks(ctx context.Context) error {
+func (pass *tablePass) refreshWrittenLinks(ctx context.Context) error {
 	if len(pass.written) == 0 {
 		return nil
 	}
-	summaries, err := pass.librarySync.nodes.ListNodes(pass.rootID, pass.path())
+	summaries, err := pass.ownRows()
 	if err != nil {
 		return fmt.Errorf("list written nodes: %w", err)
 	}

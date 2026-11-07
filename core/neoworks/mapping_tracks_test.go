@@ -79,11 +79,11 @@ func TestARatingBecomesATrackNodeAndARatingNode(t *testing.T) {
 	if report.NodesWritten != 2 {
 		t.Fatalf("nodes written = %d, want a track and a rating", report.NodesWritten)
 	}
-	tracks := store.liveItems("tracks")
+	tracks := store.liveRows("Track")
 	if len(tracks) != 1 || tracks[0]["videoId"] != "abc" || tracks[0]["thumbnailUrl"] != "https://lh3.googleusercontent.com/abc=w544-h544-l90-rj" {
 		t.Errorf("track nodes = %v", tracks)
 	}
-	ratings := store.liveItems("ratings")
+	ratings := store.liveRows("Rating")
 	if len(ratings) != 1 || ratings[0]["opinion"] != "like" || ratings[0]["videoId"] != "abc" {
 		t.Errorf("rating nodes = %v", ratings)
 	}
@@ -118,20 +118,20 @@ func TestChangingAndRemovingARatingUpdatesAndDeletesItsNode(t *testing.T) {
 	install.advance(time.Minute)
 	_ = install.library.SetRating(ctx, track, music.ItemKindSong, library.RatingDislike)
 	install.reconcile(t)
-	ratings := store.liveItems("ratings")
+	ratings := store.liveRows("Rating")
 	if len(ratings) != 1 || ratings[0]["opinion"] != "dislike" {
 		t.Fatalf("after dislike: %v", ratings)
 	}
 
 	_ = install.library.SetRating(ctx, track, music.ItemKindSong, library.RatingNone)
 	install.reconcile(t)
-	if ratings := store.liveItems("ratings"); len(ratings) != 0 {
+	if ratings := store.liveRows("Rating"); len(ratings) != 0 {
 		t.Errorf("after unrating: %v", ratings)
 	}
 	if links, _ := install.library.NodeLinks(ctx, "ratings"); len(links) != 0 {
 		t.Errorf("links after unrating: %v", links)
 	}
-	if tracks := store.liveItems("tracks"); len(tracks) != 1 {
+	if tracks := store.liveRows("Track"); len(tracks) != 1 {
 		t.Errorf("the track node must stay, got %v", tracks)
 	}
 }
@@ -177,7 +177,7 @@ func TestAnEpisodeArrivesAsAnEpisode(t *testing.T) {
 
 	phone.reconcile(t)
 
-	tracks := store.liveItems("tracks")
+	tracks := store.liveRows("Track")
 	if len(tracks) != 1 || tracks[0]["kind"] != "episode" {
 		t.Fatalf("track nodes = %v", tracks)
 	}
@@ -222,18 +222,18 @@ func TestTwoOfflineLikesMergeIntoTheNewestAndTheDuplicateNodeGoes(t *testing.T) 
 	phone.reconcile(t)
 	phone.nodes.goOnline()
 
-	if len(store.liveItems("ratings")) != 2 || len(store.liveItems("tracks")) != 2 {
-		t.Fatalf("setup must leave duplicates, got %d ratings and %d tracks", len(store.liveItems("ratings")), len(store.liveItems("tracks")))
+	if len(store.liveRows("Rating")) != 2 || len(store.liveRows("Track")) != 2 {
+		t.Fatalf("setup must leave duplicates, got %d ratings and %d tracks", len(store.liveRows("Rating")), len(store.liveRows("Track")))
 	}
 	phone.reconcile(t)
 	laptop.reconcile(t)
 
-	ratings := store.liveItems("ratings")
+	ratings := store.liveRows("Rating")
 	if len(ratings) != 1 || ratings[0]["opinion"] != "like" {
 		t.Fatalf("rating nodes = %v, want the phone's newer like only", ratings)
 	}
-	if len(store.liveItems("tracks")) != 1 {
-		t.Errorf("track nodes = %v", store.liveItems("tracks"))
+	if len(store.liveRows("Track")) != 1 {
+		t.Errorf("track nodes = %v", store.liveRows("Track"))
 	}
 	rated, _ := laptop.library.Ratings(ctx, []string{"abc"})
 	if rated["abc"] != library.RatingLike {
@@ -244,10 +244,10 @@ func TestTwoOfflineLikesMergeIntoTheNewestAndTheDuplicateNodeGoes(t *testing.T) 
 	}
 }
 
-func TestACollectionWithoutARootIsSkipped(t *testing.T) {
+func TestWithoutARootNothingIsReconciled(t *testing.T) {
 	store := newFakeNodeStore()
 	for nodeID, node := range store.nodes {
-		if node.summary.Collection == "@drift/ratings" {
+		if node.summary.Kind == libneoworks.NodeKindRoot {
 			delete(store.nodes, nodeID)
 		}
 	}
@@ -255,11 +255,11 @@ func TestACollectionWithoutARootIsSkipped(t *testing.T) {
 	_ = install.library.SetRating(t.Context(), syncedTestTrack("def"), music.ItemKindSong, library.RatingLike)
 
 	report := install.reconcile(t)
-	if len(report.WithoutRoot) != 1 || report.WithoutRoot[0] != "ratings" {
-		t.Errorf("without root = %v", report.WithoutRoot)
+	if !report.WithoutRoot || report.NodesWritten != 0 {
+		t.Errorf("report = %+v", report)
 	}
-	if len(store.liveItems("tracks")) != 1 {
-		t.Error("the other collections must still sync")
+	if len(store.liveRows("Track")) != 0 {
+		t.Error("no row may be written without a root")
 	}
 }
 
@@ -285,7 +285,7 @@ func TestAFreshStoreHoldsNoRootsSoNothingIsMapped(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(report.WithoutRoot) != len(librarySync.mappings) || report.NodesWritten != 0 {
+	if !report.WithoutRoot || report.NodesWritten != 0 {
 		t.Errorf("report = %+v", report)
 	}
 }

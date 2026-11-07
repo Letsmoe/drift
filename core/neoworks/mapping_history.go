@@ -50,6 +50,8 @@ type historyMapping struct {
 
 func (historyMapping) name() string { return "history" }
 
+func (historyMapping) table() string { return "DayLog" }
+
 func (historyMapping) optionalFields() []string {
 	return []string{"deviceName", "plays", "searches"}
 }

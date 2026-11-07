@@ -30,6 +30,8 @@ github.com/ncruces/go-strftime v1.0.0 h1:HMFp8mLCTPp341M/ZnA4qaf7ZlsbTc+miZjCLOF
 github.com/ncruces/go-strftime v1.0.0/go.mod h1:Fwc5htZGVVkseilnfgOVb9mKy6w1naJmn9CehxcKcls=
 github.com/neoworks-dev/libneoworks-go v0.0.0-20261011112906-7b4bbfbf7a56 h1:/s3k4F11z15JtwtfW3tai66cWoDTzxdJQvjrGDxqnbE=
 github.com/neoworks-dev/libneoworks-go v0.0.0-20261011112906-7b4bbfbf7a56/go.mod h1:W2t9juuKCt7JmzcIs89f0Xu0jiShOzkGlCpwFi/CUG0=
+github.com/neoworks-dev/libneoworks-go v0.0.0-20261018145813-7f4673ae34e5 h1:okHhM+eorCwmPDgv46IxmhFnqymELxiAH33tIBGyXpk=
+github.com/neoworks-dev/libneoworks-go v0.0.0-20261018145813-7f4673ae34e5/go.mod h1:W2t9juuKCt7JmzcIs89f0Xu0jiShOzkGlCpwFi/CUG0=
 github.com/pion/datachannel v1.6.3 h1:HZAYLpunVI0xi057ZiANl558d0uSpomcWw4UEPz3qXs=
 github.com/pion/datachannel v1.6.3/go.mod h1:oRmkXVVXxkUbqa8MatgdNHW29kvtQY3HUdjJQsfv2GE=
 github.com/pion/dtls/v3 v3.1.9 h1:rpeycmLIkc4krpk1IxP7+39o11QdCXbmV9+FGi9yZJ8=

@@ -22,7 +22,7 @@ func play(t *testing.T, install *testInstall, at time.Time, videoID string) int6
 
 func logsByDay(store *fakeNodeStore) map[string]map[string]any {
 	logs := map[string]map[string]any{}
-	for _, node := range store.liveItems("history") {
+	for _, node := range store.liveRows("DayLog") {
 		key := node["deviceId"].(string) + "|" + node["day"].(string)
 		logs[key] = node
 	}
@@ -129,7 +129,7 @@ func TestAnOwnLogIsRestoredWhenItsNodeIsEditedElsewhere(t *testing.T) {
 	play(t, laptop, time.Date(2026, 10, 2, 12, 0, 0, 0, time.UTC), "abc")
 	laptop.reconcile(t)
 	for _, node := range store.nodes {
-		if node.summary.Collection == "@drift/history" && node.summary.Kind == "item" {
+		if node.inTable("DayLog") {
 			node.content["plays"] = []any{}
 			node.summary.UpdatedAt = store.tick()
 		}
@@ -158,12 +158,12 @@ func TestBlocksSyncAndLiftEverywhere(t *testing.T) {
 	_ = laptop.library.BlockRecommendation(ctx, library.BlockTrack, "abc", "Title abc")
 	laptop.reconcile(t)
 
-	nodes := store.liveItems("blocks")
+	nodes := store.liveRows("Block")
 	if len(nodes) != 3 {
 		t.Fatalf("block nodes = %v", nodes)
 	}
-	if len(store.liveItems("tracks")) != 1 {
-		t.Errorf("a blocked track needs its @drift/tracks item, got %v", store.liveItems("tracks"))
+	if len(store.liveRows("Track")) != 1 {
+		t.Errorf("a blocked track needs its Track row, got %v", store.liveRows("Track"))
 	}
 	phone.reconcile(t)
 	blocks, _ := phone.library.RecommendationBlocks(ctx)
@@ -190,7 +190,7 @@ func TestAHistoryLogWaitsForTracksThatHaveNotArrived(t *testing.T) {
 	play(t, laptop, time.Date(2026, 10, 2, 12, 0, 0, 0, time.UTC), "abc")
 	laptop.reconcile(t)
 	for _, node := range store.nodes {
-		if node.summary.Collection == "@drift/tracks" {
+		if node.inTable("Track") {
 			node.summary.Deleted = true
 		}
 	}

@@ -31,6 +31,8 @@ type playlistMapping struct {
 
 func (playlistMapping) name() string { return "playlists" }
 
+func (playlistMapping) table() string { return "Playlist" }
+
 func (playlistMapping) optionalFields() []string { return []string{"description", "entries"} }
 
 func (playlistMapping) keepsNodes() bool { return false }

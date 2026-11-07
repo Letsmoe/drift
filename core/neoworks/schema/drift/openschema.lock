@@ -1,0 +1,533 @@
+{
+  "lockfileVersion": 1,
+  "generator": "openschema 0.1.0",
+  "createdAt": "2026-11-07T19:31:01.201Z",
+  "updatedAt": "2026-11-07T19:31:01.201Z",
+  "baseline": true,
+  "digest": "sha256-ca458623acd3057e59a5932dc40fd80ef85c27007b058bc95d24468738c741e0",
+  "spaces": {
+    "enum:drift.BlockKind": {
+      "kind": "enum",
+      "ordinals": {
+        "1": {
+          "state": "active",
+          "name": "track",
+          "type": null,
+          "encoding": null,
+          "since": "2026-11-07T19:31:01.201Z",
+          "major": "0.1"
+        },
+        "2": {
+          "state": "active",
+          "name": "artist",
+          "type": null,
+          "encoding": null,
+          "since": "2026-11-07T19:31:01.201Z",
+          "major": "0.1"
+        },
+        "3": {
+          "state": "active",
+          "name": "podcast",
+          "type": null,
+          "encoding": null,
+          "since": "2026-11-07T19:31:01.201Z",
+          "major": "0.1"
+        }
+      }
+    },
+    "enum:drift.Opinion": {
+      "kind": "enum",
+      "ordinals": {
+        "1": {
+          "state": "active",
+          "name": "like",
+          "type": null,
+          "encoding": null,
+          "since": "2026-11-07T19:31:01.201Z",
+          "major": "0.1"
+        },
+        "2": {
+          "state": "active",
+          "name": "dislike",
+          "type": null,
+          "encoding": null,
+          "since": "2026-11-07T19:31:01.201Z",
+          "major": "0.1"
+        }
+      }
+    },
+    "enum:drift.SavedKind": {
+      "kind": "enum",
+      "ordinals": {
+        "1": {
+          "state": "active",
+          "name": "album",
+          "type": null,
+          "encoding": null,
+          "since": "2026-11-07T19:31:01.201Z",
+          "major": "0.1"
+        },
+        "2": {
+          "state": "active",
+          "name": "artist",
+          "type": null,
+          "encoding": null,
+          "since": "2026-11-07T19:31:01.201Z",
+          "major": "0.1"
+        },
+        "3": {
+          "state": "active",
+          "name": "playlist",
+          "type": null,
+          "encoding": null,
+          "since": "2026-11-07T19:31:01.201Z",
+          "major": "0.1"
+        },
+        "4": {
+          "state": "active",
+          "name": "podcast",
+          "type": null,
+          "encoding": null,
+          "since": "2026-11-07T19:31:01.201Z",
+          "major": "0.1"
+        }
+      }
+    },
+    "enum:drift.TrackKind": {
+      "kind": "enum",
+      "ordinals": {
+        "1": {
+          "state": "active",
+          "name": "song",
+          "type": null,
+          "encoding": null,
+          "since": "2026-11-07T19:31:01.201Z",
+          "major": "0.1"
+        },
+        "2": {
+          "state": "active",
+          "name": "episode",
+          "type": null,
+          "encoding": null,
+          "since": "2026-11-07T19:31:01.201Z",
+          "major": "0.1"
+        }
+      }
+    },
+    "model:drift.Album": {
+      "kind": "model",
+      "ordinals": {
+        "1": {
+          "state": "active",
+          "name": "id",
+          "type": "string",
+          "encoding": "singular:len",
+          "since": "2026-11-07T19:31:01.201Z",
+          "major": "0.1"
+        },
+        "2": {
+          "state": "active",
+          "name": "name",
+          "type": "string",
+          "encoding": "singular:len",
+          "since": "2026-11-07T19:31:01.201Z",
+          "major": "0.1"
+        }
+      }
+    },
+    "model:drift.Artist": {
+      "kind": "model",
+      "ordinals": {
+        "1": {
+          "state": "active",
+          "name": "id",
+          "type": "string?",
+          "encoding": "singular:len",
+          "since": "2026-11-07T19:31:01.201Z",
+          "major": "0.1"
+        },
+        "2": {
+          "state": "active",
+          "name": "name",
+          "type": "string",
+          "encoding": "singular:len",
+          "since": "2026-11-07T19:31:01.201Z",
+          "major": "0.1"
+        }
+      }
+    },
+    "model:drift.Block": {
+      "kind": "model",
+      "ordinals": {
+        "1": {
+          "state": "active",
+          "name": "kind",
+          "type": "BlockKind",
+          "encoding": "singular:varint",
+          "since": "2026-11-07T19:31:01.201Z",
+          "major": "0.1"
+        },
+        "2": {
+          "state": "active",
+          "name": "targetId",
+          "type": "string",
+          "encoding": "singular:len",
+          "since": "2026-11-07T19:31:01.201Z",
+          "major": "0.1"
+        },
+        "3": {
+          "state": "active",
+          "name": "name",
+          "type": "string",
+          "encoding": "singular:len",
+          "since": "2026-11-07T19:31:01.201Z",
+          "major": "0.1"
+        },
+        "4": {
+          "state": "active",
+          "name": "createdAt",
+          "type": "timestamp",
+          "encoding": "singular:varint",
+          "since": "2026-11-07T19:31:01.201Z",
+          "major": "0.1"
+        }
+      }
+    },
+    "model:drift.DayLog": {
+      "kind": "model",
+      "ordinals": {
+        "1": {
+          "state": "active",
+          "name": "deviceId",
+          "type": "string",
+          "encoding": "singular:len",
+          "since": "2026-11-07T19:31:01.201Z",
+          "major": "0.1"
+        },
+        "2": {
+          "state": "active",
+          "name": "deviceName",
+          "type": "string?",
+          "encoding": "singular:len",
+          "since": "2026-11-07T19:31:01.201Z",
+          "major": "0.1"
+        },
+        "3": {
+          "state": "active",
+          "name": "day",
+          "type": "date",
+          "encoding": "singular:varint",
+          "since": "2026-11-07T19:31:01.201Z",
+          "major": "0.1"
+        },
+        "4": {
+          "state": "active",
+          "name": "plays",
+          "type": "[Play]?",
+          "encoding": "wrapper:repeated",
+          "since": "2026-11-07T19:31:01.201Z",
+          "major": "0.1"
+        },
+        "5": {
+          "state": "active",
+          "name": "searches",
+          "type": "[Search]?",
+          "encoding": "wrapper:repeated",
+          "since": "2026-11-07T19:31:01.201Z",
+          "major": "0.1"
+        }
+      }
+    },
+    "model:drift.Play": {
+      "kind": "model",
+      "ordinals": {
+        "1": {
+          "state": "active",
+          "name": "videoId",
+          "type": "string",
+          "encoding": "singular:len",
+          "since": "2026-11-07T19:31:01.201Z",
+          "major": "0.1"
+        },
+        "2": {
+          "state": "active",
+          "name": "context",
+          "type": "string?",
+          "encoding": "singular:len",
+          "since": "2026-11-07T19:31:01.201Z",
+          "major": "0.1"
+        },
+        "3": {
+          "state": "active",
+          "name": "startedAt",
+          "type": "timestamp",
+          "encoding": "singular:varint",
+          "since": "2026-11-07T19:31:01.201Z",
+          "major": "0.1"
+        },
+        "4": {
+          "state": "active",
+          "name": "progressSeconds",
+          "type": "u32",
+          "encoding": "singular:varint",
+          "since": "2026-11-07T19:31:01.201Z",
+          "major": "0.1"
+        },
+        "5": {
+          "state": "active",
+          "name": "completed",
+          "type": "bool",
+          "encoding": "singular:varint",
+          "since": "2026-11-07T19:31:01.201Z",
+          "major": "0.1"
+        }
+      }
+    },
+    "model:drift.Playlist": {
+      "kind": "model",
+      "ordinals": {
+        "1": {
+          "state": "active",
+          "name": "id",
+          "type": "string",
+          "encoding": "singular:len",
+          "since": "2026-11-07T19:31:01.201Z",
+          "major": "0.1"
+        },
+        "2": {
+          "state": "active",
+          "name": "name",
+          "type": "string",
+          "encoding": "singular:len",
+          "since": "2026-11-07T19:31:01.201Z",
+          "major": "0.1"
+        },
+        "3": {
+          "state": "active",
+          "name": "description",
+          "type": "string?",
+          "encoding": "singular:len",
+          "since": "2026-11-07T19:31:01.201Z",
+          "major": "0.1"
+        },
+        "4": {
+          "state": "active",
+          "name": "createdAt",
+          "type": "timestamp",
+          "encoding": "singular:varint",
+          "since": "2026-11-07T19:31:01.201Z",
+          "major": "0.1"
+        },
+        "5": {
+          "state": "active",
+          "name": "updatedAt",
+          "type": "timestamp",
+          "encoding": "singular:varint",
+          "since": "2026-11-07T19:31:01.201Z",
+          "major": "0.1"
+        }
+      }
+    },
+    "model:drift.PlaylistEntry": {
+      "kind": "model",
+      "ordinals": {
+        "1": {
+          "state": "active",
+          "name": "playlist",
+          "type": "uuid",
+          "encoding": "singular:len",
+          "since": "2026-11-07T19:31:01.201Z",
+          "major": "0.1"
+        },
+        "2": {
+          "state": "active",
+          "name": "track",
+          "type": "uuid",
+          "encoding": "singular:len",
+          "since": "2026-11-07T19:31:01.201Z",
+          "major": "0.1"
+        },
+        "3": {
+          "state": "active",
+          "name": "position",
+          "type": "f64",
+          "encoding": "singular:i64",
+          "since": "2026-11-07T19:31:01.201Z",
+          "major": "0.1"
+        },
+        "4": {
+          "state": "active",
+          "name": "addedAt",
+          "type": "timestamp",
+          "encoding": "singular:varint",
+          "since": "2026-11-07T19:31:01.201Z",
+          "major": "0.1"
+        }
+      }
+    },
+    "model:drift.Rating": {
+      "kind": "model",
+      "ordinals": {
+        "1": {
+          "state": "active",
+          "name": "track",
+          "type": "uuid",
+          "encoding": "singular:len",
+          "since": "2026-11-07T19:31:01.201Z",
+          "major": "0.1"
+        },
+        "2": {
+          "state": "active",
+          "name": "opinion",
+          "type": "Opinion",
+          "encoding": "singular:varint",
+          "since": "2026-11-07T19:31:01.201Z",
+          "major": "0.1"
+        },
+        "3": {
+          "state": "active",
+          "name": "updatedAt",
+          "type": "timestamp",
+          "encoding": "singular:varint",
+          "since": "2026-11-07T19:31:01.201Z",
+          "major": "0.1"
+        }
+      }
+    },
+    "model:drift.SavedItem": {
+      "kind": "model",
+      "ordinals": {
+        "1": {
+          "state": "active",
+          "name": "kind",
+          "type": "SavedKind",
+          "encoding": "singular:varint",
+          "since": "2026-11-07T19:31:01.201Z",
+          "major": "0.1"
+        },
+        "2": {
+          "state": "active",
+          "name": "browseId",
+          "type": "string",
+          "encoding": "singular:len",
+          "since": "2026-11-07T19:31:01.201Z",
+          "major": "0.1"
+        },
+        "3": {
+          "state": "active",
+          "name": "title",
+          "type": "string",
+          "encoding": "singular:len",
+          "since": "2026-11-07T19:31:01.201Z",
+          "major": "0.1"
+        },
+        "4": {
+          "state": "active",
+          "name": "subtitle",
+          "type": "string?",
+          "encoding": "singular:len",
+          "since": "2026-11-07T19:31:01.201Z",
+          "major": "0.1"
+        },
+        "5": {
+          "state": "active",
+          "name": "thumbnailUrl",
+          "type": "string?",
+          "encoding": "singular:len",
+          "since": "2026-11-07T19:31:01.201Z",
+          "major": "0.1"
+        },
+        "6": {
+          "state": "active",
+          "name": "savedAt",
+          "type": "timestamp",
+          "encoding": "singular:varint",
+          "since": "2026-11-07T19:31:01.201Z",
+          "major": "0.1"
+        }
+      }
+    },
+    "model:drift.Search": {
+      "kind": "model",
+      "ordinals": {
+        "1": {
+          "state": "active",
+          "name": "query",
+          "type": "string",
+          "encoding": "singular:len",
+          "since": "2026-11-07T19:31:01.201Z",
+          "major": "0.1"
+        },
+        "2": {
+          "state": "active",
+          "name": "searchedAt",
+          "type": "timestamp",
+          "encoding": "singular:varint",
+          "since": "2026-11-07T19:31:01.201Z",
+          "major": "0.1"
+        }
+      }
+    },
+    "model:drift.Track": {
+      "kind": "model",
+      "ordinals": {
+        "1": {
+          "state": "active",
+          "name": "videoId",
+          "type": "string",
+          "encoding": "singular:len",
+          "since": "2026-11-07T19:31:01.201Z",
+          "major": "0.1"
+        },
+        "2": {
+          "state": "active",
+          "name": "title",
+          "type": "string",
+          "encoding": "singular:len",
+          "since": "2026-11-07T19:31:01.201Z",
+          "major": "0.1"
+        },
+        "3": {
+          "state": "active",
+          "name": "artists",
+          "type": "[Artist]?",
+          "encoding": "wrapper:repeated",
+          "since": "2026-11-07T19:31:01.201Z",
+          "major": "0.1"
+        },
+        "4": {
+          "state": "active",
+          "name": "album",
+          "type": "Album?",
+          "encoding": "singular:len",
+          "since": "2026-11-07T19:31:01.201Z",
+          "major": "0.1"
+        },
+        "5": {
+          "state": "active",
+          "name": "durationSeconds",
+          "type": "u32",
+          "encoding": "singular:varint",
+          "since": "2026-11-07T19:31:01.201Z",
+          "major": "0.1"
+        },
+        "6": {
+          "state": "active",
+          "name": "thumbnailUrl",
+          "type": "string?",
+          "encoding": "singular:len",
+          "since": "2026-11-07T19:31:01.201Z",
+          "major": "0.1"
+        },
+        "7": {
+          "state": "active",
+          "name": "kind",
+          "type": "TrackKind?",
+          "encoding": "singular:varint",
+          "since": "2026-11-07T19:31:01.201Z",
+          "major": "0.1"
+        }
+      }
+    }
+  }
+}

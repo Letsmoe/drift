@@ -34,10 +34,13 @@ type fakeNode struct {
 
 func newFakeNodeStore() *fakeNodeStore {
 	store := &fakeNodeStore{clock: time.Date(2026, 10, 1, 0, 0, 0, 0, time.UTC), nodes: map[string]*fakeNode{}}
-	for _, name := range Collections {
-		store.add(libneoworks.NodeSummary{OwnerID: testUserID, Collection: collectionPath(name), Kind: libneoworks.NodeKindRoot}, nil)
-	}
+	store.add(libneoworks.NodeSummary{OwnerID: testUserID, Collection: collection, Kind: libneoworks.NodeKindRoot}, nil)
 	return store
+}
+
+// inTable says whether the node is a row of table.
+func (node *fakeNode) inTable(table string) bool {
+	return node.summary.Kind == libneoworks.NodeKindRow && node.summary.Table != nil && *node.summary.Table == table
 }
 
 func (store *fakeNodeStore) add(summary libneoworks.NodeSummary, content map[string]any) string {
@@ -53,18 +56,17 @@ func (store *fakeNodeStore) tick() string {
 	return library.FormatTime(store.clock)
 }
 
-// liveItems returns the contents of the live items of a collection.
-func (store *fakeNodeStore) liveItems(name string) []map[string]any {
+// liveRows returns the contents of the live rows of a table.
+func (store *fakeNodeStore) liveRows(table string) []map[string]any {
 	store.mutex.Lock()
 	defer store.mutex.Unlock()
-	var items []map[string]any
+	var rows []map[string]any
 	for _, node := range store.nodes {
-		live := node.summary.Kind == libneoworks.NodeKindItem && !node.summary.Deleted
-		if live && node.summary.Collection == collectionPath(name) {
-			items = append(items, node.content)
+		if node.inTable(table) && !node.summary.Deleted {
+			rows = append(rows, node.content)
 		}
 	}
-	return items
+	return rows
 }
 
 // fakeNodes is one install's view of the store; hidden nodes are ones that
@@ -83,7 +85,7 @@ func (view *fakeNodes) goOffline() {
 	view.store.mutex.Lock()
 	defer view.store.mutex.Unlock()
 	for nodeID, node := range view.store.nodes {
-		view.hidden[nodeID] = node.summary.Kind == libneoworks.NodeKindItem
+		view.hidden[nodeID] = node.summary.Kind == libneoworks.NodeKindRow
 	}
 }
 
@@ -91,14 +93,14 @@ func (view *fakeNodes) goOnline() {
 	view.hidden = map[string]bool{}
 }
 
-func (view *fakeNodes) CreateNode(node libneoworks.NewNode) (string, error) {
+func (view *fakeNodes) CreateRow(row libneoworks.NewRow) (string, error) {
 	view.store.mutex.Lock()
 	defer view.store.mutex.Unlock()
-	content, err := roundTrip(node.Content)
+	content, err := roundTrip(row.Content)
 	if err != nil {
 		return "", err
 	}
-	summary := libneoworks.NodeSummary{OwnerID: testUserID, Collection: node.Collection, Kind: node.Kind, ParentID: &node.ParentID}
+	summary := libneoworks.NodeSummary{OwnerID: testUserID, Collection: row.Collection, Kind: libneoworks.NodeKindRow, Table: &row.Table}
 	return view.store.add(summary, content), nil
 }
 
@@ -124,16 +126,16 @@ func (view *fakeNodes) UpdateNode(update libneoworks.NodeUpdate) error {
 	return nil
 }
 
-func (view *fakeNodes) DeleteNode(nodeID string, _ bool) error {
+func (view *fakeNodes) DeleteNode(nodeID string) ([]string, error) {
 	view.store.mutex.Lock()
 	defer view.store.mutex.Unlock()
 	node, found := view.store.nodes[nodeID]
 	if !found {
-		return libneoworks.StatusNotFound
+		return nil, libneoworks.StatusNotFound
 	}
 	node.summary.Deleted = true
 	node.summary.UpdatedAt = view.store.tick()
-	return nil
+	return []string{nodeID}, nil
 }
 
 func (view *fakeNodes) ReadNode(nodeID string) (json.RawMessage, error) {

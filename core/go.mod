@@ -7,7 +7,7 @@ require (
 	github.com/godbus/dbus/v5 v5.2.2
 	github.com/google/uuid v1.6.0
 	github.com/gorilla/websocket v1.5.3
-	github.com/neoworks-dev/libneoworks-go v0.0.0-20261011112906-7b4bbfbf7a56
+	github.com/neoworks-dev/libneoworks-go v0.0.0-20261018145813-7f4673ae34e5
 	github.com/pion/webrtc/v4 v4.2.22
 	github.com/zalando/go-keyring v0.2.8
 	golang.org/x/crypto v0.57.0

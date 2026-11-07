@@ -1,35 +1,22 @@
 package neoworks
 
 import (
-	"embed"
-	"fmt"
+	_ "embed"
 )
 
-//go:embed schema/*/generated/schema.descriptor.json
-var descriptorFiles embed.FS
+// collection is the registry path of the collection Drift syncs.
+const collection = "@letsmoe/drift"
 
-// Collections are the @drift collections Drift syncs, by name in the drift scope.
-var Collections = []string{"tracks", "ratings", "saved", "playlists", "history", "blocks"}
+// schemaVersion is the published version of the bundled descriptor, the
+// version in schema/drift/openschema.yaml.
+const schemaVersion = "0.1.0"
 
-// collectionPath is a collection's registry path, e.g. @drift/tracks.
-func collectionPath(name string) string {
-	return "@drift/" + name
-}
+// descriptor is the published descriptor of the collection, byte for byte.
+//
+//go:embed schema/drift/generated/schema.descriptor.json
+var descriptor []byte
 
-// descriptor is the published descriptor of a collection, byte for byte.
-func descriptor(name string) ([]byte, error) {
-	data, err := descriptorFiles.ReadFile("schema/" + name + "/generated/schema.descriptor.json")
-	if err != nil {
-		return nil, fmt.Errorf("neoworks: descriptor of %s: %w", name, err)
-	}
-	return data, nil
-}
-
-// scopes are what Drift asks for at sign-in: read and write on its collections.
+// scopes are what Drift asks for at sign-in: read and write on its collection.
 func scopes() []string {
-	requested := []string{"openid", "profile", "email"}
-	for _, name := range Collections {
-		requested = append(requested, collectionPath(name)+":read", collectionPath(name)+":write")
-	}
-	return requested
+	return []string{"openid", "profile", "email", collection + ":read", collection + ":write"}
 }

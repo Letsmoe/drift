@@ -1,4 +1,4 @@
-// Where the @drift collections live, and the neoworks.dev checkout the Neoworks
+// Where Drift's collection schemas live, and the neoworks.dev checkout the Neoworks
 // scripts take the openschema CLI and the local stack's ports from: NEOWORKS_DIR,
 // or the directory next to this repository's main checkout.
 import { spawnSync } from 'node:child_process';
@@ -6,7 +6,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 
 export const schemaDirectory = path.resolve(import.meta.dirname, '../core/neoworks/schema');
-export const collections = ['tracks', 'ratings', 'saved', 'playlists', 'history', 'blocks'];
+export const collections = ['drift'];
 
 function mainCheckoutDirectory(): string {
 	const result = spawnSync('git', ['rev-parse', '--path-format=absolute', '--git-common-dir'], {

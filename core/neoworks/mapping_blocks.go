@@ -22,6 +22,8 @@ type blockMapping struct {
 
 func (blockMapping) name() string { return "blocks" }
 
+func (blockMapping) table() string { return "Block" }
+
 func (blockMapping) optionalFields() []string { return nil }
 
 func (blockMapping) keepsNodes() bool { return false }

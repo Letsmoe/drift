@@ -42,6 +42,8 @@ type trackMapping struct {
 
 func (trackMapping) name() string { return "tracks" }
 
+func (trackMapping) table() string { return "Track" }
+
 func (trackMapping) optionalFields() []string {
 	return []string{"artists", "album", "thumbnailUrl"}
 }

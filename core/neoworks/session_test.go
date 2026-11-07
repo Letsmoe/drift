@@ -158,8 +158,8 @@ func TestBeginSignInAsksForDriftsCollectionsWithPKCE(t *testing.T) {
 			t.Errorf("%s = %q, want %q", name, query.Get(name), want)
 		}
 	}
-	if !strings.Contains(query.Get("scope"), "@drift/history:read") || !strings.Contains(query.Get("scope"), "@drift/blocks:write") {
-		t.Errorf("scope %q misses Drift's collections", query.Get("scope"))
+	if !strings.Contains(query.Get("scope"), "@letsmoe/drift:read") || !strings.Contains(query.Get("scope"), "@letsmoe/drift:write") {
+		t.Errorf("scope %q misses Drift's collection", query.Get("scope"))
 	}
 }
 

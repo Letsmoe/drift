@@ -1,0 +1,6 @@
+scope: letsmoe
+name: drift
+version: 0.1.0
+title: 'Drift'
+description: 'Your Drift library: ratings, saved items, playlists, blocks and listening history.'
+entry: drift.schema

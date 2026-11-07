@@ -1,4 +1,4 @@
-// Generates each @drift collection's descriptor into its generated/ directory.
+// Generates each Drift collection's descriptor into its generated/ directory.
 // The descriptor is what `openschema publish` uploads and what core hands to
 // libneoworks, so the two have to stay byte for byte the same.
 import { spawnSync } from 'node:child_process';

@@ -26,6 +26,8 @@ type ratingMapping struct {
 
 func (ratingMapping) name() string { return "ratings" }
 
+func (ratingMapping) table() string { return "Rating" }
+
 func (ratingMapping) optionalFields() []string { return nil }
 
 func (ratingMapping) keepsNodes() bool { return false }

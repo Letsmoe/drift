@@ -19,14 +19,13 @@ type remoteNode struct {
 	content *entity
 }
 
-// collectionPass reconciles one collection.
-type collectionPass struct {
+// tablePass reconciles one table.
+type tablePass struct {
 	librarySync *LibrarySync
 	mapping     collectionMapping
 	userID      string
 	report      *ReconcileReport
 
-	rootID     string
 	links      map[string]library.NodeLink
 	local      map[string]entity
 	remote     map[string]*remoteNode
@@ -35,8 +34,8 @@ type collectionPass struct {
 	written map[string]string
 }
 
-func newCollectionPass(librarySync *LibrarySync, mapping collectionMapping, userID string, report *ReconcileReport) *collectionPass {
-	return &collectionPass{
+func newTablePass(librarySync *LibrarySync, mapping collectionMapping, userID string, report *ReconcileReport) *tablePass {
+	return &tablePass{
 		librarySync: librarySync,
 		mapping:     mapping,
 		userID:      userID,
@@ -47,20 +46,8 @@ func newCollectionPass(librarySync *LibrarySync, mapping collectionMapping, user
 	}
 }
 
-func (pass *collectionPass) path() string {
-	return collectionPath(pass.mapping.name())
-}
-
-func (pass *collectionPass) run(ctx context.Context) error {
-	found, err := pass.findRoot()
-	if err != nil {
-		return err
-	}
-	if !found {
-		pass.report.WithoutRoot = append(pass.report.WithoutRoot, pass.mapping.name())
-		return nil
-	}
-	err = pass.load(ctx)
+func (pass *tablePass) run(ctx context.Context) error {
+	err := pass.load(ctx)
 	if err != nil {
 		return err
 	}
@@ -68,23 +55,26 @@ func (pass *collectionPass) run(ctx context.Context) error {
 	return errors.Join(failure, pass.refreshWrittenLinks(ctx))
 }
 
-// findRoot looks for the signed-in user's root of the collection; without a
-// grant of the collection there is none.
-func (pass *collectionPass) findRoot() (bool, error) {
-	roots, err := pass.librarySync.nodes.ListNodes("", pass.path())
+// ownRows lists the rows of this table the signed-in user owns, deleted ones
+// included. Rows shared by other people are left to their owners.
+func (pass *tablePass) ownRows() ([]libneoworks.NodeSummary, error) {
+	summaries, err := pass.librarySync.nodes.ListNodes("", collection)
 	if err != nil {
-		return false, fmt.Errorf("list roots: %w", err)
+		return nil, err
 	}
-	for _, root := range roots {
-		if root.Kind == libneoworks.NodeKindRoot && !root.Deleted && root.OwnerID == pass.userID {
-			pass.rootID = root.ID
-			return true, nil
+	var rows []libneoworks.NodeSummary
+	for _, summary := range summaries {
+		if summary.Kind != libneoworks.NodeKindRow || summary.OwnerID != pass.userID {
+			continue
+		}
+		if summary.Table != nil && *summary.Table == pass.mapping.table() {
+			rows = append(rows, summary)
 		}
 	}
-	return false, nil
+	return rows, nil
 }
 
-func (pass *collectionPass) load(ctx context.Context) error {
+func (pass *tablePass) load(ctx context.Context) error {
 	var err error
 	pass.links, err = pass.librarySync.library.NodeLinks(ctx, pass.mapping.name())
 	if err != nil {
@@ -101,9 +91,9 @@ func (pass *collectionPass) load(ctx context.Context) error {
 	return pass.loadRemote()
 }
 
-// loadRemote groups the live item nodes by natural key and keeps the newest of each.
-func (pass *collectionPass) loadRemote() error {
-	summaries, err := pass.librarySync.nodes.ListNodes(pass.rootID, pass.path())
+// loadRemote groups the live rows by natural key and keeps the newest of each.
+func (pass *tablePass) loadRemote() error {
+	summaries, err := pass.ownRows()
 	if err != nil {
 		return fmt.Errorf("list nodes: %w", err)
 	}
@@ -121,10 +111,10 @@ func (pass *collectionPass) loadRemote() error {
 	return nil
 }
 
-// classify files a node under its natural key, or notes it as deleted. A node
+// classify files a row under its natural key, or notes it as deleted. A row
 // that is rejected or cannot be read is left alone.
-func (pass *collectionPass) classify(summary libneoworks.NodeSummary, keyOfNode map[string]string, groups map[string][]*remoteNode) {
-	if summary.Kind != libneoworks.NodeKindItem || summary.Rejected {
+func (pass *tablePass) classify(summary libneoworks.NodeSummary, keyOfNode map[string]string, groups map[string][]*remoteNode) {
+	if summary.Rejected {
 		return
 	}
 	if summary.Deleted {
@@ -137,14 +127,14 @@ func (pass *collectionPass) classify(summary libneoworks.NodeSummary, keyOfNode 
 		var err error
 		key, err = pass.discoverKey(node)
 		if err != nil {
-			pass.librarySync.logger.Warn("neoworks: skipping node", "collection", pass.path(), "node", summary.ID, "error", err)
+			pass.librarySync.logger.Warn("neoworks: skipping node", "table", pass.mapping.table(), "node", summary.ID, "error", err)
 			return
 		}
 	}
 	groups[key] = append(groups[key], node)
 }
 
-func (pass *collectionPass) discoverKey(node *remoteNode) (string, error) {
+func (pass *tablePass) discoverKey(node *remoteNode) (string, error) {
 	item, err := pass.read(node)
 	if err != nil {
 		return "", err
@@ -153,7 +143,7 @@ func (pass *collectionPass) discoverKey(node *remoteNode) (string, error) {
 }
 
 // read loads and decodes the node's content once.
-func (pass *collectionPass) read(node *remoteNode) (entity, error) {
+func (pass *tablePass) read(node *remoteNode) (entity, error) {
 	if node.content != nil {
 		return *node.content, nil
 	}
@@ -171,7 +161,7 @@ func (pass *collectionPass) read(node *remoteNode) (entity, error) {
 
 // keepNewest returns the newest node of a group and deletes the others: two
 // devices that created the same entity offline left duplicates.
-func (pass *collectionPass) keepNewest(group []*remoteNode) *remoteNode {
+func (pass *tablePass) keepNewest(group []*remoteNode) *remoteNode {
 	newest := group[0]
 	for _, candidate := range group[1:] {
 		if newerNode(candidate.summary, newest.summary) {
@@ -195,16 +185,16 @@ func newerNode(candidate, current libneoworks.NodeSummary) bool {
 	return candidateTime.After(currentTime)
 }
 
-func (pass *collectionPass) deleteDuplicate(duplicate *remoteNode) {
-	err := pass.librarySync.nodes.DeleteNode(duplicate.summary.ID, false)
+func (pass *tablePass) deleteDuplicate(duplicate *remoteNode) {
+	_, err := pass.librarySync.nodes.DeleteNode(duplicate.summary.ID)
 	if err != nil {
-		pass.librarySync.logger.Warn("neoworks: deleting duplicate node", "collection", pass.path(), "node", duplicate.summary.ID, "error", err)
+		pass.librarySync.logger.Warn("neoworks: deleting duplicate node", "table", pass.mapping.table(), "node", duplicate.summary.ID, "error", err)
 		return
 	}
 	pass.report.NodesWritten++
 }
 
-func (pass *collectionPass) reconcileKeys(ctx context.Context) error {
+func (pass *tablePass) reconcileKeys(ctx context.Context) error {
 	keys := map[string]bool{}
 	for key := range pass.local {
 		keys[key] = true
@@ -225,7 +215,7 @@ func (pass *collectionPass) reconcileKeys(ctx context.Context) error {
 	return errors.Join(failures...)
 }
 
-func (pass *collectionPass) reconcileKey(ctx context.Context, key string) error {
+func (pass *tablePass) reconcileKey(ctx context.Context, key string) error {
 	state, err := pass.situationOf(key)
 	if err != nil {
 		return err
@@ -233,7 +223,7 @@ func (pass *collectionPass) reconcileKey(ctx context.Context, key string) error 
 	return pass.execute(ctx, key, decide(state))
 }
 
-func (pass *collectionPass) situationOf(key string) (situation, error) {
+func (pass *tablePass) situationOf(key string) (situation, error) {
 	state := situation{owned: pass.mapping.ownsKey(key), keepsNodes: pass.mapping.keepsNodes()}
 	pass.describeLocal(key, &state)
 	node, hasNode := pass.remote[key]
@@ -256,7 +246,7 @@ func (pass *collectionPass) situationOf(key string) (situation, error) {
 	return state, nil
 }
 
-func (pass *collectionPass) describeLocal(key string, state *situation) {
+func (pass *tablePass) describeLocal(key string, state *situation) {
 	item, found := pass.local[key]
 	if !found {
 		return
@@ -266,7 +256,7 @@ func (pass *collectionPass) describeLocal(key string, state *situation) {
 	state.localUpdatedAt = item.updatedAt
 }
 
-func (pass *collectionPass) describeRemote(node *remoteNode, state situation) (situation, error) {
+func (pass *tablePass) describeRemote(node *remoteNode, state situation) (situation, error) {
 	item, err := pass.read(node)
 	if err != nil {
 		return state, err

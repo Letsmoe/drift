@@ -31,7 +31,7 @@ func TestASavedAlbumReachesAnotherInstallAndUnsavingRemovesIt(t *testing.T) {
 	}
 	laptop.reconcile(t)
 
-	nodes := store.liveItems("saved")
+	nodes := store.liveRows("SavedItem")
 	if len(nodes) != 1 || nodes[0]["kind"] != "album" || nodes[0]["browseId"] != "MPREb_1" ||
 		nodes[0]["thumbnailUrl"] != "https://lh3.googleusercontent.com/MPREb_1=w544-h544-l90-rj" {
 		t.Fatalf("saved nodes = %v", nodes)
@@ -67,10 +67,10 @@ func TestSavedItemsOfTwoKindsWithTheSameIDStayApart(t *testing.T) {
 
 	install.reconcile(t)
 
-	if nodes := store.liveItems("saved"); len(nodes) != 2 {
+	if nodes := store.liveRows("SavedItem"); len(nodes) != 2 {
 		t.Errorf("saved nodes = %v", nodes)
 	}
-	if nodes := store.liveItems("saved"); slices.ContainsFunc(nodes, func(node map[string]any) bool { _, has := node["thumbnailUrl"]; return has && node["kind"] == "artist" }) {
+	if nodes := store.liveRows("SavedItem"); slices.ContainsFunc(nodes, func(node map[string]any) bool { _, has := node["thumbnailUrl"]; return has && node["kind"] == "artist" }) {
 		t.Error("an artist without a cover must not carry a thumbnailUrl")
 	}
 }
@@ -112,7 +112,7 @@ func TestAPlaylistKeepsItsOrderOnAnotherInstall(t *testing.T) {
 	playlist := orderedPlaylist(t, laptop, "Road trip", "c", "a", "b")
 	laptop.reconcile(t)
 
-	nodes := store.liveItems("playlists")
+	nodes := store.liveRows("Playlist")
 	if len(nodes) != 1 || nodes[0]["name"] != "Road trip" {
 		t.Fatalf("playlist nodes = %v", nodes)
 	}
@@ -120,8 +120,8 @@ func TestAPlaylistKeepsItsOrderOnAnotherInstall(t *testing.T) {
 	if len(entries) != 3 || entries[0].(map[string]any)["videoId"] != "c" || entries[2].(map[string]any)["videoId"] != "b" {
 		t.Fatalf("entries = %v", entries)
 	}
-	if len(store.liveItems("tracks")) != 3 {
-		t.Errorf("track nodes = %d, want one per entry", len(store.liveItems("tracks")))
+	if len(store.liveRows("Track")) != 3 {
+		t.Errorf("track nodes = %d, want one per entry", len(store.liveRows("Track")))
 	}
 
 	phone.reconcile(t)
@@ -169,7 +169,7 @@ func TestAPlaylistKeepsItsIDEverywhereAndRelinksAfterLinksAreLost(t *testing.T) 
 	if again := laptop.reconcile(t); again.NodesWritten != 0 || again.LibraryWritten != 0 {
 		t.Errorf("relinking must write nothing, wrote %+v", again)
 	}
-	if nodes := store.liveItems("playlists"); len(nodes) != 1 || nodes[0]["id"] != playlist.ID {
+	if nodes := store.liveRows("Playlist"); len(nodes) != 1 || nodes[0]["id"] != playlist.ID {
 		t.Errorf("playlist nodes = %v", nodes)
 	}
 }
@@ -187,7 +187,7 @@ func TestEmptyingAPlaylistClearsItsEntriesAndDescriptionOnTheNode(t *testing.T) 
 	_ = install.library.RenamePlaylist(t.Context(), playlist.ID, "Mix", "")
 	install.reconcile(t)
 
-	nodes := store.liveItems("playlists")
+	nodes := store.liveRows("Playlist")
 	if _, has := nodes[0]["entries"]; has {
 		t.Errorf("entries stayed on the node: %v", nodes[0])
 	}
@@ -211,8 +211,8 @@ func TestDeletingAPlaylistDeletesItEverywhere(t *testing.T) {
 	if summaries, _ := phone.library.Playlists(t.Context()); len(summaries) != 0 {
 		t.Errorf("phone playlists = %v", summaries)
 	}
-	if len(store.liveItems("playlists")) != 0 {
-		t.Errorf("playlist nodes remain: %v", store.liveItems("playlists"))
+	if len(store.liveRows("Playlist")) != 0 {
+		t.Errorf("playlist nodes remain: %v", store.liveRows("Playlist"))
 	}
 }
 
@@ -223,7 +223,7 @@ func TestAPlaylistWaitsForTracksThatHaveNotArrived(t *testing.T) {
 	orderedPlaylist(t, laptop, "Mix", "a")
 	laptop.reconcile(t)
 	for _, node := range store.nodes {
-		if node.summary.Collection == "@drift/tracks" {
+		if node.inTable("Track") {
 			node.summary.Deleted = true
 		}
 	}
@@ -250,14 +250,14 @@ func TestTwoOfflineSavesOfOneAlbumMergeIntoTheNewest(t *testing.T) {
 	_ = phone.library.Save(ctx, renamed)
 	phone.reconcile(t)
 	phone.nodes.goOnline()
-	if len(store.liveItems("saved")) != 2 {
-		t.Fatalf("setup must leave two nodes, got %v", store.liveItems("saved"))
+	if len(store.liveRows("SavedItem")) != 2 {
+		t.Fatalf("setup must leave two nodes, got %v", store.liveRows("SavedItem"))
 	}
 
 	phone.reconcile(t)
 	laptop.reconcile(t)
 
-	nodes := store.liveItems("saved")
+	nodes := store.liveRows("SavedItem")
 	if len(nodes) != 1 || nodes[0]["title"] != "Album (Deluxe)" {
 		t.Fatalf("saved nodes = %v, want the phone's newer one", nodes)
 	}

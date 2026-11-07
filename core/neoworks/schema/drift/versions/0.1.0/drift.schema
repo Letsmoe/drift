@@ -1,0 +1,162 @@
+// drift.schema — the @letsmoe/drift collection: everything Drift syncs, as
+// tables of one collection. Ratings and playlist entries refer to their track as
+// a row, so whoever opens a rating or a playlist opens its tracks too, and
+// sharing a playlist shares its tracks with one grant.
+
+namespace drift
+
+/// A track another table refers to, so another device can show it without
+/// asking YouTube first. Tracks are a shared cache and are never deleted.
+@neoworks.table
+model Track {
+  @neoworks.index @minLength(1) @maxLength(64)
+  1 videoId: string
+  @neoworks.title @maxLength(500)
+  2 title: string
+  3 artists: [Artist]?
+  4 album: Album?
+  @minValue(0)
+  5 durationSeconds: u32
+  /// The largest cover; Google image URLs carry their size and are resized by rewriting it.
+  @format("uri")
+  6 thumbnailUrl: string?
+  /// Absent means a song.
+  7 kind: TrackKind?
+}
+
+/// Episodes keep their resume position; songs start from the beginning.
+enum TrackKind {
+  1 song
+  2 episode
+}
+
+/// A credited artist; `id` is absent when YouTube Music does not link them.
+model Artist {
+  1 id: string?
+  @maxLength(500)
+  2 name: string
+}
+
+model Album {
+  1 id: string
+  @maxLength(500)
+  2 name: string
+}
+
+/// A liked or disliked track. Removing the rating deletes the row.
+@neoworks.table
+model Rating {
+  @onDelete("cascade")
+  1 track: ref<Track>
+  2 opinion: Opinion
+  3 updatedAt: timestamp
+}
+
+enum Opinion {
+  1 like
+  2 dislike
+}
+
+/// An album, artist, podcast or YouTube playlist the user saved.
+@neoworks.table
+model SavedItem {
+  1 kind: SavedKind
+  /// The YouTube Music browse ID of what was saved.
+  @minLength(1) @maxLength(200)
+  2 browseId: string
+  @neoworks.title @maxLength(500)
+  3 title: string
+  @maxLength(500)
+  4 subtitle: string?
+  /// The largest cover; Google image URLs carry their size and are resized by rewriting it.
+  @format("uri")
+  5 thumbnailUrl: string?
+  6 savedAt: timestamp
+}
+
+enum SavedKind {
+  1 album
+  2 artist
+  3 playlist
+  4 podcast
+}
+
+/// A track, artist or podcast the user asked never to be recommended. Unlike a
+/// dislike this is no taste signal; it only filters recommendations.
+@neoworks.table
+model Block {
+  1 kind: BlockKind
+  /// The video ID of a track, or the browse ID of an artist or podcast.
+  @minLength(1) @maxLength(200)
+  2 targetId: string
+  @neoworks.title @maxLength(500)
+  3 name: string
+  4 createdAt: timestamp
+}
+
+enum BlockKind {
+  1 track
+  2 artist
+  3 podcast
+}
+
+/// One of the user's own playlists. Its tracks are the entries that belong to it.
+@neoworks.table
+model Playlist {
+  /// Chosen by the device that created the playlist; every device keeps it as the local ID.
+  @minLength(1) @maxLength(64)
+  1 id: string
+  @neoworks.title @minLength(1) @maxLength(200)
+  2 name: string
+  @maxLength(5000)
+  3 description: string?
+  4 createdAt: timestamp
+  5 updatedAt: timestamp
+}
+
+/// A track in a playlist. Deleting the playlist or the track deletes the entry.
+@neoworks.table
+@neoworks.index(fields: ["playlist", "position"])
+model PlaylistEntry {
+  @belongsTo
+  1 playlist: ref<Playlist>
+  @onDelete("cascade")
+  2 track: ref<Track>
+  /// Where the track sits in the playlist, ascending.
+  3 position: f64
+  4 addedAt: timestamp
+}
+
+/// What one device played and searched on one day in UTC. Only that device
+/// writes it, so two devices never conflict over one log.
+@neoworks.table
+model DayLog {
+  /// The install that writes this log.
+  @minLength(1) @maxLength(200)
+  1 deviceId: string
+  @maxLength(200)
+  2 deviceName: string?
+  3 day: date
+  4 plays: [Play]?
+  5 searches: [Search]?
+}
+
+/// A play keeps the track's video ID rather than a reference, since a reference
+/// would put a track key into the log for every play.
+model Play {
+  @minLength(1) @maxLength(64)
+  1 videoId: string
+  /// Where the play started, e.g. an album or playlist; absent for a single track.
+  @maxLength(500)
+  2 context: string?
+  3 startedAt: timestamp
+  4 progressSeconds: u32
+  /// Played to the end, or at least 80 percent of the track.
+  5 completed: bool
+}
+
+model Search {
+  @minLength(1) @maxLength(500)
+  1 query: string
+  2 searchedAt: timestamp
+}
