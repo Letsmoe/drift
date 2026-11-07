@@ -19,10 +19,12 @@ import (
 
 const (
 	neoworksCallbackPath = "/neoworks/callback"
-	neoworksClientID     = "drift"
-	// neoworksDefaultDomain is where Drift signs in unless DRIFT_NEOWORKS_DOMAIN
-	// names another stack, e.g. neoworks.localhost:8443 for local development.
-	neoworksDefaultDomain = "neoworks.dev"
+	// neoworksDefaultDomain and neoworksDefaultClientID are where Drift signs in
+	// and as which client, unless DRIFT_NEOWORKS_DOMAIN and
+	// DRIFT_NEOWORKS_CLIENT_ID name another stack, e.g. neoworks.localhost:8443
+	// for local development, where the client is "drift".
+	neoworksDefaultDomain   = "neoworks.dev"
+	neoworksDefaultClientID = "app_7577b6a1eca6fbb11dbc"
 )
 
 var errNeoworksUnavailable = errors.New("neoworks sign-in is unavailable: the library or the system keyring could not be opened")
@@ -148,10 +150,14 @@ func neoworksConfig(directory string, keystore *oskeystore.Keystore) (neoworks.C
 	if domain == "" {
 		domain = neoworksDefaultDomain
 	}
+	clientID := os.Getenv("DRIFT_NEOWORKS_CLIENT_ID")
+	if clientID == "" {
+		clientID = neoworksDefaultClientID
+	}
 	return neoworks.Config{
 		OAuthURL:    "https://oauth." + domain,
 		APIURL:      "https://api." + domain,
-		ClientID:    neoworksClientID,
+		ClientID:    clientID,
 		InstallName: installName(),
 		Directory:   directory,
 		Keystore:    keystore,

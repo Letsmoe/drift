@@ -34,7 +34,10 @@ function findFreePort(): Promise<number> {
 }
 
 function neoworksEnvironment(): Record<string, string> {
-	const environment: Record<string, string> = { DRIFT_NEOWORKS_DOMAIN: localNeoworksDomain };
+	const environment: Record<string, string> = {
+		DRIFT_NEOWORKS_DOMAIN: localNeoworksDomain,
+		DRIFT_NEOWORKS_CLIENT_ID: 'drift'
+	};
 	if (existsSync(localNeoworksAuthority)) {
 		environment.DRIFT_NEOWORKS_CA = localNeoworksAuthority;
 	}

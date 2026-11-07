@@ -37,7 +37,7 @@ func newNeoworksTestApp(t *testing.T) (*App, *recordedEvents) {
 		t.Fatal(err)
 	}
 	session, err := neoworks.Open(neoworks.Config{
-		OAuthURL: "https://oauth.neoworks.test", APIURL: "https://api.neoworks.test", ClientID: neoworksClientID,
+		OAuthURL: "https://oauth.neoworks.test", APIURL: "https://api.neoworks.test", ClientID: neoworksDefaultClientID,
 		InstallName: "Drift test", Directory: t.TempDir(), Keystore: keystore,
 	})
 	if err != nil {
