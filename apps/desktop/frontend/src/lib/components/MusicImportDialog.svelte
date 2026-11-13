@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { LoadingSpinner } from '@neoworks-dev/ui';
+	import { View } from '@neoworks/svelte-gpui/ui';
+	import { LoadingSpinner } from '@neoworks/svelte-gpui-ui';
 	import Dialog from '#lib/components/Dialog.svelte';
 	import ImportPreviewStep from '#lib/components/ImportPreviewStep.svelte';
 	import ImportProgressStep from '#lib/components/ImportProgressStep.svelte';
@@ -17,7 +18,7 @@
 	{:else if flow.step === 'signin'}
 		<YouTubeSignInStep {flow} />
 	{:else if flow.step === 'loading'}
-		<div class="flex justify-center py-10"><LoadingSpinner /></div>
+		<View style={{ align: 'center', paddingY: 40 }}><LoadingSpinner /></View>
 	{:else if flow.step === 'preview' && flow.summary}
 		<ImportPreviewStep {flow} summary={flow.summary} />
 	{:else if flow.step === 'running'}
