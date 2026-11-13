@@ -1,7 +1,8 @@
 import type { Artist, ItemKind, Track } from '#lib/api/music.ts';
 import { downloads } from '#lib/downloads/downloads.svelte.ts';
-import { itemHref } from '#lib/format.ts';
+import { describeError, itemHref } from '#lib/format.ts';
 import * as icons from '#lib/icons.ts';
+import { toast } from '#lib/layout/toast.svelte.ts';
 import { library } from '#lib/library/library.svelte.ts';
 import type { MenuEntry } from '#lib/menu/menuEntry.ts';
 import { player } from '#lib/player/player.svelte.ts';
@@ -120,15 +121,33 @@ export function playlistEntries(track: Track): MenuEntry[] {
 	for (const summary of [...library.playlists].reverse()) {
 		entries.push({
 			label: summary.name,
-			onselect: () => library.addToPlaylist(summary.id, [track])
+			onselect: () => addToPlaylist(track, summary.id, summary.name)
 		});
 	}
 	return entries;
 }
 
+/** Adds the track and says so in a toast, or says why it could not. */
+async function addToPlaylist(
+	track: Track,
+	playlistId: string,
+	playlistName: string
+): Promise<void> {
+	try {
+		await library.addToPlaylist(playlistId, [track]);
+		toast.show(`Added to ${playlistName}`);
+	} catch (error) {
+		toast.show(`Could not add to ${playlistName}: ${describeError(error)}`);
+	}
+}
+
 async function addToNewPlaylist(track: Track): Promise<void> {
-	const created = await library.createNumberedPlaylist();
-	await library.addToPlaylist(created.id, [track]);
+	try {
+		const created = await library.createNumberedPlaylist();
+		await addToPlaylist(track, created.id, created.name);
+	} catch (error) {
+		toast.show(`Could not create a playlist: ${describeError(error)}`);
+	}
 }
 
 function navigationEntries(track: Track, kind: ItemKind): MenuEntry[] {

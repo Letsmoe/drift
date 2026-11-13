@@ -4,6 +4,7 @@
 	import IconAction from '#lib/components/IconAction.svelte';
 	import { heart, heartFill } from '#lib/icons.ts';
 	import { library } from '#lib/library/library.svelte.ts';
+	import { Pop } from '#lib/motion/pop.svelte.ts';
 	import { colors } from '#lib/theme.ts';
 
 	let {
@@ -15,6 +16,15 @@
 	const liked = $derived(library.isLiked(track.videoId));
 	const icon = $derived(iconFor(liked));
 	const color = $derived(colorFor(liked));
+	const pop = new Pop();
+
+	// The heart pops when it fills; taking a like back needs no fanfare.
+	function toggle(): void {
+		if (!liked) {
+			pop.trigger();
+		}
+		library.toggleLike(track, kind);
+	}
 
 	function iconFor(isLiked: boolean): string {
 		if (isLiked) {
@@ -45,5 +55,6 @@
 	{color}
 	hoverColor={hoverColorFor(liked)}
 	hoverBackground={colors.hover}
-	onpress={() => library.toggleLike(track, kind)}
+	style={{ scale: pop.scale() }}
+	onpress={toggle}
 />
