@@ -1,13 +1,23 @@
+<!-- The Neoworks account button of the top bar and the panel for signing in, syncing and signing out. -->
 <script lang="ts">
-	import { Button, LoadingSpinner } from '@neoworks-dev/ui';
-	import UserCircleIcon from 'phosphor-svelte/lib/UserCircleIcon';
+	import {
+		Button as PressableButton,
+		Icon,
+		Popover,
+		Tooltip,
+		View
+	} from '@neoworks/svelte-gpui/ui';
+	import { Button, LoadingSpinner } from '@neoworks/svelte-gpui-ui';
+	import { appearance } from '#lib/appearance.svelte.ts';
+	import Label from '#lib/components/Label.svelte';
 	import PeerAvatar from '#lib/components/PeerAvatar.svelte';
+	import { userCircle } from '#lib/layout/chromeIcons.ts';
 	import { neoworksAccount } from '#lib/neoworks/neoworksAccount.svelte.ts';
+	import { colors, floatingPanel, glassBackground, hoverTransition } from '#lib/theme.ts';
 
 	neoworksAccount.start();
 
 	let open = $state(false);
-	let container = $state<HTMLElement>();
 
 	const buttonLabel = $derived(describeButton());
 	const syncLine = $derived(describeSync());
@@ -30,112 +40,114 @@
 		if (status.lastSyncedAt === null) {
 			return 'Not synced yet';
 		}
-		const time = new Date(status.lastSyncedAt).toLocaleTimeString('en', {
-			hour: '2-digit',
-			minute: '2-digit'
-		});
-		return `Synced at ${time}`;
+		return `Synced at ${formatTime(status.lastSyncedAt)}`;
 	}
 
-	function closeOnOutsidePointer(event: PointerEvent): void {
-		if (open && container && !container.contains(event.target as Node)) {
-			open = false;
-		}
-	}
-
-	function closeOnEscape(event: KeyboardEvent): void {
-		if (open && event.key === 'Escape') {
-			open = false;
-		}
+	function formatTime(timestamp: string): string {
+		const date = new Date(timestamp);
+		const hours = String(date.getHours()).padStart(2, '0');
+		const minutes = String(date.getMinutes()).padStart(2, '0');
+		return `${hours}:${minutes}`;
 	}
 </script>
 
-<svelte:window onpointerdown={closeOnOutsidePointer} onkeydown={closeOnEscape} />
-
 {#if neoworksAccount.available}
-	<div bind:this={container} class="relative">
-		<button
-			type="button"
-			aria-label={buttonLabel}
-			title={buttonLabel}
-			aria-haspopup="dialog"
-			aria-expanded={open}
-			onclick={() => (open = !open)}
-			class="duration-fast glass flex size-9 items-center justify-center rounded-full text-dim transition-colors hover:bg-hover hover:text-default"
-		>
-			{#if neoworksAccount.signedIn}
-				<PeerAvatar name={neoworksAccount.displayName} />
-			{:else}
-				<UserCircleIcon size={22} />
-			{/if}
-		</button>
-
-		{#if open}
-			<div
-				role="dialog"
-				aria-label="Neoworks account"
-				class="absolute top-full right-0 z-40 mt-2 flex w-80 flex-col gap-4 rounded-xl border border-line bg-elevated p-4 shadow-lg"
-			>
+	<Popover
+		bind:open
+		side="bottom"
+		align="end"
+		offset={8}
+		style={{ ...floatingPanel, width: 320, padding: 16 }}
+	>
+		{#snippet trigger({ toggle })}
+			<Tooltip text={buttonLabel} side="bottom">
+				<PressableButton
+					style={{
+						size: 36,
+						radius: 9999,
+						align: 'center',
+						justify: 'center',
+						background: glassBackground,
+						color: appearance.dim,
+						transition: hoverTransition
+					}}
+					hover={{ background: colors.hover, color: colors.text }}
+					onpress={toggle}
+				>
+					{#if neoworksAccount.signedIn}
+						<PeerAvatar name={neoworksAccount.displayName} />
+					{:else}
+						<Icon svg={userCircle} size={22} />
+					{/if}
+				</PressableButton>
+			</Tooltip>
+		{/snippet}
+		{#snippet children()}
+			<View style={{ gap: 16 }}>
 				{#if neoworksAccount.signedIn}
-					<header class="flex items-center gap-3">
+					<View style={{ direction: 'row', align: 'center', gap: 12 }}>
 						<PeerAvatar name={neoworksAccount.displayName} highlighted />
-						<div class="flex min-w-0 flex-col">
-							<span class="truncate font-semibold">{neoworksAccount.displayName}</span>
+						<View style={{ flex: 1, minWidth: 0 }}>
+							<Label size="body" weight="semibold" tone="default" truncate>
+								{neoworksAccount.displayName}
+							</Label>
 							{#if neoworksAccount.status?.name !== ''}
-								<span class="truncate text-sm text-dim">{neoworksAccount.status?.email}</span>
+								<Label size="small" tone="dim" truncate>{neoworksAccount.status?.email}</Label>
 							{/if}
-						</div>
-					</header>
-					<div class="flex items-center gap-2 text-sm text-dim">
+						</View>
+					</View>
+					<View style={{ direction: 'row', align: 'center', gap: 8 }}>
 						{#if neoworksAccount.status?.syncing}
-							<LoadingSpinner size={14} label="Syncing" />
+							<LoadingSpinner size={14} label="Syncing" color={colors.dim} />
 						{/if}
-						<span>{syncLine}</span>
-					</div>
-					<div class="flex justify-end gap-2">
-						<Button size="sm" variant="ghost" onclick={() => neoworksAccount.signOut()}
-							>Sign out</Button
-						>
+						<Label size="small" tone="dim">{syncLine}</Label>
+					</View>
+					<View style={{ direction: 'row', justify: 'end', gap: 8 }}>
+						<Button size="sm" variant="ghost" onpress={() => neoworksAccount.signOut()}>
+							Sign out
+						</Button>
 						<Button
 							size="sm"
 							disabled={neoworksAccount.status?.syncing}
-							onclick={() => neoworksAccount.sync()}>Sync now</Button
+							onpress={() => neoworksAccount.sync()}
 						>
-					</div>
+							Sync now
+						</Button>
+					</View>
 				{:else if neoworksAccount.signingIn}
-					<div class="flex items-center gap-3">
-						<LoadingSpinner size={18} label="Waiting for the browser" />
-						<p class="text-sm">Finish signing in in your browser.</p>
-					</div>
-					<div class="flex justify-end">
-						<Button size="sm" variant="ghost" onclick={() => neoworksAccount.cancelSignIn()}
-							>Cancel</Button
-						>
-					</div>
+					<View style={{ direction: 'row', align: 'center', gap: 12 }}>
+						<LoadingSpinner size={18} label="Waiting for the browser" color={colors.dim} />
+						<Label size="small" tone="default">Finish signing in in your browser.</Label>
+					</View>
+					<View style={{ direction: 'row', justify: 'end' }}>
+						<Button size="sm" variant="ghost" onpress={() => neoworksAccount.cancelSignIn()}>
+							Cancel
+						</Button>
+					</View>
 				{:else}
-					<header class="flex flex-col gap-1">
-						<h2 class="text-base font-bold">Sync with Neoworks</h2>
-						<p class="text-sm text-dim">
+					<View style={{ gap: 4 }}>
+						<Label size="medium" weight="bold" tone="default">Sync with Neoworks</Label>
+						<Label size="small" tone="dim">
 							Keep your likes, playlists and history the same on all your devices. They are end to
 							end encrypted, so Neoworks cannot read them.
-						</p>
-					</header>
-					<Button variant="primary" full onclick={() => neoworksAccount.signIn()}
-						>Sign in with Neoworks</Button
-					>
+						</Label>
+					</View>
+					<Button variant="primary" full onpress={() => neoworksAccount.signIn()}>
+						Sign in with Neoworks
+					</Button>
 				{/if}
 
 				{#if neoworksAccount.status?.keyInFile}
-					<p class="text-xs text-dim">
+					<Label size="tiny" tone="dim">
 						No system keyring answered, so the key that protects your Neoworks sign-in is kept in a
 						file in Drift's data folder.
-					</p>
+					</Label>
 				{/if}
 
 				{#if neoworksAccount.errorMessage !== ''}
-					<p class="text-sm text-red">{neoworksAccount.errorMessage}</p>
+					<Label size="small" tone="danger">{neoworksAccount.errorMessage}</Label>
 				{/if}
-			</div>
-		{/if}
-	</div>
+			</View>
+		{/snippet}
+	</Popover>
 {/if}

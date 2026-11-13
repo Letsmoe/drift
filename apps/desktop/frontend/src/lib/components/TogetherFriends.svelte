@@ -1,15 +1,19 @@
+<!-- The friend list: who is online and what they play, with invite, join, trust and remove. -->
 <script lang="ts">
-	import { Button } from '@neoworks-dev/ui';
-	import CheckIcon from 'phosphor-svelte/lib/CheckIcon';
-	import ShieldCheckIcon from 'phosphor-svelte/lib/ShieldCheckIcon';
-	import TrashIcon from 'phosphor-svelte/lib/TrashIcon';
-	import FriendPresence from '#lib/components/FriendPresence.svelte';
-	import PeerAvatar from '#lib/components/PeerAvatar.svelte';
+	import { Icon, Tooltip, View } from '@neoworks/svelte-gpui/ui';
+	import { Button } from '@neoworks/svelte-gpui-ui';
 	import type { TogetherFriend } from '#lib/api/together.ts';
+	import FriendPresence from '#lib/components/FriendPresence.svelte';
+	import IconAction from '#lib/components/IconAction.svelte';
+	import Label from '#lib/components/Label.svelte';
+	import PeerAvatar from '#lib/components/PeerAvatar.svelte';
+	import { check, shieldCheck, shieldCheckFill, trash } from '#lib/layout/chromeIcons.ts';
 	import { formatUserId, listenTogether } from '#lib/together/listenTogether.svelte.ts';
+	import { colors, hoverTransition, radii } from '#lib/theme.ts';
 
 	// Online friends first, those with an open session before the rest.
-	const sortedFriends = $derived(listenTogether.friends.toSorted(compareFriends));
+	const sortedFriends = $derived([...listenTogether.friends].sort(compareFriends));
+	let hoveredUserId = $state('');
 
 	function compareFriends(left: TogetherFriend, right: TogetherFriend): number {
 		return onlineRank(left) - onlineRank(right);
@@ -51,40 +55,65 @@
 		}
 		return `Let ${displayName(friend)} join your sessions without asking`;
 	}
-</script>
 
-{#snippet trustToggle(friend: TogetherFriend)}
-	<button
-		type="button"
-		aria-label={trustLabel(friend)}
-		aria-pressed={friend.trusted}
-		title={trustLabel(friend)}
-		disabled={listenTogether.isPending(`trust:${friend.userId}`)}
-		onclick={() => listenTogether.setTrusted(friend.userId, !friend.trusted)}
-		class={[
-			'duration-fast flex size-8 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-hover',
-			friend.trusted && 'text-default',
-			!friend.trusted && 'text-faint opacity-0 group-hover:opacity-100 focus-visible:opacity-100'
-		]}
-	>
-		<ShieldCheckIcon size={16} weight={friend.trusted ? 'fill' : 'regular'} />
-	</button>
-{/snippet}
+	function joinVariant(friend: TogetherFriend): 'primary' | 'ghost' {
+		if (friend.presence?.sessionOpen) {
+			return 'primary';
+		}
+		return 'ghost';
+	}
+
+	function rowBackground(friend: TogetherFriend): string {
+		if (hoveredUserId === friend.userId) {
+			return colors.hover;
+		}
+		return 'transparent';
+	}
+
+	function trustOpacity(friend: TogetherFriend): number {
+		if (friend.trusted || hoveredUserId === friend.userId) {
+			return 1;
+		}
+		return 0;
+	}
+
+	function removeOpacity(friend: TogetherFriend): number {
+		if (hoveredUserId === friend.userId) {
+			return 1;
+		}
+		return 0;
+	}
+
+	function trustColor(friend: TogetherFriend): string {
+		if (friend.trusted) {
+			return colors.text;
+		}
+		return colors.faint;
+	}
+
+	function trustIcon(friend: TogetherFriend): string {
+		if (friend.trusted) {
+			return shieldCheckFill;
+		}
+		return shieldCheck;
+	}
+</script>
 
 {#snippet sessionActions(friend: TogetherFriend)}
 	{#if inRoomWith(friend)}
-		<span class="px-2 text-xs text-muted">Listening</span>
+		<View style={{ paddingX: 8 }}><Label size="tiny" tone="muted">Listening</Label></View>
 	{:else}
 		{#if listenTogether.invitedUserId === friend.userId}
-			<span class="flex items-center gap-1 px-2 text-xs text-muted">
-				<CheckIcon size={12} /> Invited
-			</span>
+			<View style={{ direction: 'row', align: 'center', gap: 4, paddingX: 8, color: colors.muted }}>
+				<Icon svg={check} size={12} />
+				<Label size="tiny" tone="muted">Invited</Label>
+			</View>
 		{:else}
 			<Button
 				size="sm"
 				variant="ghost"
 				disabled={listenTogether.isPending(`invite:${friend.userId}`)}
-				onclick={() => listenTogether.invite(friend.userId)}
+				onpress={() => listenTogether.invite(friend.userId)}
 			>
 				Invite
 			</Button>
@@ -92,9 +121,9 @@
 		{#if !inTheirRoom(friend)}
 			<Button
 				size="sm"
-				variant={friend.presence?.sessionOpen ? 'primary' : 'ghost'}
+				variant={joinVariant(friend)}
 				disabled={listenTogether.isPending(`join:${friend.userId}`)}
-				onclick={() => listenTogether.join(friend.userId)}
+				onpress={() => listenTogether.join(friend.userId)}
 			>
 				Join
 			</Button>
@@ -103,39 +132,73 @@
 {/snippet}
 
 {#if listenTogether.friends.length === 0}
-	<p class="text-sm text-muted">
+	<Label size="body" tone="muted">
 		Add friends by their ID to see what they play, invite them or join their sessions. Share yours
 		from the top of this panel.
-	</p>
+	</Label>
 {:else}
-	<ul class="flex flex-col">
+	<View>
 		{#each sortedFriends as friend (friend.userId)}
-			<li class="group flex items-center gap-2 rounded-md px-1 py-1.5 hover:bg-hover">
-				<span class="relative">
+			<View
+				style={{
+					direction: 'row',
+					align: 'center',
+					gap: 8,
+					padding: 4,
+					radius: radii.medium,
+					background: rowBackground(friend),
+					transition: hoverTransition
+				}}
+				onhover={(hovered) => (hoveredUserId = hovered ? friend.userId : '')}
+			>
+				<View style={{ shrink: 0 }}>
 					<PeerAvatar name={displayName(friend)} />
 					{#if friend.presence}
-						<span
-							class="absolute -right-0.5 -bottom-0.5 size-2.5 rounded-full border-2 border-elevated bg-green"
-						></span>
+						<View
+							style={{
+								position: 'absolute',
+								right: -2,
+								bottom: -2,
+								size: 12,
+								radius: 9999,
+								borderWidth: 2,
+								borderColor: colors.elevated,
+								background: colors.green
+							}}
+						/>
 					{/if}
-				</span>
-				<div class="min-w-0 flex-1 pl-1">
-					<p class="truncate text-sm font-medium">{displayName(friend)}</p>
+				</View>
+				<View style={{ flex: 1, minWidth: 0, paddingLeft: 4 }}>
+					<Label size="body" weight="medium" tone="default" truncate>{displayName(friend)}</Label>
 					<FriendPresence presence={friend.presence} userIdText={formatUserId(friend.userId)} />
-				</div>
+				</View>
 				{@render sessionActions(friend)}
-				{@render trustToggle(friend)}
-				<span class="opacity-0 group-hover:opacity-100 focus-within:opacity-100">
-					<Button
-						size="sm"
-						round
-						variant="ghost"
-						icon={TrashIcon}
-						disabled={listenTogether.isPending(`remove:${friend.userId}`)}
-						onclick={() => listenTogether.removeFriend(friend.userId)}
-					/>
-				</span>
-			</li>
+				<View style={{ opacity: trustOpacity(friend) }}>
+					<Tooltip text={trustLabel(friend)} side="top">
+						<IconAction
+							icon={trustIcon(friend)}
+							iconSize={16}
+							boxSize={32}
+							color={trustColor(friend)}
+							hoverBackground={colors.pressed}
+							disabled={listenTogether.isPending(`trust:${friend.userId}`)}
+							onpress={() => listenTogether.setTrusted(friend.userId, !friend.trusted)}
+						/>
+					</Tooltip>
+				</View>
+				<View style={{ opacity: removeOpacity(friend) }}>
+					<Tooltip text="Remove friend" side="top">
+						<IconAction
+							icon={trash}
+							iconSize={16}
+							boxSize={32}
+							hoverBackground={colors.pressed}
+							disabled={listenTogether.isPending(`remove:${friend.userId}`)}
+							onpress={() => listenTogether.removeFriend(friend.userId)}
+						/>
+					</Tooltip>
+				</View>
+			</View>
 		{/each}
-	</ul>
+	</View>
 {/if}
