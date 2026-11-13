@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { Button, View } from '@neoworks/svelte-gpui/ui';
-	import { LoadingSpinner } from '@neoworks/svelte-gpui-ui';
+	import { Chip, LoadingSpinner } from '@neoworks/svelte-gpui-ui';
 	import type { Item, Shelf } from '#lib/api/music.ts';
 	import { appearance } from '#lib/appearance.svelte.ts';
-	import Chip from '#lib/components/Chip.svelte';
+	import FilterChip from '#lib/components/FilterChip.svelte';
 	import Label from '#lib/components/Label.svelte';
 	import MediaCard from '#lib/components/MediaCard.svelte';
 	import MediaCardRow from '#lib/components/MediaCardRow.svelte';
@@ -136,7 +136,7 @@
 			{/if}
 			<View style={{ direction: 'row', wrap: true, gap: 8 }}>
 				{#each results.recentQueries as recentQuery (recentQuery)}
-					<Chip label={recentQuery} onclick={() => searchFor(recentQuery)} />
+					<Chip variant="suggestion" label={recentQuery} onpress={() => searchFor(recentQuery)} />
 				{/each}
 			</View>
 		</View>
@@ -154,12 +154,12 @@
 		</Label>
 	{:else if item.kind === 'filters'}
 		<View style={{ direction: 'row', wrap: true, gap: 8, paddingX: gutter.narrow }}>
-			<Chip label="All" selected={results.filter === ''} onclick={() => results.select('')} />
+			<FilterChip label="All" selected={results.filter === ''} onpress={() => results.select('')} />
 			{#each results.filterTitles as title (title)}
-				<Chip
+				<FilterChip
 					label={title}
 					selected={results.filter === title}
-					onclick={() => results.select(title)}
+					onpress={() => results.select(title)}
 				/>
 			{/each}
 		</View>
