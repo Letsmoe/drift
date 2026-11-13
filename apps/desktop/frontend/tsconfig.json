@@ -22,23 +22,23 @@
 		"src/Boot.svelte",
 		"src/App.svelte",
 		"src/env.d.ts",
-		"src/lib/router.svelte.ts",
-		"src/lib/storage.ts",
-		"src/lib/backend",
-		"src/lib/player",
-		"src/lib/layout",
-		"src/lib/components/TopBar.svelte",
-		"src/lib/components/SearchField.svelte",
-		"src/lib/components/LibrarySidebar.svelte",
-		"src/lib/components/LibraryRow.svelte",
-		"src/lib/components/PlayerBar.svelte",
-		"src/lib/components/QueuePanel.svelte",
-		"src/lib/components/QueueRow.svelte",
-		"src/lib/components/UpcomingQueue.svelte",
-		"src/lib/components/QueueResizeHandle.svelte",
-		"src/lib/components/RangeSlider.svelte",
-		"src/lib/components/ToggleIconButton.svelte",
-		"src/lib/components/ArtBackdrop.svelte",
-		"src/lib/components/ProgressRing.svelte"
+		"src/pages",
+		"src/lib"
+	],
+	// Components still written for the web (Tailwind, DOM) until they are converted; remove each line then.
+	"exclude": [
+		"src/lib/components/ArtistAboutCard.svelte",
+		"src/lib/components/DownloadQueueRow.svelte",
+		"src/lib/components/EditPlaylistDialog.svelte",
+		"src/lib/components/EpisodeRow.svelte",
+		"src/lib/components/ImportPreviewStep.svelte",
+		"src/lib/components/ImportProgressStep.svelte",
+		"src/lib/components/ImportSourceStep.svelte",
+		"src/lib/components/ImportStatusCard.svelte",
+		"src/lib/components/ImportSummaryStep.svelte",
+		"src/lib/components/MusicImportDialog.svelte",
+		"src/lib/components/TrackListControls.svelte",
+		"src/lib/components/YouTubeAccountPanel.svelte",
+		"src/lib/components/YouTubeSignInStep.svelte"
 	]
 }

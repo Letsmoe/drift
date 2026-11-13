@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { Button, Icon, View } from '@neoworks/svelte-gpui/ui';
+	import { Button, Icon, View, type PointerEvent } from '@neoworks/svelte-gpui/ui';
+	import type { ItemKind } from '#lib/api/music.ts';
 	import type { QueueEntry } from '#lib/api/queue.ts';
 	import { appearance } from '#lib/appearance.svelte.ts';
 	import Cover from '#lib/components/Cover.svelte';
@@ -7,8 +8,10 @@
 	import IconAction from '#lib/components/IconAction.svelte';
 	import Label from '#lib/components/Label.svelte';
 	import { downloads } from '#lib/downloads/downloads.svelte.ts';
+	import TrackContextMenu from '#lib/components/TrackContextMenu.svelte';
 	import { formatArtists } from '#lib/format.ts';
 	import { playFill, sparkleFill, x } from '#lib/layout/chromeIcons.ts';
+	import { PopupMenu } from '#lib/menu/popupMenu.svelte.ts';
 	import { player } from '#lib/player/player.svelte.ts';
 	import { colors, hoverTransition, radii } from '#lib/theme.ts';
 
@@ -27,6 +30,7 @@
 	} = $props();
 
 	let hovered = $state(false);
+	const contextMenu = new PopupMenu();
 
 	const comfortable = $derived(size === 'comfortable');
 	const coverSize = $derived(pickCoverSize());
@@ -79,6 +83,10 @@
 		return 'small';
 	}
 
+	function openContextMenu(event: PointerEvent): void {
+		contextMenu.openAtPointer(event);
+	}
+
 	function playEntry(): void {
 		if (!current) {
 			player.jump(entry.id);
@@ -86,41 +94,45 @@
 	}
 </script>
 
-<Button
-	style={{
-		direction: 'row',
-		align: 'center',
-		gap: pickGap(),
-		padding: pickRowPadding(),
-		radius: radii.medium,
-		opacity: rowOpacity,
-		transition: hoverTransition
-	}}
-	hover={{ background: colors.hover }}
-	onhover={(isHovered) => (hovered = isHovered)}
-	onpress={playEntry}
->
-	<View style={{ size: coverSize, shrink: 0, radius: pickCoverRadius(), overflow: 'hidden' }}>
-		<Cover thumbnails={entry.track.thumbnails} size={coverSize} style={{ size: coverSize }} />
-	</View>
-	<View style={{ flex: 1, minWidth: 0 }}>
-		<View style={{ direction: 'row', align: 'center', gap: 6, minWidth: 0 }}>
-			<View style={{ flex: 1, minWidth: 0 }}>
-				<Label size={pickTitleSize()} weight="medium" tone="default" accented={current} truncate>
-					{entry.track.title}
-				</Label>
+<!-- Only the right button is taken here, so a left press still reaches the Draggable around the row. -->
+<View buttons={['right']} ondown={openContextMenu}>
+	<Button
+		style={{
+			direction: 'row',
+			align: 'center',
+			gap: pickGap(),
+			padding: pickRowPadding(),
+			radius: radii.medium,
+			opacity: rowOpacity,
+			transition: hoverTransition
+		}}
+		hover={{ background: colors.hover }}
+		onhover={(isHovered) => (hovered = isHovered)}
+		onpress={playEntry}
+	>
+		<View style={{ size: coverSize, shrink: 0, radius: pickCoverRadius(), overflow: 'hidden' }}>
+			<Cover thumbnails={entry.track.thumbnails} size={coverSize} style={{ size: coverSize }} />
+		</View>
+		<View style={{ flex: 1, minWidth: 0 }}>
+			<View style={{ direction: 'row', align: 'center', gap: 6, minWidth: 0 }}>
+				<View style={{ flex: 1, minWidth: 0 }}>
+					<Label size={pickTitleSize()} weight="medium" tone="default" accented={current} truncate>
+						{entry.track.title}
+					</Label>
+				</View>
+				{#if entry.magic}
+					<Icon svg={sparkleFill} size={12} color={appearance.accent} style={{ shrink: 0 }} />
+				{/if}
+				<DownloadedIndicator videoId={entry.track.videoId} size={12} />
 			</View>
-			{#if entry.magic}
-				<Icon svg={sparkleFill} size={12} color={appearance.accent} style={{ shrink: 0 }} />
-			{/if}
-			<DownloadedIndicator videoId={entry.track.videoId} size={12} />
+			<Label size="tiny" tone="dim" truncate>{formatArtists(entry.track.artists)}</Label>
 		</View>
-		<Label size="tiny" tone="dim" truncate>{formatArtists(entry.track.artists)}</Label>
-	</View>
-	{#if !current && hovered}
-		<View style={{ direction: 'row', align: 'center', shrink: 0 }}>
-			<IconAction icon={playFill} iconSize={14} boxSize={24} onpress={playEntry} />
-			<IconAction icon={x} iconSize={14} boxSize={24} onpress={() => player.remove(entry.id)} />
-		</View>
-	{/if}
-</Button>
+		{#if !current && hovered}
+			<View style={{ direction: 'row', align: 'center', shrink: 0 }}>
+				<IconAction icon={playFill} iconSize={14} boxSize={24} onpress={playEntry} />
+				<IconAction icon={x} iconSize={14} boxSize={24} onpress={() => player.remove(entry.id)} />
+			</View>
+		{/if}
+	</Button>
+	<TrackContextMenu popup={contextMenu} track={entry.track} kind={entry.kind as ItemKind} />
+</View>

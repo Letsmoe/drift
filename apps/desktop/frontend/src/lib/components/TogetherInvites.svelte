@@ -1,33 +1,46 @@
+<!-- Friends who invited the user to a session. -->
 <script lang="ts">
-	import { Button } from '@neoworks-dev/ui';
-	import XIcon from 'phosphor-svelte/lib/XIcon';
+	import { View } from '@neoworks/svelte-gpui/ui';
+	import { Button, IconButton } from '@neoworks/svelte-gpui-ui';
+	import Label from '#lib/components/Label.svelte';
 	import PeerAvatar from '#lib/components/PeerAvatar.svelte';
+	import { x } from '#lib/layout/chromeIcons.ts';
 	import { listenTogether } from '#lib/together/listenTogether.svelte.ts';
+	import { colors, radii } from '#lib/theme.ts';
 </script>
 
-<ul class="flex flex-col gap-1">
+<View style={{ gap: 4 }}>
 	{#each listenTogether.invites as invite (invite.from.userId)}
-		<li class="flex items-center gap-3 rounded-lg bg-raised p-2">
+		<View
+			style={{
+				direction: 'row',
+				align: 'center',
+				gap: 12,
+				padding: 8,
+				radius: radii.large,
+				background: colors.raised
+			}}
+		>
 			<PeerAvatar name={invite.from.name} highlighted />
-			<p class="min-w-0 flex-1 text-sm">
-				<span class="font-semibold">{invite.from.name}</span>
-				<span class="text-muted">invites you to listen together</span>
-			</p>
+			<View style={{ flex: 1, minWidth: 0 }}>
+				<Label size="body" tone="muted">
+					<Label weight="semibold" tone="default">{invite.from.name}</Label> invites you to listen together
+				</Label>
+			</View>
 			<Button
 				size="sm"
 				variant="primary"
 				disabled={listenTogether.isPending(`join:${invite.from.userId}`)}
-				onclick={() => listenTogether.join(invite.from.userId)}
+				onpress={() => listenTogether.join(invite.from.userId)}
 			>
 				Join
 			</Button>
-			<Button
+			<IconButton
+				icon={x}
+				label="Dismiss"
 				size="sm"
-				round
-				variant="ghost"
-				icon={XIcon}
-				onclick={() => listenTogether.dismiss(invite.from.userId)}
+				onpress={() => listenTogether.dismiss(invite.from.userId)}
 			/>
-		</li>
+		</View>
 	{/each}
-</ul>
+</View>

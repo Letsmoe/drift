@@ -3,6 +3,7 @@
 	import { appearance } from '#lib/appearance.svelte.ts';
 	import IconAction from '#lib/components/IconAction.svelte';
 	import Label from '#lib/components/Label.svelte';
+	import NeoworksMenu from '#lib/components/NeoworksMenu.svelte';
 	import SearchField from '#lib/components/SearchField.svelte';
 	import {
 		caretLeftBold,
@@ -13,6 +14,7 @@
 		houseFill,
 		magnifyingGlass
 	} from '#lib/layout/chromeIcons.ts';
+	import TogetherMenu from '#lib/components/TogetherMenu.svelte';
 	import { back, forward, goto, router } from '#lib/router.svelte.ts';
 	import { SearchSuggestions } from '#lib/search/suggestions.svelte.ts';
 	import { colors, floatingPanel, glassBackground, radii } from '#lib/theme.ts';
@@ -229,6 +231,7 @@
 			gap: 8
 		}}
 	>
+		<TogetherMenu />
 		<IconAction
 			icon={gearSix}
 			iconSize={20}
@@ -239,5 +242,6 @@
 			style={{ background: glassBackground }}
 			onpress={() => goto('/settings')}
 		/>
+		<NeoworksMenu />
 	</View>
 </View>
