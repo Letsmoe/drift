@@ -1,33 +1,32 @@
 import type { AudioEvent } from '#lib/backend/commands.ts';
 import {
+	cancelAudioCrossfade,
 	loadAudio,
 	outgoingSlot,
 	seekAudio,
-	setAudioVolume,
+	setAudioGain,
+	startAudioCrossfade,
 	stopAudio
 } from '#lib/player/audioEngine.ts';
 import type { Player } from '#lib/player/player.svelte.ts';
 import { playbackSettings } from '#lib/player/playbackSettings.svelte.ts';
 
-const fadeStepMs = 50;
 /** Songs shorter than this many crossfade lengths end without one, so they don't fade most of their length. */
 const minimumLengthInFades = 3;
 /** Longest wait for the second slot to take over the ending song before giving up on the crossfade. */
 const handOverTimeoutMs = 3000;
 
 /**
- * Crossfades into the next song. The audio engine's main slot always plays the current song; near
- * its end the second slot takes over the ending song at the same position and fades it out, while
- * the main slot moves on to the next song and fades it in.
+ * Decides when to crossfade into the next song. The audio engine's main slot always plays the
+ * current song; near its end the second slot takes over the ending song at the same position, and
+ * the engine then fades it out while the main slot, which moves on to the next song, fades in.
+ * The fade itself runs in the engine (apps/desktop/shell/src/audio/fade.rs), not here.
  */
 export class Crossfade {
-	/** Multiplier on the main slot's volume while the next song fades in. */
-	incomingGain = $state(1);
-
 	#player: Player;
 	#starting = false;
-	#fadeTimer: ReturnType<typeof setInterval> | undefined = undefined;
-	#fadeStartedAt = 0;
+	/** The engine is fading the two slots. */
+	#fading = false;
 	#incomingEntryId: number | undefined = undefined;
 	#outgoingPlaying = false;
 	#positionWaiter: (() => void) | undefined = undefined;
@@ -52,20 +51,34 @@ export class Crossfade {
 		}
 	}
 
+	/** The engine says its crossfade is over, because it ran out or because something ended it. */
+	handleFadeEnded(): void {
+		this.#fading = false;
+		this.#incomingEntryId = undefined;
+		this.#outgoingPlaying = false;
+	}
+
+	/** Called when the queue shows another entry: picking another song ends the crossfade. */
+	handleEntryChange(entryId: number | undefined): void {
+		const incomingEntryId = this.#incomingEntryId;
+		if (this.#fading && incomingEntryId !== undefined && entryId !== incomingEntryId) {
+			this.finish();
+		}
+	}
+
 	/** Ends a running crossfade at once: the ending song stops, the next one plays at full volume. */
 	finish(): void {
-		if (this.#fadeTimer !== undefined) {
-			clearInterval(this.#fadeTimer);
-			this.#fadeTimer = undefined;
+		if (this.#fading) {
+			cancelAudioCrossfade();
 		}
+		this.#fading = false;
 		this.#incomingEntryId = undefined;
-		this.incomingGain = 1;
 		this.#stopOutgoing();
 	}
 
 	#shouldStart(): boolean {
 		const player = this.#player;
-		if (!playbackSettings.crossfade || this.#starting || this.#fadeTimer !== undefined) {
+		if (!playbackSettings.crossfade || this.#starting || this.#fading) {
 			return false;
 		}
 		if (player.paused || player.source === undefined || !Number.isFinite(player.duration)) {
@@ -94,11 +107,12 @@ export class Crossfade {
 			this.#stopOutgoing();
 			return;
 		}
-		this.incomingGain = 0;
-		this.#fadeStartedAt = performance.now();
-		this.#fadeTimer = setInterval(() => this.#step(), fadeStepMs);
+		this.#fading = true;
+		startAudioCrossfade(playbackSettings.crossfadeSeconds);
 		await this.#player.trackEnded();
-		this.#incomingEntryId = this.#player.entry?.id;
+		if (this.#fading) {
+			this.#incomingEntryId = this.#player.entry?.id;
+		}
 	}
 
 	// The second slot plays the ending song silently until it runs in step with the main one.
@@ -108,7 +122,7 @@ export class Crossfade {
 		if (url === undefined) {
 			return false;
 		}
-		setAudioVolume(outgoingSlot, 0);
+		setAudioGain(outgoingSlot, 0);
 		const started = this.#nextOutgoingPosition();
 		loadAudio(outgoingSlot, url, player.currentTime, true);
 		this.#outgoingPlaying = true;
@@ -117,11 +131,11 @@ export class Crossfade {
 		}
 		const aligned = this.#nextOutgoingPosition();
 		seekAudio(outgoingSlot, player.currentTime);
-		if (!(await aligned) || player.paused) {
+		if (!(await aligned)) {
 			return false;
 		}
-		this.#setOutgoingGain(1);
-		return true;
+		// A play, pause or seek by the user in the meantime has already ended the hand-over.
+		return this.#outgoingPlaying && !player.paused;
 	}
 
 	// Resolves true at the next position report of the second slot, false when none comes in time.
@@ -137,36 +151,6 @@ export class Crossfade {
 				resolve(true);
 			};
 		});
-	}
-
-	#step(): void {
-		if (this.#interrupted()) {
-			this.finish();
-			return;
-		}
-		const fadeMs = playbackSettings.crossfadeSeconds * 1000;
-		const progress = Math.min((performance.now() - this.#fadeStartedAt) / fadeMs, 1);
-		// Equal-power curves keep the loudness even while both songs play.
-		this.incomingGain = Math.sin((progress * Math.PI) / 2);
-		this.#setOutgoingGain(Math.cos((progress * Math.PI) / 2));
-		if (progress >= 1) {
-			this.finish();
-		}
-	}
-
-	// Picking another song ends the crossfade.
-	#interrupted(): boolean {
-		const entryId = this.#player.entry?.id;
-		return this.#incomingEntryId !== undefined && entryId !== this.#incomingEntryId;
-	}
-
-	#setOutgoingGain(gain: number): void {
-		const player = this.#player;
-		let volume = player.volume * gain;
-		if (player.muted) {
-			volume = 0;
-		}
-		setAudioVolume(outgoingSlot, Math.max(0, Math.min(1, volume)));
 	}
 
 	#stopOutgoing(): void {

@@ -3,7 +3,7 @@
 //! There are two slots. Slot 0 plays the song; slot 1 exists for the crossfade, where it plays the
 //! ending song while slot 0 moves on to the next one. Each slot reports what happens to it as
 //! `audio` events: position (a few times a second, only while playing), duration, playing or
-//! paused, buffering, ended and error.
+//! paused, buffering, ended and error. A crossfade (see `fade.rs`) reports `crossfade` instead.
 //!
 //! `DRIFT_AUDIO_SINK` names another GStreamer sink (`fakesink` plays nothing, in real time), for
 //! tests and machines without a sound server.
@@ -18,7 +18,13 @@ use gstreamer as gst;
 use serde_json::{Value, json};
 use svelte_gpui::Emitter;
 
+mod fade;
+
+use fade::Mixer;
+
 const SLOT_COUNT: usize = 2;
+const MAIN_SLOT: usize = 0;
+const OUTGOING_SLOT: usize = 1;
 const EVENT_NAME: &str = "audio";
 const POSITION_INTERVAL: Duration = Duration::from_millis(250);
 /// A resume position this close to the start is not worth a seek.
@@ -26,7 +32,9 @@ const MINIMUM_SEEK_SECONDS: f64 = 0.05;
 
 pub struct AudioEngine {
     slots: Vec<Slot>,
+    mixer: Mutex<Mixer>,
     emitter: Emitter,
+    started_at: Instant,
     /// With `DRIFT_AUDIO_LOG` naming a file, every event is also appended there, for tests.
     event_log: Option<Mutex<std::fs::File>>,
 }
@@ -70,7 +78,13 @@ impl AudioEngine {
         for index in 0..SLOT_COUNT {
             slots.push(Slot::new(index)?);
         }
-        let engine = Arc::new(AudioEngine { slots, emitter, event_log: open_event_log() });
+        let engine = Arc::new(AudioEngine {
+            slots,
+            mixer: Mutex::new(Mixer::new()),
+            emitter,
+            started_at: Instant::now(),
+            event_log: open_event_log(),
+        });
         for slot_index in 0..SLOT_COUNT {
             let watcher = Arc::clone(&engine);
             thread::Builder::new()
@@ -94,6 +108,7 @@ impl AudioEngine {
     }
 
     pub fn play(&self, slot_index: usize) -> Result<(), String> {
+        self.cancel_crossfade_for(slot_index);
         let slot = self.slot(slot_index)?;
         let mut state = slot.lock();
         state.wanted_playing = true;
@@ -105,6 +120,7 @@ impl AudioEngine {
     }
 
     pub fn pause(&self, slot_index: usize) -> Result<(), String> {
+        self.cancel_crossfade_for(slot_index);
         let slot = self.slot(slot_index)?;
         let mut state = slot.lock();
         state.wanted_playing = false;
@@ -117,6 +133,7 @@ impl AudioEngine {
     }
 
     pub fn seek(&self, slot_index: usize, position_seconds: f64) -> Result<(), String> {
+        self.cancel_crossfade_for(slot_index);
         let slot = self.slot(slot_index)?;
         let mut state = slot.lock();
         if !state.loaded {
@@ -134,18 +151,11 @@ impl AudioEngine {
     }
 
     pub fn stop(&self, slot_index: usize) -> Result<(), String> {
+        self.cancel_crossfade_for(slot_index);
         let slot = self.slot(slot_index)?;
         let mut state = slot.lock();
         reset_pipeline(slot)?;
         *state = SlotState::default();
-        Ok(())
-    }
-
-    pub fn set_volume(&self, slot_index: usize, volume: f64) -> Result<(), String> {
-        let slot = self.slot(slot_index)?;
-        let volume = volume.clamp(0.0, 1.0);
-        slot.pipeline.set_property("volume", volume);
-        self.log_event(&json!({ "kind": "volume", "slot": slot_index, "volume": volume }));
         Ok(())
     }
 
@@ -159,12 +169,21 @@ impl AudioEngine {
         self.emitter.emit(EVENT_NAME, event);
     }
 
+    /// For events that belong to no slot, such as the end of a crossfade.
+    fn emit_without_slot(&self, event: Value) {
+        self.log_event(&event);
+        self.emitter.emit(EVENT_NAME, event);
+    }
+
+    /// Log lines carry the milliseconds since the engine started, which the events themselves do not.
     fn log_event(&self, event: &Value) {
         let Some(log) = &self.event_log else {
             return;
         };
+        let mut line = event.clone();
+        line["ms"] = json!(self.started_at.elapsed().as_millis() as u64);
         if let Ok(mut file) = log.lock() {
-            let _ = writeln!(file, "{event}");
+            let _ = writeln!(file, "{line}");
         }
     }
 

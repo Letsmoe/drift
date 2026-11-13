@@ -4,8 +4,9 @@
 //! Commands the UI calls (typed in `frontend/src/lib/backend/commands.ts`):
 //! - `backend_address` answers `{ url, token }` once the backend listens.
 //! - `open_external` opens an http(s) link in the default browser.
-//! - `audio_load`, `audio_play`, `audio_pause`, `audio_seek`, `audio_stop` and `audio_set_volume`
-//!   drive the audio engine; what it reports arrives as `audio` events (see `audio.rs`).
+//! - `audio_load`, `audio_play`, `audio_pause`, `audio_seek`, `audio_stop`, `audio_set_volume`,
+//!   `audio_set_gain`, `audio_crossfade` and `audio_cancel_crossfade` drive the audio engine; what it
+//!   reports arrives as `audio` events (see `audio.rs`).
 //!
 //! Run it against a build of the UI:
 //!
@@ -97,7 +98,29 @@ fn register_audio_commands(commands: Commands, engine: Started<Arc<AudioEngine>>
             "audio_set_volume",
             with_engine(&engine, |engine, args| {
                 let volume = args["volume"].as_f64().ok_or("audio_set_volume needs a volume")?;
-                engine.set_volume(slot_of(args)?, volume)
+                engine.set_volume(volume);
+                Ok(())
+            }),
+        )
+        .command(
+            "audio_set_gain",
+            with_engine(&engine, |engine, args| {
+                let gain = args["gain"].as_f64().ok_or("audio_set_gain needs a gain")?;
+                engine.set_gain(slot_of(args)?, gain)
+            }),
+        )
+        .command(
+            "audio_crossfade",
+            with_engine(&engine, |engine, args| {
+                let seconds = args["seconds"].as_f64().ok_or("audio_crossfade needs seconds")?;
+                engine.start_crossfade(seconds)
+            }),
+        )
+        .command(
+            "audio_cancel_crossfade",
+            with_engine(&engine, |engine, _| {
+                engine.cancel_crossfade();
+                Ok(())
             }),
         )
 }
@@ -105,7 +128,7 @@ fn register_audio_commands(commands: Commands, engine: Started<Arc<AudioEngine>>
 // Wraps an engine call as a command that fails with the reason when GStreamer did not start.
 fn with_engine(
     engine: &Started<Arc<AudioEngine>>,
-    call: impl Fn(&AudioEngine, &Value) -> Result<(), String> + Send + Sync + 'static,
+    call: impl Fn(&Arc<AudioEngine>, &Value) -> Result<(), String> + Send + Sync + 'static,
 ) -> impl Fn(Value) -> Result<Value, CommandError> + Send + Sync + 'static {
     let engine = Arc::clone(engine);
     move |args| {

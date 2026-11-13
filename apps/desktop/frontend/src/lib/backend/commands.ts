@@ -7,7 +7,9 @@ export type AudioEvent =
 	| { kind: 'state'; slot: number; playing: boolean }
 	| { kind: 'buffering'; slot: number; buffering: boolean }
 	| { kind: 'ended'; slot: number }
-	| { kind: 'error'; slot: number; message: string };
+	| { kind: 'error'; slot: number; message: string }
+	/** The engine's crossfade is over: it ran out (`finished`) or a play, pause or seek ended it. */
+	| { kind: 'crossfade'; how: 'finished' | 'cancelled' };
 
 declare module '@neoworks/svelte-gpui' {
 	interface CommandMap {
@@ -21,7 +23,13 @@ declare module '@neoworks/svelte-gpui' {
 		audio_pause: { args: { slot: number }; result: null };
 		audio_seek: { args: { slot: number; positionSeconds: number }; result: null };
 		audio_stop: { args: { slot: number }; result: null };
-		audio_set_volume: { args: { slot: number; volume: number }; result: null };
+		/** The user's volume (0 when muted) for every slot. */
+		audio_set_volume: { args: { volume: number }; result: null };
+		/** What a slot's volume is multiplied with; the crossfade moves it on its own. */
+		audio_set_gain: { args: { slot: number; gain: number }; result: null };
+		/** Fades slot 0 in and slot 1 out over `seconds`, then stops slot 1. */
+		audio_crossfade: { args: { seconds: number }; result: null };
+		audio_cancel_crossfade: { args: undefined; result: null };
 	}
 	interface EventMap {
 		audio: AudioEvent;
