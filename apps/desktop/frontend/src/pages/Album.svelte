@@ -95,7 +95,7 @@
 	<PageStatus status={resource.status} errorMessage={resource.errorMessage} />
 
 	{#if albumPage}
-		<PageShell seed={albumPage.title}>
+		<PageShell seed={albumPage.title} cover={albumPage.thumbnails}>
 			<PageList
 				items={blocks}
 				key={(block) => block.key}
