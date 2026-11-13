@@ -17,6 +17,10 @@
 	import { router } from '#lib/router.svelte.ts';
 	import { colors, glassBackground, radii } from '#lib/theme.ts';
 
+	const pageEnterDuration = 180;
+	const pageEnterOffset = 10;
+	const pageFrameStyle = { flex: 1, minHeight: 0 };
+
 	library.load();
 	downloads.start();
 
@@ -58,17 +62,28 @@
 			}}
 		>
 			<!-- A page fills this box and scrolls itself (PageList), so it needs a bounded parent. -->
-			{#key router.href}
-				{#if Page}
-					<Page params={router.params} query={router.query} />
-				{:else}
-					<View style={{ gap: 4, padding: 16 }}>
-						<Text style={{ fontSize: 18, fontWeight: 'semibold' }}>{router.page}</Text>
-						<Text style={{ color: colors.muted }}>
-							This page is not written yet ({router.href}).
-						</Text>
-					</View>
-				{/if}
+			<!--
+				A new path fades and slides its page in; a new query on the same path only rebuilds the page. There is
+				no outro: the old page would stay laid out beside the new one until it finished.
+			-->
+			{#key router.path}
+				<Presence
+					in={[fly, { y: pageEnterOffset, duration: pageEnterDuration }]}
+					style={pageFrameStyle}
+				>
+					{#key router.href}
+						{#if Page}
+							<Page params={router.params} query={router.query} />
+						{:else}
+							<View style={{ gap: 4, padding: 16 }}>
+								<Text style={{ fontSize: 18, fontWeight: 'semibold' }}>{router.page}</Text>
+								<Text style={{ color: colors.muted }}>
+									This page is not written yet ({router.href}).
+								</Text>
+							</View>
+						{/if}
+					{/key}
+				</Presence>
 			{/key}
 		</View>
 		{#if showQueue}
