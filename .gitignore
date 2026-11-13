@@ -3,16 +3,13 @@ node_modules
 
 # build output
 dist/
-.svelte-kit/
 *.tsbuildinfo
 storybook-static/
 
 # desktop
 apps/desktop/build/bin/
-apps/desktop/build/electron/
+apps/desktop/build/package/
 apps/desktop/frontend/package.json.md5
-apps/desktop/frontend/build/*
-!apps/desktop/frontend/build/.gitkeep
 
 # env
 .env
@@ -39,3 +36,6 @@ apps/android/app/libs/*.jar
 .worktrees
 .workbench/
 apps/desktop/desktop
+
+# desktop shell
+apps/desktop/shell/target/

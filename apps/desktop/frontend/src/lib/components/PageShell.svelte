@@ -1,15 +1,21 @@
+<!--
+  The frame of an album, playlist or podcast page: a tinted wash under the header that fades out, with the
+  page's own scrolling content over it. The wash stays at the top of the pane while the content scrolls.
+-->
 <script lang="ts">
 	import type { Snippet } from 'svelte';
+	import { View } from '@neoworks/svelte-gpui/ui';
+	import VerticalFade from '#lib/components/VerticalFade.svelte';
 	import { gradientColorFor } from '#lib/pageColor.ts';
+
+	const washHeight = 416;
 
 	let { seed, children }: { seed: string; children: Snippet } = $props();
 
-	const gradient = $derived(
-		`linear-gradient(to bottom, ${gradientColorFor(seed)} 0, transparent 26rem)`
-	);
+	const color = $derived(gradientColorFor(seed));
 </script>
 
-<!-- Cancels the layout padding so the header gradient reaches the pane edges. -->
-<div class="-mx-3 -my-4 min-h-full px-6 py-6" style:background-image={gradient}>
+<View style={{ flex: 1, minHeight: 0, position: 'relative' }}>
+	<VerticalFade {color} height={washHeight} />
 	{@render children()}
-</div>
+</View>

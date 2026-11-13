@@ -1,19 +1,17 @@
 // Command desktop is the Drift desktop backend: the Go core behind one
-// loopback HTTP server (the SvelteKit UI from frontend/, the stream proxy and the
-// RPC WebSocket). The Electron shell in electron/ starts it and opens a window on it.
+// loopback HTTP server (the stream proxy and the RPC WebSocket). The shell in
+// shell/ starts it and runs the UI, which talks to it.
 package main
 
 import (
 	"bufio"
 	"context"
 	"crypto/rand"
-	"embed"
 	"encoding/json"
 	"errors"
 	"flag"
 	"fmt"
 	"io"
-	"io/fs"
 	"log/slog"
 	"net"
 	"net/http"
@@ -28,11 +26,6 @@ const shutdownTimeout = 2 * time.Second
 // announcePrefix starts the stdout line that tells the shell where the backend listens.
 const announcePrefix = "drift-backend "
 
-// frontend/build is the SvelteKit static build (`bun run build` in frontend/).
-//
-//go:embed all:frontend/build
-var embeddedAssets embed.FS
-
 // announcement is the JSON after announcePrefix.
 type announcement struct {
 	URL   string `json:"url"`
@@ -41,7 +34,7 @@ type announcement struct {
 
 func main() {
 	bindingsDirectory := flag.String("bindings", "", "write the TypeScript bindings into this directory and exit")
-	exitWithStdin := flag.Bool("exit-with-stdin", false, "quit when stdin closes (set by the Electron shell, so the backend dies with it)")
+	exitWithStdin := flag.Bool("exit-with-stdin", false, "quit when stdin closes (set by the shell, so the backend dies with it)")
 	flag.Parse()
 
 	logger := slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: logLevel()}))
@@ -68,17 +61,13 @@ func run(logger *slog.Logger, exitWithStdin bool) error {
 	if err != nil {
 		return fmt.Errorf("listen: %w", err)
 	}
-	assets, err := fs.Sub(embeddedAssets, "frontend/build")
-	if err != nil {
-		return fmt.Errorf("frontend assets: %w", err)
-	}
 
 	token := rand.Text()
 	baseURL := "http://" + listener.Addr().String()
 	rpc := newHub(token, logger)
 	app := NewApp(logger, baseURL, rpc.broadcast)
 	server := &http.Server{
-		Handler:           newServerHandler(app.proxyHandler(), rpc, app.neoworksCallbackHandler(), assets),
+		Handler:           newServerHandler(app.proxyHandler(), rpc, app.neoworksCallbackHandler()),
 		ReadHeaderTimeout: 5 * time.Second,
 	}
 	serveErrors := make(chan error, 1)

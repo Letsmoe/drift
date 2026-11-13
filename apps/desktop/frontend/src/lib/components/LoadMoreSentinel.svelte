@@ -1,24 +1,23 @@
+<!--
+  The last block of a feed: it asks for the next page as soon as it is built, which a `PageList` does only
+  when the block is near the window. Give it a key that changes with the item count, so it is built again,
+  and asks again, when the page it asked for did not fill the window.
+-->
 <script lang="ts">
-	import { LoadingSpinner } from '@neoworks-dev/ui';
-	import { whenVisible } from '#lib/whenVisible.ts';
+	import { untrack } from 'svelte';
+	import { View } from '@neoworks/svelte-gpui/ui';
+	import { LoadingSpinner } from '@neoworks/svelte-gpui-ui';
+	import { colors } from '#lib/theme.ts';
 
-	let { itemCount, onvisible }: { itemCount: number; onvisible: () => void } = $props();
+	let { onvisible }: { onvisible: () => void } = $props();
 
-	// The spinner only appears once the sentinel is in view: an off-screen spinner keeps the
-	// webview repainting the translucent panels above the backdrop.
-	let reachedAtCount = $state(-1);
-
-	function reach(): void {
-		reachedAtCount = itemCount;
-		onvisible();
-	}
+	$effect(() => {
+		untrack(() => onvisible());
+	});
 </script>
 
-<!-- Re-created per page so it fires again when it is still in view after loading. -->
-{#key itemCount}
-	<div class="flex min-h-24 justify-center py-8" {@attach whenVisible(reach)}>
-		{#if reachedAtCount === itemCount}
-			<LoadingSpinner />
-		{/if}
-	</div>
-{/key}
+<View
+	style={{ minHeight: 96, align: 'center', justify: 'center', paddingY: 32, color: colors.text }}
+>
+	<LoadingSpinner />
+</View>

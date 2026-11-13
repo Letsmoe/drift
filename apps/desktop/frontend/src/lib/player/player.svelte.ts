@@ -42,8 +42,9 @@ interface PendingRemoteStart {
 
 /**
  * Playback state shared by the track lists, the queue UI and the player bar. The queue lives
- * in the Go core; this class mirrors it and drives the <audio> element in PlayerBar, which
- * binds to `source`, `paused`, `currentTime`, `duration`, `volume` and `muted`.
+ * in the Go core; this class mirrors it and drives the Rust audio engine through
+ * `connectAudio` (audioBinding.svelte.ts), which follows `source`, `paused`, `volume`, `muted`
+ * and the seeks, and writes `currentTime`, `duration` and `buffering` back.
  */
 export class Player {
 	queue = $state<QueueState>(emptyQueueState());
@@ -65,6 +66,7 @@ export class Player {
 	#sourceEntryId: number | undefined = undefined;
 	#playIdPromise: Promise<number | null> | null = null;
 	#userActionListeners: Array<() => void> = [];
+	#seekListeners: Array<(seconds: number) => void> = [];
 	#pendingRemoteStart: PendingRemoteStart | null = null;
 	#retriedEntryId: number | undefined = undefined;
 	#failedSkips = 0;
@@ -215,8 +217,16 @@ export class Player {
 	}
 
 	seek(seconds: number): void {
-		this.currentTime = seconds;
+		this.#moveTo(seconds);
 		this.#notifyUserAction();
+	}
+
+	/** Listens to every move of the playback position that the audio engine has to carry out. */
+	onSeek(listener: (seconds: number) => void): () => void {
+		this.#seekListeners.push(listener);
+		return () => {
+			this.#seekListeners = this.#seekListeners.filter((other) => other !== listener);
+		};
 	}
 
 	/** Listens to plays, pauses and seeks by the user. Returns the unsubscribe function. */
@@ -240,7 +250,7 @@ export class Player {
 			this.paused = playback.paused;
 		}
 		if (Math.abs(this.currentTime - playback.positionSeconds) > playback.toleranceSeconds) {
-			this.currentTime = playback.positionSeconds;
+			this.#moveTo(playback.positionSeconds);
 		}
 	}
 
@@ -444,14 +454,22 @@ export class Player {
 
 	#stopAtEnd(): void {
 		this.paused = true;
-		this.currentTime = 0;
+		this.#moveTo(0);
 	}
 
 	// Repeat one: the same entry plays again, as a new play.
 	#restartCurrent(): void {
 		this.#playIdPromise = this.#startPlayReport(this.entry);
-		this.currentTime = 0;
+		this.#moveTo(0);
 		this.paused = false;
+	}
+
+	// The position changed by decision, not by playing on: the audio engine has to jump there.
+	#moveTo(seconds: number): void {
+		this.currentTime = seconds;
+		for (const listener of this.#seekListeners) {
+			listener(seconds);
+		}
 	}
 
 	#startPlayReport(entry: QueueEntry): Promise<number | null> {

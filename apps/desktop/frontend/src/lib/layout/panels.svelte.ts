@@ -1,6 +1,8 @@
+import { getItem, setItem } from '#lib/storage.ts';
+
 const queueWidthStorageKey = 'drift:queue-panel-width';
 
-/** Bounds of the Now playing column's width in CSS pixels. */
+/** Bounds of the Now playing column's width in pixels. */
 export const queueWidthLimits = { minimum: 300, maximum: 560, initial: 360 };
 
 function clampQueueWidth(width: number): number {
@@ -8,7 +10,7 @@ function clampQueueWidth(width: number): number {
 }
 
 function loadQueueWidth(): number {
-	const stored = Number(localStorage.getItem(queueWidthStorageKey));
+	const stored = Number(getItem(queueWidthStorageKey));
 	if (!Number.isFinite(stored) || stored === 0) {
 		return queueWidthLimits.initial;
 	}
@@ -29,7 +31,7 @@ class Panels {
 	/** Sets the Now playing column's width, clamped to queueWidthLimits, and remembers it. */
 	resizeQueue(width: number): void {
 		this.queueWidth = clampQueueWidth(width);
-		localStorage.setItem(queueWidthStorageKey, String(this.queueWidth));
+		setItem(queueWidthStorageKey, String(this.queueWidth));
 	}
 
 	toggleFullPlayer(): void {

@@ -1,7 +1,11 @@
+<!-- Guests waiting for the user to let them into the session. -->
 <script lang="ts">
-	import { Button } from '@neoworks-dev/ui';
+	import { View } from '@neoworks/svelte-gpui/ui';
+	import { Button } from '@neoworks/svelte-gpui-ui';
+	import Label from '#lib/components/Label.svelte';
 	import PeerAvatar from '#lib/components/PeerAvatar.svelte';
 	import { formatUserId, listenTogether } from '#lib/together/listenTogether.svelte.ts';
+	import { colors, radii } from '#lib/theme.ts';
 
 	function describeRequester(userId: string): string {
 		if (listenTogether.isFriend(userId)) {
@@ -11,32 +15,31 @@
 	}
 </script>
 
-<ul class="flex flex-col gap-1">
+<View style={{ gap: 4 }}>
 	{#each listenTogether.requests as guest (guest.id)}
-		<li class="flex flex-col gap-2 rounded-lg bg-raised p-2">
-			<div class="flex items-center gap-3">
+		<View style={{ gap: 8, padding: 8, radius: radii.large, background: colors.raised }}>
+			<View style={{ direction: 'row', align: 'center', gap: 12 }}>
 				<PeerAvatar name={guest.name} highlighted />
-				<div class="min-w-0 flex-1">
-					<p class="truncate text-sm">
-						<span class="font-semibold">{guest.name}</span>
-						<span class="text-muted">wants to listen with you</span>
-					</p>
-					<p class="truncate text-xs text-dim">{describeRequester(guest.userId)}</p>
-				</div>
-			</div>
-			<div class="flex justify-end gap-2">
+				<View style={{ flex: 1, minWidth: 0 }}>
+					<Label size="body" tone="muted" truncate>
+						<Label weight="semibold" tone="default">{guest.name}</Label> wants to listen with you
+					</Label>
+					<Label size="tiny" tone="dim" truncate>{describeRequester(guest.userId)}</Label>
+				</View>
+			</View>
+			<View style={{ direction: 'row', justify: 'end', gap: 8 }}>
 				<Button
 					size="sm"
 					variant="ghost"
 					disabled={listenTogether.isPending(`decline:${guest.id}`)}
-					onclick={() => listenTogether.declineJoin(guest.id)}
+					onpress={() => listenTogether.declineJoin(guest.id)}
 				>
 					Decline
 				</Button>
 				<Button
 					size="sm"
 					disabled={listenTogether.isPending(`accept:${guest.id}`)}
-					onclick={() => listenTogether.acceptJoin(guest.id, true)}
+					onpress={() => listenTogether.acceptJoin(guest.id, true)}
 				>
 					Always let in
 				</Button>
@@ -44,11 +47,11 @@
 					size="sm"
 					variant="primary"
 					disabled={listenTogether.isPending(`accept:${guest.id}`)}
-					onclick={() => listenTogether.acceptJoin(guest.id, false)}
+					onpress={() => listenTogether.acceptJoin(guest.id, false)}
 				>
 					Let in
 				</Button>
-			</div>
-		</li>
+			</View>
+		</View>
 	{/each}
-</ul>
+</View>

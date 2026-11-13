@@ -1,8 +1,12 @@
+<!-- Starting, joining and leaving a session, and who is in it. -->
 <script lang="ts">
-	import { Button, LoadingSpinner } from '@neoworks-dev/ui';
-	import UserPlusIcon from 'phosphor-svelte/lib/UserPlusIcon';
+	import { View } from '@neoworks/svelte-gpui/ui';
+	import { Button, LoadingSpinner } from '@neoworks/svelte-gpui-ui';
+	import Label from '#lib/components/Label.svelte';
 	import PeerAvatar from '#lib/components/PeerAvatar.svelte';
+	import { userPlus } from '#lib/layout/chromeIcons.ts';
 	import { listenTogether } from '#lib/together/listenTogether.svelte.ts';
+	import { colors } from '#lib/theme.ts';
 
 	const room = $derived(listenTogether.room);
 	const status = $derived(listenTogether.roomStatus);
@@ -49,62 +53,63 @@
 	}
 </script>
 
-<section class="flex flex-col gap-3">
-	{#if !room}
-		<p class="text-sm text-muted">
+{#if !room}
+	<View style={{ gap: 12 }}>
+		<Label size="body" tone="muted">
 			Play the same queue at the same time as your friends. Anyone in the session can play, pause,
 			skip and change the queue. You decide who gets in; trusted friends join without asking.
-		</p>
+		</Label>
 		<Button
 			variant="primary"
 			size="sm"
+			full
 			disabled={listenTogether.isPending('host')}
-			onclick={() => listenTogether.host()}
+			onpress={() => listenTogether.host()}
 		>
 			Start a session
 		</Button>
-	{:else}
-		<div class="flex items-center gap-2 text-sm">
+	</View>
+{:else}
+	<View style={{ gap: 12 }}>
+		<View style={{ direction: 'row', align: 'center', gap: 8 }}>
 			{#if working}
-				<LoadingSpinner size={14} class="shrink-0 text-dim" />
+				<LoadingSpinner size={14} color={colors.dim} style={{ shrink: 0 }} />
 			{/if}
-			<p class="flex-1 text-muted">{statusText}</p>
-		</div>
-		{#if listenTogether.otherPeers.length > 0}
-			<ul class="flex flex-col gap-1">
-				{#each listenTogether.otherPeers as peer (peer.id)}
-					<li class="flex items-center gap-3 rounded-md px-1 py-1">
-						<PeerAvatar name={peer.name} highlighted={peer.userId === room.hostUserId} />
-						<div class="min-w-0 flex-1">
-							<p class="truncate text-sm font-medium">{peer.name}</p>
-							{#if peer.userId === room.hostUserId}
-								<p class="text-xs text-dim">Host</p>
-							{/if}
-						</div>
-						{#if !listenTogether.isFriend(peer.userId)}
-							<Button
-								size="sm"
-								variant="ghost"
-								icon={UserPlusIcon}
-								disabled={listenTogether.isPending('add-friend')}
-								onclick={() => listenTogether.addFriend(peer.userId, peer.name)}
-							>
-								Add friend
-							</Button>
-						{/if}
-					</li>
-				{/each}
-			</ul>
-		{/if}
-		<div class="flex justify-end">
+			<View style={{ flex: 1, minWidth: 0 }}>
+				<Label size="body" tone="muted">{statusText}</Label>
+			</View>
+		</View>
+		{#each listenTogether.otherPeers as peer (peer.id)}
+			<View style={{ direction: 'row', align: 'center', gap: 12, padding: 4 }}>
+				<PeerAvatar name={peer.name} highlighted={peer.userId === room.hostUserId} />
+				<View style={{ flex: 1, minWidth: 0 }}>
+					<Label size="body" weight="medium" tone="default" truncate>{peer.name}</Label>
+					{#if peer.userId === room.hostUserId}
+						<Label size="tiny" tone="dim">Host</Label>
+					{/if}
+				</View>
+				{#if !listenTogether.isFriend(peer.userId)}
+					<Button
+						size="sm"
+						variant="ghost"
+						icon={userPlus}
+						disabled={listenTogether.isPending('add-friend')}
+						onpress={() => listenTogether.addFriend(peer.userId, peer.name)}
+					>
+						Add friend
+					</Button>
+				{/if}
+			</View>
+		{/each}
+		<View style={{ direction: 'row', justify: 'end' }}>
 			<Button
 				size="sm"
 				variant="ghost"
 				disabled={listenTogether.isPending('leave')}
-				onclick={() => listenTogether.leave()}
+				onpress={() => listenTogether.leave()}
 			>
 				{leaveLabel()}
 			</Button>
-		</div>
-	{/if}
-</section>
+		</View>
+	</View>
+{/if}

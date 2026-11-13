@@ -1,58 +1,67 @@
 <script lang="ts">
+	import { View } from '@neoworks/svelte-gpui/ui';
 	import type { Track } from '#lib/api/music.ts';
+	import ContextArea from '#lib/components/ContextArea.svelte';
 	import Cover from '#lib/components/Cover.svelte';
+	import Label from '#lib/components/Label.svelte';
 	import PlayOverlayButton from '#lib/components/PlayOverlayButton.svelte';
 	import TrackContextMenu from '#lib/components/TrackContextMenu.svelte';
-	import { PopupMenu } from '#lib/menu/popupMenu.svelte.ts';
 	import { formatTrackByline, trackHref } from '#lib/format.ts';
+	import { PopupMenu } from '#lib/menu/popupMenu.svelte.ts';
 	import { player } from '#lib/player/player.svelte.ts';
-	import { whenVisible } from '#lib/whenVisible.ts';
+	import { goto } from '#lib/router.svelte.ts';
+	import { colors, hoverTransition, radii } from '#lib/theme.ts';
+
+	const coverSize = 184;
 
 	let { track, onplay, onvisible }: { track: Track; onplay: () => void; onvisible?: () => void } =
 		$props();
 
 	const contextMenu = new PopupMenu();
+	let hovered = $state(false);
+
 	const playing = $derived(player.isPlaying(track));
 	const current = $derived(player.isCurrent(track));
-	const pageHref = $derived(trackHref(track));
-
-	function reportVisible(): void {
-		onvisible?.();
-	}
+	const showPlayButton = $derived(hovered || playing);
 </script>
 
-<div
-	role="group"
-	aria-label={track.title}
-	class="group/card duration-fast relative flex w-52 shrink-0 flex-col gap-2 rounded-lg p-3 transition-colors hover:bg-raised"
-	{@attach whenVisible(reportVisible)}
-	oncontextmenu={(event) => contextMenu.openAtPointer(event)}
+<ContextArea
+	popup={contextMenu}
+	onhover={(isHovered) => (hovered = isHovered)}
+	style={{ width: 182, shrink: 0 }}
 >
-	<div class="relative">
-		<Cover thumbnails={track.thumbnails} size={184} class="w-full rounded-md" />
-		<PlayOverlayButton
-			{playing}
-			size="md"
-			label="Play {track.title}"
-			onclick={onplay}
-			class={[
-				'absolute right-2 bottom-2 z-10',
-				!playing &&
-					'translate-y-1 opacity-0 group-hover/card:translate-y-0 group-hover/card:opacity-100'
-			]}
-		/>
-	</div>
-	<div class="min-w-0">
-		<p class="truncate text-sm font-semibold" class:text-action={current}>
-			{#if pageHref}
-				<!-- Stretched over the card: the card opens the page, the play button sits above it. -->
-				<a href={pageHref} class="after:absolute after:inset-0">{track.title}</a>
-			{:else}
-				{track.title}
+	<View
+		style={{
+			cursor: 'pointer',
+			align: 'stretch',
+			gap: 8,
+			padding: 12,
+			radius: radii.large,
+			transition: hoverTransition
+		}}
+		hover={{ background: colors.raised }}
+		onpress={() => goto(trackHref(track))}
+	>
+		<View style={{ position: 'relative' }}>
+			<Cover
+				thumbnails={track.thumbnails}
+				size={coverSize}
+				style={{ radius: radii.medium }}
+				onload={onvisible}
+			/>
+			{#if showPlayButton}
+				<PlayOverlayButton
+					{playing}
+					onpress={onplay}
+					style={{ position: 'absolute', right: 8, bottom: 8 }}
+				/>
 			{/if}
-		</p>
-		<p class="truncate text-xs text-dim">{formatTrackByline(track)}</p>
-	</div>
-</div>
+		</View>
+		<View style={{ minWidth: 0 }}>
+			<Label size="small" weight="semibold" accented={current} truncate>{track.title}</Label>
+			<Label size="tiny" tone="dim" truncate>{formatTrackByline(track)}</Label>
+		</View>
+	</View>
+</ContextArea>
 
 <TrackContextMenu popup={contextMenu} {track} />

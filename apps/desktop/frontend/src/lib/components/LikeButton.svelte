@@ -1,7 +1,10 @@
 <script lang="ts">
-	import HeartIcon from 'phosphor-svelte/lib/HeartIcon';
 	import type { ItemKind, Track } from '#lib/api/music.ts';
+	import { appearance } from '#lib/appearance.svelte.ts';
+	import IconAction from '#lib/components/IconAction.svelte';
+	import { heart, heartFill } from '#lib/icons.ts';
 	import { library } from '#lib/library/library.svelte.ts';
+	import { colors } from '#lib/theme.ts';
 
 	let {
 		track,
@@ -10,35 +13,37 @@
 	}: { track: Track; kind?: ItemKind; size?: number } = $props();
 
 	const liked = $derived(library.isLiked(track.videoId));
-	const label = $derived(buildLabel());
-	const weight = $derived(buildWeight());
+	const icon = $derived(iconFor(liked));
+	const color = $derived(colorFor(liked));
 
-	function buildLabel(): string {
-		if (liked) {
-			return 'Remove from Liked Songs';
+	function iconFor(isLiked: boolean): string {
+		if (isLiked) {
+			return heartFill;
 		}
-		return 'Save to Liked Songs';
+		return heart;
 	}
 
-	function buildWeight(): 'fill' | 'regular' {
-		if (liked) {
-			return 'fill';
+	function colorFor(isLiked: boolean): string {
+		if (isLiked) {
+			return appearance.accent;
 		}
-		return 'regular';
+		return appearance.muted;
+	}
+
+	function hoverColorFor(isLiked: boolean): string {
+		if (isLiked) {
+			return appearance.accent;
+		}
+		return colors.text;
 	}
 </script>
 
-<button
-	type="button"
-	aria-label={label}
-	title={label}
-	aria-pressed={liked}
-	onclick={() => library.toggleLike(track, kind)}
-	class={[
-		'duration-fast flex size-8 items-center justify-center rounded-full transition-colors hover:bg-hover',
-		liked && 'text-action',
-		!liked && 'text-muted hover:text-default'
-	]}
->
-	<HeartIcon {size} {weight} />
-</button>
+<IconAction
+	{icon}
+	iconSize={size}
+	boxSize={32}
+	{color}
+	hoverColor={hoverColorFor(liked)}
+	hoverBackground={colors.hover}
+	onpress={() => library.toggleLike(track, kind)}
+/>

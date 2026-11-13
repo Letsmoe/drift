@@ -8,6 +8,14 @@ export function downloadFraction(status: DownloadStatus | undefined): number {
 	return status.bytesDone / status.bytesTotal;
 }
 
+/** Percent (0 to 100) for a progress indicator, or undefined while the size is not known, so it spins instead. */
+export function progressPercent(fraction: number): number | undefined {
+	if (fraction <= 0 || fraction > 1) {
+		return undefined;
+	}
+	return fraction * 100;
+}
+
 export function formatBytes(bytes: number): string {
 	if (bytes < 1024) {
 		return `${bytes} B`;

@@ -1,21 +1,41 @@
+<!-- The Listen Together button of the top bar and the panel it opens. -->
 <script lang="ts">
-	import UsersThreeIcon from 'phosphor-svelte/lib/UsersThreeIcon';
+	import {
+		Button,
+		Icon,
+		Popover,
+		Scroll,
+		Tooltip,
+		View,
+		type Style
+	} from '@neoworks/svelte-gpui/ui';
+	import { window } from '@neoworks/svelte-gpui';
+	import { Divider } from '@neoworks/svelte-gpui-ui';
+	import { appearance } from '#lib/appearance.svelte.ts';
+	import Label from '#lib/components/Label.svelte';
 	import TogetherAddFriend from '#lib/components/TogetherAddFriend.svelte';
 	import TogetherFriends from '#lib/components/TogetherFriends.svelte';
 	import TogetherInvites from '#lib/components/TogetherInvites.svelte';
 	import TogetherProfile from '#lib/components/TogetherProfile.svelte';
 	import TogetherRequests from '#lib/components/TogetherRequests.svelte';
 	import TogetherSession from '#lib/components/TogetherSession.svelte';
+	import { usersThree, usersThreeFill } from '#lib/layout/chromeIcons.ts';
 	import { listenTogether } from '#lib/together/listenTogether.svelte.ts';
+	import { colors, floatingPanel, glassBackground, hoverTransition } from '#lib/theme.ts';
 
 	listenTogether.start();
 
+	const panelWidth = 384;
+	const panelPadding = 16;
+	// The panel stays inside the window: 36rem at most, else the window less the bar and player.
+	const panelMaxHeight = $derived(Math.min(576, window.size.height - 128));
+
 	let open = $state(false);
-	let container = $state<HTMLElement>();
 
 	const attentionCount = $derived(listenTogether.attentionCount);
 	const listenerCount = $derived(listenTogether.otherPeers.length);
 	const buttonLabel = $derived(describeButton());
+	const buttonIcon = $derived(pickIcon());
 
 	function describeButton(): string {
 		if (listenTogether.requests.length > 0) {
@@ -30,70 +50,83 @@
 		return 'Listen together';
 	}
 
-	function toggle(): void {
-		open = !open;
-		if (!open) {
-			listenTogether.clearError();
+	function pickIcon(): string {
+		if (listenTogether.connected) {
+			return usersThreeFill;
 		}
+		return usersThree;
 	}
 
-	function close(): void {
-		open = false;
+	function buttonColor(): string {
+		if (listenTogether.roomOpen) {
+			return colors.text;
+		}
+		return appearance.dim;
+	}
+
+	function panelStyle(): Style {
+		return {
+			...floatingPanel,
+			width: panelWidth,
+			maxHeight: panelMaxHeight,
+			padding: 0
+		};
+	}
+
+	function handleClose(): void {
 		listenTogether.clearError();
-	}
-
-	function closeOnOutsidePointer(event: PointerEvent): void {
-		if (open && container && !container.contains(event.target as Node)) {
-			close();
-		}
-	}
-
-	function closeOnEscape(event: KeyboardEvent): void {
-		if (open && event.key === 'Escape') {
-			close();
-		}
 	}
 </script>
 
-<svelte:window onpointerdown={closeOnOutsidePointer} onkeydown={closeOnEscape} />
-
 {#snippet sectionTitle(title: string)}
-	<h3 class="text-xs font-semibold tracking-wide text-dim uppercase">{title}</h3>
+	<Label size="tiny" weight="semibold" tone="dim" style={{ uppercase: true }}>{title}</Label>
 {/snippet}
 
-<div bind:this={container} class="relative">
-	<button
-		type="button"
-		aria-label={buttonLabel}
-		title={buttonLabel}
-		aria-haspopup="dialog"
-		aria-expanded={open}
-		onclick={toggle}
-		class={[
-			'duration-fast glass relative flex h-9 items-center gap-1.5 rounded-full px-3 text-sm transition-colors hover:bg-hover',
-			listenTogether.roomOpen && 'text-default',
-			!listenTogether.roomOpen && 'text-dim hover:text-default'
-		]}
-	>
-		<UsersThreeIcon size={18} weight={listenTogether.connected ? 'fill' : 'regular'} />
-		{#if listenTogether.connected}
-			<span class="font-semibold tabular-nums">{listenerCount + 1}</span>
-		{/if}
-		{#if attentionCount > 0}
-			<span class="absolute top-1 right-1 size-2 rounded-full bg-action"></span>
-		{/if}
-	</button>
-
-	{#if open}
-		<div
-			role="dialog"
-			aria-label="Listen together"
-			class="absolute top-full right-0 z-40 mt-2 flex max-h-[min(36rem,calc(100vh-8rem))] w-96 flex-col gap-4 overflow-y-auto rounded-xl border border-line bg-elevated p-4 shadow-lg"
-		>
-			<header class="flex flex-col gap-3">
-				<h2 class="text-base font-bold">Listen together</h2>
+<Popover bind:open side="bottom" align="end" offset={8} style={panelStyle()} onclose={handleClose}>
+	{#snippet trigger({ toggle })}
+		<Tooltip text={buttonLabel} side="bottom">
+			<Button
+				style={{
+					direction: 'row',
+					align: 'center',
+					justify: 'center',
+					gap: 6,
+					height: 36,
+					minWidth: 36,
+					paddingX: 9,
+					radius: 9999,
+					background: glassBackground,
+					color: buttonColor(),
+					transition: hoverTransition
+				}}
+				hover={{ background: colors.hover, color: colors.text }}
+				onpress={toggle}
+			>
+				<Icon svg={buttonIcon} size={18} />
+				{#if listenTogether.connected}
+					<Label size="body" weight="semibold">{listenerCount + 1}</Label>
+				{/if}
+				{#if attentionCount > 0}
+					<View
+						style={{
+							position: 'absolute',
+							top: 4,
+							right: 4,
+							size: 8,
+							radius: 9999,
+							background: appearance.accent
+						}}
+					/>
+				{/if}
+			</Button>
+		</Tooltip>
+	{/snippet}
+	<Scroll style={{ maxHeight: panelMaxHeight }}>
+		<View style={{ gap: 16, padding: panelPadding }}>
+			<View style={{ gap: 12 }}>
+				<Label size="medium" weight="bold" tone="default">Listen together</Label>
 				<TogetherProfile />
-			</header>
+			</View>
 
 			{#if listenTogether.requests.length > 0}
 				<TogetherRequests />
@@ -102,19 +135,19 @@
 				<TogetherInvites />
 			{/if}
 
-			<div class="h-px bg-line"></div>
+			<Divider />
 			<TogetherSession />
 
-			<div class="h-px bg-line"></div>
-			<section class="flex flex-col gap-3">
+			<Divider />
+			<View style={{ gap: 12 }}>
 				{@render sectionTitle('Friends')}
 				<TogetherFriends />
 				<TogetherAddFriend />
-			</section>
+			</View>
 
 			{#if listenTogether.errorMessage !== ''}
-				<p class="text-sm text-red">{listenTogether.errorMessage}</p>
+				<Label size="body" tone="danger">{listenTogether.errorMessage}</Label>
 			{/if}
-		</div>
-	{/if}
-</div>
+		</View>
+	</Scroll>
+</Popover>

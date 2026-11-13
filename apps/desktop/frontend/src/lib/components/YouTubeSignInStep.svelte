@@ -1,102 +1,122 @@
 <script lang="ts">
-	import { Button, LoadingSpinner } from '@neoworks-dev/ui';
+	import { View } from '@neoworks/svelte-gpui/ui';
+	import { Button, Disclosure, LoadingSpinner } from '@neoworks/svelte-gpui-ui';
+	import Label from '#lib/components/Label.svelte';
+	import TextArea from '#lib/components/TextArea.svelte';
 	import type { MusicImportFlow } from '#lib/import/musicImport.svelte.ts';
+	import { colors, hoverTransition, radii } from '#lib/theme.ts';
+
+	const cookieSteps = [
+		'Open music.youtube.com and sign in.',
+		"Open the browser's DevTools and go to the Network tab.",
+		'Reload, click any request to music.youtube.com and copy its Cookie request header.',
+		'Paste it here. A whole request or a "Copy as cURL" command works too.'
+	];
 
 	let { flow }: { flow: MusicImportFlow } = $props();
 
 	const youtube = $derived(flow.youtube);
 </script>
 
-<div class="flex flex-col gap-4">
-	<section class="flex flex-col gap-2">
-		<h3 class="text-base font-semibold">Use a browser where you are signed in</h3>
-		<p class="text-sm text-muted">
+<View style={{ gap: 16 }}>
+	<View style={{ gap: 8 }}>
+		<Label size="body" weight="semibold">Use a browser where you are signed in</Label>
+		<Label size="small" tone="muted">
 			If you are already signed in to music.youtube.com in a browser on this computer, Drift can
 			pick up that session. This reads the browser's cookie store, and only when you press the
 			button.
-		</p>
-		<div class="self-start">
-			<Button variant="primary" disabled={youtube.busy} onclick={() => youtube.searchBrowsers()}
-				>Look for signed-in browsers</Button
-			>
-		</div>
+		</Label>
+		<View style={{ alignSelf: 'start' }}>
+			<Button variant="primary" disabled={youtube.busy} onpress={() => youtube.searchBrowsers()}>
+				Look for signed-in browsers
+			</Button>
+		</View>
 
 		{#if youtube.busy}
-			<div class="flex justify-center py-3"><LoadingSpinner /></div>
+			<View style={{ align: 'center', paddingY: 12, color: colors.text }}><LoadingSpinner /></View>
 		{/if}
 
 		{#if youtube.searched}
 			{#if youtube.usableSessions.length === 0}
-				<p class="text-sm text-muted">No browser with a YouTube Music session was found.</p>
+				<Label size="small" tone="muted">No browser with a YouTube Music session was found.</Label>
 			{/if}
-			<ul class="flex flex-col">
-				{#each youtube.usableSessions as session (session.browser + session.profile)}
-					<li class="flex items-center gap-3 rounded-md px-2 py-2 hover:bg-hover">
-						<span class="min-w-0 flex-1 truncate text-sm">
-							{session.browser}
-							<span class="text-dim">{session.profile}</span>
-						</span>
-						<Button
-							size="sm"
-							variant="primary"
-							disabled={youtube.busy}
-							onclick={() => flow.useBrowserSession(session)}>Use this session</Button
-						>
-					</li>
-				{/each}
-			</ul>
+			{#each youtube.usableSessions as session (session.browser + session.profile)}
+				<View
+					style={{
+						direction: 'row',
+						align: 'center',
+						gap: 12,
+						paddingX: 8,
+						paddingY: 8,
+						radius: radii.medium,
+						transition: hoverTransition
+					}}
+					hover={{ background: colors.hover }}
+				>
+					<Label size="small" truncate style={{ flex: 1, minWidth: 0 }}>
+						{session.browser}
+						<Label size="small" tone="dim">{session.profile}</Label>
+					</Label>
+					<Button
+						size="sm"
+						variant="primary"
+						disabled={youtube.busy}
+						onpress={() => flow.useBrowserSession(session)}
+					>
+						Use this session
+					</Button>
+				</View>
+			{/each}
 			{#if youtube.unusableSessions.length > 0}
-				<details class="text-sm">
-					<summary class="cursor-pointer text-muted">
-						{youtube.unusableSessions.length} other profiles without a usable session
-					</summary>
-					<ul class="mt-2 flex flex-col gap-1">
+				<Disclosure
+					title={`${youtube.unusableSessions.length} other profiles without a usable session`}
+				>
+					<View style={{ gap: 4 }}>
 						{#each youtube.unusableSessions as session (session.browser + session.profile)}
-							<li class="text-xs text-dim">
+							<Label size="tiny" tone="dim">
 								{session.browser}
 								{session.profile}: {session.reason}
-							</li>
+							</Label>
 						{/each}
-					</ul>
-				</details>
+					</View>
+				</Disclosure>
 			{/if}
 		{/if}
-	</section>
+	</View>
 
-	<details class="rounded-md bg-raised px-3 py-2">
-		<summary class="cursor-pointer text-sm font-semibold">Paste cookies instead</summary>
-		<div class="mt-2 flex flex-col gap-2">
-			<ol class="list-decimal pl-5 text-sm text-muted">
-				<li>Open music.youtube.com and sign in.</li>
-				<li>Open the browser's DevTools and go to the Network tab.</li>
-				<li>Reload, click any request to music.youtube.com and copy its Cookie request header.</li>
-				<li>Paste it here. A whole request or a "Copy as cURL" command works too.</li>
-			</ol>
-			<textarea
+	<Disclosure title="Paste cookies instead">
+		<View style={{ gap: 8 }}>
+			<View style={{ gap: 2 }}>
+				{#each cookieSteps as step, index (index)}
+					<Label size="small" tone="muted">{index + 1}. {step}</Label>
+				{/each}
+			</View>
+			<TextArea
 				bind:value={youtube.pastedCookies}
-				aria-label="Cookie header"
-				rows="4"
+				rows={4}
+				mono
 				placeholder="SID=...; SAPISID=...; ..."
-				class="min-w-0 rounded-md bg-canvas px-3 py-2 font-mono text-xs outline-none placeholder:text-dim focus:border-line-strong"
-			></textarea>
-			<div class="self-start">
+			/>
+			<View style={{ alignSelf: 'start' }}>
 				<Button
 					disabled={youtube.busy || youtube.pastedCookies.trim() === ''}
-					onclick={() => flow.usePastedCookies()}>Sign in with these cookies</Button
+					onpress={() => flow.usePastedCookies()}
 				>
-			</div>
-		</div>
-	</details>
+					Sign in with these cookies
+				</Button>
+			</View>
+		</View>
+	</Disclosure>
 
-	<p class="text-xs text-dim">
+	<Label size="tiny" tone="dim">
 		Your session stays on this computer and is only used to read your library. Sign out any time.
-	</p>
+	</Label>
 
 	{#if youtube.errorMessage !== ''}
-		<p class="text-sm text-red">{youtube.errorMessage}</p>
+		<Label size="small" tone="danger">{youtube.errorMessage}</Label>
 	{/if}
 
-	<div class="flex justify-end">
-		<Button variant="ghost" onclick={() => flow.closeSignIn()}>Back</Button>
-	</div>
-</div>
+	<View style={{ direction: 'row', justify: 'end' }}>
+		<Button variant="ghost" onpress={() => flow.closeSignIn()}>Back</Button>
+	</View>
+</View>

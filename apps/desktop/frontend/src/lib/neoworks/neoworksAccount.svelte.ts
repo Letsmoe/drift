@@ -3,6 +3,7 @@ import {
 	cancelNeoworksSignIn,
 	loadNeoworksStatus,
 	onNeoworksChange,
+	openLink,
 	signOutOfNeoworks,
 	syncNeoworks,
 	type NeoworksAccountStatus
@@ -77,7 +78,7 @@ export class NeoworksAccount {
 		this.actionError = '';
 		try {
 			const address = await beginNeoworksSignIn();
-			window.open(address, '_blank');
+			await openLink(address);
 		} catch (error) {
 			this.actionError = describeError(error);
 		}
