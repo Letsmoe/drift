@@ -58,9 +58,8 @@ class RpcClient {
 
 	#open(): Promise<WebSocket> {
 		const address = backendAddress();
-		const url = new URL('/rpc', address.url);
-		url.protocol = url.protocol.replace('http', 'ws');
-		url.searchParams.set('token', address.token);
+		// The host's WebSocket maps http(s) to ws(s); there is no URL class to build it with.
+		const url = `${address.url}/rpc?token=${encodeURIComponent(address.token)}`;
 
 		const socket = new WebSocket(url);
 		socket.onmessage = (message) => this.#receive(message.data as string);

@@ -39,3 +39,6 @@ apps/android/app/libs/*.jar
 .worktrees
 .workbench/
 apps/desktop/desktop
+
+# desktop shell
+apps/desktop/shell/target/
