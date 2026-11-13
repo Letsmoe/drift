@@ -3,6 +3,21 @@
 	"private": true,
 	"version": "0.0.1",
 	"type": "module",
+	"svelte-gpui": {
+		"name": "Drift",
+		"id": "dev.letsmoe.drift",
+		"description": "YouTube Music player",
+		"icon": "../build/appicon.png",
+		"categories": "AudioVideo;Audio;Player;",
+		"bundle": "dist/drift.js",
+		"build": "build.mjs",
+		"crate": {
+			"manifest": "../shell/Cargo.toml",
+			"features": [
+				"package"
+			]
+		}
+	},
 	"scripts": {
 		"build": "bun build.mjs",
 		"watch": "bun build.mjs --watch",
