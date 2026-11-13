@@ -16,6 +16,7 @@
 		paddingBottom = 16,
 		rowGap = 0,
 		estimatedRowHeight = 120,
+		overscan = 4,
 		onscroll
 	}: {
 		items: Block[];
@@ -28,6 +29,11 @@
 		/** Space under every block but the last. */
 		rowGap?: number;
 		estimatedRowHeight?: number;
+		/**
+		 * Blocks built past each edge of the window. Every scroll frame lays out and draws all blocks built, and a
+		 * track row is about sixty elements, so this is kept below the list's default of eight.
+		 */
+		overscan?: number;
 		onscroll?: (position: ScrollPosition) => void;
 	} = $props();
 
@@ -46,7 +52,7 @@
 	}
 </script>
 
-<List {items} {key} {estimatedRowHeight} {onscroll} style={{ flex: 1, minHeight: 0 }}>
+<List {items} {key} {estimatedRowHeight} {overscan} {onscroll} style={{ flex: 1, minHeight: 0 }}>
 	{#snippet row(item, index)}
 		<View
 			style={{
