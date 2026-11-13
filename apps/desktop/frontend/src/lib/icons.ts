@@ -31,3 +31,8 @@ export { default as trash } from '@phosphor-icons/core/regular/trash.svg';
 export { default as user } from '@phosphor-icons/core/regular/user.svg';
 export { default as userMinus } from '@phosphor-icons/core/regular/user-minus.svg';
 export { default as warningCircleFill } from '@phosphor-icons/core/fill/warning-circle-fill.svg';
+export { default as downloadSimple } from '@phosphor-icons/core/regular/download-simple.svg';
+export { default as pause } from '@phosphor-icons/core/regular/pause.svg';
+export { default as pencilSimple } from '@phosphor-icons/core/regular/pencil-simple.svg';
+export { default as play } from '@phosphor-icons/core/regular/play.svg';
+export { default as x } from '@phosphor-icons/core/regular/x.svg';

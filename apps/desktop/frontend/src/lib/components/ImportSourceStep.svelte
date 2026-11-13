@@ -1,57 +1,61 @@
 <script lang="ts">
-	import { Button } from '@neoworks-dev/ui';
+	import { View } from '@neoworks/svelte-gpui/ui';
+	import { Button } from '@neoworks/svelte-gpui-ui';
+	import Label from '#lib/components/Label.svelte';
 	import YouTubeAccountPanel from '#lib/components/YouTubeAccountPanel.svelte';
 	import type { MusicImportFlow } from '#lib/import/musicImport.svelte.ts';
+	import TextInput from '#lib/layout/TextInput.svelte';
+	import { colors } from '#lib/theme.ts';
 
 	let { flow }: { flow: MusicImportFlow } = $props();
 
-	function submitLink(event: SubmitEvent) {
-		event.preventDefault();
-		flow.loadLink();
-	}
+	const sectionStyle = { gap: 8, paddingTop: 16, borderTopWidth: 1, borderColor: colors.line };
 </script>
 
-<div class="flex flex-col gap-5">
+<View style={{ gap: 20 }}>
 	<YouTubeAccountPanel {flow} />
 
-	<section class="flex flex-col gap-2 border-t border-line pt-4">
-		<h3 class="text-base font-semibold">Spotify data export</h3>
-		<p class="text-sm text-muted">
+	<View style={sectionStyle}>
+		<Label size="body" weight="semibold">Spotify data export</Label>
+		<Label size="small" tone="muted">
 			On spotify.com open Account, then Privacy, and request "Account data". Spotify emails the
-			download in a few days. Choose the zip you get (<code>my_spotify_data.zip</code>), or its
-			extracted folder. It holds your liked songs, playlists, saved albums, followed artists and
-			podcasts.
-		</p>
-		<p class="text-sm text-muted">
+			download in a few days. Choose the zip you get (<Label
+				size="small"
+				style={{ fontFamily: 'mono' }}>my_spotify_data.zip</Label
+			>), or its extracted folder. It holds your liked songs, playlists, saved albums, followed
+			artists and podcasts.
+		</Label>
+		<Label size="small" tone="muted">
 			For a quick start, exportify.net exports your playlists, liked songs and saved albums as a zip
 			of CSV files in seconds, with no waiting for Spotify's email.
-		</p>
-		<div class="flex flex-wrap gap-2">
-			<Button variant="primary" onclick={() => flow.chooseExportFile()}
-				>Choose zip, JSON or CSV file</Button
-			>
-			<Button onclick={() => flow.chooseExportFolder()}>Choose extracted folder</Button>
-		</div>
-	</section>
+		</Label>
+		<View style={{ direction: 'row', wrap: true, gap: 8 }}>
+			<Button variant="primary" onpress={() => flow.chooseExportFile()}>
+				Choose zip, JSON or CSV file
+			</Button>
+			<Button onpress={() => flow.chooseExportFolder()}>Choose extracted folder</Button>
+		</View>
+	</View>
 
-	<section class="flex flex-col gap-2 border-t border-line pt-4">
-		<h3 class="text-base font-semibold">A public playlist or album link</h3>
-		<p class="text-sm text-muted">
+	<View style={sectionStyle}>
+		<Label size="body" weight="semibold">A public playlist or album link</Label>
+		<Label size="small" tone="muted">
 			Paste an open.spotify.com link. Public links import up to 100 tracks; use the data export for
 			the full playlist.
-		</p>
-		<form onsubmit={submitLink} class="flex gap-2">
-			<input
+		</Label>
+		<View style={{ direction: 'row', gap: 8, align: 'center' }}>
+			<TextInput
 				bind:value={flow.linkText}
-				aria-label="Spotify playlist or album link"
 				placeholder="https://open.spotify.com/playlist/..."
-				class="h-11 min-w-0 flex-1 rounded-md bg-raised px-3 text-base outline-none placeholder:text-dim focus:border-line-strong"
+				height={44}
+				style={{ flex: 1 }}
+				onsubmit={() => flow.loadLink()}
 			/>
-			<Button type="submit" disabled={flow.linkText.trim() === ''}>Load</Button>
-		</form>
-	</section>
+			<Button disabled={flow.linkText.trim() === ''} onpress={() => flow.loadLink()}>Load</Button>
+		</View>
+	</View>
 
 	{#if flow.errorMessage !== '' && !flow.isAccountSource}
-		<p class="text-sm text-red">{flow.errorMessage}</p>
+		<Label size="small" tone="danger">{flow.errorMessage}</Label>
 	{/if}
-</div>
+</View>

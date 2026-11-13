@@ -5,7 +5,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import { window } from '@neoworks/svelte-gpui';
-	import { Popover, View } from '@neoworks/svelte-gpui/ui';
+	import { Popover, Scroll, View } from '@neoworks/svelte-gpui/ui';
 	import Label from '#lib/components/Label.svelte';
 	import { colors, radii } from '#lib/theme.ts';
 
@@ -69,7 +69,9 @@
 			}}
 		>
 			<Label size="heading" weight="bold" style={{ paddingBottom: 16 }}>{title}</Label>
-			{@render content()}
+			<Scroll style={{ shrink: 1, minHeight: 0 }}>
+				{@render content()}
+			</Scroll>
 		</View>
 	{/snippet}
 </Popover>

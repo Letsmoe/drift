@@ -27,18 +27,9 @@
 	],
 	// Components still written for the web (Tailwind, DOM) until they are converted; remove each line then.
 	"exclude": [
-		"src/lib/components/ArtistAboutCard.svelte",
 		"src/lib/components/DownloadQueueRow.svelte",
 		"src/lib/components/EditPlaylistDialog.svelte",
 		"src/lib/components/EpisodeRow.svelte",
-		"src/lib/components/ImportPreviewStep.svelte",
-		"src/lib/components/ImportProgressStep.svelte",
-		"src/lib/components/ImportSourceStep.svelte",
-		"src/lib/components/ImportStatusCard.svelte",
-		"src/lib/components/ImportSummaryStep.svelte",
-		"src/lib/components/MusicImportDialog.svelte",
-		"src/lib/components/TrackListControls.svelte",
-		"src/lib/components/YouTubeAccountPanel.svelte",
-		"src/lib/components/YouTubeSignInStep.svelte"
+		"src/lib/components/TrackListControls.svelte"
 	]
 }
