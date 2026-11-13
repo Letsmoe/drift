@@ -1,3 +1,5 @@
+import { getItem, setItem } from '#lib/storage.ts';
+
 const crossfadeKey = 'drift:crossfade';
 const crossfadeSecondsKey = 'drift:crossfade-seconds';
 
@@ -5,20 +7,11 @@ export const crossfadeSecondsLimits = { min: 1, max: 12 };
 const defaultCrossfadeSeconds = 6;
 
 function loadCrossfade(): boolean {
-	try {
-		return localStorage.getItem(crossfadeKey) === 'true';
-	} catch {
-		return false;
-	}
+	return getItem(crossfadeKey) === 'true';
 }
 
 function loadCrossfadeSeconds(): number {
-	let stored: number;
-	try {
-		stored = Number(localStorage.getItem(crossfadeSecondsKey));
-	} catch {
-		return defaultCrossfadeSeconds;
-	}
+	const stored = Number(getItem(crossfadeSecondsKey));
 	if (!Number.isFinite(stored) || stored < crossfadeSecondsLimits.min) {
 		return defaultCrossfadeSeconds;
 	}
@@ -32,12 +25,12 @@ class PlaybackSettings {
 
 	setCrossfade(enabled: boolean): void {
 		this.crossfade = enabled;
-		localStorage.setItem(crossfadeKey, String(enabled));
+		setItem(crossfadeKey, String(enabled));
 	}
 
 	setCrossfadeSeconds(seconds: number): void {
 		this.crossfadeSeconds = seconds;
-		localStorage.setItem(crossfadeSecondsKey, String(seconds));
+		setItem(crossfadeSecondsKey, String(seconds));
 	}
 }
 

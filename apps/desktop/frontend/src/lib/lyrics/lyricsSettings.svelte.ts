@@ -1,11 +1,9 @@
+import { getItem, setItem } from '#lib/storage.ts';
+
 const storageKey = 'drift:lyrics-allow-lrclib';
 
 function loadAllowLRCLIB(): boolean {
-	try {
-		return localStorage.getItem(storageKey) === 'true';
-	} catch {
-		return false;
-	}
+	return getItem(storageKey) === 'true';
 }
 
 /** Whether lyrics may be looked up on lrclib.net when YouTube has no synced lyrics. Off by default. */
@@ -14,7 +12,7 @@ class LyricsSettings {
 
 	setAllowLRCLIB(allow: boolean): void {
 		this.allowLRCLIB = allow;
-		localStorage.setItem(storageKey, String(allow));
+		setItem(storageKey, String(allow));
 	}
 }
 
