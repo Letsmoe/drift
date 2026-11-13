@@ -1,42 +1,74 @@
 <script lang="ts">
-	import type { Component } from 'svelte';
+	import { Button, Icon, Tooltip, View } from '@neoworks/svelte-gpui/ui';
+	import { appearance } from '#lib/appearance.svelte.ts';
+	import { colors, hoverTransition, radii } from '#lib/theme.ts';
 
 	let {
-		icon: Icon,
+		icon,
+		activeIcon,
 		label,
 		active,
-		onclick
+		onpress
 	}: {
-		icon: Component<{ size?: number; weight?: 'regular' | 'bold' }>;
+		/** SVG markup. */
+		icon: string;
+		/** Drawn instead of `icon` while active, such as a bolder weight. */
+		activeIcon?: string;
 		label: string;
 		active: boolean;
-		onclick: () => void;
+		onpress: () => void;
 	} = $props();
 
-	const weight = $derived(iconWeight());
+	const shownIcon = $derived(pickIcon());
+	const color = $derived(pickColor());
 
-	function iconWeight(): 'regular' | 'bold' {
-		if (active) {
-			return 'bold';
+	function pickIcon(): string {
+		if (active && activeIcon !== undefined) {
+			return activeIcon;
 		}
-		return 'regular';
+		return icon;
+	}
+
+	function pickColor(): string {
+		if (active) {
+			return appearance.accent;
+		}
+		return appearance.muted;
+	}
+
+	function hoverColor(): string {
+		if (active) {
+			return appearance.accent;
+		}
+		return colors.text;
 	}
 </script>
 
-<button
-	type="button"
-	aria-label={label}
-	aria-pressed={active}
-	title={label}
-	{onclick}
-	class={[
-		'duration-fast relative flex size-8 cursor-pointer items-center justify-center rounded-full transition-colors hover:bg-hover',
-		active && 'text-action',
-		!active && 'text-muted hover:text-default'
-	]}
->
-	<Icon size={18} {weight} />
-	{#if active}
-		<span class="absolute bottom-0.5 size-1 rounded-full bg-action"></span>
-	{/if}
-</button>
+<Tooltip text={label}>
+	<Button
+		style={{
+			size: 32,
+			radius: radii.full,
+			align: 'center',
+			justify: 'center',
+			shrink: 0,
+			color,
+			transition: hoverTransition
+		}}
+		hover={{ background: colors.hover, color: hoverColor() }}
+		{onpress}
+	>
+		<Icon svg={shownIcon} size={18} />
+		{#if active}
+			<View
+				style={{
+					position: 'absolute',
+					bottom: 2,
+					size: 4,
+					radius: radii.full,
+					background: appearance.accent
+				}}
+			/>
+		{/if}
+	</Button>
+</Tooltip>

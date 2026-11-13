@@ -1,10 +1,16 @@
 <script lang="ts">
-	import { page } from '$app/state';
-	import SpeakerHighIcon from 'phosphor-svelte/lib/SpeakerHighIcon';
+	import { Button, Icon, View } from '@neoworks/svelte-gpui/ui';
 	import type { Snippet } from 'svelte';
 	import type { Thumbnail } from '#lib/api/music.ts';
+	import { appearance } from '#lib/appearance.svelte.ts';
 	import Cover from '#lib/components/Cover.svelte';
+	import Label from '#lib/components/Label.svelte';
+	import { speakerHighFill } from '#lib/icons.ts';
+	import { goto, router } from '#lib/router.svelte.ts';
 	import { isContextCurrent, isContextPlaying } from '#lib/player/contextPlayback.ts';
+	import { colors, hoverTransition, radii } from '#lib/theme.ts';
+
+	const coverSize = 48;
 
 	let {
 		href,
@@ -25,29 +31,50 @@
 		cover?: Snippet;
 	} = $props();
 
-	const active = $derived(page.url.pathname === href);
+	const active = $derived(router.href === href || router.path === href);
 	const current = $derived(isContextCurrent(context));
+	const coverRadius = $derived(pickCoverRadius());
+
+	function pickCoverRadius(): number {
+		if (round) {
+			return radii.full;
+		}
+		return radii.medium;
+	}
+
+	function pickBackground(): string {
+		if (active) {
+			return colors.raised;
+		}
+		return 'transparent';
+	}
 </script>
 
-<a
-	{href}
-	aria-current={active ? 'page' : undefined}
-	class="duration-fast flex items-center gap-3 rounded-md p-2 transition-colors hover:bg-hover aria-[current=page]:bg-raised"
+<Button
+	style={{
+		direction: 'row',
+		align: 'center',
+		gap: 12,
+		padding: 8,
+		radius: radii.medium,
+		background: pickBackground(),
+		transition: hoverTransition
+	}}
+	hover={{ background: colors.hover }}
+	onpress={() => goto(href)}
 >
 	{#if cover}
 		{@render cover()}
 	{:else}
-		<Cover
-			{thumbnails}
-			size={48}
-			class={['size-12 shrink-0', round && 'rounded-full', !round && 'rounded-md']}
-		/>
+		<View style={{ size: coverSize, shrink: 0, radius: coverRadius, overflow: 'hidden' }}>
+			<Cover {thumbnails} size={coverSize} style={{ size: coverSize }} />
+		</View>
 	{/if}
-	<div class="min-w-0 flex-1">
-		<p class={['truncate text-base font-medium', current && 'text-action']}>{title}</p>
-		<p class="truncate text-sm text-dim">{subtitle}</p>
-	</div>
+	<View style={{ flex: 1, minWidth: 0 }}>
+		<Label size="medium" weight="medium" tone="default" accented={current} truncate>{title}</Label>
+		<Label size="small" tone="dim" truncate>{subtitle}</Label>
+	</View>
 	{#if isContextPlaying(context)}
-		<SpeakerHighIcon size={16} weight="fill" class="shrink-0 text-action" />
+		<Icon svg={speakerHighFill} size={16} color={appearance.accent} style={{ shrink: 0 }} />
 	{/if}
-</a>
+</Button>

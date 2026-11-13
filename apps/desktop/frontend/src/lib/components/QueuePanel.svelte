@@ -1,22 +1,22 @@
 <script lang="ts">
-	import { FloatingScrollbar } from '@neoworks-dev/ui';
-	import BroomIcon from 'phosphor-svelte/lib/BroomIcon';
-	import SparkleIcon from 'phosphor-svelte/lib/SparkleIcon';
-	import ArtistAboutCard from '#lib/components/ArtistAboutCard.svelte';
+	import { Button, Icon, Scroll, View } from '@neoworks/svelte-gpui/ui';
+	import { appearance } from '#lib/appearance.svelte.ts';
 	import Cover from '#lib/components/Cover.svelte';
-	import LyricsPreview from '#lib/components/LyricsPreview.svelte';
+	import IconAction from '#lib/components/IconAction.svelte';
+	import Label from '#lib/components/Label.svelte';
 	import QueueResizeHandle from '#lib/components/QueueResizeHandle.svelte';
-	import TrackCredits from '#lib/components/TrackCredits.svelte';
 	import UpcomingQueue from '#lib/components/UpcomingQueue.svelte';
+	import { artTint } from '#lib/layout/artTint.ts';
+	import { broom, sparkle } from '#lib/layout/chromeIcons.ts';
 	import { panels } from '#lib/layout/panels.svelte.ts';
+	import TrackCreditsLine from '#lib/layout/TrackCreditsLine.svelte';
 	import { player } from '#lib/player/player.svelte.ts';
 	import { splitQueue } from '#lib/queue/queueSections.ts';
+	import { colors, hoverTransition, radii } from '#lib/theme.ts';
+
+	const heroHeight = 224;
 
 	const sections = $derived(splitQueue(player.queue));
-	// Episodes' artist is their show, which has no artist page.
-	const leadArtist = $derived(
-		sections.nowPlaying?.track.artists.find((artist) => artist.id !== '')
-	);
 
 	function autoplayButtonLabel(): string {
 		if (player.queue.autoplay) {
@@ -24,74 +24,105 @@
 		}
 		return 'Autoplay off';
 	}
+
+	function autoplayColor(): string {
+		if (player.queue.autoplay) {
+			return appearance.accent;
+		}
+		return appearance.dim;
+	}
 </script>
 
-<aside
-	class="art-wash-strong relative flex shrink-0 flex-col rounded-2xl"
-	style:width="{panels.queueWidth}px"
+<View
+	style={{
+		width: panels.queueWidth,
+		shrink: 0,
+		minHeight: 0,
+		radius: radii.extraLarge,
+		background: artTint(0, 0.32),
+		transition: hoverTransition
+	}}
 >
 	<QueueResizeHandle />
-	<header class="flex h-12 shrink-0 items-center justify-between gap-2 px-4">
-		<h2 class="text-base font-semibold">Now playing</h2>
-		<div class="flex items-center gap-1">
-			<button
-				type="button"
-				aria-pressed={player.queue.autoplay}
-				onclick={() => player.toggleAutoplay()}
-				class={[
-					'duration-fast flex items-center gap-1 rounded-full px-2 py-1 text-xs transition-colors hover:bg-hover',
-					player.queue.autoplay && 'text-action',
-					!player.queue.autoplay && 'text-dim'
-				]}
+	<View
+		style={{
+			direction: 'row',
+			align: 'center',
+			justify: 'between',
+			height: 48,
+			shrink: 0,
+			gap: 8,
+			paddingX: 16
+		}}
+	>
+		<Label size="medium" weight="semibold" tone="default">Now playing</Label>
+		<View style={{ direction: 'row', align: 'center', gap: 4 }}>
+			<Button
+				style={{
+					direction: 'row',
+					align: 'center',
+					gap: 4,
+					paddingX: 8,
+					paddingY: 4,
+					radius: radii.full,
+					color: autoplayColor(),
+					transition: hoverTransition
+				}}
+				hover={{ background: colors.hover }}
+				onpress={() => player.toggleAutoplay()}
 			>
-				<SparkleIcon size={14} />
-				{autoplayButtonLabel()}
-			</button>
-			<button
-				type="button"
-				aria-label="Clear queue"
-				title="Clear queue"
+				<Icon svg={sparkle} size={14} />
+				<Label size="tiny">{autoplayButtonLabel()}</Label>
+			</Button>
+			<IconAction
+				icon={broom}
+				iconSize={16}
+				boxSize={28}
+				hoverBackground={colors.hover}
 				disabled={player.queue.entries.length === 0}
-				onclick={() => player.clearQueue()}
-				class="rounded-full p-1.5 text-muted hover:bg-hover hover:text-default disabled:opacity-40"
-			>
-				<BroomIcon size={16} />
-			</button>
-		</div>
-	</header>
+				onpress={() => player.clearQueue()}
+			/>
+		</View>
+	</View>
 
-	<FloatingScrollbar class="min-h-0 flex-1">
-		<div class="flex flex-col gap-6 px-4 pb-4">
+	<Scroll style={{ flex: 1, minHeight: 0 }}>
+		<View style={{ gap: 24, paddingX: 16, paddingBottom: 16 }}>
 			{#if sections.nowPlaying}
-				<section class="relative h-56 w-full shrink-0 overflow-hidden rounded-xl shadow-lg">
-					<button
-						type="button"
-						aria-label="Open full-screen player"
-						onclick={() => panels.toggleFullPlayer()}
-						class="absolute inset-0 cursor-pointer"
+				<Button
+					style={{
+						height: heroHeight,
+						shrink: 0,
+						radius: radii.extraLarge,
+						overflow: 'hidden',
+						shadow: { y: 8, blur: 24, color: 'rgba(0, 0, 0, 0.4)' }
+					}}
+					onpress={() => panels.toggleFullPlayer()}
+				>
+					<Cover thumbnails={sections.nowPlaying.track.thumbnails} size={panels.queueWidth} fill />
+					<View
+						style={{
+							position: 'absolute',
+							left: 0,
+							right: 0,
+							bottom: 0,
+							paddingX: 16,
+							paddingTop: 24,
+							paddingBottom: 16,
+							background: 'rgba(0, 0, 0, 0.55)'
+						}}
 					>
-						<Cover
-							thumbnails={sections.nowPlaying.track.thumbnails}
-							size={panels.queueWidth}
-							fill
+						<TrackCreditsLine
+							track={sections.nowPlaying.track}
+							titleSize="xlarge"
+							artistSize="body"
 						/>
-					</button>
-					<!-- Clicks pass through to the cover button except on the title and artist links. -->
-					<div
-						class="pointer-events-none absolute inset-x-0 bottom-0 bg-linear-to-t from-black/85 via-black/50 to-transparent px-4 pt-16 pb-4 [&_a]:pointer-events-auto [&>p:first-child]:text-2xl [&>p:first-child]:font-bold"
-					>
-						<TrackCredits track={sections.nowPlaying.track} />
-					</div>
-				</section>
-				{#if leadArtist}
-					<ArtistAboutCard artist={leadArtist} />
-				{/if}
-				<LyricsPreview />
+					</View>
+				</Button>
 			{/if}
 
-			<div class="-mx-1.5 flex flex-col gap-4">
+			<View style={{ gap: 16, marginX: -6 }}>
 				<UpcomingQueue />
-			</div>
-		</div>
-	</FloatingScrollbar>
-</aside>
+			</View>
+		</View>
+	</Scroll>
+</View>
