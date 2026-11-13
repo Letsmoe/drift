@@ -69,7 +69,11 @@ DRIFT_AUDIO_SINK=fakesink bun scripts/desktop-shot.ts /tmp/shot.png 12 --shell -
 
 `DRIFT_AUDIO_SINK=fakesink` plays in real time to nowhere, so tests make no sound. The script prints the file
 that `DRIFT_AUDIO_LOG` wrote: every audio event as one JSON line (position, duration, state, buffering,
-ended, error, and the volume of each slot).
+ended, error, the end of a crossfade, and the volume of each slot, with the milliseconds since the engine started).
+
+The crossfade runs in the engine (`audio_crossfade`, see `src/audio/fade.rs`); the UI only says when. The shell is
+also an MPRIS player, `org.mpris.MediaPlayer2.drift` (`drift.instance<pid>` when another Drift holds that name), so
+`playerctl -p drift status`, `metadata`, `pause` and `next` work on the instance a script started, offscreen too.
 
 ## What the UI can rely on
 

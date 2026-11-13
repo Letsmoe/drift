@@ -9,6 +9,9 @@ description = "The Drift desktop shell: starts the Go backend, plays audio with 
 svelte_gpui_host = { path = "../../../../svelte-gpui/host" }
 serde_json = "1"
 gstreamer = "0.25"
+serde = { version = "1", features = ["derive"] }
+# MPRIS (media keys, desktop widgets, playerctl) over the session D-Bus.
+mpris-server = "0.11"
 
 [features]
 # Set by scripts/package.mjs of svelte-gpui: runs the bundle packed into the binary instead of a --bundle file.

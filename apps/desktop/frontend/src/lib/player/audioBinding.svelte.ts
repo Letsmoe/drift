@@ -12,12 +12,14 @@ import {
 	stopAudio
 } from '#lib/player/audioEngine.ts';
 import type { Crossfade } from '#lib/player/crossfade.svelte.ts';
+import { connectMpris } from '#lib/player/mprisBinding.svelte.ts';
 import type { Player } from '#lib/player/player.svelte.ts';
 
 /**
  * Connects the player to the Rust audio engine. The player's state goes out as commands (a new
  * `source` loads, `paused` plays or pauses, seeks jump, volume follows), and what the engine
- * reports comes back into the player. Call from a component's script: it registers effects.
+ * reports comes back into the player. It also connects the player to MPRIS (media keys,
+ * `playerctl`). Call from a component's script: it registers effects.
  */
 export function connectAudio(player: Player, crossfade: Crossfade): void {
 	$effect(() => listen<AudioEvent>('audio', (event) => handleAudioEvent(player, crossfade, event)));
@@ -27,6 +29,7 @@ export function connectAudio(player: Player, crossfade: Crossfade): void {
 	$effect(() => followVolume(player));
 	$effect(() => endCrossfadeWhenEntryChanges(player, crossfade));
 	$effect(() => () => crossfade.finish());
+	connectMpris(player);
 }
 
 function loadWhenSourceChanges(player: Player): void {
