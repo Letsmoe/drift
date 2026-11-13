@@ -66,9 +66,10 @@ export const fontSizes = {
 	heading: 24,
 	title: 30,
 	display: 36,
-	pageTitle: 60,
-	pageTitleWide: 72,
-	hero: 96
+	// text-6xl, text-7xl and text-8xl of the old layout, whose root font size is 14 px, not 16.
+	pageTitle: 52,
+	pageTitleWide: 63,
+	hero: 84
 } as const;
 
 export type TextSize = keyof typeof fontSizes;
