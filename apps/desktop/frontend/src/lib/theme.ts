@@ -54,7 +54,23 @@ export const radii = {
 	full: 9999
 } as const;
 
-export const hoverTransition: Transition = { duration: 120, easing: 'ease-out' };
+/** A press springs: the control gives under the pointer and bounces back, while colours keep their quick ease. */
+export const pressSpring = { duration: 420, easing: 'spring' } as const;
+
+export const hoverTransition: Transition = {
+	duration: 120,
+	easing: 'ease-out',
+	scale: pressSpring
+};
+
+/**
+ * The pressed look of Drift's own buttons. Bare icons have no background to darken, so they shrink
+ * further than the kit's controls (96%) for the spring to read.
+ */
+export const pressedLook: Style = { scale: 0.88 };
+
+/** The pressed look of a large solid button, such as the play button, which reads at a smaller shrink. */
+export const pressedSolidLook: Style = { scale: 0.93 };
 
 /** Font sizes in pixels, named after what they are used for. */
 export const fontSizes = {
