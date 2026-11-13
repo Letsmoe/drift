@@ -1,10 +1,10 @@
 <script lang="ts">
-	import { Menu } from '@neoworks/svelte-gpui-ui';
+	import { Popover } from '@neoworks/svelte-gpui/ui';
 	import type { Track } from '#lib/api/music.ts';
 	import { appearance } from '#lib/appearance.svelte.ts';
 	import IconAction from '#lib/components/IconAction.svelte';
+	import MenuList from '#lib/components/MenuList.svelte';
 	import { plusCircle } from '#lib/icons.ts';
-	import { toKitMenuItems } from '#lib/menu/kitMenuItems.ts';
 	import { playlistEntries } from '#lib/menu/trackMenuEntries.ts';
 	import { colors } from '#lib/theme.ts';
 
@@ -13,7 +13,6 @@
 	let open = $state(false);
 	const iconSize = $derived(iconSizeFor());
 	const boxSize = $derived(boxSizeFor());
-	const items = $derived(toKitMenuItems(playlistEntries(track)));
 
 	function iconSizeFor(): number {
 		if (large) {
@@ -30,8 +29,9 @@
 	}
 </script>
 
-<Menu bind:open {items} placement="bottom-start">
-	{#snippet trigger({ onpress })}
+<!-- Drift's own menu, like the track and "…" menus: the kit's Menu sets its items in 17 px body text. -->
+<Popover bind:open style={{}} focusPanel={false} side="bottom" align="start" offset={4}>
+	{#snippet trigger({ toggle })}
 		<IconAction
 			icon={plusCircle}
 			{iconSize}
@@ -39,7 +39,10 @@
 			color={appearance.muted}
 			hoverColor={colors.text}
 			hoverBackground={colors.hover}
-			{onpress}
+			onpress={toggle}
 		/>
 	{/snippet}
-</Menu>
+	{#snippet children({ close })}
+		<MenuList entries={playlistEntries(track)} onclose={() => close('select')} autofocus />
+	{/snippet}
+</Popover>
