@@ -24,7 +24,8 @@ export function connectAudio(player: Player, crossfade: Crossfade): void {
 	$effect(() => loadWhenSourceChanges(player));
 	$effect(() => playOrPauseWhenPausedChanges(player));
 	$effect(() => player.onSeek((seconds) => seekAudio(mainSlot, seconds)));
-	$effect(() => followVolume(player, crossfade));
+	$effect(() => followVolume(player));
+	$effect(() => endCrossfadeWhenEntryChanges(player, crossfade));
 	$effect(() => () => crossfade.finish());
 }
 
@@ -53,16 +54,25 @@ function playOrPauseWhenPausedChanges(player: Player): void {
 	});
 }
 
-// The fade-in scales the slot's volume without touching the user's volume setting.
-function followVolume(player: Player, crossfade: Crossfade): void {
-	let volume = player.volume * crossfade.incomingGain;
+// The engine multiplies this with its crossfade gains, so a fade never touches the user's setting.
+function followVolume(player: Player): void {
+	let volume = player.volume;
 	if (player.muted) {
 		volume = 0;
 	}
-	setAudioVolume(mainSlot, volume);
+	setAudioVolume(volume);
+}
+
+function endCrossfadeWhenEntryChanges(player: Player, crossfade: Crossfade): void {
+	const entryId = player.entry?.id;
+	untrack(() => crossfade.handleEntryChange(entryId));
 }
 
 function handleAudioEvent(player: Player, crossfade: Crossfade, event: AudioEvent): void {
+	if (event.kind === 'crossfade') {
+		crossfade.handleFadeEnded();
+		return;
+	}
 	if (event.slot === outgoingSlot) {
 		crossfade.handleOutgoingEvent(event);
 		return;

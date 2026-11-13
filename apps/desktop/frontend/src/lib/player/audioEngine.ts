@@ -40,6 +40,18 @@ export function stopAudio(slot: number): void {
 	send('audio_stop', { slot });
 }
 
-export function setAudioVolume(slot: number, volume: number): void {
-	send('audio_set_volume', { slot, volume });
+export function setAudioVolume(volume: number): void {
+	send('audio_set_volume', { volume });
+}
+
+export function setAudioGain(slot: number, gain: number): void {
+	send('audio_set_gain', { slot, gain });
+}
+
+export function startAudioCrossfade(seconds: number): void {
+	send('audio_crossfade', { seconds });
+}
+
+export function cancelAudioCrossfade(): void {
+	send('audio_cancel_crossfade', undefined);
 }
