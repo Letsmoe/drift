@@ -5,7 +5,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import { View } from '@neoworks/svelte-gpui/ui';
-	import VerticalFade from '#lib/components/VerticalFade.svelte';
 	import { gradientColorFor } from '#lib/pageColor.ts';
 
 	const washHeight = 416;
@@ -16,6 +15,15 @@
 </script>
 
 <View style={{ flex: 1, minHeight: 0, position: 'relative' }}>
-	<VerticalFade {color} height={washHeight} />
+	<View
+		style={{
+			position: 'absolute',
+			top: 0,
+			left: 0,
+			right: 0,
+			height: washHeight,
+			background: { angle: 'to bottom', from: color, to: 'transparent' }
+		}}
+	/>
 	{@render children()}
 </View>
