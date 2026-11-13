@@ -1,18 +1,19 @@
 <script lang="ts">
-	import { Popover } from '@neoworks/svelte-gpui/ui';
+	import { Menu } from '@neoworks/svelte-gpui-ui';
 	import type { Track } from '#lib/api/music.ts';
+	import { appearance } from '#lib/appearance.svelte.ts';
 	import IconAction from '#lib/components/IconAction.svelte';
-	import MenuList from '#lib/components/MenuList.svelte';
 	import { plusCircle } from '#lib/icons.ts';
+	import { toKitMenuItems } from '#lib/menu/kitMenuItems.ts';
 	import { playlistEntries } from '#lib/menu/trackMenuEntries.ts';
 	import { colors } from '#lib/theme.ts';
-	import { appearance } from '#lib/appearance.svelte.ts';
 
 	let { track, large = false }: { track: Track; large?: boolean } = $props();
 
 	let open = $state(false);
 	const iconSize = $derived(iconSizeFor());
 	const boxSize = $derived(boxSizeFor());
+	const items = $derived(toKitMenuItems(playlistEntries(track)));
 
 	function iconSizeFor(): number {
 		if (large) {
@@ -29,8 +30,8 @@
 	}
 </script>
 
-<Popover bind:open style={{}} focusPanel={false} side="bottom" align="start" offset={4}>
-	{#snippet trigger({ toggle })}
+<Menu bind:open {items} placement="bottom-start">
+	{#snippet trigger({ onpress })}
 		<IconAction
 			icon={plusCircle}
 			{iconSize}
@@ -38,10 +39,7 @@
 			color={appearance.muted}
 			hoverColor={colors.text}
 			hoverBackground={colors.hover}
-			onpress={toggle}
+			{onpress}
 		/>
 	{/snippet}
-	{#snippet children({ close })}
-		<MenuList entries={playlistEntries(track)} onclose={() => close('select')} autofocus />
-	{/snippet}
-</Popover>
+</Menu>
