@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { View } from '@neoworks/svelte-gpui/ui';
-	import { Button } from '@neoworks/svelte-gpui-ui';
-	import Dialog from '#lib/components/Dialog.svelte';
+	import { Button, Dialog } from '@neoworks/svelte-gpui-ui';
 	import TextArea from '#lib/components/TextArea.svelte';
 	import TextInput from '#lib/layout/TextInput.svelte';
 	import { colors, fontSizes } from '#lib/theme.ts';
@@ -34,7 +33,7 @@
 	}
 </script>
 
-<Dialog title="Edit details" {onclose}>
+<Dialog open title="Edit details" {onclose}>
 	<View style={{ gap: 12 }}>
 		<TextInput
 			bind:value={draftName}
@@ -49,9 +48,9 @@
 			placeholder="Add an optional description"
 			style={{ background: colors.raised, fontSize: fontSizes.body, lineHeight: 21, padding: 12 }}
 		/>
-		<View style={{ direction: 'row', justify: 'end', gap: 8, paddingTop: 8 }}>
-			<Button variant="ghost" onpress={onclose}>Cancel</Button>
-			<Button variant="primary" disabled={!canSave} onpress={submit}>Save</Button>
-		</View>
 	</View>
+	{#snippet actions()}
+		<Button variant="ghost" onpress={onclose}>Cancel</Button>
+		<Button variant="primary" disabled={!canSave} onpress={submit}>Save</Button>
+	{/snippet}
 </Dialog>

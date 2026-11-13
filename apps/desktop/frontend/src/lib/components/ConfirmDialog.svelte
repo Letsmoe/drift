@@ -1,8 +1,6 @@
 <script lang="ts">
-	import { Button } from '@neoworks/svelte-gpui-ui';
-	import { View } from '@neoworks/svelte-gpui/ui';
-	import Dialog from '#lib/components/Dialog.svelte';
-	import Label from '#lib/components/Label.svelte';
+	import { Text } from '@neoworks/svelte-gpui/ui';
+	import { Button, Dialog } from '@neoworks/svelte-gpui-ui';
 
 	let {
 		title,
@@ -24,10 +22,10 @@
 	}
 </script>
 
-<Dialog {title} {onclose}>
-	<Label size="small" tone="muted" style={{ paddingBottom: 24 }}>{message}</Label>
-	<View style={{ direction: 'row', justify: 'end', gap: 8 }}>
+<Dialog open {title} {onclose}>
+	<Text>{message}</Text>
+	{#snippet actions()}
 		<Button variant="ghost" onpress={onclose}>Cancel</Button>
 		<Button variant="danger" onpress={confirm}>{confirmLabel}</Button>
-	</View>
+	{/snippet}
 </Dialog>
