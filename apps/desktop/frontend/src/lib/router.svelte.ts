@@ -1,4 +1,4 @@
-// In-memory routing with the paths the SvelteKit app used. The app shell (App.svelte) maps
+// In-memory routing with the same paths the web UI had. The app shell (App.svelte) maps
 // `router.page` to a component in src/pages; pages and components navigate with `goto`.
 
 export type PageName =

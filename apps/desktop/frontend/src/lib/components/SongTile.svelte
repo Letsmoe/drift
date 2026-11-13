@@ -13,7 +13,7 @@
 	import { goto } from '#lib/router.svelte.ts';
 	import { accentRing, colors, hoverTransition, radii } from '#lib/theme.ts';
 
-	// Electron's h-18: the old theme's spacing unit makes numbers it has no token for 3.5 px wide.
+	// The old layout's h-18: its theme's spacing unit makes numbers it has no token for 3.5 px wide.
 	const tileHeight = 63;
 
 	let {

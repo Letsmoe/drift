@@ -8,7 +8,7 @@
 	import Label from '#lib/components/Label.svelte';
 	import { radii, wideWindowWidth, type TextSize } from '#lib/theme.ts';
 
-	// Electron's size-58, which comes to 203 px, not the 232 px it looks like.
+	// The old layout's size-58, which comes to 203 px, not the 232 px it looks like.
 	const coverSide = 203;
 
 	let {

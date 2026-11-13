@@ -12,7 +12,7 @@
 	import { goto } from '#lib/router.svelte.ts';
 	import { colors, hoverTransition, radii } from '#lib/theme.ts';
 
-	// Electron's w-56: the old theme's spacing unit makes numbers it has no token for 3.5 px wide.
+	// The old layout's w-56: its theme's spacing unit makes numbers it has no token for 3.5 px wide.
 	const cardWidth = 196;
 	const coverSide = cardWidth - 24;
 	// Thumbnail to fetch, sharp enough for 2x screens.
