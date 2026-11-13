@@ -1,7 +1,14 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
+	import { window } from '@neoworks/svelte-gpui';
+	import { View } from '@neoworks/svelte-gpui/ui';
 	import type { Thumbnail } from '#lib/api/music.ts';
+	import { appearance } from '#lib/appearance.svelte.ts';
 	import Cover from '#lib/components/Cover.svelte';
+	import Label from '#lib/components/Label.svelte';
+	import { radii, wideWindowWidth, type TextSize } from '#lib/theme.ts';
+
+	const coverSide = 232;
 
 	let {
 		label,
@@ -19,24 +26,51 @@
 		cover?: Snippet;
 		meta?: Snippet;
 	} = $props();
+
+	const titleSize = $derived(titleSizeFor(window.size.width));
+
+	function titleSizeFor(windowWidth: number): TextSize {
+		if (windowWidth >= wideWindowWidth) {
+			return 'pageTitleWide';
+		}
+		return 'pageTitle';
+	}
 </script>
 
-<header class="flex items-end gap-6 pt-4 pb-6">
-	<div class="size-58 shrink-0 overflow-hidden rounded-md shadow-lg">
+<View style={{ direction: 'row', align: 'end', gap: 24, paddingTop: 16, paddingBottom: 24 }}>
+	<View
+		style={{
+			size: coverSide,
+			shrink: 0,
+			radius: radii.medium,
+			overflow: 'hidden',
+			shadow: { y: 12, blur: 32, color: 'rgba(0, 0, 0, 0.55)' }
+		}}
+	>
 		{#if cover}
 			{@render cover()}
 		{:else}
-			<Cover {thumbnails} size={232} class="size-full" />
+			<Cover {thumbnails} size={coverSide} style={{ size: coverSide }} />
 		{/if}
-	</div>
-	<div class="flex min-w-0 flex-col gap-2">
-		<p class="text-sm font-medium">{label}</p>
-		<h1 class="line-clamp-2 text-6xl leading-tight font-bold xl:text-7xl">{title}</h1>
+	</View>
+	<View style={{ flex: 1, minWidth: 0, gap: 8 }}>
+		<Label size="small" weight="medium">{label}</Label>
+		<Label size={titleSize} weight="bold" lines={2}>{title}</Label>
 		{#if description}
-			<p class="line-clamp-2 max-w-3xl text-sm text-muted">{description}</p>
+			<Label size="small" tone="muted" lines={2} style={{ maxWidth: 768 }}>{description}</Label>
 		{/if}
 		{#if meta}
-			<p class="flex flex-wrap items-center gap-x-1 text-sm text-muted">{@render meta()}</p>
+			<View
+				style={{
+					direction: 'row',
+					wrap: true,
+					align: 'center',
+					columnGap: 4,
+					color: appearance.muted
+				}}
+			>
+				{@render meta()}
+			</View>
 		{/if}
-	</div>
-</header>
+	</View>
+</View>

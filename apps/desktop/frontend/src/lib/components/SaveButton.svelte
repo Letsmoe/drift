@@ -1,28 +1,36 @@
 <script lang="ts">
-	import CheckCircleIcon from 'phosphor-svelte/lib/CheckCircleIcon';
-	import PlusCircleIcon from 'phosphor-svelte/lib/PlusCircleIcon';
 	import type { Item, ItemKind } from '#lib/api/music.ts';
+	import { appearance } from '#lib/appearance.svelte.ts';
+	import IconAction from '#lib/components/IconAction.svelte';
+	import { checkCircleFill, plusCircle } from '#lib/icons.ts';
 	import { library } from '#lib/library/library.svelte.ts';
+	import { colors } from '#lib/theme.ts';
 
 	let { item }: { item: Item } = $props();
 
 	const saved = $derived(library.isSaved(item.kind as ItemKind, item.id));
+	const icon = $derived(iconFor(saved));
+	const color = $derived(colorFor(saved));
+
+	function iconFor(isSaved: boolean): string {
+		if (isSaved) {
+			return checkCircleFill;
+		}
+		return plusCircle;
+	}
+
+	function colorFor(isSaved: boolean): string {
+		if (isSaved) {
+			return appearance.accent;
+		}
+		return appearance.dim;
+	}
 </script>
 
-<button
-	type="button"
-	aria-label="Save {item.title} to your library"
-	aria-pressed={saved}
-	onclick={() => library.toggleSaved(item)}
-	class={[
-		'duration-fast transition-transform hover:scale-105',
-		saved && 'text-action',
-		!saved && 'text-dim hover:text-default'
-	]}
->
-	{#if saved}
-		<CheckCircleIcon size={32} weight="fill" />
-	{:else}
-		<PlusCircleIcon size={32} />
-	{/if}
-</button>
+<IconAction
+	{icon}
+	iconSize={32}
+	{color}
+	hoverColor={colors.text}
+	onpress={() => library.toggleSaved(item)}
+/>

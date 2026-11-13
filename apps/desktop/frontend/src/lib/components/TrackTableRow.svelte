@@ -1,25 +1,29 @@
 <script lang="ts">
-	import DotsThreeIcon from 'phosphor-svelte/lib/DotsThreeIcon';
-	import HeartIcon from 'phosphor-svelte/lib/HeartIcon';
-	import PauseIcon from 'phosphor-svelte/lib/PauseIcon';
-	import PlayIcon from 'phosphor-svelte/lib/PlayIcon';
-	import SpeakerHighIcon from 'phosphor-svelte/lib/SpeakerHighIcon';
+	import { Button, Icon, View } from '@neoworks/svelte-gpui/ui';
 	import type { ItemKind, Track } from '#lib/api/music.ts';
+	import { appearance } from '#lib/appearance.svelte.ts';
 	import ArtistLinks from '#lib/components/ArtistLinks.svelte';
+	import ContextArea from '#lib/components/ContextArea.svelte';
 	import Cover from '#lib/components/Cover.svelte';
 	import DownloadButton from '#lib/components/DownloadButton.svelte';
 	import DownloadedIndicator from '#lib/components/DownloadedIndicator.svelte';
+	import IconAction from '#lib/components/IconAction.svelte';
+	import Label from '#lib/components/Label.svelte';
 	import Menu from '#lib/components/Menu.svelte';
+	import MoreMenuButton from '#lib/components/MoreMenuButton.svelte';
+	import { actionColumnWidth, rowGap, rowPaddingX } from '#lib/components/trackColumns.ts';
 	import { formatDuration, itemHref } from '#lib/format.ts';
+	import { heart, heartFill, pauseFill, playFill, speakerHighFill } from '#lib/icons.ts';
 	import { library } from '#lib/library/library.svelte.ts';
 	import { PopupMenu } from '#lib/menu/popupMenu.svelte.ts';
 	import { buildTrackMenuEntries } from '#lib/menu/trackMenuEntries.ts';
 	import { player } from '#lib/player/player.svelte.ts';
+	import { goto } from '#lib/router.svelte.ts';
+	import { colors, hoverTransition, radii } from '#lib/theme.ts';
 
 	let {
 		track,
 		index,
-		gridClass,
 		kind = 'song',
 		showCover,
 		showAlbum,
@@ -29,7 +33,6 @@
 	}: {
 		track: Track;
 		index: number;
-		gridClass: string;
 		kind?: ItemKind;
 		showCover: boolean;
 		showAlbum: boolean;
@@ -40,34 +43,69 @@
 	} = $props();
 
 	const popup = new PopupMenu();
+	let pointerOver = $state(false);
+	let moreMenuOpen = $state(false);
+
 	const current = $derived(player.isCurrent(track));
 	const playing = $derived(player.isPlaying(track));
 	const liked = $derived(library.isLiked(track.videoId));
+	const active = $derived(pointerOver || moreMenuOpen || popup.isOpen);
+	const heartVisible = $derived(active || liked);
+	const albumId = $derived(albumIdOf(track));
 
-	const likeLabel = $derived(describeLikeAction(liked));
-
-	function describeLikeAction(isLiked: boolean): string {
-		if (isLiked) {
-			return 'Remove from Liked Songs';
+	function rowBackground(isActive: boolean): string {
+		if (isActive) {
+			return colors.hover;
 		}
-		return 'Save to Liked Songs';
+		return 'transparent';
 	}
 
-	function heartWeightFor(isLiked: boolean): 'fill' | 'regular' {
-		if (isLiked) {
-			return 'fill';
+	function albumIdOf(shown: Track): string {
+		if (shown.album && shown.album.id) {
+			return shown.album.id;
 		}
-		return 'regular';
+		return '';
 	}
 
-	function openContextMenu(event: MouseEvent) {
-		event.preventDefault();
-		popup.openAt(event.clientX, event.clientY);
+	function opacityFor(visible: boolean): number {
+		if (visible) {
+			return 1;
+		}
+		return 0;
 	}
 
-	function openMoreMenu(event: MouseEvent) {
-		event.stopPropagation();
-		popup.openBelow(event.currentTarget as HTMLElement);
+	function playPauseIcon(isPlaying: boolean): string {
+		if (isPlaying) {
+			return pauseFill;
+		}
+		return playFill;
+	}
+
+	function heartIcon(isLiked: boolean): string {
+		if (isLiked) {
+			return heartFill;
+		}
+		return heart;
+	}
+
+	function heartColor(isLiked: boolean): string {
+		if (isLiked) {
+			return appearance.accent;
+		}
+		return appearance.dim;
+	}
+
+	function heartHoverColor(isLiked: boolean): string {
+		if (isLiked) {
+			return appearance.accent;
+		}
+		return colors.text;
+	}
+
+	function playOnDoubleClick(event: { clicks: number }): void {
+		if (event.clicks >= 2) {
+			onplay();
+		}
 	}
 
 	function entries() {
@@ -75,99 +113,110 @@
 	}
 </script>
 
-<div
-	role="row"
-	tabindex="-1"
-	oncontextmenu={openContextMenu}
-	ondblclick={onplay}
-	class={[
-		'group/row duration-fast grid h-14 items-center gap-4 rounded-md px-4 transition-colors focus-within:bg-hover hover:bg-hover',
-		popup.isOpen && 'bg-hover',
-		gridClass
-	]}
+<ContextArea
+	{popup}
+	onhover={(isHovered) => (pointerOver = isHovered)}
+	onpress={playOnDoubleClick}
+	style={{
+		height: 56,
+		direction: 'row',
+		align: 'center',
+		gap: rowGap,
+		paddingX: rowPaddingX,
+		radius: radii.medium,
+		background: rowBackground(active),
+		transition: hoverTransition
+	}}
 >
-	<div class="flex w-4 items-center justify-end text-sm text-dim tabular-nums">
-		<span
-			class={['group-focus-within/row:hidden group-hover/row:hidden', current && 'text-action']}
-		>
-			{#if playing}
-				<SpeakerHighIcon size={16} weight="fill" />
-			{:else}
-				{index + 1}
-			{/if}
-		</span>
-		<button
-			type="button"
-			aria-label="Play {track.title}"
-			onclick={onplay}
-			class="hidden text-default group-focus-within/row:block group-hover/row:block"
-		>
-			{#if playing}
-				<PauseIcon size={16} weight="fill" />
-			{:else}
-				<PlayIcon size={16} weight="fill" />
-			{/if}
-		</button>
-	</div>
-
-	<div class="flex min-w-0 items-center gap-3">
-		{#if showCover}
-			<Cover thumbnails={track.thumbnails} size={40} class="size-10 shrink-0 rounded-sm" />
+	<View style={{ width: 16, shrink: 0, align: 'end', justify: 'center' }}>
+		{#if active}
+			<Button style={{ color: colors.text }} onpress={onplay}>
+				<Icon svg={playPauseIcon(playing)} size={16} />
+			</Button>
+		{:else if playing}
+			<Icon svg={speakerHighFill} size={16} color={appearance.accent} />
+		{:else}
+			<Label size="small" tone="dim" accented={current}>{index + 1}</Label>
 		{/if}
-		<div class="min-w-0">
-			<div class="flex min-w-0 items-center gap-1.5">
-				<p class={['truncate text-base', current && 'text-action']}>{track.title}</p>
+	</View>
+
+	<View style={{ flex: 6, minWidth: 0, direction: 'row', align: 'center', gap: 12 }}>
+		{#if showCover}
+			<Cover
+				thumbnails={track.thumbnails}
+				size={40}
+				style={{ size: 40, shrink: 0, radius: radii.small }}
+			/>
+		{/if}
+		<View style={{ flex: 1, minWidth: 0 }}>
+			<View style={{ direction: 'row', align: 'center', gap: 6, minWidth: 0 }}>
+				<Label size="body" accented={current} truncate style={{ flex: 1, minWidth: 0 }}>
+					{track.title}
+				</Label>
 				<DownloadedIndicator videoId={track.videoId} />
-			</div>
-			<p class="truncate text-sm text-dim">
-				<ArtistLinks artists={track.artists} />{#if track.playCount}
-					<span> • {track.playCount}</span>{/if}
-			</p>
-		</div>
-	</div>
+			</View>
+			<View style={{ direction: 'row', align: 'center', gap: 5, minWidth: 0 }}>
+				<ArtistLinks artists={track.artists} color={appearance.dim} />
+				{#if track.playCount}
+					<Label size="small" tone="dim" truncate style={{ flex: 1, minWidth: 0 }}>
+						• {track.playCount}
+					</Label>
+				{/if}
+			</View>
+		</View>
+	</View>
 
 	{#if showAlbum}
-		<p class="truncate text-sm text-dim">
-			{#if track.album && track.album.id}
-				<a href={itemHref('album', track.album.id)} class="hover:text-default hover:underline">
-					{track.album.name}
-				</a>
+		<View style={{ flex: 4, minWidth: 0, direction: 'row' }}>
+			{#if albumId !== '' && track.album}
+				<View
+					style={{ flex: 1, minWidth: 0, cursor: 'pointer', color: appearance.dim }}
+					hover={{ color: colors.text, underline: true }}
+					onpress={() => goto(itemHref('album', albumId))}
+				>
+					<Label size="small" truncate>{track.album.name}</Label>
+				</View>
 			{/if}
-		</p>
+		</View>
 	{/if}
 
 	{#if dateAdded !== undefined}
-		<p class="truncate text-sm text-dim">{dateAdded}</p>
+		<View style={{ flex: 3, minWidth: 0 }}>
+			<Label size="small" tone="dim" truncate>{dateAdded}</Label>
+		</View>
 	{/if}
 
-	<div class="flex items-center justify-end gap-3 text-dim">
-		<DownloadButton {track} {kind} />
-		<button
-			type="button"
-			aria-label={likeLabel}
-			aria-pressed={liked}
-			onclick={() => library.toggleLike(track, kind)}
-			class={[
-				'group-hover/row:opacity-100 hover:text-default focus-visible:opacity-100',
-				!liked && 'opacity-0',
-				liked && 'text-action hover:text-action'
-			]}
-		>
-			<HeartIcon size={18} weight={heartWeightFor(liked)} />
-		</button>
-		<span class="w-10 text-right text-sm tabular-nums">{formatDuration(track.durationSeconds)}</span
-		>
-		<button
-			type="button"
-			aria-label="More options for {track.title}"
-			aria-haspopup="menu"
-			onclick={openMoreMenu}
-			class="opacity-0 group-focus-within/row:opacity-100 group-hover/row:opacity-100 hover:text-default"
-		>
-			<DotsThreeIcon size={22} weight="bold" />
-		</button>
-	</div>
-</div>
+	<View
+		style={{
+			width: actionColumnWidth,
+			shrink: 0,
+			direction: 'row',
+			align: 'center',
+			justify: 'end',
+			gap: 12
+		}}
+	>
+		<DownloadButton {track} {kind} rowHovered={active} />
+		<IconAction
+			icon={heartIcon(liked)}
+			iconSize={18}
+			color={heartColor(liked)}
+			hoverColor={heartHoverColor(liked)}
+			style={{ opacity: opacityFor(heartVisible) }}
+			onpress={() => library.toggleLike(track, kind)}
+		/>
+		<Label size="small" tone="dim" style={{ width: 40, textAlign: 'right', shrink: 0 }}>
+			{formatDuration(track.durationSeconds)}
+		</Label>
+		<MoreMenuButton
+			bind:open={moreMenuOpen}
+			buildEntries={entries}
+			size={22}
+			boxSize={22}
+			style={{ opacity: opacityFor(active) }}
+		/>
+	</View>
+</ContextArea>
 
 {#if popup.position}
 	<Menu

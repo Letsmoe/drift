@@ -1,12 +1,19 @@
 <script lang="ts">
+	import { View, type Shadow } from '@neoworks/svelte-gpui/ui';
 	import type { Track } from '#lib/api/music.ts';
+	import { appearance } from '#lib/appearance.svelte.ts';
+	import ContextArea from '#lib/components/ContextArea.svelte';
 	import Cover from '#lib/components/Cover.svelte';
+	import Label from '#lib/components/Label.svelte';
 	import PlayOverlayButton from '#lib/components/PlayOverlayButton.svelte';
 	import TrackContextMenu from '#lib/components/TrackContextMenu.svelte';
-	import { PopupMenu } from '#lib/menu/popupMenu.svelte.ts';
 	import { formatTrackByline, trackHref, trackKindOf } from '#lib/format.ts';
+	import { PopupMenu } from '#lib/menu/popupMenu.svelte.ts';
 	import { player } from '#lib/player/player.svelte.ts';
-	import { whenVisible } from '#lib/whenVisible.ts';
+	import { goto } from '#lib/router.svelte.ts';
+	import { accentRing, colors, hoverTransition, radii } from '#lib/theme.ts';
+
+	const tileHeight = 72;
 
 	let {
 		track,
@@ -25,50 +32,66 @@
 	} = $props();
 
 	const contextMenu = new PopupMenu();
+	let hovered = $state(false);
+
 	const current = $derived(player.isCurrent(track));
 	const playing = $derived(player.isPlaying(track));
 	const pageHref = $derived(trackHref(track));
+	const showPlayButton = $derived(hovered || playing);
+	const ring = $derived(ringFor(current));
+
+	function ringFor(isCurrent: boolean): Shadow | null {
+		if (isCurrent) {
+			return accentRing(appearance.accent);
+		}
+		return null;
+	}
+
+	function backgroundFor(isCurrent: boolean): string {
+		if (isCurrent) {
+			return colors.hover;
+		}
+		return colors.raised;
+	}
 
 	function play(): void {
 		onplay?.();
 		player.playOrToggle(track, tracks, index, context, trackKindOf(track));
 	}
-
-	function reportVisible(): void {
-		onvisible?.();
-	}
 </script>
 
-<div
-	role="group"
-	aria-label={track.title}
-	class={[
-		'group/tile duration-fast relative flex h-18 items-center gap-3 overflow-hidden rounded-md pr-2 transition-colors',
-		current && 'bg-hover ring-1 ring-action/40',
-		!current && 'bg-raised hover:bg-hover'
-	]}
-	{@attach whenVisible(reportVisible)}
-	oncontextmenu={(event) => contextMenu.openAtPointer(event)}
->
-	<Cover thumbnails={track.thumbnails} size={72} class="h-full shrink-0" />
-	<div class="min-w-0 flex-1">
-		<p class="truncate text-base font-semibold" class:text-action={current}>
-			{#if pageHref}
-				<!-- Stretched over the tile: the whole tile opens the page, the play button sits above it. -->
-				<a href={pageHref} class="after:absolute after:inset-0">{track.title}</a>
-			{:else}
-				{track.title}
-			{/if}
-		</p>
-		<p class="truncate text-sm text-dim">{formatTrackByline(track)}</p>
-	</div>
-	<PlayOverlayButton
-		{playing}
-		size="sm"
-		label="Play {track.title}"
-		onclick={play}
-		class={['relative z-10 shrink-0', !playing && 'opacity-0 group-hover/tile:opacity-100']}
-	/>
-</div>
+<ContextArea popup={contextMenu} onhover={(isHovered) => (hovered = isHovered)}>
+	<View
+		style={{
+			cursor: 'pointer',
+			height: tileHeight,
+			direction: 'row',
+			align: 'center',
+			gap: 12,
+			paddingRight: 8,
+			radius: radii.medium,
+			overflow: 'hidden',
+			background: backgroundFor(current),
+			shadow: ring,
+			transition: hoverTransition
+		}}
+		hover={{ background: colors.hover }}
+		onpress={() => goto(pageHref)}
+	>
+		<Cover
+			thumbnails={track.thumbnails}
+			size={tileHeight}
+			style={{ width: tileHeight, height: tileHeight, shrink: 0 }}
+			onload={onvisible}
+		/>
+		<View style={{ flex: 1, minWidth: 0 }}>
+			<Label size="body" weight="semibold" accented={current} truncate>{track.title}</Label>
+			<Label size="small" tone="dim" truncate>{formatTrackByline(track)}</Label>
+		</View>
+		{#if showPlayButton}
+			<PlayOverlayButton size="sm" {playing} onpress={play} />
+		{/if}
+	</View>
+</ContextArea>
 
 <TrackContextMenu popup={contextMenu} {track} />

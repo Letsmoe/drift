@@ -1,14 +1,19 @@
 <script lang="ts">
+	import { Button, View } from '@neoworks/svelte-gpui/ui';
 	import { podcast } from '#lib/api/catalog.ts';
 	import type { Item, PodcastPage } from '#lib/api/music.ts';
 	import Cover from '#lib/components/Cover.svelte';
+	import Label from '#lib/components/Label.svelte';
 	import PlayOverlayButton from '#lib/components/PlayOverlayButton.svelte';
 	import { formatDuration, itemHref } from '#lib/format.ts';
 	import { player } from '#lib/player/player.svelte.ts';
-
-	let { item }: { item: Item } = $props();
+	import { goto } from '#lib/router.svelte.ts';
+	import { colors, radii } from '#lib/theme.ts';
 
 	const latestEpisodeCount = 3;
+	const coverSide = 208;
+
+	let { item }: { item: Item } = $props();
 
 	let page = $state<PodcastPage | null>(null);
 	const episodes = $derived(latestEpisodes(page));
@@ -41,48 +46,85 @@
 	function playEpisode(index: number): void {
 		player.playOrToggle(episodeTracks[index], episodeTracks, index, context, 'episode');
 	}
+
+	function openShow(): void {
+		goto(itemHref('podcast', item.id));
+	}
 </script>
 
-<section class="flex gap-6 rounded-2xl bg-raised p-5">
-	<a href={itemHref('podcast', item.id)} class="shrink-0">
-		<Cover thumbnails={item.thumbnails} size={208} class="size-52 rounded-xl shadow-lg" />
-	</a>
-	<div class="flex min-w-0 flex-1 flex-col gap-2">
-		<p class="text-xs font-semibold tracking-wide text-dim uppercase">Featured podcast</p>
-		<a href={itemHref('podcast', item.id)} class="text-3xl leading-tight font-bold hover:underline">
-			{item.title}
-		</a>
-		<p class="text-sm text-muted">{item.subtitle}</p>
+<View
+	style={{
+		direction: 'row',
+		gap: 24,
+		padding: 20,
+		radius: radii.extraLarge,
+		background: colors.raised
+	}}
+>
+	<Button style={{ shrink: 0, alignSelf: 'start' }} onpress={openShow}>
+		<Cover
+			thumbnails={item.thumbnails}
+			size={coverSide}
+			style={{
+				size: coverSide,
+				radius: radii.large,
+				shadow: { y: 12, blur: 32, color: 'rgba(0, 0, 0, 0.55)' }
+			}}
+		/>
+	</Button>
+	<View style={{ flex: 1, minWidth: 0, gap: 8 }}>
+		<Label size="tiny" tone="dim" weight="semibold" style={{ uppercase: true }}>
+			Featured podcast
+		</Label>
+		<View
+			style={{ alignSelf: 'start', minWidth: 0, cursor: 'pointer' }}
+			hover={{ underline: true }}
+			onpress={openShow}
+		>
+			<Label size="title" weight="bold" lines={2}>{item.title}</Label>
+		</View>
+		<Label size="small" tone="muted">{item.subtitle}</Label>
 		{#if item.description}
-			<p class="line-clamp-3 max-w-3xl text-sm text-dim">{item.description}</p>
+			<Label size="small" tone="dim" lines={3} style={{ maxWidth: 768 }}>{item.description}</Label>
 		{/if}
 		{#if episodes.length > 0}
-			<div class="mt-2 flex flex-col">
-				<p class="pb-1 text-xs font-semibold text-muted">Latest episodes</p>
+			<View style={{ marginTop: 8 }}>
+				<Label size="tiny" tone="muted" weight="semibold" style={{ paddingBottom: 4 }}>
+					Latest episodes
+				</Label>
 				{#each episodes as episode, index (episode.track.videoId)}
-					<div class="flex items-center gap-3 rounded-md px-2 py-1.5 hover:bg-hover">
+					<View
+						style={{
+							direction: 'row',
+							align: 'center',
+							gap: 12,
+							paddingX: 8,
+							paddingY: 6,
+							radius: radii.medium
+						}}
+						hover={{ background: colors.hover }}
+					>
 						<PlayOverlayButton
 							size="sm"
 							playing={player.isPlaying(episode.track)}
-							label="Play {episode.track.title}"
-							onclick={() => playEpisode(index)}
+							onpress={() => playEpisode(index)}
 						/>
-						<p
-							class={[
-								'min-w-0 flex-1 truncate text-sm',
-								player.isCurrent(episode.track) && 'text-action'
-							]}
+						<Label
+							size="small"
+							accented={player.isCurrent(episode.track)}
+							truncate
+							style={{ flex: 1, minWidth: 0 }}
 						>
 							{episode.track.title}
-						</p>
-						<span class="shrink-0 text-xs text-dim">
+						</Label>
+						<Label size="tiny" tone="dim" style={{ shrink: 0 }}>
 							{[episode.published, formatDuration(episode.track.durationSeconds)]
 								.filter((part) => part !== '')
 								.join(' • ')}
-						</span>
-					</div>
+						</Label>
+					</View>
 				{/each}
-			</div>
+			</View>
 		{/if}
-	</div>
-</section>
+	</View>
+</View>

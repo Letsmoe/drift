@@ -1,19 +1,30 @@
 <script lang="ts">
+	import { View } from '@neoworks/svelte-gpui/ui';
 	import type { Item, ItemKind } from '#lib/api/music.ts';
+	import ContextArea from '#lib/components/ContextArea.svelte';
 	import Cover from '#lib/components/Cover.svelte';
+	import Label from '#lib/components/Label.svelte';
 	import PlayOverlayButton from '#lib/components/PlayOverlayButton.svelte';
 	import TrackContextMenu from '#lib/components/TrackContextMenu.svelte';
-	import { PopupMenu } from '#lib/menu/popupMenu.svelte.ts';
 	import { itemHref, trackHref } from '#lib/format.ts';
+	import { PopupMenu } from '#lib/menu/popupMenu.svelte.ts';
 	import { player } from '#lib/player/player.svelte.ts';
+	import { goto } from '#lib/router.svelte.ts';
+	import { colors, hoverTransition, radii } from '#lib/theme.ts';
+
+	const coverSize = 200;
 
 	let { item, context = 'home' }: { item: Item; context?: string } = $props();
 
-	const playing = $derived(isTrackPlaying());
 	const contextMenu = new PopupMenu();
+	let hovered = $state(false);
+
+	const playing = $derived(isTrackPlaying());
 	// Songs and episodes open their album or show; the play button plays them in place.
 	const pageHref = $derived(hrefOf(item));
 	const subtitle = $derived(subtitleOf(item));
+	const coverRadius = $derived(coverRadiusOf(item));
+	const showPlayButton = $derived(item.track !== undefined && (hovered || playing));
 
 	// Song cards already carry "Artist • 6.2M plays" in YouTube's subtitle; episodes don't.
 	function subtitleOf(shown: Item): string {
@@ -31,6 +42,13 @@
 		return itemHref(shown.kind, shown.id);
 	}
 
+	function coverRadiusOf(shown: Item): number {
+		if (shown.kind === 'artist') {
+			return coverSize / 2;
+		}
+		return radii.medium;
+	}
+
 	function isTrackPlaying(): boolean {
 		if (!item.track) {
 			return false;
@@ -38,59 +56,59 @@
 		return player.isPlaying(item.track);
 	}
 
-	// Only songs and episodes have a track menu; other cards keep the browser default.
-	function openContextMenu(event: MouseEvent) {
-		if (item.track) {
-			contextMenu.openAtPointer(event);
+	function openPage(): void {
+		if (pageHref) {
+			goto(pageHref);
 		}
 	}
 
-	function playTrack() {
+	function playTrack(): void {
 		if (item.track) {
 			player.playOrToggle(item.track, [item.track], 0, context, item.kind as ItemKind);
 		}
 	}
 </script>
 
-<article
-	class="group/card duration-fast relative flex w-56 shrink-0 flex-col gap-2 rounded-lg p-3 transition-colors hover:bg-hover"
-	oncontextmenu={openContextMenu}
+<ContextArea
+	popup={item.track ? contextMenu : undefined}
+	onhover={(isHovered) => (hovered = isHovered)}
+	style={{ width: 224, shrink: 0 }}
 >
-	<div class="relative">
-		<Cover
-			thumbnails={item.thumbnails}
-			size={200}
-			class={[
-				'w-full shadow-md',
-				item.kind === 'artist' && 'rounded-full',
-				item.kind !== 'artist' && 'rounded-md'
-			]}
-		/>
-		{#if item.track}
-			<PlayOverlayButton
-				{playing}
-				label="Play {item.title}"
-				onclick={playTrack}
-				class={[
-					'absolute right-2 bottom-2 z-10',
-					!playing &&
-						'translate-y-2 opacity-0 group-hover/card:translate-y-0 group-hover/card:opacity-100'
-				]}
+	<View
+		style={{
+			cursor: 'pointer',
+			align: 'stretch',
+			gap: 8,
+			padding: 12,
+			radius: radii.large,
+			transition: hoverTransition
+		}}
+		hover={{ background: colors.hover }}
+		onpress={openPage}
+	>
+		<View style={{ position: 'relative' }}>
+			<Cover
+				thumbnails={item.thumbnails}
+				size={coverSize}
+				style={{
+					radius: coverRadius,
+					shadow: { y: 4, blur: 12, color: 'rgba(0, 0, 0, 0.45)' }
+				}}
 			/>
-		{/if}
-	</div>
-	<div class="min-w-0">
-		<h3 class="truncate text-base font-medium">
-			{#if pageHref}
-				<!-- Stretched over the card: the card opens the page, the play button sits above it. -->
-				<a href={pageHref} class="after:absolute after:inset-0">{item.title}</a>
-			{:else}
-				{item.title}
+			{#if showPlayButton}
+				<PlayOverlayButton
+					{playing}
+					onpress={playTrack}
+					style={{ position: 'absolute', right: 8, bottom: 8 }}
+				/>
 			{/if}
-		</h3>
-		<p class="line-clamp-2 text-sm text-dim">{subtitle}</p>
-	</div>
-</article>
+		</View>
+		<View style={{ minWidth: 0 }}>
+			<Label size="body" weight="medium" truncate>{item.title}</Label>
+			<Label size="small" tone="dim" lines={2}>{subtitle}</Label>
+		</View>
+	</View>
+</ContextArea>
 
 {#if item.track}
 	<TrackContextMenu popup={contextMenu} track={item.track} kind={item.kind as ItemKind} />

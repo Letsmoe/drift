@@ -1,24 +1,12 @@
-import { goto } from '$app/navigation';
 import type { Artist, ItemKind, Track } from '#lib/api/music.ts';
 import { downloads } from '#lib/downloads/downloads.svelte.ts';
 import { itemHref } from '#lib/format.ts';
+import * as icons from '#lib/icons.ts';
 import { library } from '#lib/library/library.svelte.ts';
 import type { MenuEntry } from '#lib/menu/menuEntry.ts';
 import { player } from '#lib/player/player.svelte.ts';
 import { recommendationFeedback } from '#lib/recommend/recommendationFeedback.svelte.ts';
-import ArrowCircleDownIcon from 'phosphor-svelte/lib/ArrowCircleDownIcon';
-import DiscIcon from 'phosphor-svelte/lib/DiscIcon';
-import HeartIcon from 'phosphor-svelte/lib/HeartIcon';
-import ListPlusIcon from 'phosphor-svelte/lib/ListPlusIcon';
-import MicrophoneIcon from 'phosphor-svelte/lib/MicrophoneIcon';
-import PlusIcon from 'phosphor-svelte/lib/PlusIcon';
-import PlaylistIcon from 'phosphor-svelte/lib/PlaylistIcon';
-import ProhibitIcon from 'phosphor-svelte/lib/ProhibitIcon';
-import ThumbsDownIcon from 'phosphor-svelte/lib/ThumbsDownIcon';
-import UserMinusIcon from 'phosphor-svelte/lib/UserMinusIcon';
-import QueueIcon from 'phosphor-svelte/lib/QueueIcon';
-import TrashIcon from 'phosphor-svelte/lib/TrashIcon';
-import UserIcon from 'phosphor-svelte/lib/UserIcon';
+import { goto } from '#lib/router.svelte.ts';
 
 export interface TrackMenuOptions {
 	kind?: ItemKind;
@@ -29,9 +17,9 @@ export interface TrackMenuOptions {
 export function buildTrackMenuEntries(track: Track, options: TrackMenuOptions = {}): MenuEntry[] {
 	const kind = menuKind(options);
 	const entries: MenuEntry[] = [
-		{ label: 'Add to playlist', icon: PlaylistIcon, children: playlistEntries(track) },
-		{ label: 'Add to queue', icon: QueueIcon, onselect: () => player.addToQueue([track]) },
-		{ label: 'Play next', icon: ListPlusIcon, onselect: () => player.playNext([track]) },
+		{ label: 'Add to playlist', icon: icons.playlist, children: playlistEntries(track) },
+		{ label: 'Add to queue', icon: icons.queue, onselect: () => player.addToQueue([track]) },
+		{ label: 'Play next', icon: icons.listPlus, onselect: () => player.playNext([track]) },
 		...navigationEntries(track, kind),
 		likeEntry(track, kind),
 		downloadEntry(track, kind),
@@ -40,7 +28,7 @@ export function buildTrackMenuEntries(track: Track, options: TrackMenuOptions = 
 	if (options.onRemoveFromPlaylist) {
 		entries.push({
 			label: 'Remove from this playlist',
-			icon: TrashIcon,
+			icon: icons.trash,
 			onselect: options.onRemoveFromPlaylist
 		});
 	}
@@ -66,13 +54,13 @@ function feedbackEntries(track: Track, kind: ItemKind): MenuEntry[] {
 	const entries: MenuEntry[] = [
 		{
 			label: dislikeLabel(track, kind),
-			icon: ThumbsDownIcon,
+			icon: icons.thumbsDown,
 			separatorBefore: true,
 			onselect: () => recommendationFeedback.toggleDislike(track, kind)
 		},
 		{
 			label: `Don’t recommend this ${nounFor(kind)}`,
-			icon: ProhibitIcon,
+			icon: icons.prohibit,
 			onselect: () => recommendationFeedback.blockTrack(track)
 		}
 	];
@@ -86,7 +74,7 @@ function feedbackEntries(track: Track, kind: ItemKind): MenuEntry[] {
 	} else if (artists.length > 1) {
 		entries.push({
 			label: 'Don’t recommend artist',
-			icon: UserMinusIcon,
+			icon: icons.userMinus,
 			children: artists.map((artist) => blockArtistEntry(artist.name, artist))
 		});
 	}
@@ -102,7 +90,7 @@ function blockShowEntries(track: Track): MenuEntry[] {
 	return [
 		{
 			label: `Don’t recommend ${show.name}`,
-			icon: UserMinusIcon,
+			icon: icons.userMinus,
 			onselect: () => recommendationFeedback.blockPodcast(show.id, show.name)
 		}
 	];
@@ -118,7 +106,7 @@ function dislikeLabel(track: Track, kind: ItemKind): string {
 function blockArtistEntry(label: string, artist: Artist): MenuEntry {
 	return {
 		label,
-		icon: UserMinusIcon,
+		icon: icons.userMinus,
 		onselect: () => recommendationFeedback.blockArtist(artist)
 	};
 }
@@ -127,9 +115,9 @@ function blockArtistEntry(label: string, artist: Artist): MenuEntry {
 // Newest playlist last: the menu opens near the bottom of the window, so the cursor lands there.
 export function playlistEntries(track: Track): MenuEntry[] {
 	const entries: MenuEntry[] = [
-		{ label: 'New playlist', icon: PlusIcon, onselect: () => addToNewPlaylist(track) }
+		{ label: 'New playlist', icon: icons.plus, onselect: () => addToNewPlaylist(track) }
 	];
-	for (const summary of library.playlists.toReversed()) {
+	for (const summary of [...library.playlists].reverse()) {
 		entries.push({
 			label: summary.name,
 			onselect: () => library.addToPlaylist(summary.id, [track])
@@ -160,14 +148,14 @@ function albumEntry(albumId: string, kind: ItemKind, separatorBefore: boolean): 
 	if (kind === 'episode') {
 		return {
 			label: 'Go to podcast',
-			icon: MicrophoneIcon,
+			icon: icons.microphone,
 			onselect: () => goto(itemHref('podcast', albumId)),
 			separatorBefore
 		};
 	}
 	return {
 		label: 'Go to album',
-		icon: DiscIcon,
+		icon: icons.disc,
 		onselect: () => goto(itemHref('album', albumId)),
 		separatorBefore
 	};
@@ -179,7 +167,7 @@ function artistEntry(artists: Artist[]): MenuEntry {
 	}
 	return {
 		label: 'Go to artist',
-		icon: UserIcon,
+		icon: icons.user,
 		separatorBefore: true,
 		children: artists.map((artist) => goToArtistEntry(artist.name, artist, false))
 	};
@@ -188,7 +176,7 @@ function artistEntry(artists: Artist[]): MenuEntry {
 function goToArtistEntry(label: string, artist: Artist, separatorBefore: boolean): MenuEntry {
 	return {
 		label,
-		icon: UserIcon,
+		icon: icons.user,
 		separatorBefore,
 		onselect: () => goto(itemHref('artist', artist.id))
 	};
@@ -202,7 +190,7 @@ function likeEntry(track: Track, kind: ItemKind): MenuEntry {
 	}
 	return {
 		label,
-		icon: HeartIcon,
+		icon: icons.heart,
 		separatorBefore: true,
 		onselect: () => library.toggleLike(track, kind)
 	};
@@ -212,13 +200,13 @@ function downloadEntry(track: Track, kind: ItemKind): MenuEntry {
 	if (downloads.stateOf(track.videoId) === '') {
 		return {
 			label: 'Download',
-			icon: ArrowCircleDownIcon,
+			icon: icons.arrowCircleDown,
 			onselect: () => downloads.download(track, kind)
 		};
 	}
 	return {
 		label: 'Remove download',
-		icon: ArrowCircleDownIcon,
+		icon: icons.arrowCircleDown,
 		onselect: () => downloads.remove(track.videoId)
 	};
 }

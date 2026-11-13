@@ -1,6 +1,11 @@
+<!--
+  A short list of tracks with its column header, all built at once. Long lists (albums, playlists) are rows of
+  a `PageList` instead, built from `TrackTableRow` directly.
+-->
 <script lang="ts">
-	import ClockIcon from 'phosphor-svelte/lib/ClockIcon';
+	import { View } from '@neoworks/svelte-gpui/ui';
 	import type { ItemKind, Track } from '#lib/api/music.ts';
+	import TrackTableHeader from '#lib/components/TrackTableHeader.svelte';
 	import TrackTableRow from '#lib/components/TrackTableRow.svelte';
 	import { downloads } from '#lib/downloads/downloads.svelte.ts';
 	import { library } from '#lib/library/library.svelte.ts';
@@ -37,27 +42,13 @@
 	const hasAlbumColumn = $derived(
 		showAlbum && tracks.some((track) => track.album !== undefined && track.album.id !== '')
 	);
-	const gridClass = $derived(gridClassFor(hasAlbumColumn, showDateAdded));
 
 	$effect(() => {
 		library.ensureRatings(visibleTracks.map((track) => track.videoId));
 		downloads.ensureStates(visibleTracks.map((track) => track.videoId));
 	});
 
-	function gridClassFor(withAlbum: boolean, withDate: boolean): string {
-		if (withAlbum && withDate) {
-			return 'grid-cols-[1rem_minmax(0,6fr)_minmax(0,4fr)_minmax(0,3fr)_minmax(8rem,1fr)]';
-		}
-		if (withAlbum) {
-			return 'grid-cols-[1rem_minmax(0,6fr)_minmax(0,4fr)_minmax(8rem,1fr)]';
-		}
-		if (withDate) {
-			return 'grid-cols-[1rem_minmax(0,6fr)_minmax(0,3fr)_minmax(8rem,1fr)]';
-		}
-		return 'grid-cols-[1rem_minmax(0,1fr)_minmax(8rem,auto)]';
-	}
-
-	function playAt(index: number) {
+	function playAt(index: number): void {
 		player.playOrToggle(tracks[index], tracks, index, context, kind);
 	}
 
@@ -73,27 +64,14 @@
 	}
 </script>
 
-<div role="table" class="flex flex-col">
+<View>
 	{#if showHeader}
-		<div
-			role="row"
-			class={[
-				'sticky top-0 z-10 mb-2 grid h-9 items-center gap-4 border-b border-line bg-surface px-4 text-sm text-dim',
-				gridClass
-			]}
-		>
-			<span class="text-right">#</span>
-			<span>Title</span>
-			{#if hasAlbumColumn}<span>Album</span>{/if}
-			{#if showDateAdded}<span>Date added</span>{/if}
-			<span class="flex justify-end pr-9"><ClockIcon size={16} /></span>
-		</div>
+		<TrackTableHeader showAlbum={hasAlbumColumn} {showDateAdded} />
 	{/if}
 	{#each visibleTracks as track, index (index)}
 		<TrackTableRow
 			{track}
 			{index}
-			{gridClass}
 			{kind}
 			{showCover}
 			showAlbum={hasAlbumColumn}
@@ -102,4 +80,4 @@
 			onremove={removeHandlerFor(index)}
 		/>
 	{/each}
-</div>
+</View>

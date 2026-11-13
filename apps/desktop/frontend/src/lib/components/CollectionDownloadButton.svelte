@@ -1,9 +1,13 @@
 <script lang="ts">
-	import ArrowCircleDownIcon from 'phosphor-svelte/lib/ArrowCircleDownIcon';
+	import { Button } from '@neoworks/svelte-gpui/ui';
 	import type { CollectionKind } from '#lib/api/downloads.ts';
+	import { appearance } from '#lib/appearance.svelte.ts';
 	import ConfirmDialog from '#lib/components/ConfirmDialog.svelte';
+	import IconAction from '#lib/components/IconAction.svelte';
 	import ProgressRing from '#lib/components/ProgressRing.svelte';
 	import { downloads } from '#lib/downloads/downloads.svelte.ts';
+	import { arrowCircleDown, arrowCircleDownFill } from '#lib/icons.ts';
+	import { colors } from '#lib/theme.ts';
 
 	let {
 		kind,
@@ -22,7 +26,6 @@
 			collection.doneCount >= collection.trackCount
 	);
 	const fraction = $derived(progressFraction());
-	const label = $derived(describeAction());
 	let confirmingRemoval = $state(false);
 
 	// A kept YouTube collection looks for new tracks whenever its page opens.
@@ -37,14 +40,21 @@
 		return collection.doneCount / collection.trackCount;
 	}
 
-	function describeAction(): string {
-		if (!collection) {
-			return `Keep ${title} downloaded`;
+	function colorFor(isComplete: boolean): string {
+		if (isComplete) {
+			return appearance.accent;
 		}
-		return `Remove downloads of ${title}`;
+		return appearance.dim;
 	}
 
-	function toggle() {
+	function idleIconFor(isComplete: boolean): string {
+		if (isComplete) {
+			return arrowCircleDownFill;
+		}
+		return arrowCircleDown;
+	}
+
+	function toggle(): void {
 		if (!collection) {
 			downloads.keepDownloaded(kind, id);
 			return;
@@ -53,31 +63,29 @@
 	}
 </script>
 
-<button
-	type="button"
-	aria-label={label}
-	aria-pressed={collection !== undefined}
-	title={label}
-	onclick={toggle}
-	class={[
-		'duration-fast flex size-8 items-center justify-center transition-transform hover:scale-105',
-		complete && 'text-action',
-		!complete && 'text-dim hover:text-default'
-	]}
->
-	{#if complete}
-		<ArrowCircleDownIcon size={32} weight="fill" />
-	{:else if collection}
+{#if collection && !complete}
+	<Button
+		style={{ size: 32, align: 'center', justify: 'center', color: appearance.dim }}
+		hover={{ color: colors.text }}
+		onpress={toggle}
+	>
 		<ProgressRing {fraction} size={28} strokeWidth={3} />
-	{:else}
-		<ArrowCircleDownIcon size={32} />
-	{/if}
-</button>
+	</Button>
+{:else}
+	<IconAction
+		icon={idleIconFor(complete)}
+		iconSize={32}
+		boxSize={32}
+		color={colorFor(complete)}
+		hoverColor={colors.text}
+		onpress={toggle}
+	/>
+{/if}
 
 {#if confirmingRemoval}
 	<ConfirmDialog
 		title="Remove downloads"
-		message="Delete the downloaded songs of &quot;{title}&quot; and stop keeping it downloaded? Songs that another downloaded collection or a single download still needs stay."
+		message={`Delete the downloaded songs of "${title}" and stop keeping it downloaded? Songs that another downloaded collection or a single download still needs stay.`}
 		confirmLabel="Remove"
 		onconfirm={() => downloads.removeCollection(kind, id)}
 		onclose={() => (confirmingRemoval = false)}
