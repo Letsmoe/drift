@@ -1,7 +1,9 @@
+<!-- The kit's toggle icon button, with Drift's colours: the cover's accent while on, the secondary text colour off. -->
 <script lang="ts">
-	import { Button, Icon, Tooltip, View } from '@neoworks/svelte-gpui/ui';
+	import type { Style } from '@neoworks/svelte-gpui/ui';
+	import { IconButton } from '@neoworks/svelte-gpui-ui';
 	import { appearance } from '#lib/appearance.svelte.ts';
-	import { colors, hoverTransition, radii } from '#lib/theme.ts';
+	import { colors } from '#lib/theme.ts';
 
 	let {
 		icon,
@@ -19,56 +21,23 @@
 		onpress: () => void;
 	} = $props();
 
-	const shownIcon = $derived(pickIcon());
-	const color = $derived(pickColor());
+	const look = $derived(pickLook());
 
-	function pickIcon(): string {
-		if (active && activeIcon !== undefined) {
-			return activeIcon;
-		}
-		return icon;
-	}
-
-	function pickColor(): string {
+	// A raised background keeps the state readable when the cover's accent is close to the muted text.
+	function pickLook(): Style {
 		if (active) {
-			return appearance.accent;
+			return { color: appearance.accent, background: colors.raised, shrink: 0 };
 		}
-		return appearance.muted;
-	}
-
-	function hoverColor(): string {
-		if (active) {
-			return appearance.accent;
-		}
-		return colors.text;
+		return { color: appearance.muted, shrink: 0 };
 	}
 </script>
 
-<Tooltip text={label}>
-	<Button
-		style={{
-			size: 32,
-			radius: radii.full,
-			align: 'center',
-			justify: 'center',
-			shrink: 0,
-			color,
-			transition: hoverTransition
-		}}
-		hover={{ background: colors.hover, color: hoverColor() }}
-		{onpress}
-	>
-		<Icon svg={shownIcon} size={18} />
-		{#if active}
-			<View
-				style={{
-					position: 'absolute',
-					bottom: 2,
-					size: 4,
-					radius: radii.full,
-					background: appearance.accent
-				}}
-			/>
-		{/if}
-	</Button>
-</Tooltip>
+<IconButton
+	size="sm"
+	{icon}
+	selectedIcon={activeIcon}
+	{label}
+	selected={active}
+	style={look}
+	{onpress}
+/>
