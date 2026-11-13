@@ -10,7 +10,7 @@
 	// Each press scrolls this share of the visible width, keeping a card of context.
 	const pageShare = 0.85;
 	// The arrows sit a third of the way down the row, over the covers.
-	const arrowTop = 78;
+	const arrowTop = 70;
 
 	let { children }: { children: Snippet } = $props();
 

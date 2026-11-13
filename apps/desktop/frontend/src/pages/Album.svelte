@@ -102,7 +102,7 @@
 				paddingX={24}
 				paddingTop={24}
 				paddingBottom={24}
-				estimatedRowHeight={56}
+				estimatedRowHeight={49}
 				onscroll={(position) => (scrollOffset = position.y)}
 			>
 				{#snippet row(block)}

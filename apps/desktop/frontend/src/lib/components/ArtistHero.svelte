@@ -7,7 +7,7 @@
 	import { pickThumbnail } from '#lib/format.ts';
 	import { colors, wideWindowWidth, type TextSize } from '#lib/theme.ts';
 
-	const heroHeight = 320;
+	const heroHeight = 280;
 
 	let { name, thumbnails }: { name: string; thumbnails: Thumbnail[] } = $props();
 

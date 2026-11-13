@@ -28,7 +28,7 @@
 <ContextArea
 	popup={contextMenu}
 	onhover={(isHovered) => (hovered = isHovered)}
-	style={{ width: 208, shrink: 0 }}
+	style={{ width: 182, shrink: 0 }}
 >
 	<View
 		style={{

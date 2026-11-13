@@ -143,7 +143,7 @@
 	{/each}
 {/snippet}
 
-<View bind:this={root} focusable onkey={handleKey} style={{ ...floatingPanel, minWidth: 208 }}>
+<View bind:this={root} focusable onkey={handleKey} style={{ ...floatingPanel, minWidth: 182 }}>
 	{#if onleave}
 		<Scroll style={{ maxHeight: submenuMaxHeight }}>
 			{@render rows()}
