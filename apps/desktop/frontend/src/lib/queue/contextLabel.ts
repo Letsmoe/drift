@@ -1,3 +1,5 @@
+import { getItem, setItem } from '#lib/storage.ts';
+
 const recommendContextPrefix = 'recommend:';
 const storageKey = 'drift:context-titles';
 // Enough for every list played recently; older names fall back to the generic label.
@@ -31,7 +33,7 @@ export function rememberContextTitle(context: string, title: string): void {
 	while (titles.size > maxStoredTitles) {
 		titles.delete(titles.keys().next().value!);
 	}
-	localStorage.setItem(storageKey, JSON.stringify([...titles]));
+	setItem(storageKey, JSON.stringify([...titles]));
 }
 
 /** Human readable name of the context a queue was started from. */
@@ -62,7 +64,7 @@ function kindLabel(context: string): string {
 
 function loadTitles(): Map<string, string> {
 	try {
-		const stored = localStorage.getItem(storageKey);
+		const stored = getItem(storageKey);
 		if (stored === null) {
 			return new Map();
 		}
