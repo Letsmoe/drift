@@ -1,62 +1,72 @@
 <script lang="ts">
-	import { Button, LoadingSpinner } from '@neoworks-dev/ui';
-	import HeartIcon from 'phosphor-svelte/lib/HeartIcon';
-	import QueueIcon from 'phosphor-svelte/lib/QueueIcon';
-	import RepeatIcon from 'phosphor-svelte/lib/RepeatIcon';
-	import RepeatOnceIcon from 'phosphor-svelte/lib/RepeatOnceIcon';
-	import SkipBackIcon from 'phosphor-svelte/lib/SkipBackIcon';
-	import SkipForwardIcon from 'phosphor-svelte/lib/SkipForwardIcon';
-	import SpeakerHighIcon from 'phosphor-svelte/lib/SpeakerHighIcon';
-	import SpeakerLowIcon from 'phosphor-svelte/lib/SpeakerLowIcon';
-	import SpeakerXIcon from 'phosphor-svelte/lib/SpeakerXIcon';
+	import { Button, Icon, View } from '@neoworks/svelte-gpui/ui';
+	import { LoadingSpinner } from '@neoworks/svelte-gpui-ui';
+	import type { ItemKind } from '#lib/api/music.ts';
+	import { appearance } from '#lib/appearance.svelte.ts';
 	import AddToPlaylistButton from '#lib/components/AddToPlaylistButton.svelte';
 	import Cover from '#lib/components/Cover.svelte';
 	import DownloadButton from '#lib/components/DownloadButton.svelte';
+	import IconAction from '#lib/components/IconAction.svelte';
+	import Label from '#lib/components/Label.svelte';
+	import LikeButton from '#lib/components/LikeButton.svelte';
 	import PlayOverlayButton from '#lib/components/PlayOverlayButton.svelte';
 	import RangeSlider from '#lib/components/RangeSlider.svelte';
-	import TrackCredits from '#lib/components/TrackCredits.svelte';
 	import ToggleIconButton from '#lib/components/ToggleIconButton.svelte';
 	import { formatDuration } from '#lib/format.ts';
+	import {
+		queue,
+		repeat,
+		repeatBold,
+		repeatOnce,
+		repeatOnceBold,
+		skipBackFill,
+		skipForwardFill,
+		speakerHigh,
+		speakerLow,
+		speakerX
+	} from '#lib/layout/chromeIcons.ts';
 	import { panels } from '#lib/layout/panels.svelte.ts';
-	import { library } from '#lib/library/library.svelte.ts';
+	import { shuffleActiveIcon, shuffleIcon, shuffleLabel } from '#lib/layout/shuffleIcons.ts';
+	import TrackCreditsLine from '#lib/layout/TrackCreditsLine.svelte';
+	import { connectAudio } from '#lib/player/audioBinding.svelte.ts';
 	import { Crossfade } from '#lib/player/crossfade.svelte.ts';
-	import { connectMediaSession } from '#lib/player/mediaSession.svelte.ts';
 	import { player } from '#lib/player/player.svelte.ts';
-	import { shuffleIcon, shuffleLabel } from '#lib/player/shuffleMode.ts';
-	import type { ItemKind } from '#lib/api/music.ts';
-
-	connectMediaSession(player);
+	import { colors, radii } from '#lib/theme.ts';
 
 	const crossfade = new Crossfade(player);
-	let mainAudio = $state<HTMLAudioElement>();
-	let outgoingAudio = $state<HTMLAudioElement>();
+	connectAudio(player, crossfade);
 
-	$effect(() => {
-		if (mainAudio && outgoingAudio) {
-			crossfade.attach(mainAudio, outgoingAudio);
+	const barHeight = 72;
+	const coverSize = 56;
+
+	const volumeIcon = $derived(pickVolumeIcon());
+	const repeatIcon = $derived(pickRepeatIcon());
+	const repeatActiveIcon = $derived(pickRepeatActiveIcon());
+	const shownVolume = $derived(pickShownVolume());
+	const kind = $derived(currentKind());
+
+	function pickVolumeIcon(): string {
+		if (player.muted || player.volume === 0) {
+			return speakerX;
 		}
-		return () => crossfade.finish();
-	});
-
-	// The fade-in scales the element's volume without touching the user's volume setting.
-	$effect(() => {
-		if (mainAudio) {
-			mainAudio.volume = player.volume * crossfade.incomingGain;
+		if (player.volume < 0.5) {
+			return speakerLow;
 		}
-	});
+		return speakerHigh;
+	}
 
-	const VolumeIcon = $derived(pickVolumeIcon());
-	const liked = $derived(player.track !== null && library.isLiked(player.track.videoId));
-	const likeLabel = $derived(buildLikeLabel());
-	const likeWeight = $derived(buildLikeWeight());
-	const RepeatButtonIcon = $derived(pickRepeatIcon());
-	const ShuffleButtonIcon = $derived(shuffleIcon(player.queue));
-
-	function pickRepeatIcon() {
+	function pickRepeatIcon(): string {
 		if (player.queue.repeat === 'one') {
-			return RepeatOnceIcon;
+			return repeatOnce;
 		}
-		return RepeatIcon;
+		return repeat;
+	}
+
+	function pickRepeatActiveIcon(): string {
+		if (player.queue.repeat === 'one') {
+			return repeatOnceBold;
+		}
+		return repeatBold;
 	}
 
 	function repeatLabel(): string {
@@ -69,237 +79,160 @@
 		return 'Repeat: all';
 	}
 
+	function pickShownVolume(): number {
+		if (player.muted) {
+			return 0;
+		}
+		return player.volume;
+	}
+
 	function currentKind(): ItemKind {
 		if (!player.entry) {
 			return 'song';
 		}
 		return player.entry.kind as ItemKind;
 	}
-
-	function pickVolumeIcon() {
-		if (player.muted || player.volume === 0) {
-			return SpeakerXIcon;
-		}
-		if (player.volume < 0.5) {
-			return SpeakerLowIcon;
-		}
-		return SpeakerHighIcon;
-	}
-
-	function playButtonLabel(): string {
-		if (player.paused) {
-			return 'Play';
-		}
-		return 'Pause';
-	}
-
-	function buildLikeLabel(): string {
-		if (liked) {
-			return 'Remove from Liked Songs';
-		}
-		return 'Save to Liked Songs';
-	}
-
-	function buildLikeWeight(): 'fill' | 'regular' {
-		if (liked) {
-			return 'fill';
-		}
-		return 'regular';
-	}
-
-	function toggleLikeOfCurrent(): void {
-		if (!player.track || !player.entry) {
-			return;
-		}
-		library.toggleLike(player.track, player.entry.kind as ItemKind);
-	}
-
-	function isTypingTarget(target: EventTarget | null): boolean {
-		if (!(target instanceof HTMLElement)) {
-			return false;
-		}
-		return target.closest('input, textarea, select, button, a, [contenteditable]') !== null;
-	}
-
-	function handleKeydown(event: KeyboardEvent): void {
-		if (event.code !== 'Space' || isTypingTarget(event.target)) {
-			return;
-		}
-		event.preventDefault();
-		player.toggle();
-	}
-
-	// Playback position at the last `waiting` or `timeupdate`.
-	let lastPosition = 0;
-
-	function startBuffering(event: Event): void {
-		const audio = event.currentTarget as HTMLAudioElement;
-		lastPosition = audio.currentTime;
-		player.buffering = true;
-	}
-
-	// After a seek WebKitGTK keeps playing but neither fires `playing` nor raises readyState
-	// past HAVE_CURRENT_DATA, so buffering ends once the position moves on with data loaded.
-	function endBufferingWhenAdvancing(event: Event): void {
-		const audio = event.currentTarget as HTMLAudioElement;
-		const advanced = audio.currentTime !== lastPosition;
-		lastPosition = audio.currentTime;
-		if (advanced && !audio.paused && audio.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
-			player.playbackAdvanced();
-		}
-		crossfade.check();
-	}
-
-	function shownVolume(): number {
-		if (player.muted) {
-			return 0;
-		}
-		return player.volume;
-	}
 </script>
 
-<svelte:window onkeydown={handleKeydown} />
-
-<audio
-	bind:this={mainAudio}
-	src={player.source}
-	autoplay
-	bind:paused={player.paused}
-	bind:currentTime={player.currentTime}
-	bind:duration={player.duration}
-	bind:muted={player.muted}
-	onwaiting={startBuffering}
-	onplaying={() => (player.buffering = false)}
-	ontimeupdate={endBufferingWhenAdvancing}
-	onended={() => player.trackEnded()}
-	onerror={() => player.playbackFailed()}
-></audio>
-<audio bind:this={outgoingAudio}></audio>
-
-<footer class="grid h-18 shrink-0 grid-cols-[1fr_minmax(0,2fr)_1fr] items-center gap-4 px-2">
-	<div class="flex min-w-0 items-center gap-3">
+<View
+	style={{
+		direction: 'row',
+		align: 'center',
+		height: barHeight,
+		shrink: 0,
+		gap: 16,
+		paddingX: 8
+	}}
+>
+	<View style={{ flex: 1, minWidth: 0, direction: 'row', align: 'center', gap: 12 }}>
 		{#if player.track}
-			<button
-				type="button"
-				aria-label="Open full-screen player"
-				onclick={() => panels.toggleFullPlayer()}
-				class="shrink-0 cursor-pointer rounded-md"
+			<Button
+				style={{ shrink: 0, radius: radii.medium, overflow: 'hidden' }}
+				onpress={() => panels.toggleFullPlayer()}
 			>
-				<Cover thumbnails={player.track.thumbnails} size={56} class="size-14 rounded-md" />
-			</button>
-			<div class="min-w-0">
-				<TrackCredits track={player.track} />
-			</div>
-			<div class="flex shrink-0 items-center">
-				<button
-					type="button"
-					aria-label={likeLabel}
-					title={likeLabel}
-					aria-pressed={liked}
-					onclick={toggleLikeOfCurrent}
-					class={[
-						'duration-fast flex size-8 items-center justify-center rounded-full transition-colors hover:bg-hover',
-						liked && 'text-action',
-						!liked && 'text-muted hover:text-default'
-					]}
-				>
-					<HeartIcon size={20} weight={likeWeight} />
-				</button>
+				<Cover
+					thumbnails={player.track.thumbnails}
+					size={coverSize}
+					style={{ size: coverSize, radius: radii.medium }}
+				/>
+			</Button>
+			<View style={{ flex: 1, minWidth: 0 }}>
+				<TrackCreditsLine track={player.track} />
+			</View>
+			<View style={{ direction: 'row', align: 'center', shrink: 0 }}>
+				<LikeButton track={player.track} {kind} />
 				<AddToPlaylistButton track={player.track} />
-				<span class="flex size-8 items-center justify-center text-muted">
-					<DownloadButton
-						track={player.track}
-						kind={currentKind()}
-						size={20}
-						revealOnHover={false}
-					/>
-				</span>
-			</div>
+				<View style={{ size: 32, align: 'center', justify: 'center' }}>
+					<DownloadButton track={player.track} {kind} size={20} revealOnHover={false} />
+				</View>
+			</View>
 		{/if}
-	</div>
+	</View>
 
-	<div class="flex flex-col items-center gap-1">
-		<div
-			class={['flex items-center gap-2', !player.track && 'pointer-events-none opacity-40']}
-			aria-disabled={!player.track}
+	<View style={{ flex: 2, minWidth: 0, align: 'center', gap: 4 }}>
+		<View
+			style={{
+				direction: 'row',
+				align: 'center',
+				gap: 8,
+				opacity: player.track ? 1 : 0.4
+			}}
 		>
 			<ToggleIconButton
-				icon={ShuffleButtonIcon}
+				icon={shuffleIcon(player.queue)}
+				activeIcon={shuffleActiveIcon(player.queue)}
 				label={shuffleLabel(player.queue)}
 				active={player.queue.shuffle}
-				onclick={() => player.cycleShuffle()}
+				onpress={() => player.cycleShuffle()}
 			/>
-			<Button
-				round
-				size="sm"
-				variant="ghost"
-				icon={SkipBackIcon}
-				onclick={() => player.previous()}
+			<IconAction
+				icon={skipBackFill}
+				iconSize={16}
+				boxSize={32}
+				hoverBackground={colors.hover}
+				onpress={() => player.previous()}
 			/>
 			{#if player.buffering && player.track && !player.errorMessage}
-				<div class="flex size-8 items-center justify-center"><LoadingSpinner size={18} /></div>
+				<View style={{ size: 32, align: 'center', justify: 'center' }}>
+					<LoadingSpinner size={18} color={appearance.accent} />
+				</View>
 			{:else}
-				<PlayOverlayButton
-					size="sm"
-					playing={!player.paused}
-					label={playButtonLabel()}
-					onclick={() => player.toggle()}
-				/>
+				<PlayOverlayButton size="sm" playing={!player.paused} onpress={() => player.toggle()} />
 			{/if}
-			<Button
-				round
-				size="sm"
-				variant="ghost"
-				icon={SkipForwardIcon}
-				onclick={() => player.next()}
+			<IconAction
+				icon={skipForwardFill}
+				iconSize={16}
+				boxSize={32}
+				hoverBackground={colors.hover}
+				onpress={() => player.next()}
 			/>
 			<ToggleIconButton
-				icon={RepeatButtonIcon}
+				icon={repeatIcon}
+				activeIcon={repeatActiveIcon}
 				label={repeatLabel()}
 				active={player.queue.repeat !== 'off'}
-				onclick={() => player.cycleRepeat()}
+				onpress={() => player.cycleRepeat()}
 			/>
-		</div>
+		</View>
 
 		{#if player.errorMessage}
-			<p class="h-4 text-xs text-red">{player.errorMessage}</p>
+			<View style={{ height: 16 }}>
+				<Label size="tiny" tone="danger">{player.errorMessage}</Label>
+			</View>
 		{:else if !player.track}
-			<p class="h-4 text-xs text-dim">Pick something to play</p>
+			<View style={{ height: 16 }}>
+				<Label size="tiny" tone="dim">Pick something to play</Label>
+			</View>
 		{:else}
-			<div class="flex w-full items-center gap-2">
-				<span class="w-10 text-right text-xs text-dim tabular-nums">
-					{formatDuration(Math.floor(player.currentTime))}
-				</span>
+			<View style={{ direction: 'row', align: 'center', gap: 8, width: 'full' }}>
+				<View style={{ width: 40, align: 'end' }}>
+					<Label size="tiny" tone="dim"
+						>{formatDuration(Math.floor(player.currentTime)) || '0:00'}</Label
+					>
+				</View>
 				<RangeSlider
-					label="Seek"
 					value={player.currentTime}
 					max={player.duration || 0}
-					disabled={!player.track}
-					oninput={(seconds) => player.seek(seconds)}
+					oncommit={(seconds) => player.seek(seconds)}
 				/>
-				<span class="w-10 text-xs text-dim tabular-nums">
-					{formatDuration(Math.floor(player.duration))}
-				</span>
-			</div>
+				<View style={{ width: 40 }}>
+					<Label size="tiny" tone="dim">{formatDuration(Math.floor(player.duration))}</Label>
+				</View>
+			</View>
 		{/if}
-	</div>
+	</View>
 
-	<div class="flex items-center justify-end gap-1 pr-2">
+	<View
+		style={{
+			flex: 1,
+			minWidth: 0,
+			direction: 'row',
+			align: 'center',
+			justify: 'end',
+			gap: 4,
+			paddingRight: 8
+		}}
+	>
 		<ToggleIconButton
-			icon={QueueIcon}
+			icon={queue}
 			label="Queue"
 			active={panels.queueOpen}
-			onclick={() => panels.toggleQueue()}
+			onpress={() => panels.toggleQueue()}
 		/>
-		<Button round size="sm" variant="ghost" icon={VolumeIcon} onclick={() => player.toggleMute()} />
-		<div class="w-24">
+		<IconAction
+			icon={volumeIcon}
+			iconSize={20}
+			boxSize={32}
+			hoverBackground={colors.hover}
+			onpress={() => player.toggleMute()}
+		/>
+		<View style={{ width: 96, direction: 'row' }}>
 			<RangeSlider
-				label="Volume"
-				value={shownVolume()}
+				value={shownVolume}
 				max={1}
 				step={0.01}
 				oninput={(volume) => player.setVolume(volume)}
 			/>
-		</div>
-	</div>
-</footer>
+		</View>
+	</View>
+</View>

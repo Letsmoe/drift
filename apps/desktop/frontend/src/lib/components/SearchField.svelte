@@ -1,70 +1,116 @@
 <script lang="ts">
-	import MagnifyingGlassIcon from 'phosphor-svelte/lib/MagnifyingGlassIcon';
-	import XIcon from 'phosphor-svelte/lib/XIcon';
+	import { Button, Icon, Input, View, type KeyEvent } from '@neoworks/svelte-gpui/ui';
+	import type { Snippet } from 'svelte';
+	import { appearance } from '#lib/appearance.svelte.ts';
+	import { magnifyingGlass, x } from '#lib/layout/chromeIcons.ts';
+	import { textFocus } from '#lib/layout/textFocus.svelte.ts';
+	import { colors, fontSizes, glassBackground, hoverTransition, radii } from '#lib/theme.ts';
 
 	let {
 		value = $bindable(''),
 		placeholder = 'Search',
-		expanded = false,
 		onsubmit,
-		onfocus = undefined,
-		oninput = undefined,
-		onkeydown = undefined
+		onfocus,
+		oninput,
+		onblur,
+		onkey,
+		children
 	}: {
 		value?: string;
 		placeholder?: string;
-		/** Whether a suggestions list is open under the field. */
-		expanded?: boolean;
 		onsubmit: () => void;
 		onfocus?: () => void;
 		oninput?: () => void;
-		onkeydown?: (event: KeyboardEvent) => void;
+		onblur?: () => void;
+		onkey?: (event: KeyEvent) => void;
+		/** Drawn against the field's box, such as a suggestions list. */
+		children?: Snippet;
 	} = $props();
 
-	let inputElement = $state<HTMLInputElement>();
+	let field = $state<Input>();
+	let focused = $state(false);
+	let hovered = $state(false);
 
-	function handleSubmit(event: SubmitEvent) {
-		event.preventDefault();
-		onsubmit();
+	const borderColor = $derived(pickBorderColor());
+	const background = $derived(pickBackground());
+
+	function pickBorderColor(): string {
+		if (focused) {
+			return colors.lineStrong;
+		}
+		if (hovered) {
+			return colors.line;
+		}
+		return 'transparent';
 	}
 
-	function clear() {
+	function pickBackground(): string {
+		if (hovered && !focused) {
+			return colors.raised;
+		}
+		return glassBackground;
+	}
+
+	function handleFocus(): void {
+		focused = true;
+		textFocus.enter();
+		onfocus?.();
+	}
+
+	function handleBlur(): void {
+		focused = false;
+		textFocus.leave();
+		onblur?.();
+	}
+
+	function clear(): void {
 		value = '';
 		oninput?.();
-		inputElement?.focus();
+		field?.focus();
 	}
 </script>
 
-<form
-	role="search"
-	onsubmit={handleSubmit}
-	class="duration-fast glass flex h-12 items-center gap-3 rounded-full border border-transparent px-4 transition-colors focus-within:border-line-strong hover:border-line hover:bg-raised"
+<View
+	style={{
+		direction: 'row',
+		align: 'center',
+		height: 48,
+		gap: 12,
+		paddingX: 16,
+		radius: radii.full,
+		background,
+		borderWidth: 1,
+		borderColor,
+		transition: hoverTransition
+	}}
+	onhover={(isHovered) => (hovered = isHovered)}
 >
-	<MagnifyingGlassIcon size={20} class="shrink-0 text-dim" />
-	<input
-		bind:this={inputElement}
-		type="text"
-		role="combobox"
-		aria-expanded={expanded}
-		aria-controls="search-suggestions"
-		aria-autocomplete="list"
+	<Icon svg={magnifyingGlass} size={20} color={appearance.dim} style={{ shrink: 0 }} />
+	<Input
+		bind:this={field}
 		bind:value
 		{placeholder}
-		{onfocus}
-		{oninput}
-		{onkeydown}
-		autocomplete="off"
-		spellcheck="false"
-		class="h-full min-w-0 flex-1 bg-transparent text-base text-default outline-none placeholder:text-dim"
+		style={{
+			flex: 1,
+			minWidth: 0,
+			alignSelf: 'center',
+			fontSize: fontSizes.medium,
+			color: colors.text
+		}}
+		onfocus={handleFocus}
+		onblur={handleBlur}
+		oninput={() => oninput?.()}
+		onsubmit={() => onsubmit()}
+		{onkey}
 	/>
 	{#if value !== ''}
-		<button
-			type="button"
-			aria-label="Clear search"
-			onclick={clear}
-			class="shrink-0 text-dim hover:text-default"
+		<Button
+			style={{ shrink: 0, color: appearance.dim }}
+			hover={{ color: colors.text }}
+			onpress={clear}
 		>
-			<XIcon size={18} />
-		</button>
+			<Icon svg={x} size={18} />
+		</Button>
 	{/if}
-</form>
+	{@render children?.()}
+</View>

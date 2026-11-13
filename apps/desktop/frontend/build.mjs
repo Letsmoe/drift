@@ -45,7 +45,8 @@ async function listPageNames() {
 
 await build({
 	entry: here('./src/main.ts'),
-	outfile: here('./dist/drift.js'),
+	// DRIFT_BUNDLE_OUT lets scripts that run side by side each build a bundle of their own.
+	outfile: process.env.DRIFT_BUNDLE_OUT || here('./dist/drift.js'),
 	watch: process.argv.includes('--watch'),
 	plugins: [pagesPlugin],
 	define: {

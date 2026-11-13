@@ -1,4 +1,7 @@
 <script lang="ts">
+	import { Button, DropTarget, Draggable, View } from '@neoworks/svelte-gpui/ui';
+	import { appearance } from '#lib/appearance.svelte.ts';
+	import Label from '#lib/components/Label.svelte';
 	import QueueRow from '#lib/components/QueueRow.svelte';
 	import { player } from '#lib/player/player.svelte.ts';
 	import { contextLabel } from '#lib/queue/contextLabel.ts';
@@ -17,9 +20,6 @@
 
 	let showAllPlayed = $state(false);
 	const visiblePlayed = $derived(visiblePlayedEntries());
-
-	let draggedEntryId = $state<number | undefined>(undefined);
-	let dropTargetEntryId = $state<number | undefined>(undefined);
 
 	function buildQueuedHeading(context: string): string {
 		const label = contextLabel(context);
@@ -40,88 +40,82 @@
 		return sections.played.slice(-collapsedPlayedCount);
 	}
 
-	function startDrag(event: DragEvent, entryId: number): void {
-		draggedEntryId = entryId;
-		event.dataTransfer?.setData('text/plain', String(entryId));
-	}
-
-	function dragOver(event: DragEvent, entryId: number): void {
-		if (draggedEntryId === undefined) {
-			return;
+	function showAllLabel(): string {
+		if (showAllPlayed) {
+			return 'Show less';
 		}
-		event.preventDefault();
-		dropTargetEntryId = entryId;
+		return `Show all ${sections.played.length}`;
 	}
 
-	function drop(event: DragEvent, target: UpcomingEntry): void {
-		event.preventDefault();
-		const movedEntryId = draggedEntryId;
-		endDrag();
-		if (movedEntryId === undefined || movedEntryId === target.entry.id) {
+	// What a dragged row carries is its entry's ID.
+	function isEntryId(data: unknown): boolean {
+		return typeof data === 'number';
+	}
+
+	function drop(movedEntryId: unknown, target: UpcomingEntry): void {
+		if (typeof movedEntryId !== 'number' || movedEntryId === target.entry.id) {
 			return;
 		}
 		player.move(movedEntryId, target.index);
 	}
-
-	function endDrag(): void {
-		draggedEntryId = undefined;
-		dropTargetEntryId = undefined;
-	}
 </script>
 
 {#snippet upcomingList(entries: UpcomingEntry[])}
-	<div role="list" class="flex flex-col">
+	<View>
 		{#each entries as upcoming (upcoming.entry.id)}
-			<QueueRow
-				entry={upcoming.entry}
-				{size}
-				draggable
-				dropTarget={dropTargetEntryId === upcoming.entry.id}
-				ondragstart={(event) => startDrag(event, upcoming.entry.id)}
-				ondragover={(event) => dragOver(event, upcoming.entry.id)}
-				ondrop={(event) => drop(event, upcoming)}
-				ondragend={endDrag}
-			/>
+			<DropTarget
+				accept={isEntryId}
+				ondrop={({ data }) => drop(data, upcoming)}
+				over={{ borderTopWidth: 2, borderColor: appearance.accent }}
+			>
+				<Draggable data={upcoming.entry.id}>
+					<QueueRow entry={upcoming.entry} {size} />
+				</Draggable>
+			</DropTarget>
 		{/each}
-	</div>
+	</View>
+{/snippet}
+
+{#snippet heading(text: string)}
+	<View style={{ paddingX: 6 }}>
+		<Label size="small" weight="semibold" tone="muted" truncate>{text}</Label>
+	</View>
 {/snippet}
 
 {#if sections.played.length > 0}
-	<section class="flex flex-col gap-1">
-		<div class="flex items-center justify-between gap-2 px-1.5">
-			<h3 class="text-sm font-semibold text-muted">Played</h3>
+	<View style={{ gap: 4 }}>
+		<View style={{ direction: 'row', align: 'center', justify: 'between', gap: 8, paddingX: 6 }}>
+			<Label size="small" weight="semibold" tone="muted">Played</Label>
 			{#if sections.played.length > collapsedPlayedCount}
-				<button
-					type="button"
-					class="text-xs font-semibold text-dim hover:text-default"
-					onclick={() => (showAllPlayed = !showAllPlayed)}
-				>
-					{#if showAllPlayed}Show less{:else}Show all {sections.played.length}{/if}
-				</button>
+				<Button hover={{ color: 'white' }} onpress={() => (showAllPlayed = !showAllPlayed)}>
+					<Label size="tiny" weight="semibold" tone="dim">{showAllLabel()}</Label>
+				</Button>
 			{/if}
-		</div>
-		<div role="list" class="flex flex-col">
+		</View>
+		<View>
 			{#each visiblePlayed as playedEntry (playedEntry.entry.id)}
 				<QueueRow entry={playedEntry.entry} {size} played />
 			{/each}
-		</div>
-	</section>
+		</View>
+	</View>
 {/if}
 
 {#if sections.queued.length > 0}
-	<section class="flex flex-col gap-1">
-		<h3 class="truncate px-1.5 text-sm font-semibold text-muted">{queuedHeading}</h3>
+	<View style={{ gap: 4 }}>
+		{@render heading(queuedHeading)}
 		{@render upcomingList(sections.queued)}
-	</section>
+	</View>
 {/if}
 
 {#if sections.autoplay.length > 0}
-	<section class="flex flex-col gap-1">
-		<h3 class="px-1.5 text-sm font-semibold text-muted">Autoplay: Recommended for you</h3>
+	<View style={{ gap: 4 }}>
+		{@render heading('Autoplay: Recommended for you')}
 		{@render upcomingList(sections.autoplay)}
-	</section>
+	</View>
 {/if}
 
 {#if sections.nowPlaying && !hasUpcoming}
-	<p class="px-2 text-center text-sm text-dim">No songs up next.</p>
+	<View style={{ paddingX: 8, align: 'center' }}>
+		<Label size="small" tone="dim">No songs up next.</Label>
+	</View>
 {/if}

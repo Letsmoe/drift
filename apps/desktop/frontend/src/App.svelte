@@ -1,22 +1,80 @@
 <script lang="ts">
 	import { Scroll, Text, View } from '@neoworks/svelte-gpui/ui';
 	import { pages } from 'virtual:pages';
+	import ArtBackdrop from '#lib/components/ArtBackdrop.svelte';
+	import LibrarySidebar from '#lib/components/LibrarySidebar.svelte';
+	import PlayerBar from '#lib/components/PlayerBar.svelte';
+	import QueuePanel from '#lib/components/QueuePanel.svelte';
+	import TopBar from '#lib/components/TopBar.svelte';
+	import { downloads } from '#lib/downloads/downloads.svelte.ts';
+	import { panels } from '#lib/layout/panels.svelte.ts';
+	import { textFocus } from '#lib/layout/textFocus.svelte.ts';
+	import { library } from '#lib/library/library.svelte.ts';
+	import { nowPlayingPalette } from '#lib/palette/coverPalette.svelte.ts';
+	import { player } from '#lib/player/player.svelte.ts';
 	import { router } from '#lib/router.svelte.ts';
+	import { colors, glassBackground, radii } from '#lib/theme.ts';
+
+	library.load();
+	downloads.start();
 
 	const Page = $derived(pages[router.page]);
+	const showQueue = $derived(panels.queueOpen && player.queue.entries.length > 0);
+
+	$effect(() => {
+		if (player.track === null) {
+			nowPlayingPalette.load([]);
+			return;
+		}
+		nowPlayingPalette.load(player.track.thumbnails);
+	});
+
+	// Space plays and pauses, unless a text field is being typed in.
+	function handleKeydown(event: KeyboardEvent): void {
+		if (event.key !== ' ' || textFocus.typing) {
+			return;
+		}
+		event.preventDefault();
+		player.toggle();
+	}
 </script>
 
-<View style={{ flex: 1, background: '#141416', color: '#fafafa', padding: 8, gap: 8 }}>
-	<Scroll style={{ flex: 1, padding: 16 }}>
-		{#key router.href}
-			{#if Page}
-				<Page params={router.params} query={router.query} />
-			{:else}
-				<View style={{ gap: 4 }}>
-					<Text style={{ fontSize: 18, fontWeight: 'semibold' }}>{router.page}</Text>
-					<Text style={{ color: '#a1a1aa' }}>This page is not written yet ({router.href}).</Text>
+<svelte:window onkeydown={handleKeydown} />
+
+<View style={{ flex: 1, background: colors.canvas, color: colors.text, padding: 8, gap: 8 }}>
+	<ArtBackdrop />
+	<TopBar />
+	<View style={{ flex: 1, minHeight: 0, direction: 'row', gap: 8 }}>
+		<LibrarySidebar />
+		<View
+			style={{
+				flex: 1,
+				minWidth: 0,
+				radius: radii.extraLarge,
+				background: glassBackground,
+				overflow: 'hidden'
+			}}
+		>
+			<Scroll style={{ flex: 1 }}>
+				<View style={{ paddingX: 12, paddingY: 16 }}>
+					{#key router.href}
+						{#if Page}
+							<Page params={router.params} query={router.query} />
+						{:else}
+							<View style={{ gap: 4 }}>
+								<Text style={{ fontSize: 18, fontWeight: 'semibold' }}>{router.page}</Text>
+								<Text style={{ color: colors.muted }}>
+									This page is not written yet ({router.href}).
+								</Text>
+							</View>
+						{/if}
+					{/key}
 				</View>
-			{/if}
-		{/key}
-	</Scroll>
+			</Scroll>
+		</View>
+		{#if showQueue}
+			<QueuePanel />
+		{/if}
+	</View>
+	<PlayerBar />
 </View>

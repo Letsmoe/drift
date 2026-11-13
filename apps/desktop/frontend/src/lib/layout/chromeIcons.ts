@@ -1,0 +1,33 @@
+// Phosphor icons of the app chrome (top bar, sidebar, player bar, queue) as SVG markup for `Icon`.
+// The build loads .svg imports as text.
+
+export { default as arrowCircleDownFill } from '@phosphor-icons/core/fill/arrow-circle-down-fill.svg';
+export { default as books } from '@phosphor-icons/core/regular/books.svg';
+export { default as broom } from '@phosphor-icons/core/regular/broom.svg';
+export { default as caretLeftBold } from '@phosphor-icons/core/bold/caret-left-bold.svg';
+export { default as caretRightBold } from '@phosphor-icons/core/bold/caret-right-bold.svg';
+export { default as clockCounterClockwise } from '@phosphor-icons/core/regular/clock-counter-clockwise.svg';
+export { default as downloadSimple } from '@phosphor-icons/core/regular/download-simple.svg';
+export { default as gearSix } from '@phosphor-icons/core/regular/gear-six.svg';
+export { default as heartFill } from '@phosphor-icons/core/fill/heart-fill.svg';
+export { default as house } from '@phosphor-icons/core/regular/house.svg';
+export { default as houseFill } from '@phosphor-icons/core/fill/house-fill.svg';
+export { default as magnifyingGlass } from '@phosphor-icons/core/regular/magnifying-glass.svg';
+export { default as playFill } from '@phosphor-icons/core/fill/play-fill.svg';
+export { default as plus } from '@phosphor-icons/core/regular/plus.svg';
+export { default as queue } from '@phosphor-icons/core/regular/queue.svg';
+export { default as queueBold } from '@phosphor-icons/core/bold/queue-bold.svg';
+export { default as repeat } from '@phosphor-icons/core/regular/repeat.svg';
+export { default as repeatBold } from '@phosphor-icons/core/bold/repeat-bold.svg';
+export { default as repeatOnce } from '@phosphor-icons/core/regular/repeat-once.svg';
+export { default as repeatOnceBold } from '@phosphor-icons/core/bold/repeat-once-bold.svg';
+export { default as shuffle } from '@phosphor-icons/core/regular/shuffle.svg';
+export { default as shuffleBold } from '@phosphor-icons/core/bold/shuffle-bold.svg';
+export { default as skipBackFill } from '@phosphor-icons/core/fill/skip-back-fill.svg';
+export { default as skipForwardFill } from '@phosphor-icons/core/fill/skip-forward-fill.svg';
+export { default as sparkle } from '@phosphor-icons/core/regular/sparkle.svg';
+export { default as sparkleFill } from '@phosphor-icons/core/fill/sparkle-fill.svg';
+export { default as speakerHigh } from '@phosphor-icons/core/regular/speaker-high.svg';
+export { default as speakerLow } from '@phosphor-icons/core/regular/speaker-low.svg';
+export { default as speakerX } from '@phosphor-icons/core/regular/speaker-x.svg';
+export { default as x } from '@phosphor-icons/core/regular/x.svg';
