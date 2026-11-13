@@ -43,7 +43,7 @@
 		<Label size="small" tone="dim" lines={2}>{episode.description}</Label>
 		<View style={{ direction: 'row', align: 'center', gap: 12, paddingTop: 8 }}>
 			<PlayOverlayButton size="sm" {playing} onpress={onplay} />
-			<Label size="small" tone="dim">{details}</Label>
+			<Label size="small" tone="dim" truncate style={{ flex: 1, minWidth: 0 }}>{details}</Label>
 		</View>
 	</View>
 </View>

@@ -21,7 +21,7 @@
 		size: number;
 		/** 'video' (16:9) suits episode thumbnails, which YouTube serves wide. */
 		aspect?: 'square' | 'video';
-		/** Fills the parent and crops instead of letterboxing, e.g. as a backdrop; aspect is ignored. */
+		/** Fills the parent instead of keeping an aspect, e.g. as a backdrop; aspect is ignored. */
 		fill?: boolean;
 		/** Overrides the box: a fixed width and height, a radius, a shadow. */
 		style?: Style;
@@ -32,6 +32,8 @@
 	let failedUrl = $state<string | undefined>(undefined);
 	const showImage = $derived(url !== undefined && url !== failedUrl);
 	const box = $derived(boxStyle());
+	// Only an image that rounds itself can be a circle, and it cannot also be cropped (an artist's photo is square).
+	const circular = $derived(typeof box.radius === 'number' && box.radius >= size / 2);
 
 	function boxStyle(): Style {
 		if (fill) {
@@ -42,23 +44,29 @@
 		}
 		return { width: 'full', aspectRatio: 1, ...style };
 	}
-
-	function imageFit(): 'cover' | 'contain' {
-		if (fill) {
-			return 'cover';
-		}
-		return 'contain';
-	}
 </script>
 
 {#if showImage && url !== undefined}
-	<Image
-		src={url}
-		fit={imageFit()}
-		style={{ ...box, background: 'rgba(0, 0, 0, 0.4)' }}
-		{onload}
-		onerror={() => (failedUrl = url)}
-	/>
+	{#if circular}
+		<Image
+			src={url}
+			fit="contain"
+			style={{ ...box, background: 'rgba(0, 0, 0, 0.4)' }}
+			{onload}
+			onerror={() => (failedUrl = url)}
+		/>
+	{:else}
+		<!-- A cropping image is not clipped to its own box, so a box around it clips it. -->
+		<View style={{ ...box, overflow: 'hidden', background: 'rgba(0, 0, 0, 0.4)' }}>
+			<Image
+				src={url}
+				fit="cover"
+				style={{ size: 'full' }}
+				{onload}
+				onerror={() => (failedUrl = url)}
+			/>
+		</View>
+	{/if}
 {:else}
 	<View
 		style={{
