@@ -1,6 +1,7 @@
 import type { Color } from '@neoworks/svelte-gpui/ui';
 import { nowPlayingPalette } from '#lib/palette/coverPalette.svelte.ts';
 import { mixColors } from '#lib/palette/colorMix.ts';
+import { themes } from '@neoworks/svelte-gpui-ui';
 import { colors } from '#lib/theme.ts';
 
 // With a cover playing, secondary text turns translucent white because the theme's greys disappear on mid-tone tints.
@@ -24,3 +25,23 @@ class Appearance {
 }
 
 export const appearance = new Appearance();
+
+/**
+ * Kit components fill their buttons, checkboxes and sliders with the theme's `fill` and `accent`. Those two
+ * roles read the cover's accent through getters, so a kit component read inside a `$derived` or a style follows
+ * the cover like the components written here, easing included.
+ */
+function followCoverAccentInKit(): void {
+	const kitColors = themes.dark.colors;
+	const accentRoles = {
+		fill: () => appearance.accent,
+		accent: () => appearance.accent,
+		fillHover: () => appearance.accentHover,
+		accentHover: () => appearance.accentHover
+	};
+	for (const [role, read] of Object.entries(accentRoles)) {
+		Object.defineProperty(kitColors, role, { get: read, enumerable: true, configurable: true });
+	}
+}
+
+followCoverAccentInKit();
