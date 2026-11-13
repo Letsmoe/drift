@@ -42,7 +42,8 @@ export const colors = {
 } as const satisfies Record<string, Color>;
 
 /** Panels let the window's backdrop show through: the surface at 68%. */
-export const glassBackground: Color = 'rgba(28, 28, 30, 0.68)';
+export const glassAlpha = 0.68;
+export const glassBackground: Color = withAlpha(colors.surface, glassAlpha);
 
 export const radii = {
 	small: 6,

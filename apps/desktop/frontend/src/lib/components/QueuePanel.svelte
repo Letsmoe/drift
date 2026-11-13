@@ -46,8 +46,7 @@
 		shrink: 0,
 		minHeight: 0,
 		radius: radii.extraLarge,
-		background: artTint(0, 0.32),
-		transition: hoverTransition
+		background: artTint(0, 0.32)
 	}}
 >
 	<QueueResizeHandle />
