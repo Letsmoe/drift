@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { View } from '@neoworks/svelte-gpui/ui';
+	import { ProgressIndicator } from '@neoworks/svelte-gpui-ui';
 	import type { DownloadItem, DownloadStatus } from '#lib/api/downloads.ts';
 	import { appearance } from '#lib/appearance.svelte.ts';
 	import Cover from '#lib/components/Cover.svelte';
@@ -74,11 +75,7 @@
 			{describeState()}
 		</Label>
 		{#if status.state === 'downloading'}
-			<View
-				style={{ height: 4, radius: radii.full, background: colors.raised, overflow: 'hidden' }}
-			>
-				<View style={{ width: `${percent}%`, height: 4, background: appearance.accent }} />
-			</View>
+			<ProgressIndicator label="Downloading" value={percent} tone="accent" />
 		{/if}
 	</View>
 	{#if failed}

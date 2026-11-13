@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { Button, Icon } from '@neoworks/svelte-gpui/ui';
+	import { ProgressIndicator } from '@neoworks/svelte-gpui-ui';
 	import type { ItemKind, Track } from '#lib/api/music.ts';
 	import { appearance } from '#lib/appearance.svelte.ts';
-	import ProgressRing from '#lib/components/ProgressRing.svelte';
 	import { downloads } from '#lib/downloads/downloads.svelte.ts';
-	import { downloadFraction } from '#lib/downloads/downloadProgress.ts';
+	import { downloadFraction, progressPercent } from '#lib/downloads/downloadProgress.ts';
 	import {
 		arrowCircleDown,
 		arrowCircleDownFill,
@@ -13,6 +13,9 @@
 		warningCircleFill
 	} from '#lib/icons.ts';
 	import { colors, hoverTransition } from '#lib/theme.ts';
+
+	// Stroke width in the kit's units (a 48 unit wide ring): about 2.3 px on the 18 px ring of a row.
+	const ringThickness = 6;
 
 	let {
 		track,
@@ -102,7 +105,15 @@
 	onpress={act}
 >
 	{#if state === 'downloading'}
-		<ProgressRing fraction={downloadFraction(status)} {size} />
+		<ProgressIndicator
+			variant="circular"
+			label="Downloading"
+			value={progressPercent(downloadFraction(status))}
+			{size}
+			thickness={ringThickness}
+			tone="inherit"
+			color={appearance.muted}
+		/>
 	{:else}
 		<Icon svg={iconFor(state)} {size} />
 	{/if}

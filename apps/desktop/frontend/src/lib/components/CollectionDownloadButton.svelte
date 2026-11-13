@@ -1,11 +1,12 @@
 <script lang="ts">
 	import { Button } from '@neoworks/svelte-gpui/ui';
+	import { ProgressIndicator } from '@neoworks/svelte-gpui-ui';
 	import type { CollectionKind } from '#lib/api/downloads.ts';
 	import { appearance } from '#lib/appearance.svelte.ts';
 	import ConfirmDialog from '#lib/components/ConfirmDialog.svelte';
 	import IconAction from '#lib/components/IconAction.svelte';
-	import ProgressRing from '#lib/components/ProgressRing.svelte';
 	import { downloads } from '#lib/downloads/downloads.svelte.ts';
+	import { progressPercent } from '#lib/downloads/downloadProgress.ts';
 	import { arrowCircleDown, arrowCircleDownFill } from '#lib/icons.ts';
 	import { colors } from '#lib/theme.ts';
 
@@ -69,7 +70,15 @@
 		hover={{ color: colors.text }}
 		onpress={toggle}
 	>
-		<ProgressRing {fraction} size={28} strokeWidth={3} />
+		<ProgressIndicator
+			variant="circular"
+			label="Downloading"
+			value={progressPercent(fraction)}
+			size={28}
+			thickness={5}
+			tone="inherit"
+			color={appearance.muted}
+		/>
 	</Button>
 {:else}
 	<IconAction
