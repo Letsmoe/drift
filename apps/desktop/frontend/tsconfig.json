@@ -1,9 +1,30 @@
 {
-	"extends": "$app/tsconfig",
 	"compilerOptions": {
-		"allowJs": false,
-		"checkJs": false,
-		"strict": true
+		"target": "ES2022",
+		"module": "ESNext",
+		"moduleResolution": "bundler",
+		"strict": true,
+		"noEmit": true,
+		"skipLibCheck": true,
+		"allowImportingTsExtensions": true,
+		"verbatimModuleSyntax": true,
+		"lib": ["ES2022"],
+		"types": [],
+		"typeRoots": [],
+		"paths": {
+			"@neoworks/svelte-gpui": ["../../../../svelte-gpui/runtime/index.ts"],
+			"@neoworks/svelte-gpui/ui": ["../../../../svelte-gpui/runtime/ui/index.ts"],
+			"@neoworks/svelte-gpui-ui": ["../../../../svelte-gpui/packages/svelte-gpui-ui/src/index.ts"]
+		}
 	},
-	"include": ["src", "*"]
+	"include": [
+		"src/main.ts",
+		"src/App.svelte",
+		"src/env.d.ts",
+		"src/lib/router.svelte.ts",
+		"src/lib/storage.ts",
+		"src/lib/backend",
+		"src/lib/player",
+		"src/lib/layout"
+	]
 }

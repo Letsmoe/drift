@@ -1,19 +1,29 @@
-// Runs the desktop app for development: the Vite dev server (hot reload for the
-// UI), a fresh build of the Go backend and Electron pointed at both. Go changes
-// need a restart of this script.
+// Runs the desktop app for development: a fresh build of the Go backend, the UI bundle rebuilt
+// on every save, and the window reloading on every build (svelte-gpui's --watch).
+//
+//   bun run desktop:dev            the Rust shell (apps/desktop/shell): starts the backend, plays audio
+//   bun run desktop:dev --plain    the plain svelte-gpui host and a backend started here; no audio,
+//                                  for working on pages and components
+//
+// Everything after `--` goes to the host, for example `-- --do press:Settings`. Go changes need a
+// restart of this script.
 import { spawn, spawnSync, type ChildProcess } from 'node:child_process';
 import { existsSync } from 'node:fs';
-import net from 'node:net';
+import { createInterface } from 'node:readline';
 import { homedir } from 'node:os';
 import path from 'node:path';
 
-const desktopDirectory = path.resolve(import.meta.dirname, '../apps/desktop');
+const repositoryDirectory = path.resolve(import.meta.dirname, '..');
+const desktopDirectory = path.join(repositoryDirectory, 'apps/desktop');
 const frontendDirectory = path.join(desktopDirectory, 'frontend');
-const electronDirectory = path.join(desktopDirectory, 'electron');
+const shellDirectory = path.join(desktopDirectory, 'shell');
 const backendBinary = path.join(desktopDirectory, 'build/bin/drift-backend');
-const devServerPort = await findFreePort();
-const devServerUrl = `http://localhost:${devServerPort}`;
-const devServerTimeoutMs = 30_000;
+const bundlePath = path.join(frontendDirectory, 'dist/drift.js');
+// The svelte-gpui checkout sits next to this one (a worktree reaches it through .worktrees/).
+const gpuiDirectory =
+	process.env.SVELTE_GPUI_DIR || path.resolve(repositoryDirectory, '../svelte-gpui');
+const plainHostBinary = path.join(gpuiDirectory, 'target/release/svelte-gpui');
+const announcePrefix = 'drift-backend ';
 // Development signs in to the local Neoworks stack (neoworks.dev's process-compose) unless told otherwise.
 const localNeoworksDomain = 'neoworks.localhost:8443';
 const localNeoworksAuthority = path.join(
@@ -21,17 +31,13 @@ const localNeoworksAuthority = path.join(
 	'.local/share/caddy/pki/authorities/local/root.crt'
 );
 
-// Asks the OS for an unused port; --strictPort makes Vite fail loudly if it is taken in between.
-function findFreePort(): Promise<number> {
-	return new Promise((resolve, reject) => {
-		const server = net.createServer();
-		server.on('error', reject);
-		server.listen(0, 'localhost', () => {
-			const address = server.address() as net.AddressInfo;
-			server.close(() => resolve(address.port));
-		});
-	});
-}
+const commandLine = process.argv.slice(2);
+const separatorIndex = commandLine.indexOf('--');
+const ownFlags = commandLine.slice(0, separatorIndex < 0 ? commandLine.length : separatorIndex);
+const hostFlags = separatorIndex < 0 ? [] : commandLine.slice(separatorIndex + 1);
+const usePlainHost = ownFlags.includes('--plain');
+
+const children: ChildProcess[] = [];
 
 function neoworksEnvironment(): Record<string, string> {
 	const environment: Record<string, string> = { DRIFT_NEOWORKS_DOMAIN: localNeoworksDomain };
@@ -41,56 +47,105 @@ function neoworksEnvironment(): Record<string, string> {
 	return environment;
 }
 
-function runOrExit(command: string, args: string[], directory: string): void {
-	const result = spawnSync(command, args, { cwd: directory, stdio: 'inherit' });
+function runOrExit(
+	command: string,
+	args: string[],
+	directory: string,
+	environment: Record<string, string> = {}
+): void {
+	const result = spawnSync(command, args, {
+		cwd: directory,
+		stdio: 'inherit',
+		env: { ...process.env, ...environment }
+	});
 	if (result.status !== 0) {
 		process.exit(result.status || 1);
 	}
 }
 
-async function waitForDevServer(): Promise<void> {
-	const deadline = Date.now() + devServerTimeoutMs;
-	while (Date.now() < deadline) {
-		try {
-			await fetch(devServerUrl);
-			return;
-		} catch {
-			await new Promise((resolve) => setTimeout(resolve, 250));
-		}
-	}
-	throw new Error(`The Vite dev server did not answer on ${devServerUrl}.`);
+function startChild(
+	command: string,
+	args: string[],
+	directory: string,
+	environment = {}
+): ChildProcess {
+	const child = spawn(command, args, {
+		cwd: directory,
+		stdio: 'inherit',
+		env: { ...neoworksEnvironment(), ...process.env, ...environment }
+	});
+	children.push(child);
+	return child;
 }
 
-function stopAll(children: ChildProcess[]): void {
+function stopAll(): void {
 	for (const child of children) {
 		child.kill();
 	}
 }
 
-runOrExit('go', ['build', '-o', backendBinary, '.'], desktopDirectory);
-runOrExit('bun', ['run', 'build'], electronDirectory);
+// Starts the backend and resolves with the address it announces on stdout.
+function startBackend(): Promise<{ url: string; token: string }> {
+	const backend = spawn(backendBinary, ['-exit-with-stdin'], {
+		stdio: ['pipe', 'pipe', 'inherit'],
+		env: { ...neoworksEnvironment(), ...process.env }
+	});
+	children.push(backend);
+	return new Promise((resolve, reject) => {
+		backend.once('exit', (code) => reject(new Error(`The backend exited (code ${code}).`)));
+		createInterface({ input: backend.stdout! }).on('line', (line) => {
+			if (line.startsWith(announcePrefix)) {
+				resolve(JSON.parse(line.slice(announcePrefix.length)));
+				return;
+			}
+			console.log(line);
+		});
+	});
+}
 
-const vite = spawn('bun', ['run', 'dev', '--port', String(devServerPort), '--strictPort'], {
-	cwd: frontendDirectory,
-	stdio: 'inherit'
-});
-await waitForDevServer();
-
-const electron = spawn('bun', ['x', 'electron', '.'], {
-	cwd: electronDirectory,
-	stdio: 'inherit',
-	env: {
-		...neoworksEnvironment(),
-		...process.env,
-		DRIFT_DEV_URL: devServerUrl,
-		DRIFT_BACKEND_BINARY: backendBinary
+async function runPlain(): Promise<ChildProcess> {
+	if (!existsSync(plainHostBinary)) {
+		throw new Error(
+			`No svelte-gpui host at ${plainHostBinary}; build it with scripts/host.sh there.`
+		);
 	}
-});
+	const address = await startBackend();
+	const addressEnvironment = { DRIFT_BACKEND_URL: address.url, DRIFT_BACKEND_TOKEN: address.token };
+	// The host needs a bundle to start from; the watching build then keeps it current.
+	runOrExit('bun', ['build.mjs'], frontendDirectory, addressEnvironment);
+	startChild('bun', ['build.mjs', '--watch'], frontendDirectory, addressEnvironment);
+	return startChild(
+		plainHostBinary,
+		['--bundle', bundlePath, '--watch', ...hostFlags],
+		frontendDirectory
+	);
+}
 
-electron.on('exit', (code) => {
-	stopAll([vite]);
+function runShell(): ChildProcess {
+	runOrExit('bun', ['build.mjs'], frontendDirectory);
+	startChild('bun', ['build.mjs', '--watch'], frontendDirectory);
+	return startChild(
+		'cargo',
+		['run', '--release', '--', '--bundle', bundlePath, '--watch', ...hostFlags],
+		shellDirectory,
+		{ DRIFT_BACKEND_BINARY: backendBinary }
+	);
+}
+
+runOrExit('go', ['build', '-o', backendBinary, '.'], desktopDirectory);
+let host: ChildProcess;
+if (usePlainHost) {
+	host = await runPlain();
+} else {
+	host = runShell();
+}
+
+host.on('exit', (code) => {
+	stopAll();
 	process.exit(code || 0);
 });
 for (const signal of ['SIGINT', 'SIGTERM'] as const) {
-	process.on(signal, () => stopAll([electron, vite]));
+	process.on(signal, () => {
+		stopAll();
+	});
 }
