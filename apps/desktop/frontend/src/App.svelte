@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Scroll, Text, View } from '@neoworks/svelte-gpui/ui';
+	import { Text, View } from '@neoworks/svelte-gpui/ui';
 	import { pages } from 'virtual:pages';
 	import ArtBackdrop from '#lib/components/ArtBackdrop.svelte';
 	import LibrarySidebar from '#lib/components/LibrarySidebar.svelte';
@@ -55,22 +55,19 @@
 				overflow: 'hidden'
 			}}
 		>
-			<Scroll style={{ flex: 1 }}>
-				<View style={{ paddingX: 12, paddingY: 16 }}>
-					{#key router.href}
-						{#if Page}
-							<Page params={router.params} query={router.query} />
-						{:else}
-							<View style={{ gap: 4 }}>
-								<Text style={{ fontSize: 18, fontWeight: 'semibold' }}>{router.page}</Text>
-								<Text style={{ color: colors.muted }}>
-									This page is not written yet ({router.href}).
-								</Text>
-							</View>
-						{/if}
-					{/key}
-				</View>
-			</Scroll>
+			<!-- A page fills this box and scrolls itself (PageList), so it needs a bounded parent. -->
+			{#key router.href}
+				{#if Page}
+					<Page params={router.params} query={router.query} />
+				{:else}
+					<View style={{ gap: 4, padding: 16 }}>
+						<Text style={{ fontSize: 18, fontWeight: 'semibold' }}>{router.page}</Text>
+						<Text style={{ color: colors.muted }}>
+							This page is not written yet ({router.href}).
+						</Text>
+					</View>
+				{/if}
+			{/key}
 		</View>
 		{#if showQueue}
 			<QueuePanel />
