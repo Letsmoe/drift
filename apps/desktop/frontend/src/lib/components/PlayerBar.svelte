@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Button, Icon, View } from '@neoworks/svelte-gpui/ui';
+	import { Button, View } from '@neoworks/svelte-gpui/ui';
 	import { LoadingSpinner } from '@neoworks/svelte-gpui-ui';
 	import type { ItemKind } from '#lib/api/music.ts';
 	import { appearance } from '#lib/appearance.svelte.ts';
@@ -12,6 +12,7 @@
 	import PlayOverlayButton from '#lib/components/PlayOverlayButton.svelte';
 	import RangeSlider from '#lib/components/RangeSlider.svelte';
 	import ToggleIconButton from '#lib/components/ToggleIconButton.svelte';
+	import TrackCredits from '#lib/components/TrackCredits.svelte';
 	import { formatDuration } from '#lib/format.ts';
 	import {
 		queue,
@@ -27,7 +28,6 @@
 	} from '#lib/layout/chromeIcons.ts';
 	import { panels } from '#lib/layout/panels.svelte.ts';
 	import { shuffleActiveIcon, shuffleIcon, shuffleLabel } from '#lib/layout/shuffleIcons.ts';
-	import TrackCreditsLine from '#lib/layout/TrackCreditsLine.svelte';
 	import { connectAudio } from '#lib/player/audioBinding.svelte.ts';
 	import { Crossfade } from '#lib/player/crossfade.svelte.ts';
 	import { player } from '#lib/player/player.svelte.ts';
@@ -36,8 +36,9 @@
 	const crossfade = new Crossfade(player);
 	connectAudio(player, crossfade);
 
-	const barHeight = 72;
-	const coverSize = 56;
+	// h-18 and size-14 in the old layout, whose theme made those spacing numbers 3.5 px wide.
+	const barHeight = 63;
+	const coverSize = 49;
 
 	const volumeIcon = $derived(pickVolumeIcon());
 	const repeatIcon = $derived(pickRepeatIcon());
@@ -117,7 +118,7 @@
 				/>
 			</Button>
 			<View style={{ flex: 1, minWidth: 0 }}>
-				<TrackCreditsLine track={player.track} />
+				<TrackCredits track={player.track} titleSize="medium" />
 			</View>
 			<View style={{ direction: 'row', align: 'center', shrink: 0 }}>
 				<LikeButton track={player.track} {kind} />

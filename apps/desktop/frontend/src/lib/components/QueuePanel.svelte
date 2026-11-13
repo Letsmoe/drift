@@ -1,22 +1,29 @@
 <script lang="ts">
 	import { Button, Icon, Scroll, View } from '@neoworks/svelte-gpui/ui';
 	import { appearance } from '#lib/appearance.svelte.ts';
+	import ArtistAboutCard from '#lib/components/ArtistAboutCard.svelte';
 	import Cover from '#lib/components/Cover.svelte';
 	import IconAction from '#lib/components/IconAction.svelte';
 	import Label from '#lib/components/Label.svelte';
+	import LyricsPreview from '#lib/components/LyricsPreview.svelte';
 	import QueueResizeHandle from '#lib/components/QueueResizeHandle.svelte';
+	import TrackCredits from '#lib/components/TrackCredits.svelte';
 	import UpcomingQueue from '#lib/components/UpcomingQueue.svelte';
 	import { artTint } from '#lib/layout/artTint.ts';
 	import { broom, sparkle } from '#lib/layout/chromeIcons.ts';
 	import { panels } from '#lib/layout/panels.svelte.ts';
-	import TrackCreditsLine from '#lib/layout/TrackCreditsLine.svelte';
 	import { player } from '#lib/player/player.svelte.ts';
 	import { splitQueue } from '#lib/queue/queueSections.ts';
 	import { colors, hoverTransition, radii } from '#lib/theme.ts';
 
-	const heroHeight = 224;
+	// h-56 in the old layout, whose theme made that spacing number 3.5 px wide.
+	const heroHeight = 196;
 
 	const sections = $derived(splitQueue(player.queue));
+	// Episodes' artist is their show, which has no artist page.
+	const leadArtist = $derived(
+		sections.nowPlaying?.track.artists.find((artist) => artist.id !== '')
+	);
 
 	function autoplayButtonLabel(): string {
 		if (player.queue.autoplay) {
@@ -111,13 +118,13 @@
 							background: 'rgba(0, 0, 0, 0.55)'
 						}}
 					>
-						<TrackCreditsLine
-							track={sections.nowPlaying.track}
-							titleSize="xlarge"
-							artistSize="body"
-						/>
+						<TrackCredits track={sections.nowPlaying.track} titleSize="heading" artistSize="body" />
 					</View>
 				</Button>
+				{#if leadArtist}
+					<ArtistAboutCard artist={leadArtist} />
+				{/if}
+				<LyricsPreview />
 			{/if}
 
 			<View style={{ gap: 16, marginX: -6 }}>
