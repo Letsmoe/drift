@@ -22,6 +22,7 @@
 	import { library } from '#lib/library/library.svelte.ts';
 	import { PopupMenu } from '#lib/menu/popupMenu.svelte.ts';
 	import { buildTrackMenuEntries } from '#lib/menu/trackMenuEntries.ts';
+	import { Pop } from '#lib/motion/pop.svelte.ts';
 	import { player } from '#lib/player/player.svelte.ts';
 	import { goto } from '#lib/router.svelte.ts';
 	import { colors, hoverTransition, radii } from '#lib/theme.ts';
@@ -48,6 +49,7 @@
 	} = $props();
 
 	const popup = new PopupMenu();
+	const heartPop = new Pop();
 	let pointerOver = $state(false);
 	let moreMenuOpen = $state(false);
 
@@ -105,6 +107,14 @@
 			return appearance.accent;
 		}
 		return colors.text;
+	}
+
+	// The heart pops when it fills; taking a like back needs no fanfare.
+	function toggleLike(): void {
+		if (!liked) {
+			heartPop.trigger();
+		}
+		library.toggleLike(track, kind);
 	}
 
 	function playOnDoubleClick(event: { clicks: number }): void {
@@ -207,8 +217,8 @@
 			iconSize={18}
 			color={heartColor(liked)}
 			hoverColor={heartHoverColor(liked)}
-			style={{ opacity: opacityFor(heartVisible) }}
-			onpress={() => library.toggleLike(track, kind)}
+			style={{ opacity: opacityFor(heartVisible), scale: heartPop.scale() }}
+			onpress={toggleLike}
 		/>
 		<Label size="small" tone="dim" style={{ width: 40, textAlign: 'right', shrink: 0 }}>
 			{formatDuration(track.durationSeconds)}
