@@ -13,7 +13,7 @@
 	import { goto } from '#lib/router.svelte.ts';
 	import { accentRing, colors, hoverTransition, radii } from '#lib/theme.ts';
 
-	const coverWidth = 144;
+	const coverWidth = 126;
 
 	let {
 		item,

@@ -19,7 +19,7 @@
 		onpress: (event: PointerEvent) => void;
 	} = $props();
 
-	const sides: Record<Size, number> = { sm: 32, md: 48, lg: 56 };
+	const sides: Record<Size, number> = { sm: 32, md: 48, lg: 49 };
 	const iconSizes: Record<Size, number> = { sm: 14, md: 20, lg: 24 };
 
 	const icon = $derived(iconFor(playing));

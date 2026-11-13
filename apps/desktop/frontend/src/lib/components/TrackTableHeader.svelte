@@ -17,7 +17,7 @@
 
 <View
 	style={{
-		height: 36,
+		height: 32,
 		direction: 'row',
 		align: 'center',
 		gap: rowGap,

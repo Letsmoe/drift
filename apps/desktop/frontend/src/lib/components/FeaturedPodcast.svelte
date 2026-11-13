@@ -11,7 +11,7 @@
 	import { colors, radii } from '#lib/theme.ts';
 
 	const latestEpisodeCount = 3;
-	const coverSide = 208;
+	const coverSide = 182;
 
 	let { item }: { item: Item } = $props();
 

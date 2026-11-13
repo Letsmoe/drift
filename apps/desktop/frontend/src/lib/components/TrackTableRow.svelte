@@ -11,7 +11,12 @@
 	import Label from '#lib/components/Label.svelte';
 	import Menu from '#lib/components/Menu.svelte';
 	import MoreMenuButton from '#lib/components/MoreMenuButton.svelte';
-	import { actionColumnWidth, rowGap, rowPaddingX } from '#lib/components/trackColumns.ts';
+	import {
+		actionColumnWidth,
+		rowGap,
+		rowPaddingX,
+		trackRowHeight
+	} from '#lib/components/trackColumns.ts';
 	import { formatDuration, itemHref } from '#lib/format.ts';
 	import { heart, heartFill, pauseFill, playFill, speakerHighFill } from '#lib/icons.ts';
 	import { library } from '#lib/library/library.svelte.ts';
@@ -118,7 +123,7 @@
 	onhover={(isHovered) => (pointerOver = isHovered)}
 	onpress={playOnDoubleClick}
 	style={{
-		height: 56,
+		height: trackRowHeight,
 		direction: 'row',
 		align: 'center',
 		gap: rowGap,

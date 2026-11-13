@@ -13,7 +13,8 @@
 	import { goto } from '#lib/router.svelte.ts';
 	import { accentRing, colors, hoverTransition, radii } from '#lib/theme.ts';
 
-	const tileHeight = 72;
+	// Electron's h-18: the old theme's spacing unit makes numbers it has no token for 3.5 px wide.
+	const tileHeight = 63;
 
 	let {
 		track,

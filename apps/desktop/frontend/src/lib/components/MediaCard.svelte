@@ -12,6 +12,10 @@
 	import { goto } from '#lib/router.svelte.ts';
 	import { colors, hoverTransition, radii } from '#lib/theme.ts';
 
+	// Electron's w-56: the old theme's spacing unit makes numbers it has no token for 3.5 px wide.
+	const cardWidth = 196;
+	const coverSide = cardWidth - 24;
+	// Thumbnail to fetch, sharp enough for 2x screens.
 	const coverSize = 200;
 
 	let { item, context = 'home' }: { item: Item; context?: string } = $props();
@@ -44,7 +48,7 @@
 
 	function coverRadiusOf(shown: Item): number {
 		if (shown.kind === 'artist') {
-			return coverSize / 2;
+			return coverSide / 2;
 		}
 		return radii.medium;
 	}
@@ -72,7 +76,7 @@
 <ContextArea
 	popup={item.track ? contextMenu : undefined}
 	onhover={(isHovered) => (hovered = isHovered)}
-	style={{ width: 224, shrink: 0 }}
+	style={{ width: cardWidth, shrink: 0 }}
 >
 	<View
 		style={{
