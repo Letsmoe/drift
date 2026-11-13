@@ -20,7 +20,6 @@
 	import { playContext } from '#lib/player/contextPlayback.ts';
 	import { player } from '#lib/player/player.svelte.ts';
 	import { goto } from '#lib/router.svelte.ts';
-	import { colors } from '#lib/theme.ts';
 
 	type PodcastBlock =
 		| { key: string; kind: 'header' }
