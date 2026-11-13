@@ -121,35 +121,33 @@
 			</Button>
 		</Tooltip>
 	{/snippet}
-	{#snippet children()}
-		<Scroll style={{ maxHeight: panelMaxHeight }}>
-			<View style={{ gap: 16, padding: panelPadding }}>
-				<View style={{ gap: 12 }}>
-					<Label size="medium" weight="bold" tone="default">Listen together</Label>
-					<TogetherProfile />
-				</View>
-
-				{#if listenTogether.requests.length > 0}
-					<TogetherRequests />
-				{/if}
-				{#if listenTogether.invites.length > 0}
-					<TogetherInvites />
-				{/if}
-
-				<Divider />
-				<TogetherSession />
-
-				<Divider />
-				<View style={{ gap: 12 }}>
-					{@render sectionTitle('Friends')}
-					<TogetherFriends />
-					<TogetherAddFriend />
-				</View>
-
-				{#if listenTogether.errorMessage !== ''}
-					<Label size="body" tone="danger">{listenTogether.errorMessage}</Label>
-				{/if}
+	<Scroll style={{ maxHeight: panelMaxHeight }}>
+		<View style={{ gap: 16, padding: panelPadding }}>
+			<View style={{ gap: 12 }}>
+				<Label size="medium" weight="bold" tone="default">Listen together</Label>
+				<TogetherProfile />
 			</View>
-		</Scroll>
-	{/snippet}
+
+			{#if listenTogether.requests.length > 0}
+				<TogetherRequests />
+			{/if}
+			{#if listenTogether.invites.length > 0}
+				<TogetherInvites />
+			{/if}
+
+			<Divider />
+			<TogetherSession />
+
+			<Divider />
+			<View style={{ gap: 12 }}>
+				{@render sectionTitle('Friends')}
+				<TogetherFriends />
+				<TogetherAddFriend />
+			</View>
+
+			{#if listenTogether.errorMessage !== ''}
+				<Label size="body" tone="danger">{listenTogether.errorMessage}</Label>
+			{/if}
+		</View>
+	</Scroll>
 </Popover>

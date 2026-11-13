@@ -82,72 +82,70 @@
 				</PressableButton>
 			</Tooltip>
 		{/snippet}
-		{#snippet children()}
-			<View style={{ gap: 16 }}>
-				{#if neoworksAccount.signedIn}
-					<View style={{ direction: 'row', align: 'center', gap: 12 }}>
-						<PeerAvatar name={neoworksAccount.displayName} highlighted />
-						<View style={{ flex: 1, minWidth: 0 }}>
-							<Label size="body" weight="semibold" tone="default" truncate>
-								{neoworksAccount.displayName}
-							</Label>
-							{#if neoworksAccount.status?.name !== ''}
-								<Label size="small" tone="dim" truncate>{neoworksAccount.status?.email}</Label>
-							{/if}
-						</View>
-					</View>
-					<View style={{ direction: 'row', align: 'center', gap: 8 }}>
-						{#if neoworksAccount.status?.syncing}
-							<LoadingSpinner size={14} label="Syncing" color={colors.dim} />
-						{/if}
-						<Label size="small" tone="dim">{syncLine}</Label>
-					</View>
-					<View style={{ direction: 'row', justify: 'end', gap: 8 }}>
-						<Button size="sm" variant="ghost" onpress={() => neoworksAccount.signOut()}>
-							Sign out
-						</Button>
-						<Button
-							size="sm"
-							disabled={neoworksAccount.status?.syncing}
-							onpress={() => neoworksAccount.sync()}
-						>
-							Sync now
-						</Button>
-					</View>
-				{:else if neoworksAccount.signingIn}
-					<View style={{ direction: 'row', align: 'center', gap: 12 }}>
-						<LoadingSpinner size={18} label="Waiting for the browser" color={colors.dim} />
-						<Label size="small" tone="default">Finish signing in in your browser.</Label>
-					</View>
-					<View style={{ direction: 'row', justify: 'end' }}>
-						<Button size="sm" variant="ghost" onpress={() => neoworksAccount.cancelSignIn()}>
-							Cancel
-						</Button>
-					</View>
-				{:else}
-					<View style={{ gap: 4 }}>
-						<Label size="medium" weight="bold" tone="default">Sync with Neoworks</Label>
-						<Label size="small" tone="dim">
-							Keep your likes, playlists and history the same on all your devices. They are end to
-							end encrypted, so Neoworks cannot read them.
+		<View style={{ gap: 16 }}>
+			{#if neoworksAccount.signedIn}
+				<View style={{ direction: 'row', align: 'center', gap: 12 }}>
+					<PeerAvatar name={neoworksAccount.displayName} highlighted />
+					<View style={{ flex: 1, minWidth: 0 }}>
+						<Label size="body" weight="semibold" tone="default" truncate>
+							{neoworksAccount.displayName}
 						</Label>
+						{#if neoworksAccount.status?.name !== ''}
+							<Label size="small" tone="dim" truncate>{neoworksAccount.status?.email}</Label>
+						{/if}
 					</View>
-					<Button variant="primary" full onpress={() => neoworksAccount.signIn()}>
-						Sign in with Neoworks
+				</View>
+				<View style={{ direction: 'row', align: 'center', gap: 8 }}>
+					{#if neoworksAccount.status?.syncing}
+						<LoadingSpinner size={14} label="Syncing" color={colors.dim} />
+					{/if}
+					<Label size="small" tone="dim">{syncLine}</Label>
+				</View>
+				<View style={{ direction: 'row', justify: 'end', gap: 8 }}>
+					<Button size="sm" variant="ghost" onpress={() => neoworksAccount.signOut()}>
+						Sign out
 					</Button>
-				{/if}
-
-				{#if neoworksAccount.status?.keyInFile}
-					<Label size="tiny" tone="dim">
-						No system keyring answered, so the key that protects your Neoworks sign-in is kept in a
-						file in Drift's data folder.
+					<Button
+						size="sm"
+						disabled={neoworksAccount.status?.syncing}
+						onpress={() => neoworksAccount.sync()}
+					>
+						Sync now
+					</Button>
+				</View>
+			{:else if neoworksAccount.signingIn}
+				<View style={{ direction: 'row', align: 'center', gap: 12 }}>
+					<LoadingSpinner size={18} label="Waiting for the browser" color={colors.dim} />
+					<Label size="small" tone="default">Finish signing in in your browser.</Label>
+				</View>
+				<View style={{ direction: 'row', justify: 'end' }}>
+					<Button size="sm" variant="ghost" onpress={() => neoworksAccount.cancelSignIn()}>
+						Cancel
+					</Button>
+				</View>
+			{:else}
+				<View style={{ gap: 4 }}>
+					<Label size="medium" weight="bold" tone="default">Sync with Neoworks</Label>
+					<Label size="small" tone="dim">
+						Keep your likes, playlists and history the same on all your devices. They are end to end
+						encrypted, so Neoworks cannot read them.
 					</Label>
-				{/if}
+				</View>
+				<Button variant="primary" full onpress={() => neoworksAccount.signIn()}>
+					Sign in with Neoworks
+				</Button>
+			{/if}
 
-				{#if neoworksAccount.errorMessage !== ''}
-					<Label size="small" tone="danger">{neoworksAccount.errorMessage}</Label>
-				{/if}
-			</View>
-		{/snippet}
+			{#if neoworksAccount.status?.keyInFile}
+				<Label size="tiny" tone="dim">
+					No system keyring answered, so the key that protects your Neoworks sign-in is kept in a
+					file in Drift's data folder.
+				</Label>
+			{/if}
+
+			{#if neoworksAccount.errorMessage !== ''}
+				<Label size="small" tone="danger">{neoworksAccount.errorMessage}</Label>
+			{/if}
+		</View>
 	</Popover>
 {/if}

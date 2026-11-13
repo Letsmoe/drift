@@ -62,7 +62,7 @@
 			<Label size="tiny" tone="muted" truncate>{describeSong()}</Label>
 		</View>
 		<View style={{ shrink: 0 }}>
-			<Label size="tiny" tone="muted">{position}</Label>
+			<Label size="tiny" tone="muted" style={{ nowrap: true }}>{position}</Label>
 		</View>
 	</View>
 {:else}
