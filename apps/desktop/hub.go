@@ -53,8 +53,8 @@ func newHub(token string, logger *slog.Logger) *hub {
 	return &hub{
 		token:  token,
 		logger: logger,
-		// Any origin may connect (the Vite dev server is a different origin); the
-		// token is what keeps other local processes and web pages out.
+		// Any origin may connect; the token is what keeps other local processes
+		// and web pages out.
 		upgrader:    websocket.Upgrader{CheckOrigin: func(*http.Request) bool { return true }},
 		connections: make(map[*rpcConnection]struct{}),
 	}
