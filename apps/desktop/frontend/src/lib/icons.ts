@@ -1,0 +1,33 @@
+// Phosphor icons as SVG markup, for `Icon`. The build loads .svg imports as text.
+
+export { default as arrowCircleDown } from '@phosphor-icons/core/regular/arrow-circle-down.svg';
+export { default as arrowCircleDownFill } from '@phosphor-icons/core/fill/arrow-circle-down-fill.svg';
+export { default as arrowClockwise } from '@phosphor-icons/core/regular/arrow-clockwise.svg';
+export { default as caretLeftBold } from '@phosphor-icons/core/bold/caret-left-bold.svg';
+export { default as caretRight } from '@phosphor-icons/core/regular/caret-right.svg';
+export { default as caretRightBold } from '@phosphor-icons/core/bold/caret-right-bold.svg';
+export { default as checkCircleFill } from '@phosphor-icons/core/fill/check-circle-fill.svg';
+export { default as clock } from '@phosphor-icons/core/regular/clock.svg';
+export { default as disc } from '@phosphor-icons/core/regular/disc.svg';
+export { default as dotsThreeBold } from '@phosphor-icons/core/bold/dots-three-bold.svg';
+export { default as heart } from '@phosphor-icons/core/regular/heart.svg';
+export { default as heartFill } from '@phosphor-icons/core/fill/heart-fill.svg';
+export { default as listPlus } from '@phosphor-icons/core/regular/list-plus.svg';
+export { default as magnifyingGlass } from '@phosphor-icons/core/regular/magnifying-glass.svg';
+export { default as microphone } from '@phosphor-icons/core/regular/microphone.svg';
+export { default as musicNote } from '@phosphor-icons/core/regular/music-note.svg';
+export { default as pauseCircle } from '@phosphor-icons/core/regular/pause-circle.svg';
+export { default as pauseFill } from '@phosphor-icons/core/fill/pause-fill.svg';
+export { default as playFill } from '@phosphor-icons/core/fill/play-fill.svg';
+export { default as playlist } from '@phosphor-icons/core/regular/playlist.svg';
+export { default as plus } from '@phosphor-icons/core/regular/plus.svg';
+export { default as plusCircle } from '@phosphor-icons/core/regular/plus-circle.svg';
+export { default as prohibit } from '@phosphor-icons/core/regular/prohibit.svg';
+export { default as queue } from '@phosphor-icons/core/regular/queue.svg';
+export { default as shuffle } from '@phosphor-icons/core/regular/shuffle.svg';
+export { default as speakerHighFill } from '@phosphor-icons/core/fill/speaker-high-fill.svg';
+export { default as thumbsDown } from '@phosphor-icons/core/regular/thumbs-down.svg';
+export { default as trash } from '@phosphor-icons/core/regular/trash.svg';
+export { default as user } from '@phosphor-icons/core/regular/user.svg';
+export { default as userMinus } from '@phosphor-icons/core/regular/user-minus.svg';
+export { default as warningCircleFill } from '@phosphor-icons/core/fill/warning-circle-fill.svg';

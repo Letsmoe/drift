@@ -1,8 +1,7 @@
-import type { Component } from 'svelte';
-
 export interface MenuEntry {
 	label: string;
-	icon?: Component<{ size?: number | string }>;
+	/** SVG markup of the icon before the label. */
+	icon?: string;
 	onselect?: () => void;
 	/** Entries that open a submenu instead of acting. */
 	children?: MenuEntry[];

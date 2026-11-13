@@ -1,49 +1,47 @@
 <script lang="ts">
-	import PlusCircleIcon from 'phosphor-svelte/lib/PlusCircleIcon';
+	import { Popover } from '@neoworks/svelte-gpui/ui';
 	import type { Track } from '#lib/api/music.ts';
-	import Menu from '#lib/components/Menu.svelte';
+	import IconAction from '#lib/components/IconAction.svelte';
+	import MenuList from '#lib/components/MenuList.svelte';
+	import { plusCircle } from '#lib/icons.ts';
 	import { playlistEntries } from '#lib/menu/trackMenuEntries.ts';
-	import { PopupMenu } from '#lib/menu/popupMenu.svelte.ts';
+	import { colors } from '#lib/theme.ts';
+	import { appearance } from '#lib/appearance.svelte.ts';
 
 	let { track, large = false }: { track: Track; large?: boolean } = $props();
 
-	const popup = new PopupMenu();
+	let open = $state(false);
+	const iconSize = $derived(iconSizeFor());
+	const boxSize = $derived(boxSizeFor());
 
-	function toggle(event: MouseEvent) {
-		event.stopPropagation();
-		if (popup.isOpen) {
-			popup.close();
-			return;
+	function iconSizeFor(): number {
+		if (large) {
+			return 24;
 		}
-		popup.openBelow(event.currentTarget as HTMLElement);
+		return 20;
+	}
+
+	function boxSizeFor(): number {
+		if (large) {
+			return 40;
+		}
+		return 32;
 	}
 </script>
 
-<button
-	type="button"
-	aria-label="Add {track.title} to a playlist"
-	title="Add to playlist"
-	aria-haspopup="menu"
-	aria-expanded={popup.isOpen}
-	onclick={toggle}
-	class={[
-		'duration-fast flex items-center justify-center rounded-full text-muted transition-colors hover:bg-hover hover:text-default',
-		large && 'p-2',
-		!large && 'size-8'
-	]}
->
-	{#if large}
-		<PlusCircleIcon size={24} />
-	{:else}
-		<PlusCircleIcon size={20} />
-	{/if}
-</button>
-
-{#if popup.position}
-	<Menu
-		entries={playlistEntries(track)}
-		x={popup.position.x}
-		y={popup.position.y}
-		onclose={() => popup.close()}
-	/>
-{/if}
+<Popover bind:open style={{}} focusPanel={false} side="bottom" align="start" offset={4}>
+	{#snippet trigger({ toggle })}
+		<IconAction
+			icon={plusCircle}
+			{iconSize}
+			{boxSize}
+			color={appearance.muted}
+			hoverColor={colors.text}
+			hoverBackground={colors.hover}
+			onpress={toggle}
+		/>
+	{/snippet}
+	{#snippet children({ close })}
+		<MenuList entries={playlistEntries(track)} onclose={() => close('select')} autofocus />
+	{/snippet}
+</Popover>

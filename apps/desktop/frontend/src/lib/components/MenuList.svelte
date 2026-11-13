@@ -1,8 +1,17 @@
+<!--
+  The rows of a menu on a floating card, with submenus that open to the side. Arrow keys move the highlight,
+  Right enters a submenu, Left leaves it and Enter chooses. The host's own Menu has no submenus, which the
+  track menu needs, so this one is written here.
+-->
 <script lang="ts">
-	import CaretRightIcon from 'phosphor-svelte/lib/CaretRightIcon';
-	import type { Attachment } from 'svelte/attachments';
+	import { Icon, Overlay, Scroll, View, type KeyEvent } from '@neoworks/svelte-gpui/ui';
+	import Label from '#lib/components/Label.svelte';
 	import MenuList from '#lib/components/MenuList.svelte';
+	import { caretRight } from '#lib/icons.ts';
 	import type { MenuEntry } from '#lib/menu/menuEntry.ts';
+	import { colors, floatingPanel, hoverTransition, radii } from '#lib/theme.ts';
+
+	const submenuMaxHeight = 320;
 
 	let {
 		entries,
@@ -13,140 +22,133 @@
 		entries: MenuEntry[];
 		onclose: () => void;
 		autofocus?: boolean;
-		/** Called for ArrowLeft in a submenu so the parent can close it. */
+		/** Called for Left in a submenu so the parent can close it. */
 		onleave?: () => void;
 	} = $props();
 
-	let listElement = $state<HTMLElement>();
+	let root: ReturnType<typeof View> | undefined = $state();
+	let activeIndex = $state(-1);
 	let openSubmenuIndex = $state(-1);
-	let flipSubmenu = $state(false);
 
-	const focusFirstItem: Attachment<HTMLElement> = (element) => {
+	$effect(() => {
 		if (autofocus) {
-			itemButtons(element)[0]?.focus();
+			root?.focus();
 		}
-	};
+	});
 
-	function itemButtons(list: HTMLElement): HTMLElement[] {
-		return [...list.querySelectorAll<HTMLElement>(':scope > div > [role=menuitem]')];
-	}
-
-	function select(entry: MenuEntry) {
+	function select(entry: MenuEntry): void {
 		onclose();
 		entry.onselect?.();
 	}
 
-	function openSubmenu(index: number, trigger: HTMLElement) {
-		const bounds = trigger.getBoundingClientRect();
-		const submenuWidth = 260;
-		flipSubmenu = bounds.right + submenuWidth > window.innerWidth;
-		openSubmenuIndex = index;
-	}
-
-	function activate(index: number, event: MouseEvent) {
+	function activate(index: number): void {
 		const entry = entries[index];
+		if (entry === undefined) {
+			return;
+		}
 		if (entry.children) {
-			openSubmenu(index, event.currentTarget as HTMLElement);
+			openSubmenuIndex = index;
 			return;
 		}
 		select(entry);
 	}
 
-	function hover(index: number, event: MouseEvent) {
+	function hover(index: number, hovered: boolean): void {
+		if (!hovered) {
+			return;
+		}
+		activeIndex = index;
 		if (entries[index].children) {
-			openSubmenu(index, event.currentTarget as HTMLElement);
+			openSubmenuIndex = index;
 			return;
 		}
 		openSubmenuIndex = -1;
 	}
 
-	function moveFocus(step: number) {
-		if (!listElement) {
-			return;
-		}
-		const buttons = itemButtons(listElement);
-		const currentIndex = buttons.indexOf(document.activeElement as HTMLElement);
-		const nextIndex = (currentIndex + step + buttons.length) % buttons.length;
-		buttons[nextIndex]?.focus();
-	}
-
-	function enterSubmenu(index: number, event: KeyboardEvent) {
-		if (!entries[index].children) {
-			return;
-		}
-		openSubmenu(index, event.currentTarget as HTMLElement);
-		const submenu = (event.currentTarget as HTMLElement).parentElement?.querySelector(
-			'[role=menu]'
-		);
-		queueMicrotask(() =>
-			(submenu?.querySelector('[role=menuitem]') as HTMLElement | null)?.focus()
-		);
-	}
-
-	function leaveSubmenu() {
+	function moveActive(step: number): void {
 		openSubmenuIndex = -1;
+		activeIndex = (activeIndex + step + entries.length) % entries.length;
 	}
 
-	function handleKeydown(index: number, event: KeyboardEvent) {
+	function leaveSubmenu(): void {
+		openSubmenuIndex = -1;
+		root?.focus();
+	}
+
+	function handleKey(event: KeyEvent): void {
 		if (event.key === 'ArrowDown') {
 			event.preventDefault();
-			event.stopPropagation();
-			moveFocus(1);
-		} else if (event.key === 'ArrowUp') {
+			moveActive(1);
+			return;
+		}
+		if (event.key === 'ArrowUp') {
+			event.preventDefault();
+			moveActive(-1);
+			return;
+		}
+		if (event.key === 'ArrowLeft' && onleave) {
 			event.preventDefault();
 			event.stopPropagation();
-			moveFocus(-1);
-		} else if (event.key === 'ArrowRight') {
-			event.stopPropagation();
-			enterSubmenu(index, event);
-		} else if (event.key === 'ArrowLeft' && onleave) {
-			event.stopPropagation();
 			onleave();
+			return;
 		}
+		if (event.key === 'ArrowRight' || event.key === 'Enter' || event.key === ' ') {
+			event.preventDefault();
+			activate(activeIndex);
+		}
+	}
+
+	function rowBackground(index: number): string {
+		if (activeIndex === index) {
+			return colors.hover;
+		}
+		return 'transparent';
 	}
 </script>
 
-<div
-	bind:this={listElement}
-	{@attach focusFirstItem}
-	role="menu"
-	class={[
-		'min-w-52 rounded-lg border border-line bg-elevated p-1 text-sm shadow-lg',
-		onleave && 'max-h-80 overflow-y-auto'
-	]}
->
+{#snippet rows()}
 	{#each entries as entry, index (index)}
-		<div class="relative">
-			{#if entry.separatorBefore}
-				<div class="my-1 h-px bg-line"></div>
+		{#if entry.separatorBefore}
+			<View style={{ height: 1, marginY: 4, background: colors.line, shrink: 0 }} />
+		{/if}
+		<View
+			onpress={() => activate(index)}
+			onhover={(hovered) => hover(index, hovered)}
+			style={{
+				direction: 'row',
+				align: 'center',
+				gap: 12,
+				paddingX: 12,
+				paddingY: 8,
+				radius: radii.medium,
+				shrink: 0,
+				cursor: 'pointer',
+				transition: hoverTransition,
+				background: rowBackground(index)
+			}}
+		>
+			{#if entry.icon}
+				<Icon svg={entry.icon} size={16} color={colors.text} />
 			{/if}
-			<button
-				type="button"
-				role="menuitem"
-				onclick={(event) => activate(index, event)}
-				onmouseenter={(event) => hover(index, event)}
-				onkeydown={(event) => handleKeydown(index, event)}
-				class="duration-fast flex w-full items-center gap-3 rounded-md px-3 py-2 text-left text-default transition-colors hover:bg-hover focus-visible:bg-hover focus-visible:outline-none"
-			>
-				{#if entry.icon}
-					<entry.icon size={16} />
-				{/if}
-				<span class="flex-1 truncate">{entry.label}</span>
-				{#if entry.children}
-					<CaretRightIcon size={14} class="text-dim" />
-				{/if}
-			</button>
+			<Label size="small" tone="default" style={{ flex: 1, nowrap: true }}>{entry.label}</Label>
+			{#if entry.children}
+				<Icon svg={caretRight} size={14} color={colors.dim} />
+			{/if}
 			{#if entry.children && openSubmenuIndex === index}
-				<div
-					class={[
-						'absolute top-0 z-10',
-						flipSubmenu && 'right-full pr-1',
-						!flipSubmenu && 'left-full pl-1'
-					]}
-				>
-					<MenuList entries={entry.children} {onclose} onleave={leaveSubmenu} />
-				</div>
+				<Overlay side="right" align="start" offset={4}>
+					<MenuList entries={entry.children} {onclose} onleave={leaveSubmenu} autofocus />
+				</Overlay>
 			{/if}
-		</div>
+		</View>
 	{/each}
-</div>
+{/snippet}
+
+<View bind:this={root} focusable onkey={handleKey} style={{ ...floatingPanel, minWidth: 208 }}>
+	{#if onleave}
+		<Scroll style={{ maxHeight: submenuMaxHeight }}>
+			{@render rows()}
+		</Scroll>
+	{:else}
+		{@render rows()}
+	{/if}
+</View>

@@ -6,12 +6,26 @@ import {
 import type { ImportOptions, ImportSummary } from '#lib/api/musicImport.ts';
 import { pickFile, pickFolder } from '#lib/backend/shell.ts';
 
-/** Opens a file picker; resolves to '' when the user cancels. */
-export function pickExportFile(): Promise<string> {
-	return pickFile({
+const exportExtensions = ['zip', 'json', 'csv'];
+
+function hasExportExtension(path: string): boolean {
+	const lowerCasePath = path.toLowerCase();
+	return exportExtensions.some((extension) => lowerCasePath.endsWith(`.${extension}`));
+}
+
+/**
+ * Opens a file picker; resolves to '' when the user cancels. The picker has no file filter, so the
+ * extension is checked after the pick.
+ */
+export async function pickExportFile(): Promise<string> {
+	const path = await pickFile({
 		title: 'Choose your Spotify data export',
-		filters: [{ name: 'Spotify export (*.zip, *.json, *.csv)', extensions: ['zip', 'json', 'csv'] }]
+		filters: [{ name: 'Spotify export (*.zip, *.json, *.csv)', extensions: exportExtensions }]
 	});
+	if (path === '' || hasExportExtension(path)) {
+		return path;
+	}
+	throw new Error('Choose a .zip, .json or .csv file.');
 }
 
 /** Opens a folder picker; resolves to '' when the user cancels. */

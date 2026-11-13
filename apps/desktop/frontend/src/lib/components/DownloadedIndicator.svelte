@@ -1,13 +1,12 @@
 <script lang="ts">
-	import ArrowCircleDownIcon from 'phosphor-svelte/lib/ArrowCircleDownIcon';
+	import { Icon } from '@neoworks/svelte-gpui/ui';
+	import { appearance } from '#lib/appearance.svelte.ts';
 	import { downloads } from '#lib/downloads/downloads.svelte.ts';
+	import { arrowCircleDownFill } from '#lib/icons.ts';
 
 	let { videoId, size = 14 }: { videoId: string; size?: number } = $props();
 </script>
 
 {#if downloads.isDownloaded(videoId)}
-	<span title="Downloaded" class="shrink-0 text-action">
-		<ArrowCircleDownIcon {size} weight="fill" />
-		<span class="sr-only">Downloaded</span>
-	</span>
+	<Icon svg={arrowCircleDownFill} {size} color={appearance.accent} style={{ shrink: 0 }} />
 {/if}
