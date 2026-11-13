@@ -4,7 +4,7 @@
 -->
 <script lang="ts">
 	import { Button, Icon, type PointerEvent, type Style } from '@neoworks/svelte-gpui/ui';
-	import { colors, hoverTransition, radii } from '#lib/theme.ts';
+	import { colors, hoverTransition, pressedLook, radii } from '#lib/theme.ts';
 
 	let {
 		icon,
@@ -62,6 +62,7 @@
 		...style
 	}}
 	hover={hoverLook}
+	active={pressedLook}
 	{disabled}
 	{onpress}
 >
