@@ -22,16 +22,11 @@ export async function loadStorage(): Promise<void> {
 }
 
 async function readValues(path: string): Promise<Record<string, string>> {
-	let text = '';
 	try {
-		text = await files.readText(path);
-	} catch {
-		// First start, or an unreadable file: begin empty.
-		return {};
-	}
-	try {
+		const text = await files.readText(path);
 		return JSON.parse(text) as Record<string, string>;
 	} catch {
+		// First start, or an unreadable or damaged file: begin empty.
 		return {};
 	}
 }
