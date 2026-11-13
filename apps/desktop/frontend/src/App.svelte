@@ -1,7 +1,9 @@
 <script lang="ts">
-	import { Text, View } from '@neoworks/svelte-gpui/ui';
+	import { Presence, Text, View } from '@neoworks/svelte-gpui/ui';
+	import { fade, fly } from 'svelte/transition';
 	import { pages } from 'virtual:pages';
 	import ArtBackdrop from '#lib/components/ArtBackdrop.svelte';
+	import FullPlayer from '#lib/components/FullPlayer.svelte';
 	import LibrarySidebar from '#lib/components/LibrarySidebar.svelte';
 	import PlayerBar from '#lib/components/PlayerBar.svelte';
 	import QueuePanel from '#lib/components/QueuePanel.svelte';
@@ -74,4 +76,13 @@
 		{/if}
 	</View>
 	<PlayerBar />
+	{#if panels.fullPlayerOpen}
+		<Presence
+			in={[fly, { y: 48, duration: 320 }]}
+			out={[fade, { duration: 160 }]}
+			style={{ position: 'absolute', inset: 0 }}
+		>
+			<FullPlayer />
+		</Presence>
+	{/if}
 </View>
