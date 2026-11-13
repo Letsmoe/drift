@@ -3,7 +3,7 @@
 	import { LoadingSpinner } from '@neoworks/svelte-gpui-ui';
 	import type { Item, Shelf } from '#lib/api/music.ts';
 	import { appearance } from '#lib/appearance.svelte.ts';
-	import Chip from '#lib/components/Chip.svelte';
+	import FilterChip from '#lib/components/FilterChip.svelte';
 	import FeaturedPodcast from '#lib/components/FeaturedPodcast.svelte';
 	import IconAction from '#lib/components/IconAction.svelte';
 	import Label from '#lib/components/Label.svelte';
@@ -119,11 +119,10 @@
 	{#if item.kind === 'filters'}
 		<View style={{ direction: 'row', gap: 8, paddingX: gutter.narrow, marginBottom: -8 }}>
 			{#each filters as option (option.value)}
-				<Chip
+				<FilterChip
 					label={option.label}
-					paddingX={16}
 					selected={feed.filter === option.value}
-					onclick={() => feed.select(option.value)}
+					onpress={() => feed.select(option.value)}
 				/>
 			{/each}
 		</View>

@@ -3,7 +3,7 @@
 	import { Button } from '@neoworks/svelte-gpui-ui';
 	import { listenToImport } from '#lib/api/musicImport.ts';
 	import { appearance } from '#lib/appearance.svelte.ts';
-	import Chip from '#lib/components/Chip.svelte';
+	import FilterChip from '#lib/components/FilterChip.svelte';
 	import IconAction from '#lib/components/IconAction.svelte';
 	import ImportStatusCard from '#lib/components/ImportStatusCard.svelte';
 	import Label from '#lib/components/Label.svelte';
@@ -129,7 +129,11 @@
 
 	<View style={{ direction: 'row', wrap: true, gap: 8, paddingX: 8, paddingBottom: 4 }}>
 		{#each libraryFilters as { filter, label } (filter)}
-			<Chip {label} selected={listing.filter === filter} onclick={() => listing.toggle(filter)} />
+			<FilterChip
+				{label}
+				selected={listing.filter === filter}
+				onpress={() => listing.toggle(filter)}
+			/>
 		{/each}
 	</View>
 
