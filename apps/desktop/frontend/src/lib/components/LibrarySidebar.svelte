@@ -5,8 +5,10 @@
 	import { appearance } from '#lib/appearance.svelte.ts';
 	import Chip from '#lib/components/Chip.svelte';
 	import IconAction from '#lib/components/IconAction.svelte';
+	import ImportStatusCard from '#lib/components/ImportStatusCard.svelte';
 	import Label from '#lib/components/Label.svelte';
 	import LibraryRow from '#lib/components/LibraryRow.svelte';
+	import MusicImportDialog from '#lib/components/MusicImportDialog.svelte';
 	import { downloads } from '#lib/downloads/downloads.svelte.ts';
 	import { formatSongCount } from '#lib/format.ts';
 	import { musicImport } from '#lib/import/musicImport.svelte.ts';
@@ -24,7 +26,7 @@
 	import { goto } from '#lib/router.svelte.ts';
 	import { colors, glassBackground, radii } from '#lib/theme.ts';
 
-	const sidebarWidth = 320;
+	const sidebarWidth = 280;
 	const tileSize = 48;
 
 	const listing = new LibraryListing();
@@ -204,4 +206,12 @@
 			{/if}
 		</View>
 	</Scroll>
+
+	{#if musicImport.hasBackgroundStatus && !musicImport.dialogOpen}
+		<ImportStatusCard flow={musicImport} />
+	{/if}
+
+	{#if musicImport.dialogOpen}
+		<MusicImportDialog />
+	{/if}
 </View>
