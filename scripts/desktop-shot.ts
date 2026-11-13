@@ -1,6 +1,9 @@
 // Takes a screenshot of the desktop app on svelte-gpui's offscreen display, never on the real one.
 //
-//   bun scripts/desktop-shot.ts OUT.png SECONDS [--shell] [--track JSON]... [-- host flags]
+//   bun scripts/desktop-shot.ts OUT.png SECONDS [--shell] [--path /song/ID] [--track JSON]... [-- host flags]
+//
+// --path opens the app on that page (/album/ID, /settings, ...) instead of Home. WIDTH and HEIGHT in
+// the environment set the window's size (default 1100x760).
 //
 // It builds the Go backend and the UI bundle, starts a backend of its own, and runs the plain
 // svelte-gpui host against it, or with --shell the Rust shell (apps/desktop/shell, which starts its
@@ -63,6 +66,12 @@ function parseArguments(): Options {
 			tracks.push(JSON.parse(own[index]));
 			continue;
 		}
+		if (own[index] === '--path') {
+			// The bundle build reads it (DRIFT_START_PATH in build.mjs) from this process's environment.
+			index += 1;
+			process.env.DRIFT_START_PATH = own[index];
+			continue;
+		}
 		if (!own[index].startsWith('--')) {
 			positional.push(own[index]);
 		}
@@ -70,7 +79,7 @@ function parseArguments(): Options {
 	const [outputPath, seconds] = positional;
 	if (!outputPath || !seconds) {
 		console.error(
-			'usage: bun scripts/desktop-shot.ts OUT.png SECONDS [--shell] [--track JSON]... [-- host flags]'
+			'usage: bun scripts/desktop-shot.ts OUT.png SECONDS [--shell] [--path /song/ID] [--track JSON]... [-- host flags]'
 		);
 		process.exit(2);
 	}

@@ -51,6 +51,7 @@ await build({
 	plugins: [pagesPlugin],
 	define: {
 		__DRIFT_BACKEND_URL__: JSON.stringify(process.env.DRIFT_BACKEND_URL || ''),
-		__DRIFT_BACKEND_TOKEN__: JSON.stringify(process.env.DRIFT_BACKEND_TOKEN || '')
+		__DRIFT_BACKEND_TOKEN__: JSON.stringify(process.env.DRIFT_BACKEND_TOKEN || ''),
+		__DRIFT_START_PATH__: JSON.stringify(process.env.DRIFT_START_PATH || '')
 	}
 });

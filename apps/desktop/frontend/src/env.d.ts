@@ -6,6 +6,8 @@ declare module '*.svg' {
 /** Baked in by build.mjs from DRIFT_BACKEND_URL and DRIFT_BACKEND_TOKEN; empty when unset. */
 declare const __DRIFT_BACKEND_URL__: string;
 declare const __DRIFT_BACKEND_TOKEN__: string;
+/** Baked in by build.mjs from DRIFT_START_PATH, so a screenshot can open on any page; empty when unset. */
+declare const __DRIFT_START_PATH__: string;
 
 declare module 'virtual:pages' {
 	import type { Component } from 'svelte';
