@@ -2,7 +2,7 @@
 	import { Button, Icon, type PointerEvent, type Style } from '@neoworks/svelte-gpui/ui';
 	import { appearance } from '#lib/appearance.svelte.ts';
 	import { pauseFill, playFill } from '#lib/icons.ts';
-	import { radii } from '#lib/theme.ts';
+	import { hoverTransition, pressedSolidLook, radii } from '#lib/theme.ts';
 
 	type Size = 'sm' | 'md' | 'lg';
 
@@ -42,10 +42,11 @@
 		background: appearance.accent,
 		color: appearance.onAccent,
 		shadow: { y: 4, blur: 12, color: 'rgba(0, 0, 0, 0.45)' },
-		transition: 120,
+		transition: hoverTransition,
 		...style
 	}}
 	hover={{ background: appearance.accentHover }}
+	active={pressedSolidLook}
 	{onpress}
 >
 	<Icon svg={icon} size={iconSizes[size]} />

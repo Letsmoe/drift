@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { Presence, Text, View } from '@neoworks/svelte-gpui/ui';
+	import { Snackbar } from '@neoworks/svelte-gpui-ui';
 	import { fade, fly } from 'svelte/transition';
 	import { pages } from 'virtual:pages';
 	import ArtBackdrop from '#lib/components/ArtBackdrop.svelte';
@@ -11,6 +12,7 @@
 	import { downloads } from '#lib/downloads/downloads.svelte.ts';
 	import { panels } from '#lib/layout/panels.svelte.ts';
 	import { textFocus } from '#lib/layout/textFocus.svelte.ts';
+	import { toast } from '#lib/layout/toast.svelte.ts';
 	import { library } from '#lib/library/library.svelte.ts';
 	import { nowPlayingPalette } from '#lib/palette/coverPalette.svelte.ts';
 	import { player } from '#lib/player/player.svelte.ts';
@@ -20,6 +22,9 @@
 	const pageEnterDuration = 180;
 	const pageEnterOffset = 10;
 	const pageFrameStyle = { flex: 1, minHeight: 0 };
+	const toastDurationMs = 3000;
+	// Above the player bar (63 px and the window's 8 px padding), not over its controls.
+	const toastBottomGap = 88;
 
 	library.load();
 	downloads.start();
@@ -100,4 +105,13 @@
 			<FullPlayer />
 		</Presence>
 	{/if}
+	<!-- Keyed by the toast's version, so a new message restarts the countdown of one still showing. -->
+	{#key toast.version}
+		<Snackbar
+			bind:open={toast.open}
+			message={toast.message}
+			duration={toastDurationMs}
+			bottomGap={toastBottomGap}
+		/>
+	{/key}
 </View>

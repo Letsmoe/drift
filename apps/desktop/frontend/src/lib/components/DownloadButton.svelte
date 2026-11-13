@@ -12,7 +12,7 @@
 		pauseCircle,
 		warningCircleFill
 	} from '#lib/icons.ts';
-	import { colors, hoverTransition } from '#lib/theme.ts';
+	import { colors, hoverTransition, pressedLook } from '#lib/theme.ts';
 
 	// Stroke width in the kit's units (a 48 unit wide ring): about 2.3 px on the 18 px ring of a row.
 	const ringThickness = 6;
@@ -102,6 +102,7 @@
 <Button
 	style={{ color, opacity, transition: hoverTransition, align: 'center', justify: 'center' }}
 	hover={{ color: hoverColor(state) }}
+	active={pressedLook}
 	onpress={act}
 >
 	{#if state === 'downloading'}

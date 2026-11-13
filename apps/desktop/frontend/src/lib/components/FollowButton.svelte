@@ -3,7 +3,7 @@
 	import type { Item, ItemKind } from '#lib/api/music.ts';
 	import Label from '#lib/components/Label.svelte';
 	import { library } from '#lib/library/library.svelte.ts';
-	import { colors, hoverTransition, radii } from '#lib/theme.ts';
+	import { colors, hoverTransition, pressedSolidLook, radii } from '#lib/theme.ts';
 
 	let { item }: { item: Item } = $props();
 
@@ -30,6 +30,7 @@
 		transition: hoverTransition
 	}}
 	hover={{ borderColor: colors.text }}
+	active={pressedSolidLook}
 	onpress={() => library.toggleSaved(item)}
 >
 	<Label size="small" weight="semibold" tone="default">{label}</Label>

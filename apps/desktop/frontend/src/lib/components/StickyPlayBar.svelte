@@ -32,7 +32,7 @@
 			background: 'rgba(28, 28, 30, 0.92)',
 			borderBottomWidth: 1,
 			borderColor: colors.lineFaint,
-			radius: [radii.huge, radii.huge, 0, 0],
+			radius: [radii.extraLarge, radii.extraLarge, 0, 0],
 			shadow: { y: 12, blur: 32, color: 'rgba(0, 0, 0, 0.55)' }
 		}}
 	>

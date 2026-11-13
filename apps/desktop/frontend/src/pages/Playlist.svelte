@@ -113,7 +113,7 @@
 	<PageStatus status={resource.status} errorMessage={resource.errorMessage} />
 
 	{#if playlistPage}
-		<PageShell seed={playlistPage.title}>
+		<PageShell seed={playlistPage.title} cover={playlistPage.thumbnails}>
 			<PageList
 				items={blocks}
 				key={(block) => block.key}
