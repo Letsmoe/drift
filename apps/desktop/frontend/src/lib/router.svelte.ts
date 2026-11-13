@@ -120,8 +120,15 @@ function parseLocation(href: string): Location {
 	return { href, path, page: 'NotFound', params: {}, query };
 }
 
+function startPath(): string {
+	if (__DRIFT_START_PATH__ === '') {
+		return '/';
+	}
+	return __DRIFT_START_PATH__;
+}
+
 class Router {
-	#history = $state<Location[]>([parseLocation('/')]);
+	#history = $state<Location[]>([parseLocation(startPath())]);
 	#position = $state(0);
 
 	#current = $derived(this.#history[this.#position]);
