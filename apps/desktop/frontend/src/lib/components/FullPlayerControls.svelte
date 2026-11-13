@@ -1,121 +1,130 @@
+<!-- Seek bar, transport buttons, like and add to playlist of the full-screen player. -->
 <script lang="ts">
-	import { Button, LoadingSpinner } from '@neoworks-dev/ui';
-	import HeartIcon from 'phosphor-svelte/lib/HeartIcon';
-	import RepeatIcon from 'phosphor-svelte/lib/RepeatIcon';
-	import RepeatOnceIcon from 'phosphor-svelte/lib/RepeatOnceIcon';
-	import SkipBackIcon from 'phosphor-svelte/lib/SkipBackIcon';
-	import SkipForwardIcon from 'phosphor-svelte/lib/SkipForwardIcon';
+	import { View } from '@neoworks/svelte-gpui/ui';
+	import { LoadingSpinner } from '@neoworks/svelte-gpui-ui';
+	import type { ItemKind } from '#lib/api/music.ts';
+	import { appearance } from '#lib/appearance.svelte.ts';
 	import AddToPlaylistButton from '#lib/components/AddToPlaylistButton.svelte';
+	import IconAction from '#lib/components/IconAction.svelte';
+	import Label from '#lib/components/Label.svelte';
+	import LikeButton from '#lib/components/LikeButton.svelte';
 	import PlayOverlayButton from '#lib/components/PlayOverlayButton.svelte';
 	import RangeSlider from '#lib/components/RangeSlider.svelte';
+	import ToggleIconButton from '#lib/components/ToggleIconButton.svelte';
 	import { formatDuration } from '#lib/format.ts';
-	import { library } from '#lib/library/library.svelte.ts';
+	import {
+		repeat,
+		repeatBold,
+		repeatOnce,
+		repeatOnceBold,
+		skipBackFill,
+		skipForwardFill
+	} from '#lib/layout/chromeIcons.ts';
+	import { shuffleActiveIcon, shuffleIcon, shuffleLabel } from '#lib/layout/shuffleIcons.ts';
 	import { player } from '#lib/player/player.svelte.ts';
-	import { shuffleIcon, shuffleLabel } from '#lib/player/shuffleMode.ts';
-	import type { ItemKind } from '#lib/api/music.ts';
+	import { colors } from '#lib/theme.ts';
 
-	const liked = $derived(player.track !== null && library.isLiked(player.track.videoId));
-	const RepeatButtonIcon = $derived(pickRepeatIcon());
+	const kind = $derived(currentKind());
+	const repeatIcon = $derived(pickRepeatIcon());
+	const repeatActiveIcon = $derived(pickRepeatActiveIcon());
 
-	function pickRepeatIcon() {
+	function currentKind(): ItemKind {
+		if (!player.entry) {
+			return 'song';
+		}
+		return player.entry.kind as ItemKind;
+	}
+
+	function pickRepeatIcon(): string {
 		if (player.queue.repeat === 'one') {
-			return RepeatOnceIcon;
+			return repeatOnce;
 		}
-		return RepeatIcon;
+		return repeat;
 	}
 
-	function playButtonLabel(): string {
-		if (player.paused) {
-			return 'Play';
+	function pickRepeatActiveIcon(): string {
+		if (player.queue.repeat === 'one') {
+			return repeatOnceBold;
 		}
-		return 'Pause';
+		return repeatBold;
 	}
 
-	function likeLabel(): string {
-		if (liked) {
-			return 'Remove from Liked Songs';
+	function repeatLabel(): string {
+		if (player.queue.repeat === 'one') {
+			return 'Repeat: one song';
 		}
-		return 'Save to Liked Songs';
-	}
-
-	function likeWeight(): 'fill' | 'regular' {
-		if (liked) {
-			return 'fill';
+		if (player.queue.repeat === 'off') {
+			return 'Repeat: off';
 		}
-		return 'regular';
-	}
-
-	function toggleLikeOfCurrent(): void {
-		if (!player.track || !player.entry) {
-			return;
-		}
-		library.toggleLike(player.track, player.entry.kind as ItemKind);
+		return 'Repeat: all';
 	}
 </script>
 
-<div class="flex w-full flex-col gap-3">
-	<div class="flex items-center gap-3">
-		<span class="w-10 text-right font-mono text-xs text-muted tabular-nums">
-			{formatDuration(Math.floor(player.currentTime))}
-		</span>
+<View style={{ width: 'full', gap: 12 }}>
+	<View style={{ direction: 'row', align: 'center', gap: 12 }}>
+		<View style={{ width: 40, align: 'end' }}>
+			<Label size="tiny" tone="muted" style={{ fontFamily: 'mono' }}>
+				{formatDuration(Math.floor(player.currentTime)) || '0:00'}
+			</Label>
+		</View>
 		<RangeSlider
-			label="Seek"
 			value={player.currentTime}
 			max={player.duration || 0}
 			disabled={!player.track}
-			oninput={(seconds) => player.seek(seconds)}
+			oncommit={(seconds) => player.seek(seconds)}
 		/>
-		<span class="w-10 font-mono text-xs text-muted tabular-nums">
-			{formatDuration(Math.floor(player.duration))}
-		</span>
-	</div>
+		<View style={{ width: 40 }}>
+			<Label size="tiny" tone="muted" style={{ fontFamily: 'mono' }}>
+				{formatDuration(Math.floor(player.duration))}
+			</Label>
+		</View>
+	</View>
 
 	{#if player.errorMessage}
-		<p class="text-center text-xs text-red">{player.errorMessage}</p>
+		<Label size="tiny" tone="danger" style={{ textAlign: 'center' }}>{player.errorMessage}</Label>
 	{/if}
 
-	<div class="flex items-center justify-center gap-3">
+	<View style={{ direction: 'row', align: 'center', justify: 'center', gap: 12 }}>
 		{#if player.track}
 			<AddToPlaylistButton track={player.track} large />
 		{/if}
-		<span
-			title={shuffleLabel(player.queue)}
-			class={[player.queue.shuffle && '[&>button]:text-action']}
-		>
-			<Button
-				round
-				variant="ghost"
-				icon={shuffleIcon(player.queue)}
-				onclick={() => player.cycleShuffle()}
-			/>
-		</span>
-		<Button round variant="ghost" icon={SkipBackIcon} onclick={() => player.previous()} />
+		<ToggleIconButton
+			icon={shuffleIcon(player.queue)}
+			activeIcon={shuffleActiveIcon(player.queue)}
+			label={shuffleLabel(player.queue)}
+			active={player.queue.shuffle}
+			onpress={() => player.cycleShuffle()}
+		/>
+		<IconAction
+			icon={skipBackFill}
+			iconSize={20}
+			boxSize={40}
+			hoverBackground={colors.hover}
+			onpress={() => player.previous()}
+		/>
 		{#if player.buffering && player.track && !player.errorMessage}
-			<div class="flex size-14 items-center justify-center"><LoadingSpinner size={24} /></div>
+			<View style={{ size: 56, align: 'center', justify: 'center' }}>
+				<LoadingSpinner size={24} color={appearance.accent} />
+			</View>
 		{:else}
-			<PlayOverlayButton
-				size="lg"
-				playing={!player.paused}
-				label={playButtonLabel()}
-				onclick={() => player.toggle()}
-			/>
+			<PlayOverlayButton size="lg" playing={!player.paused} onpress={() => player.toggle()} />
 		{/if}
-		<Button round variant="ghost" icon={SkipForwardIcon} onclick={() => player.next()} />
-		<span class={[player.queue.repeat !== 'off' && '[&>button]:text-action']}>
-			<Button round variant="ghost" icon={RepeatButtonIcon} onclick={() => player.cycleRepeat()} />
-		</span>
-		<button
-			type="button"
-			aria-label={likeLabel()}
-			aria-pressed={liked}
-			onclick={toggleLikeOfCurrent}
-			class={[
-				'rounded-full p-2 hover:text-default',
-				liked && 'text-action',
-				!liked && 'text-muted'
-			]}
-		>
-			<HeartIcon size={24} weight={likeWeight()} />
-		</button>
-	</div>
-</div>
+		<IconAction
+			icon={skipForwardFill}
+			iconSize={20}
+			boxSize={40}
+			hoverBackground={colors.hover}
+			onpress={() => player.next()}
+		/>
+		<ToggleIconButton
+			icon={repeatIcon}
+			activeIcon={repeatActiveIcon}
+			label={repeatLabel()}
+			active={player.queue.repeat !== 'off'}
+			onpress={() => player.cycleRepeat()}
+		/>
+		{#if player.track}
+			<LikeButton track={player.track} {kind} size={24} />
+		{/if}
+	</View>
+</View>

@@ -1,14 +1,18 @@
 <script lang="ts">
-	import { Button } from '@neoworks-dev/ui';
-	import ArrowClockwiseIcon from 'phosphor-svelte/lib/ArrowClockwiseIcon';
+	import { View } from '@neoworks/svelte-gpui/ui';
 	import type { RecommendedItem } from '#lib/api/recommend.ts';
+	import IconAction from '#lib/components/IconAction.svelte';
+	import Label from '#lib/components/Label.svelte';
 	import ScrollRow from '#lib/components/ScrollRow.svelte';
 	import SongCard from '#lib/components/SongCard.svelte';
 	import SongTile from '#lib/components/SongTile.svelte';
 	import TileGrid from '#lib/components/TileGrid.svelte';
+	import { appearance } from '#lib/appearance.svelte.ts';
 	import { trackKindOf } from '#lib/format.ts';
+	import { arrowClockwise } from '#lib/icons.ts';
 	import { player } from '#lib/player/player.svelte.ts';
 	import type { Recommendations } from '#lib/recommend/recommendations.svelte.ts';
+	import { colors, gutter } from '#lib/theme.ts';
 
 	let {
 		title,
@@ -35,22 +39,22 @@
 	}
 </script>
 
-<section class="flex flex-col gap-2">
-	<div class="flex items-center gap-2 px-3">
-		<h2 class="text-2xl font-bold">{title}</h2>
+<View style={{ gap: 8 }}>
+	<View style={{ direction: 'row', align: 'center', gap: 8, paddingX: gutter.narrow }}>
+		<Label size="heading" weight="bold">{title}</Label>
 		{#if onrefresh}
-			<span title="Refresh recommendations" class="flex">
-				<Button
-					round
-					size="sm"
-					variant="ghost"
-					icon={ArrowClockwiseIcon}
-					disabled={refreshing}
-					onclick={onrefresh}
-				/>
-			</span>
+			<IconAction
+				icon={arrowClockwise}
+				iconSize={16}
+				boxSize={32}
+				color={appearance.dim}
+				hoverColor={colors.text}
+				hoverBackground={colors.hover}
+				disabled={refreshing}
+				onpress={onrefresh}
+			/>
 		{/if}
-	</div>
+	</View>
 	{#if layout === 'grid'}
 		<TileGrid count={items.length}>
 			{#snippet tile(index)}
@@ -78,4 +82,4 @@
 			{/each}
 		</ScrollRow>
 	{/if}
-</section>
+</View>

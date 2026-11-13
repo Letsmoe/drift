@@ -1,64 +1,102 @@
 <script lang="ts">
-	import { Button } from '@neoworks-dev/ui';
+	import { Image, View } from '@neoworks/svelte-gpui/ui';
+	import { Button } from '@neoworks/svelte-gpui-ui';
+	import Label from '#lib/components/Label.svelte';
 	import { formatDate } from '#lib/format.ts';
 	import type { MusicImportFlow } from '#lib/import/musicImport.svelte.ts';
+	import { colors, radii } from '#lib/theme.ts';
 
 	let { flow }: { flow: MusicImportFlow } = $props();
 
 	const youtube = $derived(flow.youtube);
 	const lastSynced = $derived(formatDate(youtube.status?.lastSyncedAt));
+	const accountDetails = $derived(accountDetailsOf());
+
+	function accountDetailsOf(): string {
+		if (!youtube.status) {
+			return '';
+		}
+		const parts: string[] = [];
+		if (youtube.status.account.handle !== '') {
+			parts.push(youtube.status.account.handle);
+		}
+		if (lastSynced !== '') {
+			parts.push(`Last synced ${lastSynced}`);
+		} else {
+			parts.push('Not synced yet');
+		}
+		return parts.join(' · ');
+	}
 </script>
 
-<section class="flex flex-col gap-3">
-	<div class="flex items-center gap-2">
-		<h3 class="text-base font-semibold">YouTube Music account</h3>
-		<span class="rounded-full bg-raised px-2 py-0.5 text-xs text-muted">Recommended</span>
-	</div>
+<View style={{ gap: 12 }}>
+	<View style={{ direction: 'row', align: 'center', gap: 8 }}>
+		<Label size="body" weight="semibold">YouTube Music account</Label>
+		<Label
+			size="tiny"
+			tone="muted"
+			style={{ paddingX: 8, paddingY: 2, radius: radii.full, background: colors.raised }}
+		>
+			Recommended
+		</Label>
+	</View>
 
 	{#if youtube.signedIn && youtube.status}
-		<div class="flex items-center gap-3 rounded-lg bg-raised p-3">
+		<View
+			style={{
+				direction: 'row',
+				align: 'center',
+				gap: 12,
+				padding: 12,
+				radius: radii.large,
+				background: colors.raised
+			}}
+		>
 			{#if youtube.status.account.photoUrl !== ''}
-				<img src={youtube.status.account.photoUrl} alt="" class="size-10 rounded-full" />
+				<Image
+					src={youtube.status.account.photoUrl}
+					fit="cover"
+					style={{ size: 40, shrink: 0, radius: 20 }}
+				/>
 			{/if}
-			<div class="min-w-0 flex-1">
-				<p class="truncate text-sm font-semibold">Signed in as {youtube.status.account.name}</p>
-				<p class="truncate text-xs text-muted">
-					{#if youtube.status.account.handle !== ''}{youtube.status.account.handle} ·
-					{/if}{#if lastSynced !== ''}Last synced {lastSynced}{:else}Not synced yet{/if}
-				</p>
-			</div>
-			<Button size="sm" variant="ghost" onclick={() => youtube.signOut()}>Sign out</Button>
-		</div>
-		<div class="flex flex-wrap gap-2">
-			<Button variant="primary" onclick={() => flow.syncNow()}>Sync now</Button>
-			<Button onclick={() => flow.loadAccountPreview()}>Choose what to import</Button>
-		</div>
-		<p class="text-xs text-dim">
+			<View style={{ flex: 1, minWidth: 0 }}>
+				<Label size="small" weight="semibold" truncate>
+					Signed in as {youtube.status.account.name}
+				</Label>
+				<Label size="tiny" tone="muted" truncate>{accountDetails}</Label>
+			</View>
+			<Button size="sm" variant="ghost" onpress={() => youtube.signOut()}>Sign out</Button>
+		</View>
+		<View style={{ direction: 'row', wrap: true, gap: 8 }}>
+			<Button variant="primary" onpress={() => flow.syncNow()}>Sync now</Button>
+			<Button onpress={() => flow.loadAccountPreview()}>Choose what to import</Button>
+		</View>
+		<Label size="tiny" tone="dim">
 			Your session stays on this computer and is only used to read your library. Sign out any time.
-		</p>
+		</Label>
 	{:else}
-		<p class="text-sm text-muted">
+		<Label size="small" tone="muted">
 			Sign in to YouTube Music once and bring over your liked songs, playlists, albums, artists and
 			podcasts. Sync again any time to pick up changes.
-		</p>
-		<div class="flex flex-wrap gap-2">
-			<Button variant="primary" onclick={() => flow.openSignIn()}>Sign in to YouTube Music</Button>
-		</div>
-		<p class="text-xs text-dim">
+		</Label>
+		<View style={{ direction: 'row', wrap: true, gap: 8 }}>
+			<Button variant="primary" onpress={() => flow.openSignIn()}>Sign in to YouTube Music</Button>
+		</View>
+		<Label size="tiny" tone="dim">
 			Coming from Spotify? Copy your library to YouTube Music with TuneMyMusic or Soundiiz first,
 			then import here.
-		</p>
+		</Label>
 	{/if}
 
 	{#if flow.errorMessage !== '' && flow.isAccountSource}
-		<p class="text-sm text-red">{flow.errorMessage}</p>
+		<Label size="small" tone="danger">{flow.errorMessage}</Label>
 	{/if}
 	{#if youtube.errorMessage !== ''}
-		<p class="text-sm text-red">{youtube.errorMessage}</p>
+		<Label size="small" tone="danger">{youtube.errorMessage}</Label>
 	{/if}
 	{#if flow.isAccountSource && flow.errorMessage.includes('sign in again')}
-		<div class="self-start">
-			<Button size="sm" onclick={() => flow.openSignIn()}>Sign in again</Button>
-		</div>
+		<View style={{ alignSelf: 'start' }}>
+			<Button size="sm" onpress={() => flow.openSignIn()}>Sign in again</Button>
+		</View>
 	{/if}
-</section>
+</View>

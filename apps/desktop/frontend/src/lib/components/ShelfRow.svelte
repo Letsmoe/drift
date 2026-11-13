@@ -1,16 +1,19 @@
 <script lang="ts">
+	import { View } from '@neoworks/svelte-gpui/ui';
 	import type { Item, ItemKind, Shelf, Track } from '#lib/api/music.ts';
 	import EpisodeCard from '#lib/components/EpisodeCard.svelte';
+	import Label from '#lib/components/Label.svelte';
 	import MediaCard from '#lib/components/MediaCard.svelte';
 	import PodcastCard from '#lib/components/PodcastCard.svelte';
 	import ScrollRow from '#lib/components/ScrollRow.svelte';
 	import SongTile from '#lib/components/SongTile.svelte';
 	import TileGrid from '#lib/components/TileGrid.svelte';
-
-	let { shelf }: { shelf: Shelf } = $props();
+	import { gutter } from '#lib/theme.ts';
 
 	// Podcast and episode cards carry descriptions; three per row keeps them readable.
-	const threeColumns = 'repeat(3, minmax(0, 1fr))';
+	const descriptionColumns = 3;
+
+	let { shelf }: { shelf: Shelf } = $props();
 
 	const layout = $derived(layoutOf(shelf.items));
 	const tracks = $derived(playableTracks(shelf.items));
@@ -43,16 +46,16 @@
 	}
 </script>
 
-<section class="flex flex-col gap-2">
-	<h2 class="px-3 text-2xl font-bold">{shelf.title}</h2>
+<View style={{ gap: 8 }}>
+	<Label size="heading" weight="bold" style={{ paddingX: gutter.narrow }}>{shelf.title}</Label>
 	{#if layout === 'podcasts'}
-		<TileGrid count={shelf.items.length} columns={threeColumns}>
+		<TileGrid count={shelf.items.length} fixedColumns={descriptionColumns}>
 			{#snippet tile(index)}
 				<PodcastCard item={shelf.items[index]} />
 			{/snippet}
 		</TileGrid>
 	{:else if layout === 'episodes'}
-		<TileGrid count={shelf.items.length} columns={threeColumns}>
+		<TileGrid count={shelf.items.length} fixedColumns={descriptionColumns}>
 			{#snippet tile(index)}
 				<EpisodeCard item={shelf.items[index]} track={tracks[index]} {tracks} {index} />
 			{/snippet}
@@ -70,4 +73,4 @@
 			{/each}
 		</ScrollRow>
 	{/if}
-</section>
+</View>

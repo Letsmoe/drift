@@ -1,3 +1,5 @@
+import { files, invoke } from '@neoworks/svelte-gpui';
+
 /** Where the Go backend listens and the token its RPC socket requires. */
 export interface BackendAddress {
 	url: string;
@@ -14,43 +16,53 @@ export interface OpenDialogOptions {
 	filters?: FileFilter[];
 }
 
-/** What electron/src/preload.ts exposes as `window.drift`. */
-interface ShellBridge {
-	backend(): BackendAddress;
-	/** Resolves to the chosen path, or '' when the user cancels. */
-	pickFile(options: OpenDialogOptions): Promise<string>;
-	pickFolder(options: OpenDialogOptions): Promise<string>;
-}
-
-declare global {
-	interface Window {
-		drift?: ShellBridge;
-	}
-}
+let address: BackendAddress | undefined;
 
 /**
- * The backend address from the Electron shell. Opened in a plain browser, the page
- * is served by the backend itself, so its origin and `?token=` are used instead.
+ * Asks the Rust shell where the backend listens. Without the shell (the plain svelte-gpui host)
+ * the address baked in at build time is used, so the UI can run against a backend started by hand.
+ * Call once before the app mounts; `backendAddress()` answers from then on.
  */
+export async function loadBackendAddress(): Promise<void> {
+	try {
+		address = await invoke('backend_address');
+		return;
+	} catch (error) {
+		console.warn('no Rust shell, using the build-time backend address:', error);
+	}
+	address = { url: __DRIFT_BACKEND_URL__, token: __DRIFT_BACKEND_TOKEN__ };
+}
+
 export function backendAddress(): BackendAddress {
-	if (window.drift) {
-		return window.drift.backend();
+	if (!address) {
+		throw new Error('The backend address is not loaded yet.');
 	}
-	const token = new URLSearchParams(window.location.search).get('token');
-	return { url: window.location.origin, token: token || '' };
+	return address;
 }
 
-function requireShell(): ShellBridge {
-	if (!window.drift) {
-		throw new Error('File dialogs need the desktop app.');
+/** Opens an http(s) link in the default browser. */
+export async function openExternal(url: string): Promise<void> {
+	try {
+		await invoke('open_external', { url });
+	} catch (error) {
+		console.warn('could not open the link', error);
 	}
-	return window.drift;
 }
 
-export function pickFile(options: OpenDialogOptions): Promise<string> {
-	return requireShell().pickFile(options);
+/** Resolves to the chosen path, or '' when the user cancels. */
+export async function pickFile(options: OpenDialogOptions): Promise<string> {
+	const picked = await files.pickFiles({ prompt: options.title });
+	return firstPath(picked);
 }
 
-export function pickFolder(options: OpenDialogOptions): Promise<string> {
-	return requireShell().pickFolder(options);
+export async function pickFolder(options: OpenDialogOptions): Promise<string> {
+	const picked = await files.pickFiles({ directories: true, prompt: options.title });
+	return firstPath(picked);
+}
+
+function firstPath(picked: string[] | null): string {
+	if (!picked || picked.length === 0) {
+		return '';
+	}
+	return picked[0];
 }

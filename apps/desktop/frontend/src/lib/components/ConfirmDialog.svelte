@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { Button } from '@neoworks-dev/ui';
-	import Dialog from '#lib/components/Dialog.svelte';
+	import { Text } from '@neoworks/svelte-gpui/ui';
+	import { Button, Dialog } from '@neoworks/svelte-gpui-ui';
 
 	let {
 		title,
@@ -16,16 +16,16 @@
 		onclose: () => void;
 	} = $props();
 
-	function confirm() {
+	function confirm(): void {
 		onclose();
 		onconfirm();
 	}
 </script>
 
-<Dialog {title} {onclose}>
-	<p class="pb-6 text-sm text-muted">{message}</p>
-	<div class="flex justify-end gap-2">
-		<Button variant="ghost" onclick={onclose}>Cancel</Button>
-		<Button variant="danger" onclick={confirm}>{confirmLabel}</Button>
-	</div>
+<Dialog open {title} {onclose}>
+	<Text>{message}</Text>
+	{#snippet actions()}
+		<Button variant="ghost" onpress={onclose}>Cancel</Button>
+		<Button variant="danger" onpress={confirm}>{confirmLabel}</Button>
+	{/snippet}
 </Dialog>

@@ -1,78 +1,125 @@
 <script lang="ts">
-	// Considered from @neoworks-dev/ui: none; it has no slider. Music-specific for
-	// now (seek, volume); move it into the ui package if another app needs one.
+	import { View, type PointerEvent } from '@neoworks/svelte-gpui/ui';
+	import { appearance } from '#lib/appearance.svelte.ts';
+	import { colors, radii } from '#lib/theme.ts';
+
+	// Music-specific for now (seek, volume).
 	let {
 		value,
 		max,
-		label,
-		step = 1,
+		step = 0,
 		disabled = false,
-		oninput
+		oninput,
+		oncommit
 	}: {
 		value: number;
 		max: number;
-		label: string;
+		/** Values snap to multiples of this; 0 leaves them free. */
 		step?: number;
 		disabled?: boolean;
-		oninput: (value: number) => void;
+		/** Called with every value while the thumb is dragged, and once on a plain press. */
+		oninput?: (value: number) => void;
+		/** Called with the value the thumb was released at. */
+		oncommit?: (value: number) => void;
 	} = $props();
 
-	const fillPercent = $derived(computeFillPercent(value, max));
+	const hitHeight = 16;
+	const trackHeight = 4;
+	const thumbSize = 12;
 
-	function computeFillPercent(value: number, max: number): number {
+	let width = $state(0);
+	let hovered = $state(false);
+	let dragValue = $state<number | undefined>(undefined);
+
+	const shownValue = $derived(pickShownValue());
+	const fillWidth = $derived(fillWidthOf(shownValue));
+	const thumbVisible = $derived((hovered || dragValue !== undefined) && !disabled);
+
+	function pickShownValue(): number {
+		if (dragValue !== undefined) {
+			return dragValue;
+		}
+		return value;
+	}
+
+	function fillWidthOf(shown: number): number {
 		if (max <= 0) {
 			return 0;
 		}
-		return Math.min(100, (value / max) * 100);
+		return Math.min(width, Math.max(0, (shown / max) * width));
 	}
 
-	function handleInput(event: Event) {
-		const input = event.currentTarget as HTMLInputElement;
-		oninput(Number(input.value));
+	function valueAt(pointerX: number): number {
+		if (width <= 0 || max <= 0) {
+			return 0;
+		}
+		let next = Math.min(max, Math.max(0, (pointerX / width) * max));
+		if (step > 0) {
+			next = Math.round(next / step) * step;
+		}
+		return next;
+	}
+
+	function startDrag(event: PointerEvent): void {
+		if (disabled) {
+			return;
+		}
+		dragValue = valueAt(event.x);
+		oninput?.(dragValue);
+	}
+
+	function moveDrag(event: PointerEvent): void {
+		if (dragValue === undefined) {
+			return;
+		}
+		dragValue = valueAt(event.x);
+		oninput?.(dragValue);
+	}
+
+	function endDrag(): void {
+		if (dragValue === undefined) {
+			return;
+		}
+		const released = dragValue;
+		dragValue = undefined;
+		oncommit?.(released);
 	}
 </script>
 
-<input
-	type="range"
-	aria-label={label}
-	min="0"
-	{max}
-	{step}
-	{value}
-	{disabled}
-	oninput={handleInput}
-	style="--fill: {fillPercent}%"
-	class="range-slider h-3 w-full cursor-pointer appearance-none bg-transparent disabled:cursor-default"
-/>
-
-<style>
-	.range-slider::-webkit-slider-runnable-track {
-		height: 4px;
-		border-radius: 9999px;
-		background: linear-gradient(
-			to right,
-			var(--primary) var(--fill),
-			var(--surface-hover) var(--fill)
-		);
-	}
-
-	.range-slider::-webkit-slider-thumb {
-		appearance: none;
-		width: 12px;
-		height: 12px;
-		margin-top: -4px;
-		border-radius: 9999px;
-		background: var(--text);
-		opacity: 0;
-		transition: opacity var(--dur-fast);
-	}
-
-	.range-slider:hover:not(:disabled)::-webkit-slider-thumb,
-	.range-slider:focus-visible::-webkit-slider-thumb {
-		opacity: 1;
-	}
-
-	.range-slider:disabled::-webkit-slider-runnable-track {
-		background: var(--surface-hover);
-	}
-</style>
+<View
+	style={{ flex: 1, height: hitHeight, justify: 'center' }}
+	onlayout={(layout) => (width = layout.width)}
+	onhover={(isHovered) => (hovered = isHovered)}
+	ondown={startDrag}
+	onmove={moveDrag}
+	onup={endDrag}
+>
+	<View
+		style={{
+			height: trackHeight,
+			radius: radii.full,
+			background: colors.hover
+		}}
+	>
+		<View
+			style={{
+				width: fillWidth,
+				height: trackHeight,
+				radius: radii.full,
+				background: appearance.accent
+			}}
+		/>
+	</View>
+	{#if thumbVisible}
+		<View
+			style={{
+				position: 'absolute',
+				left: Math.max(0, fillWidth - thumbSize / 2),
+				top: (hitHeight - thumbSize) / 2,
+				size: thumbSize,
+				radius: radii.full,
+				background: colors.text
+			}}
+		/>
+	{/if}
+</View>

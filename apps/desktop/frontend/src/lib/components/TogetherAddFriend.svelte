@@ -1,5 +1,8 @@
+<!-- Adds a friend by their ID, or joins their session without adding them. -->
 <script lang="ts">
-	import { Button } from '@neoworks-dev/ui';
+	import { View } from '@neoworks/svelte-gpui/ui';
+	import { Button } from '@neoworks/svelte-gpui-ui';
+	import TextInput from '#lib/layout/TextInput.svelte';
 	import { listenTogether } from '#lib/together/listenTogether.svelte.ts';
 
 	let friendId = $state('');
@@ -7,8 +10,7 @@
 
 	const hasId = $derived(friendId.trim() !== '');
 
-	async function add(event: SubmitEvent): Promise<void> {
-		event.preventDefault();
+	async function add(): Promise<void> {
 		if (await listenTogether.addFriend(friendId, friendName)) {
 			friendId = '';
 			friendName = '';
@@ -23,30 +25,29 @@
 	}
 </script>
 
-<form onsubmit={add} class="flex flex-col gap-2">
-	<div class="flex gap-2">
-		<input
+<View style={{ gap: 8 }}>
+	<View style={{ direction: 'row', gap: 8 }}>
+		<TextInput
 			bind:value={friendId}
-			aria-label="Friend's ID"
 			placeholder="Friend's ID"
-			spellcheck="false"
-			autocomplete="off"
-			class="h-9 min-w-0 flex-1 rounded-md bg-raised px-3 font-mono text-sm uppercase outline-none placeholder:font-sans placeholder:text-dim placeholder:normal-case"
+			mono
+			style={{ flex: 1 }}
+			onsubmit={add}
 		/>
-		<input
+		<TextInput
 			bind:value={friendName}
-			aria-label="Name (optional)"
 			placeholder="Name (optional)"
-			maxlength="40"
-			class="h-9 w-32 rounded-md bg-raised px-3 text-sm outline-none placeholder:text-dim"
+			maxLength={40}
+			style={{ width: 128 }}
+			onsubmit={add}
 		/>
-	</div>
-	<div class="flex justify-end gap-2">
-		<Button size="sm" variant="ghost" disabled={!hasId} onclick={joinById}
-			>Join without adding</Button
-		>
-		<Button size="sm" type="submit" disabled={!hasId || listenTogether.isPending('add-friend')}>
+	</View>
+	<View style={{ direction: 'row', justify: 'end', gap: 8 }}>
+		<Button size="sm" variant="ghost" disabled={!hasId} onpress={joinById}>
+			Join without adding
+		</Button>
+		<Button size="sm" disabled={!hasId || listenTogether.isPending('add-friend')} onpress={add}>
 			Add friend
 		</Button>
-	</div>
-</form>
+	</View>
+</View>

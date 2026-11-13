@@ -1,39 +1,52 @@
 <script lang="ts">
-	import PauseIcon from 'phosphor-svelte/lib/PauseIcon';
-	import PlayIcon from 'phosphor-svelte/lib/PlayIcon';
-	import type { ClassValue } from 'svelte/elements';
+	import { Button, Icon, type PointerEvent, type Style } from '@neoworks/svelte-gpui/ui';
+	import { appearance } from '#lib/appearance.svelte.ts';
+	import { pauseFill, playFill } from '#lib/icons.ts';
+	import { radii } from '#lib/theme.ts';
+
+	type Size = 'sm' | 'md' | 'lg';
 
 	let {
 		playing,
-		label,
 		size = 'md',
-		class: className = '',
-		onclick
+		style,
+		onpress
 	}: {
 		playing: boolean;
-		label: string;
-		size?: 'sm' | 'md' | 'lg';
-		class?: ClassValue;
-		onclick: (event: MouseEvent) => void;
+		size?: Size;
+		/** Position and opacity, such as the corner of a card. */
+		style?: Style;
+		onpress: (event: PointerEvent) => void;
 	} = $props();
 
-	const sizeClasses = { sm: 'size-8', md: 'size-12', lg: 'size-14' };
-	const iconSizes = { sm: 14, md: 20, lg: 24 };
+	const sides: Record<Size, number> = { sm: 32, md: 48, lg: 49 };
+	const iconSizes: Record<Size, number> = { sm: 14, md: 20, lg: 24 };
+
+	const icon = $derived(iconFor(playing));
+
+	function iconFor(isPlaying: boolean): string {
+		if (isPlaying) {
+			return pauseFill;
+		}
+		return playFill;
+	}
 </script>
 
-<button
-	type="button"
-	aria-label={label}
-	{onclick}
-	class={[
-		'duration-fast flex items-center justify-center rounded-full bg-action text-action-fg shadow-md transition-[transform,opacity] hover:scale-105',
-		sizeClasses[size],
-		className
-	]}
+<Button
+	style={{
+		size: sides[size],
+		radius: radii.full,
+		align: 'center',
+		justify: 'center',
+		shrink: 0,
+		background: appearance.accent,
+		color: appearance.onAccent,
+		shadow: { y: 4, blur: 12, color: 'rgba(0, 0, 0, 0.45)' },
+		transition: 120,
+		...style
+	}}
+	hover={{ background: appearance.accentHover }}
+	{onpress}
 >
-	{#if playing}
-		<PauseIcon size={iconSizes[size]} weight="fill" />
-	{:else}
-		<PlayIcon size={iconSizes[size]} weight="fill" />
-	{/if}
-</button>
+	<Icon svg={icon} size={iconSizes[size]} />
+</Button>

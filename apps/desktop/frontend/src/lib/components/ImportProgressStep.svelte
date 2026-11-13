@@ -1,34 +1,32 @@
 <script lang="ts">
-	import { Button } from '@neoworks-dev/ui';
+	import { View } from '@neoworks/svelte-gpui/ui';
+	import { Button, ProgressIndicator } from '@neoworks/svelte-gpui-ui';
+	import Label from '#lib/components/Label.svelte';
 	import type { MusicImportFlow } from '#lib/import/musicImport.svelte.ts';
 
 	let { flow }: { flow: MusicImportFlow } = $props();
+
+	const currentItem = $derived(currentItemOf());
+
+	function currentItemOf(): string {
+		if (flow.progress) {
+			return flow.progress.current;
+		}
+		return '';
+	}
 </script>
 
-<div class="flex flex-col gap-4">
-	<div class="flex items-baseline justify-between text-sm">
-		<span class="font-semibold">{flow.phaseLabel}</span>
+<View style={{ gap: 16 }}>
+	<View style={{ direction: 'row', align: 'center', justify: 'between' }}>
+		<Label size="small" weight="semibold">{flow.phaseLabel}</Label>
 		{#if flow.progress}
-			<span class="text-muted">{flow.progress.done} / {flow.progress.total}</span>
+			<Label size="small" tone="muted">{flow.progress.done} / {flow.progress.total}</Label>
 		{/if}
-	</div>
-	<div
-		class="h-2 overflow-hidden rounded-full bg-raised"
-		role="progressbar"
-		aria-valuemin="0"
-		aria-valuemax="100"
-		aria-valuenow={Math.round(flow.progressFraction * 100)}
-	>
-		<div
-			class="h-full rounded-full bg-action transition-all"
-			style:width="{flow.progressFraction * 100}%"
-		></div>
-	</div>
-	<p class="min-h-5 truncate text-sm text-muted">
-		{#if flow.progress}{flow.progress.current}{/if}
-	</p>
-	<div class="flex justify-end gap-2">
-		<Button variant="ghost" onclick={() => flow.cancel()}>Cancel</Button>
-		<Button onclick={() => flow.closeDialog()}>Continue in background</Button>
-	</div>
-</div>
+	</View>
+	<ProgressIndicator variant="linear" value={flow.progressFraction * 100} label="Import progress" />
+	<Label size="small" tone="muted" truncate style={{ minHeight: 20 }}>{currentItem}</Label>
+	<View style={{ direction: 'row', justify: 'end', gap: 8 }}>
+		<Button variant="ghost" onpress={() => flow.cancel()}>Cancel</Button>
+		<Button onpress={() => flow.closeDialog()}>Continue in background</Button>
+	</View>
+</View>

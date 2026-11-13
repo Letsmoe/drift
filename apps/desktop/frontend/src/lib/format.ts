@@ -70,13 +70,31 @@ export function formatSongCount(count: number): string {
 	return `${count} songs`;
 }
 
-/** Formats a timestamp from the core, or returns an empty string when it is not a date. */
+const monthNames = [
+	'Jan',
+	'Feb',
+	'Mar',
+	'Apr',
+	'May',
+	'Jun',
+	'Jul',
+	'Aug',
+	'Sep',
+	'Oct',
+	'Nov',
+	'Dec'
+];
+
+/**
+ * Formats a timestamp from the core as "Nov 13, 2026", or returns an empty string when it is not a date.
+ * The month is spelled out here because the UI's runtime has no `toLocaleDateString`.
+ */
 export function formatDate(timestamp: unknown): string {
 	const date = new Date(String(timestamp));
 	if (Number.isNaN(date.getTime())) {
 		return '';
 	}
-	return date.toLocaleDateString('en', { month: 'short', day: 'numeric', year: 'numeric' });
+	return `${monthNames[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
 }
 
 export function itemHref(kind: string, id: string): string {
@@ -107,4 +125,9 @@ export function trackHref(track: Track): string {
 		return itemHref('podcast', albumId);
 	}
 	return itemHref('song', track.videoId);
+}
+
+/** Whether any track links to an album; a table column for albums stays empty otherwise. */
+export function hasLinkedAlbums(tracks: Track[]): boolean {
+	return tracks.some((track) => track.album !== undefined && track.album.id !== '');
 }

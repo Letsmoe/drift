@@ -1,138 +1,138 @@
 <script lang="ts">
-	import PlayIcon from 'phosphor-svelte/lib/PlayIcon';
-	import SparkleIcon from 'phosphor-svelte/lib/SparkleIcon';
-	import XIcon from 'phosphor-svelte/lib/XIcon';
+	import { Button, Icon, View, type PointerEvent } from '@neoworks/svelte-gpui/ui';
 	import type { ItemKind } from '#lib/api/music.ts';
 	import type { QueueEntry } from '#lib/api/queue.ts';
+	import { appearance } from '#lib/appearance.svelte.ts';
 	import Cover from '#lib/components/Cover.svelte';
 	import DownloadedIndicator from '#lib/components/DownloadedIndicator.svelte';
-	import TrackContextMenu from '#lib/components/TrackContextMenu.svelte';
-	import { PopupMenu } from '#lib/menu/popupMenu.svelte.ts';
+	import IconAction from '#lib/components/IconAction.svelte';
+	import Label from '#lib/components/Label.svelte';
 	import { downloads } from '#lib/downloads/downloads.svelte.ts';
+	import TrackContextMenu from '#lib/components/TrackContextMenu.svelte';
 	import { formatArtists } from '#lib/format.ts';
+	import { playFill, sparkleFill, x } from '#lib/layout/chromeIcons.ts';
+	import { PopupMenu } from '#lib/menu/popupMenu.svelte.ts';
 	import { player } from '#lib/player/player.svelte.ts';
+	import { colors, hoverTransition, radii } from '#lib/theme.ts';
 
 	let {
 		entry,
 		current = false,
 		played = false,
-		draggable = false,
-		dropTarget = false,
-		size = 'compact',
-		ondragstart,
-		ondragover,
-		ondrop,
-		ondragend
+		size = 'compact'
 	}: {
 		entry: QueueEntry;
 		current?: boolean;
 		/** Already played: shown dimmed, above the current entry. */
 		played?: boolean;
-		draggable?: boolean;
-		dropTarget?: boolean;
 		/** Compact rows fit the side panel; comfortable ones the full-screen player. */
 		size?: 'compact' | 'comfortable';
-		ondragstart?: (event: DragEvent) => void;
-		ondragover?: (event: DragEvent) => void;
-		ondrop?: (event: DragEvent) => void;
-		ondragend?: (event: DragEvent) => void;
 	} = $props();
 
+	let hovered = $state(false);
 	const contextMenu = new PopupMenu();
+
+	const comfortable = $derived(size === 'comfortable');
+	const coverSize = $derived(pickCoverSize());
+	const rowOpacity = $derived(pickOpacity());
 
 	$effect(() => {
 		downloads.ensureStates([entry.track.videoId]);
 	});
+
+	function pickCoverSize(): number {
+		if (comfortable) {
+			return 48;
+		}
+		return 32;
+	}
+
+	function pickOpacity(): number {
+		if (played && !hovered) {
+			return 0.6;
+		}
+		return 1;
+	}
+
+	// Compact rows are tighter, as the old side panel's were.
+	function pickRowPadding(): number {
+		if (comfortable) {
+			return 8;
+		}
+		return 4;
+	}
+
+	function pickGap(): number {
+		if (comfortable) {
+			return 12;
+		}
+		return 10;
+	}
+
+	function pickCoverRadius(): number {
+		if (comfortable) {
+			return radii.medium;
+		}
+		return 4;
+	}
+
+	function pickTitleSize(): 'medium' | 'small' {
+		if (comfortable) {
+			return 'medium';
+		}
+		return 'small';
+	}
+
+	function openContextMenu(event: PointerEvent): void {
+		contextMenu.openAtPointer(event);
+	}
 
 	function playEntry(): void {
 		if (!current) {
 			player.jump(entry.id);
 		}
 	}
-
-	function removeEntry(event: MouseEvent): void {
-		event.stopPropagation();
-		player.remove(entry.id);
-	}
 </script>
 
-<!-- Clicking anywhere on the row plays it; keyboard users have the row's play button. -->
-<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_noninteractive_element_interactions -->
-<div
-	role="listitem"
-	{draggable}
-	{ondragstart}
-	{ondragover}
-	{ondrop}
-	{ondragend}
-	oncontextmenu={(event) => contextMenu.openAtPointer(event)}
-	onclick={playEntry}
-	class={[
-		'group/queuerow duration-fast flex items-center rounded-md transition-colors hover:bg-hover',
-		size === 'compact' && 'gap-2.5 px-1.5 py-1',
-		size === 'comfortable' && 'gap-3 p-2',
-		dropTarget && 'border-t-2 border-action',
-		played && 'opacity-60 hover:opacity-100',
-		!current && 'cursor-pointer'
-	]}
->
-	{#if size === 'comfortable'}
-		<Cover thumbnails={entry.track.thumbnails} size={48} class="size-12 shrink-0 rounded-md" />
-	{:else}
-		<Cover thumbnails={entry.track.thumbnails} size={32} class="size-8 shrink-0 rounded" />
-	{/if}
-	<div class="min-w-0 flex-1">
-		<div class="flex min-w-0 items-center gap-1.5">
-			<p
-				class={[
-					'truncate font-medium',
-					size === 'compact' && 'text-[13px] leading-tight',
-					size === 'comfortable' && 'text-base',
-					current && 'text-action'
-				]}
-			>
-				{entry.track.title}
-			</p>
-			{#if entry.magic}
-				<span title="Recommended by magic shuffle" class="shrink-0 text-action">
-					<SparkleIcon size={12} weight="fill" />
-				</span>
-			{/if}
-			<DownloadedIndicator videoId={entry.track.videoId} size={12} />
-		</div>
-		<p
-			class={[
-				'truncate text-dim',
-				size === 'compact' && 'text-xs leading-tight',
-				size === 'comfortable' && 'text-sm'
-			]}
-		>
-			{formatArtists(entry.track.artists)}
-		</p>
-	</div>
-	{#if !current}
-		<div class="flex shrink-0 items-center opacity-0 group-hover/queuerow:opacity-100">
-			<button
-				type="button"
-				aria-label="Play {entry.track.title}"
-				class="rounded-full p-1 text-muted hover:text-default"
-				onclick={(event) => {
-					event.stopPropagation();
-					playEntry();
-				}}
-			>
-				<PlayIcon size={14} weight="fill" />
-			</button>
-			<button
-				type="button"
-				aria-label="Remove {entry.track.title} from queue"
-				class="rounded-full p-1 text-muted hover:text-default"
-				onclick={removeEntry}
-			>
-				<XIcon size={14} />
-			</button>
-		</div>
-	{/if}
-</div>
-
-<TrackContextMenu popup={contextMenu} track={entry.track} kind={entry.kind as ItemKind} />
+<!-- Only the right button is taken here, so a left press still reaches the Draggable around the row. -->
+<View buttons={['right']} ondown={openContextMenu}>
+	<Button
+		style={{
+			direction: 'row',
+			align: 'center',
+			gap: pickGap(),
+			padding: pickRowPadding(),
+			radius: radii.medium,
+			opacity: rowOpacity,
+			transition: hoverTransition
+		}}
+		hover={{ background: colors.hover }}
+		onhover={(isHovered) => (hovered = isHovered)}
+		onpress={playEntry}
+	>
+		<View style={{ size: coverSize, shrink: 0, radius: pickCoverRadius(), overflow: 'hidden' }}>
+			<Cover thumbnails={entry.track.thumbnails} size={coverSize} style={{ size: coverSize }} />
+		</View>
+		<View style={{ flex: 1, minWidth: 0 }}>
+			<View style={{ direction: 'row', align: 'center', gap: 6, minWidth: 0 }}>
+				<View style={{ flex: 1, minWidth: 0 }}>
+					<Label size={pickTitleSize()} weight="medium" tone="default" accented={current} truncate>
+						{entry.track.title}
+					</Label>
+				</View>
+				{#if entry.magic}
+					<Icon svg={sparkleFill} size={12} color={appearance.accent} style={{ shrink: 0 }} />
+				{/if}
+				<DownloadedIndicator videoId={entry.track.videoId} size={12} />
+			</View>
+			<Label size="tiny" tone="dim" truncate>{formatArtists(entry.track.artists)}</Label>
+		</View>
+		{#if !current && hovered}
+			<View style={{ direction: 'row', align: 'center', shrink: 0 }}>
+				<IconAction icon={playFill} iconSize={14} boxSize={24} onpress={playEntry} />
+				<IconAction icon={x} iconSize={14} boxSize={24} onpress={() => player.remove(entry.id)} />
+			</View>
+		{/if}
+	</Button>
+	<TrackContextMenu popup={contextMenu} track={entry.track} kind={entry.kind as ItemKind} />
+</View>

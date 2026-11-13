@@ -1,11 +1,9 @@
+import { getItem, setItem } from '#lib/storage.ts';
+
 const storageKey = 'drift:import-prompt-hidden';
 
 function loadHidden(): boolean {
-	try {
-		return localStorage.getItem(storageKey) === 'true';
-	} catch {
-		return false;
-	}
+	return getItem(storageKey) === 'true';
 }
 
 /** Whether the library sidebar still offers the "Import your music" card. */
@@ -14,7 +12,7 @@ class ImportPrompt {
 
 	hide(): void {
 		this.hidden = true;
-		localStorage.setItem(storageKey, 'true');
+		setItem(storageKey, 'true');
 	}
 }
 

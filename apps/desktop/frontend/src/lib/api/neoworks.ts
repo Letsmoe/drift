@@ -6,9 +6,15 @@ import {
 	NeoworksSync
 } from '#lib/backend/generated/App.ts';
 import { onEvent } from '#lib/backend/rpc.ts';
+import { openExternal } from '#lib/backend/shell.ts';
 import type { main } from '#lib/backend/generated/models.ts';
 
 export type NeoworksAccountStatus = main.NeoworksStatus;
+
+/** Opens a link in the default browser. */
+export function openLink(url: string): Promise<void> {
+	return openExternal(url);
+}
 
 export function loadNeoworksStatus(): Promise<NeoworksAccountStatus> {
 	return NeoworksStatus();

@@ -1,10 +1,14 @@
+<!-- The user's own name and ID in the Listen Together panel, and whether friends see what they play. -->
 <script lang="ts">
-	import { Checkbox } from '@neoworks-dev/ui';
-	import CheckIcon from 'phosphor-svelte/lib/CheckIcon';
-	import CopyIcon from 'phosphor-svelte/lib/CopyIcon';
-	import PencilSimpleIcon from 'phosphor-svelte/lib/PencilSimpleIcon';
+	import { clipboard } from '@neoworks/svelte-gpui';
+	import { Button, Icon, View } from '@neoworks/svelte-gpui/ui';
+	import { Checkbox } from '@neoworks/svelte-gpui-ui';
+	import Label from '#lib/components/Label.svelte';
 	import PeerAvatar from '#lib/components/PeerAvatar.svelte';
+	import { check, copy, pencilSimple } from '#lib/layout/chromeIcons.ts';
+	import TextInput from '#lib/layout/TextInput.svelte';
 	import { formatUserId, listenTogether } from '#lib/together/listenTogether.svelte.ts';
+	import { colors, hoverTransition } from '#lib/theme.ts';
 
 	const copiedResetMs = 1500;
 
@@ -21,85 +25,85 @@
 		editing = true;
 	}
 
-	async function saveName(event: SubmitEvent): Promise<void> {
-		event.preventDefault();
+	async function saveName(): Promise<void> {
 		if (await listenTogether.rename(draftName)) {
 			editing = false;
 		}
-	}
-
-	function cancelOnEscape(event: KeyboardEvent): void {
-		if (event.key === 'Escape') {
-			event.stopPropagation();
-			editing = false;
-		}
-	}
-
-	function toggleSharing(event: Event): void {
-		const checkbox = event.currentTarget as HTMLInputElement;
-		listenTogether.setSharePresence(checkbox.checked);
 	}
 
 	async function copyId(): Promise<void> {
 		if (!self) {
 			return;
 		}
-		await navigator.clipboard.writeText(formatUserId(self.userId));
+		await clipboard.write(formatUserId(self.userId));
 		copied = true;
 		setTimeout(() => (copied = false), copiedResetMs);
+	}
+
+	function copyIcon(): string {
+		if (copied) {
+			return check;
+		}
+		return copy;
 	}
 </script>
 
 {#if self}
-	<div class="flex items-center gap-3">
-		<PeerAvatar name={self.name} highlighted />
-		<div class="min-w-0 flex-1">
-			{#if editing}
-				<form onsubmit={saveName}>
-					<!-- svelte-ignore a11y_autofocus -->
-					<input
+	<View style={{ gap: 12 }}>
+		<View style={{ direction: 'row', align: 'center', gap: 12 }}>
+			<PeerAvatar name={self.name} highlighted />
+			<View style={{ flex: 1, minWidth: 0, gap: 2 }}>
+				{#if editing}
+					<TextInput
 						bind:value={draftName}
-						aria-label="Your name"
-						maxlength="40"
+						maxLength={40}
+						height={28}
 						autofocus
-						onkeydown={cancelOnEscape}
+						onsubmit={saveName}
+						onescape={() => (editing = false)}
 						onblur={() => (editing = false)}
-						class="h-7 w-full rounded-md bg-raised px-2 text-sm outline-none"
 					/>
-				</form>
-			{:else}
-				<button
-					type="button"
-					onclick={startEditing}
-					title="Change the name friends see"
-					class="group flex max-w-full items-center gap-1.5 text-sm font-semibold"
-				>
-					<span class="truncate">{self.name}</span>
-					<PencilSimpleIcon size={12} class="shrink-0 text-dim group-hover:text-default" />
-				</button>
-			{/if}
-			<button
-				type="button"
-				onclick={copyId}
-				title="Copy your ID; friends add you with it"
-				class="flex items-center gap-1.5 font-mono text-xs text-muted hover:text-default"
-			>
-				{formatUserId(self.userId)}
-				{#if copied}
-					<CheckIcon size={12} />
 				{:else}
-					<CopyIcon size={12} />
+					<Button
+						style={{
+							direction: 'row',
+							align: 'center',
+							gap: 6,
+							alignSelf: 'start',
+							maxWidth: 'full'
+						}}
+						hover={{ color: colors.text }}
+						onpress={startEditing}
+					>
+						<View style={{ minWidth: 0, shrink: 1 }}>
+							<Label size="body" weight="semibold" tone="default" truncate>{self.name}</Label>
+						</View>
+						<Icon svg={pencilSimple} size={12} color={colors.dim} style={{ shrink: 0 }} />
+					</Button>
 				{/if}
-			</button>
-		</div>
-	</div>
-	<label class="flex cursor-pointer items-center gap-2 text-xs text-muted">
+				<Button
+					style={{
+						direction: 'row',
+						align: 'center',
+						gap: 6,
+						alignSelf: 'start',
+						color: colors.muted,
+						transition: hoverTransition
+					}}
+					hover={{ color: colors.text }}
+					onpress={copyId}
+				>
+					<Label size="tiny" style={{ fontFamily: 'mono' }}>{formatUserId(self.userId)}</Label>
+					<Icon svg={copyIcon()} size={12} />
+				</Button>
+			</View>
+		</View>
 		<Checkbox
 			size="sm"
+			label="Show friends what I'm playing"
 			checked={listenTogether.sharePresence}
 			disabled={listenTogether.isPending('share-presence')}
-			onchange={toggleSharing}
+			onchange={(share) => listenTogether.setSharePresence(share)}
 		/>
-		Show friends what I'm playing
-	</label>
+	</View>
 {/if}
