@@ -1,9 +1,14 @@
 <script lang="ts">
+	import { View } from '@neoworks/svelte-gpui/ui';
 	import type { Episode } from '#lib/api/music.ts';
 	import Cover from '#lib/components/Cover.svelte';
+	import Label from '#lib/components/Label.svelte';
 	import PlayOverlayButton from '#lib/components/PlayOverlayButton.svelte';
 	import { formatDuration, playCountOf } from '#lib/format.ts';
 	import { player } from '#lib/player/player.svelte.ts';
+	import { colors, hoverTransition, radii } from '#lib/theme.ts';
+
+	const coverSide = 96;
 
 	let { episode, onplay }: { episode: Episode; onplay: () => void } = $props();
 
@@ -17,16 +22,28 @@
 	);
 </script>
 
-<div
-	class="group/episode duration-fast flex gap-4 rounded-lg p-4 transition-colors focus-within:bg-hover hover:bg-hover"
+<View
+	style={{
+		direction: 'row',
+		width: 'full',
+		gap: 16,
+		padding: 16,
+		radius: radii.large,
+		transition: hoverTransition
+	}}
+	hover={{ background: colors.hover }}
 >
-	<Cover thumbnails={track.thumbnails} size={96} class="size-24 shrink-0 rounded-md" />
-	<div class="flex min-w-0 flex-1 flex-col gap-1">
-		<h3 class={['truncate text-base font-bold', current && 'text-action']}>{track.title}</h3>
-		<p class="line-clamp-2 text-sm text-dim">{episode.description}</p>
-		<div class="flex items-center gap-3 pt-2">
-			<PlayOverlayButton size="sm" {playing} label="Play {track.title}" onclick={onplay} />
-			<span class="text-sm text-dim">{details}</span>
-		</div>
-	</div>
-</div>
+	<Cover
+		thumbnails={track.thumbnails}
+		size={coverSide}
+		style={{ size: coverSide, shrink: 0, radius: radii.medium }}
+	/>
+	<View style={{ flex: 1, minWidth: 0, gap: 4, overflow: 'hidden' }}>
+		<Label size="body" weight="bold" accented={current} truncate>{track.title}</Label>
+		<Label size="small" tone="dim" lines={2}>{episode.description}</Label>
+		<View style={{ direction: 'row', align: 'center', gap: 12, paddingTop: 8 }}>
+			<PlayOverlayButton size="sm" {playing} onpress={onplay} />
+			<Label size="small" tone="dim">{details}</Label>
+		</View>
+	</View>
+</View>

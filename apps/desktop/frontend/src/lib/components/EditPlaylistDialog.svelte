@@ -1,6 +1,10 @@
 <script lang="ts">
-	import { Button } from '@neoworks-dev/ui';
+	import { View } from '@neoworks/svelte-gpui/ui';
+	import { Button } from '@neoworks/svelte-gpui-ui';
 	import Dialog from '#lib/components/Dialog.svelte';
+	import TextArea from '#lib/components/TextArea.svelte';
+	import TextInput from '#lib/layout/TextInput.svelte';
+	import { colors, fontSizes } from '#lib/theme.ts';
 
 	let {
 		name,
@@ -21,8 +25,7 @@
 	let draftDescription = $state(description);
 	const canSave = $derived(draftName.trim() !== '');
 
-	function submit(event: SubmitEvent) {
-		event.preventDefault();
+	function submit(): void {
 		if (!canSave) {
 			return;
 		}
@@ -32,23 +35,23 @@
 </script>
 
 <Dialog title="Edit details" {onclose}>
-	<form onsubmit={submit} class="flex flex-col gap-3">
-		<input
+	<View style={{ gap: 12 }}>
+		<TextInput
 			bind:value={draftName}
-			aria-label="Name"
 			placeholder="Playlist name"
-			class="h-11 rounded-md bg-raised px-3 text-base outline-none placeholder:text-dim focus:border-line-strong"
+			height={44}
+			autofocus
+			onsubmit={submit}
 		/>
-		<textarea
+		<TextArea
 			bind:value={draftDescription}
-			aria-label="Description"
+			rows={3}
 			placeholder="Add an optional description"
-			rows="3"
-			class="resize-none rounded-md bg-raised p-3 text-base outline-none placeholder:text-dim"
-		></textarea>
-		<div class="flex justify-end gap-2 pt-2">
-			<Button variant="ghost" onclick={onclose}>Cancel</Button>
-			<Button variant="primary" type="submit" disabled={!canSave}>Save</Button>
-		</div>
-	</form>
+			style={{ background: colors.raised, fontSize: fontSizes.body, lineHeight: 21, padding: 12 }}
+		/>
+		<View style={{ direction: 'row', justify: 'end', gap: 8, paddingTop: 8 }}>
+			<Button variant="ghost" onpress={onclose}>Cancel</Button>
+			<Button variant="primary" disabled={!canSave} onpress={submit}>Save</Button>
+		</View>
+	</View>
 </Dialog>

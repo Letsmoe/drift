@@ -24,12 +24,5 @@
 		"src/env.d.ts",
 		"src/pages",
 		"src/lib"
-	],
-	// Components still written for the web (Tailwind, DOM) until they are converted; remove each line then.
-	"exclude": [
-		"src/lib/components/DownloadQueueRow.svelte",
-		"src/lib/components/EditPlaylistDialog.svelte",
-		"src/lib/components/EpisodeRow.svelte",
-		"src/lib/components/TrackListControls.svelte"
 	]
 }
