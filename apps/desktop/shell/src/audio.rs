@@ -20,8 +20,6 @@ use svelte_gpui::Emitter;
 
 const SLOT_COUNT: usize = 2;
 const EVENT_NAME: &str = "audio";
-const POLL_INTERVAL: Duration = Duration::from_millis(40);
-const IDLE_POLL_INTERVAL: Duration = Duration::from_millis(250);
 const POSITION_INTERVAL: Duration = Duration::from_millis(250);
 /// A resume position this close to the start is not worth a seek.
 const MINIMUM_SEEK_SECONDS: f64 = 0.05;
@@ -58,6 +56,13 @@ struct SlotState {
     last_position_event: Option<Instant>,
 }
 
+impl SlotState {
+    /// The song is audibly moving, which is when positions are reported.
+    fn is_playing(&self) -> bool {
+        self.loaded && self.wanted_playing && self.prerolled && !self.paused_by_buffering && !self.ended
+    }
+}
+
 impl AudioEngine {
     pub fn start(emitter: Emitter) -> Result<Arc<AudioEngine>, String> {
         gst::init().map_err(|error| format!("could not start GStreamer: {error}"))?;
@@ -66,11 +71,13 @@ impl AudioEngine {
             slots.push(Slot::new(index)?);
         }
         let engine = Arc::new(AudioEngine { slots, emitter, event_log: open_event_log() });
-        let poller = Arc::clone(&engine);
-        thread::Builder::new()
-            .name("audio-bus".to_string())
-            .spawn(move || poller.poll_forever())
-            .map_err(|error| format!("could not start the audio thread: {error}"))?;
+        for slot_index in 0..SLOT_COUNT {
+            let watcher = Arc::clone(&engine);
+            thread::Builder::new()
+                .name(format!("audio-bus-{slot_index}"))
+                .spawn(move || watcher.watch_slot(slot_index))
+                .map_err(|error| format!("could not start the audio thread: {error}"))?;
+        }
         Ok(engine)
     }
 
@@ -90,6 +97,7 @@ impl AudioEngine {
         let slot = self.slot(slot_index)?;
         let mut state = slot.lock();
         state.wanted_playing = true;
+        slot.wake_watcher();
         if state.prerolled && !state.paused_by_buffering {
             return set_pipeline_state(slot, gst::State::Playing);
         }
@@ -101,6 +109,7 @@ impl AudioEngine {
         let mut state = slot.lock();
         state.wanted_playing = false;
         state.paused_by_buffering = false;
+        slot.wake_watcher();
         if state.loaded {
             return set_pipeline_state(slot, gst::State::Paused);
         }
@@ -120,6 +129,7 @@ impl AudioEngine {
         seek_pipeline(slot, position_seconds)?;
         state.ended = false;
         state.last_position_event = None;
+        slot.wake_watcher();
         Ok(())
     }
 
@@ -158,28 +168,32 @@ impl AudioEngine {
         }
     }
 
-    fn poll_forever(&self) {
-        loop {
-            let mut anything_loaded = false;
-            for slot in &self.slots {
-                self.drain_bus(slot);
-                anything_loaded |= self.report_position(slot);
-            }
-            if anything_loaded {
-                thread::sleep(POLL_INTERVAL);
-            } else {
-                thread::sleep(IDLE_POLL_INTERVAL);
-            }
-        }
-    }
-
-    fn drain_bus(&self, slot: &Slot) {
+    /// Runs on a thread of its own per slot. It sleeps in the bus until a message arrives, or, while the
+    /// slot plays, until the next position report is due; a slot that does not play never wakes it.
+    fn watch_slot(&self, slot_index: usize) {
+        let slot = &self.slots[slot_index];
         let Some(bus) = slot.pipeline.bus() else {
             return;
         };
-        while let Some(message) = bus.pop() {
-            self.handle_message(slot, &message);
+        loop {
+            if let Some(message) = bus.timed_pop(self.position_delay(slot)) {
+                self.handle_message(slot, &message);
+            }
+            self.report_position_if_due(slot);
         }
+    }
+
+    /// How long the watcher may sleep: until the next position report, or without end when none is due.
+    fn position_delay(&self, slot: &Slot) -> Option<gst::ClockTime> {
+        let state = slot.lock();
+        if !state.is_playing() {
+            return None;
+        }
+        let wait = match state.last_position_event {
+            Some(moment) => POSITION_INTERVAL.saturating_sub(moment.elapsed()),
+            None => Duration::ZERO,
+        };
+        Some(gst::ClockTime::from_nseconds(wait.as_nanos() as u64))
     }
 
     fn handle_message(&self, slot: &Slot, message: &gst::Message) {
@@ -190,10 +204,8 @@ impl AudioEngine {
             MessageView::AsyncDone(_) => self.handle_preroll(slot),
             MessageView::Buffering(buffering) => self.handle_buffering(slot, buffering.percent()),
             MessageView::DurationChanged(_) => self.announce_duration(slot),
-            MessageView::StateChanged(changed) => {
-                if message.src() == Some(slot.pipeline.upcast_ref::<gst::Object>()) {
-                    self.handle_state_change(slot, changed.current());
-                }
+            MessageView::StateChanged(changed) if is_from_pipeline(slot, message) => {
+                self.handle_state_change(slot, changed.current());
             }
             _ => {}
         }
@@ -235,10 +247,11 @@ impl AudioEngine {
 
     fn start_if_wanted(&self, slot: &Slot) {
         let state = slot.lock();
-        if state.wanted_playing && !state.paused_by_buffering {
-            if let Err(message) = set_pipeline_state(slot, gst::State::Playing) {
-                eprintln!("audio play failed: {message}");
-            }
+        if !state.wanted_playing || state.paused_by_buffering {
+            return;
+        }
+        if let Err(message) = set_pipeline_state(slot, gst::State::Playing) {
+            eprintln!("audio play failed: {message}");
         }
     }
 
@@ -293,25 +306,21 @@ impl AudioEngine {
         self.emit(slot, json!({ "kind": "duration", "durationSeconds": seconds }));
     }
 
-    /// Emits the position while the slot plays; says whether the slot has a song at all.
-    fn report_position(&self, slot: &Slot) -> bool {
+    /// Emits the position when the slot plays and the last report is old enough.
+    fn report_position_if_due(&self, slot: &Slot) {
         let due = {
             let mut state = slot.lock();
-            if !state.loaded {
-                return false;
-            }
-            let playing = state.wanted_playing && state.prerolled && !state.paused_by_buffering && !state.ended;
             let elapsed = state.last_position_event.map(|moment| moment.elapsed());
             let overdue = elapsed.is_none_or(|duration| duration >= POSITION_INTERVAL);
-            if playing && overdue {
+            let due = state.is_playing() && overdue;
+            if due {
                 state.last_position_event = Some(Instant::now());
             }
-            playing && overdue
+            due
         };
         if due && self.emitter.has_listeners(EVENT_NAME) {
             self.emit_position(slot);
         }
-        true
     }
 
     fn emit_position(&self, slot: &Slot) {
@@ -340,6 +349,16 @@ impl Slot {
     fn lock(&self) -> MutexGuard<'_, SlotState> {
         self.state.lock().unwrap_or_else(|poisoned| poisoned.into_inner())
     }
+
+    /// Wakes the slot's watcher so it works out again whether positions are due. Most changes post a bus
+    /// message anyway; a seek after the song ended, for one, does not.
+    fn wake_watcher(&self) {
+        let Some(bus) = self.pipeline.bus() else {
+            return;
+        };
+        let wake = gst::message::Application::new(gst::Structure::new_empty("drift-wake"));
+        let _ = bus.post(wake);
+    }
 }
 
 fn open_event_log() -> Option<Mutex<std::fs::File>> {
@@ -358,6 +377,11 @@ fn audio_sink_override() -> Result<Option<gst::Element>, String> {
         sink.set_property("sync", true);
     }
     Ok(Some(sink))
+}
+
+// Child elements post state changes too; only the pipeline's own say what the slot is doing.
+fn is_from_pipeline(slot: &Slot, message: &gst::Message) -> bool {
+    message.src() == Some(slot.pipeline.upcast_ref::<gst::Object>())
 }
 
 // Back to a clean pipeline, with the old song's messages dropped.
