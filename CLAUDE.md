@@ -28,13 +28,15 @@ Write issues and their comments the way you'd explain it to a colleague, in comp
 
 One agent at a time, with me giving feedback as it goes. Keep each step small enough for me to read in one sitting, and stop to show me rather than piling up work I then have to catch up on.
 
-`main` is what I've reviewed. It stays checked out in the repo root: never switch branches there.
+`main` is what I've reviewed.
 
-Straight to `main` in the root, no branch: typos, one-liners, and anything that only touches how we work rather than the app — this file, `.claude/skills/`, CI workflows, editor config.
+Straight to `main`, no branch: typos, one-liners, and anything that only touches how we work rather than the app — this file, `.claude/skills/`, CI workflows, editor config.
 
-Everything else happens on a branch off `main`, in a worktree under `.worktrees/<branch>` (`git worktree add .worktrees/<branch> -b <branch> main`). Name it `<issue-number>-<slug>` when there is an issue (`12-lyrics-offset`), `<slug>` when there isn't. One branch is one thing; anything found along the way gets written down as an issue and stays off the branch, unless the branch can't finish without it.
+Everything else happens on a feature branch off `main`, checked out in the repo root (`git switch -c <branch> main`). Name it `<issue-number>-<slug>` when there is an issue (`12-lyrics-offset`), `<slug>` when there isn't. One branch is one thing; anything found along the way gets written down as an issue and stays off the branch, unless the branch can't finish without it.
 
-Before starting on anything, check whether it is already half-built: `git branch` and `git worktree list` for the feature, and read what is on the branch. Sessions end mid-feature, and a branch is where that work is — starting again writes it a second time and loses whatever the first attempt learned. If a branch for it exists, continue on it.
+Worktrees only when several agents work alongside each other: then each agent gets its own under `.worktrees/<branch>` (`git worktree add .worktrees/<branch> -b <branch> main`), so they don't switch branches under one another.
+
+Before starting on anything, check whether it is already half-built: `git branch` (and `git worktree list`, if agents worked in parallel) for the feature, and read what is on the branch. Sessions end mid-feature, and a branch is where that work is — starting again writes it a second time and loses whatever the first attempt learned. If a branch for it exists, continue on it.
 
 No pull requests unless I ask for one. Review happens here, on the diff, before the merge.
 
@@ -79,7 +81,7 @@ Never launch or restart my installed app; run your own instance. When I tell you
 
 ## Merging
 
-I review the branch's diff, and it merges into `main` when I say so — never before, and never without evidence. Merge in the root with `git merge --no-ff <branch>`, so the branch stays one unit in the history; if it conflicts, resolve it in the merge commit. Push `main`. Then remove the worktree and delete the branch, and close its issue with `gh issue close <n>`.
+I review the branch's diff, and it merges into `main` when I say so — never before, and never without evidence. Switch back to `main` and merge with `git merge --no-ff <branch>`, so the branch stays one unit in the history; if it conflicts, resolve it in the merge commit. Push `main`. Then delete the branch (and its worktree, if it had one), and close its issue with `gh issue close <n>`.
 
 ## Releases
 
