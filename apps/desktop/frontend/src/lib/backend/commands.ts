@@ -11,6 +11,37 @@ export type AudioEvent =
 	/** The engine's crossfade is over: it ran out (`finished`) or a play, pause or seek ended it. */
 	| { kind: 'crossfade'; how: 'finished' | 'cancelled' };
 
+/** The song as MPRIS shows it (apps/desktop/shell/src/mpris.rs). */
+export interface MprisTrack {
+	/** Names the queue entry, so the same song twice in the queue is two tracks. */
+	trackId: string;
+	title: string;
+	artists: string[];
+	album: string;
+	coverUrl: string;
+	lengthSeconds: number;
+}
+
+/** Everything the UI tells MPRIS about its player. */
+export interface MprisUpdate {
+	track: MprisTrack | null;
+	status: 'playing' | 'paused' | 'stopped';
+	/** Where the player was when this was sent; MPRIS counts on from there while it plays. */
+	positionSeconds: number;
+	volume: number;
+	canGoNext: boolean;
+	canGoPrevious: boolean;
+	/** The position changed by a seek, which MPRIS clients hear as `Seeked`. */
+	seeked: boolean;
+}
+
+/** What media keys, widgets and `playerctl` ask the player to do. */
+export type MprisRequest =
+	| { kind: 'play' | 'pause' | 'playPause' | 'stop' | 'next' | 'previous' }
+	| { kind: 'seek'; offsetSeconds: number }
+	| { kind: 'setPosition'; positionSeconds: number }
+	| { kind: 'setVolume'; volume: number };
+
 declare module '@neoworks/svelte-gpui' {
 	interface CommandMap {
 		backend_address: { args: undefined; result: { url: string; token: string } };
@@ -30,8 +61,10 @@ declare module '@neoworks/svelte-gpui' {
 		/** Fades slot 0 in and slot 1 out over `seconds`, then stops slot 1. */
 		audio_crossfade: { args: { seconds: number }; result: null };
 		audio_cancel_crossfade: { args: undefined; result: null };
+		mpris_update: { args: MprisUpdate; result: null };
 	}
 	interface EventMap {
 		audio: AudioEvent;
+		mpris: MprisRequest;
 	}
 }

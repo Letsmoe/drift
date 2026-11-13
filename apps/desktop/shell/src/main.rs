@@ -7,6 +7,8 @@
 //! - `audio_load`, `audio_play`, `audio_pause`, `audio_seek`, `audio_stop`, `audio_set_volume`,
 //!   `audio_set_gain`, `audio_crossfade` and `audio_cancel_crossfade` drive the audio engine; what it
 //!   reports arrives as `audio` events (see `audio.rs`).
+//! - `mpris_update` pushes the player's song and state to MPRIS; requests from media keys and
+//!   `playerctl` arrive as `mpris` events (see `mpris.rs`).
 //!
 //! Run it against a build of the UI:
 //!
@@ -18,11 +20,13 @@
 mod audio;
 mod backend;
 mod external;
+mod mpris;
 
 use std::sync::Arc;
 
 use audio::AudioEngine;
 use backend::Backend;
+use mpris::Mpris;
 use serde_json::{Value, json};
 use svelte_gpui::{CommandError, Commands, Options};
 
@@ -33,9 +37,11 @@ fn main() {
     let commands = Commands::new();
     let backend: Started<Backend> = Arc::new(Backend::start().inspect_err(report));
     let engine: Started<Arc<AudioEngine>> = Arc::new(AudioEngine::start(commands.emitter()).inspect_err(report));
+    let mpris = Mpris::start(commands.emitter());
     publish_address_for_tools(&backend);
     let commands = register_shell_commands(commands, backend);
     let commands = register_audio_commands(commands, engine);
+    let commands = register_mpris_command(commands, mpris);
     svelte_gpui::run(options().commands(commands));
 }
 
@@ -123,6 +129,14 @@ fn register_audio_commands(commands: Commands, engine: Started<Arc<AudioEngine>>
                 Ok(())
             }),
         )
+}
+
+fn register_mpris_command(commands: Commands, mpris: Mpris) -> Commands {
+    commands.command("mpris_update", move |args| {
+        let update = serde_json::from_value(args).map_err(|error| format!("mpris_update: {error}"))?;
+        mpris.update(update);
+        Ok::<_, CommandError>(Value::Null)
+    })
 }
 
 // Wraps an engine call as a command that fails with the reason when GStreamer did not start.
