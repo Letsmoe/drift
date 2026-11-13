@@ -164,7 +164,7 @@
 	{/if}
 
 	{#if song}
-		<PageShell seed={song.title}>
+		<PageShell seed={song.title} cover={song.thumbnails}>
 			<PageList
 				items={blocks}
 				key={(block) => block.key}

@@ -87,7 +87,7 @@
 	<PageStatus status={resource.status} errorMessage={resource.errorMessage} />
 
 	{#if podcastPage}
-		<PageShell seed={podcastPage.title}>
+		<PageShell seed={podcastPage.title} cover={podcastPage.thumbnails}>
 			<PageList
 				items={blocks}
 				key={(block) => block.key}
