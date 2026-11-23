@@ -14,6 +14,13 @@ type ratingContent struct {
 	UpdatedAt string `json:"updatedAt"`
 }
 
+// ratingRow is a rating as its row holds it, the track as its Track row ID.
+type ratingRow struct {
+	Track     string `json:"track"`
+	Opinion   string `json:"opinion"`
+	UpdatedAt string `json:"updatedAt"`
+}
+
 const (
 	opinionLike    = "like"
 	opinionDislike = "dislike"
@@ -78,6 +85,27 @@ func ratingEntity(content ratingContent, updatedAt time.Time) (entity, error) {
 		return entity{}, err
 	}
 	return entity{key: content.VideoID, canonical: canonical, updatedAt: updatedAt, model: content}, nil
+}
+
+func (ratingMapping) toRow(item entity, tracks trackRows) (map[string]any, error) {
+	content := item.model.(ratingContent)
+	trackRowID, err := tracks.rowOf(content.VideoID)
+	if err != nil {
+		return nil, err
+	}
+	return contentMap(ratingRow{Track: trackRowID, Opinion: content.Opinion, UpdatedAt: content.UpdatedAt})
+}
+
+func (ratingMapping) fromRow(raw []byte, tracks trackRows) ([]byte, error) {
+	row, err := decodeModel[ratingRow](raw)
+	if err != nil {
+		return nil, err
+	}
+	videoID, err := tracks.videoOf(row.Track)
+	if err != nil {
+		return nil, err
+	}
+	return canonicalJSON(ratingContent{VideoID: videoID, Opinion: row.Opinion, UpdatedAt: row.UpdatedAt})
 }
 
 func (ratingMapping) decode(_ string, raw []byte) (entity, error) {

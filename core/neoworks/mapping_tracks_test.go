@@ -84,7 +84,7 @@ func TestARatingBecomesATrackNodeAndARatingNode(t *testing.T) {
 		t.Errorf("track nodes = %v", tracks)
 	}
 	ratings := store.liveRows("Rating")
-	if len(ratings) != 1 || ratings[0]["opinion"] != "like" || ratings[0]["videoId"] != "abc" {
+	if len(ratings) != 1 || ratings[0]["opinion"] != "like" || store.videoOfTrackRow(ratings[0]["track"]) != "abc" {
 		t.Errorf("rating nodes = %v", ratings)
 	}
 	links, err := install.library.NodeLinks(ctx, "ratings")
@@ -207,7 +207,7 @@ func TestAnUnlikeOnOneInstallRemovesTheLikeOnTheOther(t *testing.T) {
 	}
 }
 
-func TestTwoOfflineLikesMergeIntoTheNewestAndTheDuplicateNodeGoes(t *testing.T) {
+func TestTwoOfflineLikesMergeIntoTheNewestAndTheDuplicateRatingGoes(t *testing.T) {
 	store := newFakeNodeStore()
 	laptop := newTestInstall(t, store, "laptop")
 	phone := newTestInstall(t, store, "phone")
@@ -232,7 +232,8 @@ func TestTwoOfflineLikesMergeIntoTheNewestAndTheDuplicateNodeGoes(t *testing.T) 
 	if len(ratings) != 1 || ratings[0]["opinion"] != "like" {
 		t.Fatalf("rating nodes = %v, want the phone's newer like only", ratings)
 	}
-	if len(store.liveRows("Track")) != 1 {
+	// Both Track rows stay: the surviving rating may refer to either.
+	if len(store.liveRows("Track")) != 2 {
 		t.Errorf("track nodes = %v", store.liveRows("Track"))
 	}
 	rated, _ := laptop.library.Ratings(ctx, []string{"abc"})

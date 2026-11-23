@@ -10,8 +10,8 @@ import (
 	"github.com/letsmoe/drift/core/music"
 )
 
-// errTrackNotSynced means an entity refers to a track whose @drift/tracks node
-// has not arrived. The entity is applied on a later pass.
+// errTrackNotSynced means an entity refers to a track whose Track row has not
+// arrived. The entity is applied on a later pass.
 var errTrackNotSynced = errors.New("the track is not in the library yet")
 
 type artistContent struct {

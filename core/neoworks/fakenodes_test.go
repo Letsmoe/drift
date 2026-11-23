@@ -56,6 +56,18 @@ func (store *fakeNodeStore) tick() string {
 	return library.FormatTime(store.clock)
 }
 
+// videoOfTrackRow is the video ID in the Track row a reference names.
+func (store *fakeNodeStore) videoOfTrackRow(reference any) any {
+	store.mutex.Lock()
+	defer store.mutex.Unlock()
+	rowID, _ := reference.(string)
+	node, found := store.nodes[rowID]
+	if !found || !node.inTable("Track") {
+		return nil
+	}
+	return node.content["videoId"]
+}
+
 // liveRows returns the contents of the live rows of a table.
 func (store *fakeNodeStore) liveRows(table string) []map[string]any {
 	store.mutex.Lock()

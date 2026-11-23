@@ -27,11 +27,16 @@ type tablePass struct {
 	report      *ReconcileReport
 
 	links      map[string]library.NodeLink
+	// tracks is loaded for a mapping whose rows refer to Track rows.
+	tracks     trackRows
 	local      map[string]entity
 	remote     map[string]*remoteNode
 	tombstones map[string]bool
 	// written holds the node of each key this pass wrote, whose update time is read back afterwards.
 	written map[string]string
+	// waiting holds the rows skipped because a track they refer to has not arrived,
+	// so the pass fails and is retried.
+	waiting []error
 }
 
 func newTablePass(librarySync *LibrarySync, mapping collectionMapping, userID string, report *ReconcileReport) *tablePass {
@@ -52,7 +57,7 @@ func (pass *tablePass) run(ctx context.Context) error {
 		return err
 	}
 	failure := pass.reconcileKeys(ctx)
-	return errors.Join(failure, pass.refreshWrittenLinks(ctx))
+	return errors.Join(failure, pass.refreshWrittenLinks(ctx), errors.Join(pass.waiting...))
 }
 
 // ownRows lists the rows of this table the signed-in user owns, deleted ones
@@ -79,6 +84,12 @@ func (pass *tablePass) load(ctx context.Context) error {
 	pass.links, err = pass.librarySync.library.NodeLinks(ctx, pass.mapping.name())
 	if err != nil {
 		return err
+	}
+	if _, refers := pass.mapping.(referencingMapping); refers {
+		pass.tracks, err = loadTrackRows(ctx, pass.librarySync.library, pass.librarySync.nodes)
+		if err != nil {
+			return err
+		}
 	}
 	entities, err := pass.mapping.local(ctx)
 	if err != nil {
@@ -112,7 +123,8 @@ func (pass *tablePass) loadRemote() error {
 }
 
 // classify files a row under its natural key, or notes it as deleted. A row
-// that is rejected or cannot be read is left alone.
+// that is rejected or cannot be read is left alone, and one that refers to a
+// track that has not arrived is left for a later pass.
 func (pass *tablePass) classify(summary libneoworks.NodeSummary, keyOfNode map[string]string, groups map[string][]*remoteNode) {
 	if summary.Rejected {
 		return
@@ -126,6 +138,10 @@ func (pass *tablePass) classify(summary libneoworks.NodeSummary, keyOfNode map[s
 	if !linked {
 		var err error
 		key, err = pass.discoverKey(node)
+		if errors.Is(err, errTrackNotSynced) {
+			pass.waiting = append(pass.waiting, err)
+			return
+		}
 		if err != nil {
 			pass.librarySync.logger.Warn("neoworks: skipping node", "table", pass.mapping.table(), "node", summary.ID, "error", err)
 			return
@@ -147,9 +163,9 @@ func (pass *tablePass) read(node *remoteNode) (entity, error) {
 	if node.content != nil {
 		return *node.content, nil
 	}
-	raw, err := pass.librarySync.nodes.ReadNode(node.summary.ID)
+	raw, err := pass.readContent(node.summary.ID)
 	if err != nil {
-		return entity{}, fmt.Errorf("read node %s: %w", node.summary.ID, err)
+		return entity{}, err
 	}
 	item, err := pass.mapping.decode(node.summary.ID, raw)
 	if err != nil {
@@ -159,14 +175,46 @@ func (pass *tablePass) read(node *remoteNode) (entity, error) {
 	return item, nil
 }
 
+// readContent is the row's content as decode reads it: with video IDs where
+// the row refers to Track rows.
+func (pass *tablePass) readContent(nodeID string) ([]byte, error) {
+	raw, err := pass.librarySync.nodes.ReadNode(nodeID)
+	if err != nil {
+		return nil, fmt.Errorf("read node %s: %w", nodeID, err)
+	}
+	referencing, refers := pass.mapping.(referencingMapping)
+	if !refers {
+		return raw, nil
+	}
+	translated, err := referencing.fromRow(raw, pass.tracks)
+	if err != nil {
+		return nil, fmt.Errorf("node %s: %w", nodeID, err)
+	}
+	return translated, nil
+}
+
+// rowContent is the content the entity's row holds: with Track row IDs where
+// the row refers to tracks.
+func (pass *tablePass) rowContent(item entity) (map[string]any, error) {
+	referencing, refers := pass.mapping.(referencingMapping)
+	if !refers {
+		return item.content()
+	}
+	return referencing.toRow(item, pass.tracks)
+}
+
 // keepNewest returns the newest node of a group and deletes the others: two
-// devices that created the same entity offline left duplicates.
+// devices that created the same entity offline left duplicates. Rows of a
+// mapping that keeps its nodes stay, since other rows may refer to any of them.
 func (pass *tablePass) keepNewest(group []*remoteNode) *remoteNode {
 	newest := group[0]
 	for _, candidate := range group[1:] {
 		if newerNode(candidate.summary, newest.summary) {
 			newest = candidate
 		}
+	}
+	if pass.mapping.keepsNodes() {
+		return newest
 	}
 	for _, candidate := range group {
 		if candidate != newest {

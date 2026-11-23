@@ -2,9 +2,9 @@
   "lockfileVersion": 1,
   "generator": "openschema 0.1.0",
   "createdAt": "2026-11-07T19:31:01.201Z",
-  "updatedAt": "2026-11-07T19:31:01.201Z",
-  "baseline": true,
-  "digest": "sha256-ca458623acd3057e59a5932dc40fd80ef85c27007b058bc95d24468738c741e0",
+  "updatedAt": "2026-11-07T19:42:07.574Z",
+  "baseline": false,
+  "digest": "sha256-b166d6cbdc34d05f3561d58871973cf0d5b40d19f611e82c538e204ee13830fc",
   "spaces": {
     "enum:drift.BlockKind": {
       "kind": "enum",
@@ -325,6 +325,14 @@
           "encoding": "singular:varint",
           "since": "2026-11-07T19:31:01.201Z",
           "major": "0.1"
+        },
+        "6": {
+          "state": "active",
+          "name": "entries",
+          "type": "[PlaylistEntry]?",
+          "encoding": "wrapper:repeated",
+          "since": "2026-11-07T19:42:07.574Z",
+          "major": "0.2"
         }
       }
     },
@@ -332,12 +340,13 @@
       "kind": "model",
       "ordinals": {
         "1": {
-          "state": "active",
+          "state": "retired",
           "name": "playlist",
           "type": "uuid",
           "encoding": "singular:len",
           "since": "2026-11-07T19:31:01.201Z",
-          "major": "0.1"
+          "major": "0.2",
+          "retiredAt": "2026-11-07T19:42:07.574Z"
         },
         "2": {
           "state": "active",
@@ -348,12 +357,13 @@
           "major": "0.1"
         },
         "3": {
-          "state": "active",
+          "state": "retired",
           "name": "position",
           "type": "f64",
           "encoding": "singular:i64",
           "since": "2026-11-07T19:31:01.201Z",
-          "major": "0.1"
+          "major": "0.2",
+          "retiredAt": "2026-11-07T19:42:07.574Z"
         },
         "4": {
           "state": "active",

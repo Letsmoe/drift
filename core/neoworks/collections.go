@@ -9,7 +9,7 @@ const collection = "@letsmoe/drift"
 
 // schemaVersion is the published version of the bundled descriptor, the
 // version in schema/drift/openschema.yaml.
-const schemaVersion = "0.1.0"
+const schemaVersion = "0.2.0"
 
 // descriptor is the published descriptor of the collection, byte for byte.
 //

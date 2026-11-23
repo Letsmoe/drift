@@ -23,6 +23,21 @@ type playlistContent struct {
 	ID          string                 `json:"id"`
 }
 
+// playlistRow is a playlist as its row holds it, each entry's track as its Track row ID.
+type playlistRow struct {
+	Name        string             `json:"name"`
+	Description string             `json:"description,omitempty"`
+	Entries     []playlistEntryRow `json:"entries,omitempty"`
+	CreatedAt   string             `json:"createdAt"`
+	UpdatedAt   string             `json:"updatedAt"`
+	ID          string             `json:"id"`
+}
+
+type playlistEntryRow struct {
+	Track   string `json:"track"`
+	AddedAt string `json:"addedAt"`
+}
+
 // playlistMapping maps the user's own playlists, keyed by the playlist ID the
 // creating install chose, which every install keeps as its local ID.
 type playlistMapping struct {
@@ -82,6 +97,47 @@ func playlistEntity(content playlistContent, updatedAt time.Time) (entity, error
 		return entity{}, err
 	}
 	return entity{key: content.ID, canonical: canonical, updatedAt: updatedAt, model: content}, nil
+}
+
+func (playlistMapping) toRow(item entity, tracks trackRows) (map[string]any, error) {
+	content := item.model.(playlistContent)
+	row := playlistRow{
+		Name:        content.Name,
+		Description: content.Description,
+		CreatedAt:   content.CreatedAt,
+		UpdatedAt:   content.UpdatedAt,
+		ID:          content.ID,
+	}
+	for _, entry := range content.Entries {
+		trackRowID, err := tracks.rowOf(entry.VideoID)
+		if err != nil {
+			return nil, err
+		}
+		row.Entries = append(row.Entries, playlistEntryRow{Track: trackRowID, AddedAt: entry.AddedAt})
+	}
+	return contentMap(row)
+}
+
+func (playlistMapping) fromRow(raw []byte, tracks trackRows) ([]byte, error) {
+	row, err := decodeModel[playlistRow](raw)
+	if err != nil {
+		return nil, err
+	}
+	content := playlistContent{
+		Name:        row.Name,
+		Description: row.Description,
+		CreatedAt:   row.CreatedAt,
+		UpdatedAt:   row.UpdatedAt,
+		ID:          row.ID,
+	}
+	for _, entry := range row.Entries {
+		videoID, err := tracks.videoOf(entry.Track)
+		if err != nil {
+			return nil, err
+		}
+		content.Entries = append(content.Entries, playlistEntryContent{VideoID: videoID, AddedAt: entry.AddedAt})
+	}
+	return canonicalJSON(content)
 }
 
 func (playlistMapping) decode(_ string, raw []byte) (entity, error) {

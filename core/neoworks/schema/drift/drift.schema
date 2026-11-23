@@ -46,7 +46,6 @@ model Album {
 /// A liked or disliked track. Removing the rating deletes the row.
 @neoworks.table
 model Rating {
-  @onDelete("cascade")
   1 track: ref<Track>
   2 opinion: Opinion
   3 updatedAt: timestamp
@@ -100,7 +99,8 @@ enum BlockKind {
   3 podcast
 }
 
-/// One of the user's own playlists. Its tracks are the entries that belong to it.
+/// One of the user's own playlists, with its tracks in play order. Entries have
+/// no identity of their own across devices, so the playlist is written whole.
 @neoworks.table
 model Playlist {
   /// Chosen by the device that created the playlist; every device keeps it as the local ID.
@@ -112,18 +112,13 @@ model Playlist {
   3 description: string?
   4 createdAt: timestamp
   5 updatedAt: timestamp
+  6 entries: [PlaylistEntry]?
 }
 
-/// A track in a playlist. Deleting the playlist or the track deletes the entry.
-@neoworks.table
-@neoworks.index(fields: ["playlist", "position"])
+/// A track in a playlist. The reference carries the track's key, so whoever
+/// opens the playlist opens its tracks.
 model PlaylistEntry {
-  @belongsTo
-  1 playlist: ref<Playlist>
-  @onDelete("cascade")
   2 track: ref<Track>
-  /// Where the track sits in the playlist, ascending.
-  3 position: f64
   4 addedAt: timestamp
 }
 

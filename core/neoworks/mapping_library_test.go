@@ -117,7 +117,7 @@ func TestAPlaylistKeepsItsOrderOnAnotherInstall(t *testing.T) {
 		t.Fatalf("playlist nodes = %v", nodes)
 	}
 	entries, _ := nodes[0]["entries"].([]any)
-	if len(entries) != 3 || entries[0].(map[string]any)["videoId"] != "c" || entries[2].(map[string]any)["videoId"] != "b" {
+	if len(entries) != 3 || store.videoOfTrackRow(entries[0].(map[string]any)["track"]) != "c" || store.videoOfTrackRow(entries[2].(map[string]any)["track"]) != "b" {
 		t.Fatalf("entries = %v", entries)
 	}
 	if len(store.liveRows("Track")) != 3 {

@@ -31,7 +31,7 @@ func (pass *tablePass) execute(ctx context.Context, key string, chosen action) e
 
 func (pass *tablePass) createNode(ctx context.Context, key string) error {
 	item := pass.local[key]
-	content, err := item.content()
+	content, err := pass.rowContent(item)
 	if err != nil {
 		return err
 	}
@@ -64,9 +64,9 @@ func (pass *tablePass) updateNode(ctx context.Context, key string) error {
 	return pass.saveLink(ctx, key, node.summary.ID, item.hash(), "")
 }
 
-// changesFor is the whole content, with the optional fields the entity lacks cleared.
+// changesFor is the whole row content, with the optional fields the entity lacks cleared.
 func (pass *tablePass) changesFor(item entity) (map[string]any, error) {
-	changes, err := item.content()
+	changes, err := pass.rowContent(item)
 	if err != nil {
 		return nil, err
 	}
